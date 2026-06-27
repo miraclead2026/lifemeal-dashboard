@@ -30,6 +30,7 @@ firebase.initializeApp({
   projectId: "lifemeal-f0d71"
 });
 const db = firebase.database();
+const DB_PATH = '/dashboard';   // 운영. 테스트할 땐 '/dashboard_test' 로 변경
 const { useState, useEffect, useRef } = React;
 
 const G = '#1B4D3E', GO = '#C8963E', BG = '#F0F4F1';
@@ -430,6 +431,15 @@ const blankDate = { start: '', due: '', useDep: false, depId: '', depDays: '' };
 
 function AddModal({ data, setData, onClose }) {
   const [oMode, setOMode] = useState('exist'), [oSel, setOSel] = useState(''), [oCls, setOCls] = useState(data.categories[0]?.name || 'MD출력'), [oName, setOName] = useState('');
+  const [showNewCat, setShowNewCat] = useState(false), [newCatName, setNewCatName] = useState(''), [newCatPrefix, setNewCatPrefix] = useState('');
+  const addCategory = () => {
+    const nm = newCatName.trim(), px = newCatPrefix.trim();
+    if (!nm || !px) { alert('분류 제목과 분류 코드를 모두 입력하세요'); return; }
+    if (data.categories.some(c => c.name === nm)) { alert('이미 있는 분류 제목입니다'); return; }
+    if (data.categories.some(c => c.prefix.toUpperCase() === px.toUpperCase())) { alert('이미 있는 분류 코드입니다'); return; }
+    setData(d => ({ ...d, categories: [...d.categories, { name: nm, prefix: px }] }));
+    setOCls(nm); setNewCatName(''); setNewCatPrefix(''); setShowNewCat(false);
+  };
   const [pMode, setPMode] = useState('exist'), [pSel, setPSel] = useState(''), [pName, setPName] = useState(''), [pDate, setPDate] = useState(blankDate);
   const [sMode, setSMode] = useState('none'), [sSel, setSSel] = useState(''), [sName, setSName] = useState(''), [sDate, setSDate] = useState(blankDate);
   const [checks, setChecks] = useState(['']);
@@ -469,7 +479,8 @@ function AddModal({ data, setData, onClose }) {
         <Toggle mode={oMode} setMode={setOMode} opts={[{ v: 'exist', l: '기존 선택' }, { v: 'new', l: '+ 새로 추가' }]} />
         {oMode === 'exist' ? <Sel value={oSel} onChange={setOSel} ph="선택..." opts={data.outputs.map(o => ({ v: o.id, l: o.code + ' · ' + o.name }))} /> :
           <div style={{ background: '#F9FAFB', borderRadius: 10, padding: 12, border: '1px solid #EEF0F2' }}>
-            <Lbl c="분류" /><div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>{data.categories.map((cat, i) => <button key={cat.name} onClick={() => setOCls(cat.name)} style={{ padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: oCls === cat.name ? CAT_PALETTE[i % CAT_PALETTE.length] : '#E5E7EB', color: oCls === cat.name ? 'white' : '#374151' }}>{cat.name}</button>)}</div>
+            <Lbl c="분류" /><div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>{data.categories.map((cat, i) => <button key={cat.name} onClick={() => setOCls(cat.name)} style={{ padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: oCls === cat.name ? CAT_PALETTE[i % CAT_PALETTE.length] : '#E5E7EB', color: oCls === cat.name ? 'white' : '#374151' }}>{cat.name}</button>)}<button onClick={() => setShowNewCat(!showNewCat)} style={{ padding: '7px 12px', borderRadius: 8, border: '1px dashed ' + G, cursor: 'pointer', fontSize: 12, fontWeight: 600, background: showNewCat ? G : 'white', color: showNewCat ? 'white' : G }}>+ 분류 추가</button></div>
+            {showNewCat && <div style={{ background: 'white', borderRadius: 8, padding: 10, border: '1px solid #A7F3D0', marginBottom: 8 }}><div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 6, marginBottom: 6 }}><div><Lbl c="분류 제목" /><Inp value={newCatName} onChange={setNewCatName} placeholder="예: 이벤트" /></div><div><Lbl c="분류 코드" /><Inp value={newCatPrefix} onChange={setNewCatPrefix} placeholder="예: E" /></div></div><div style={{ fontSize: 11, color: '#6B7280', marginBottom: 8 }}>코드 뒤 번호(-1, -2…)는 자동 부여됩니다. 예: 코드 "E" → E-1</div><div style={{ display: 'flex', gap: 6 }}><Btn onClick={addCategory} style={{ flex: 1, padding: '7px 0', fontSize: 12 }}>분류 추가</Btn><Btn v="secondary" onClick={() => setShowNewCat(false)} style={{ padding: '7px 14px', fontSize: 12 }}>취소</Btn></div></div>}
             <div style={{ marginBottom: 8 }}><Badge label={newCode} color={catColor} /></div>
             <Inp value={oName} onChange={setOName} placeholder="출력 프로젝트명" />
           </div>}
@@ -1416,7 +1427,7 @@ function App() {
   const initDoneRef = useRef(false);
 
   useEffect(() => {
-    const ref = db.ref('/dashboard');
+    const ref = db.ref(DB_PATH);
     ref.on('value', snap => {
       const remote = snap.val();
       const remoteStr = remote ? JSON.stringify(remote) : null;
@@ -1440,7 +1451,7 @@ function App() {
     setSync('saving');
     pendingRef.current = setTimeout(() => {
       lastSavedRef.current = str;
-      db.ref('/dashboard').set(data).then(() => setSync('ok')).catch(e => { setSync('error'); setSyncErr(e.message || '저장 실패'); lastSavedRef.current = null; });
+      db.ref(DB_PATH).set(data).then(() => setSync('ok')).catch(e => { setSync('error'); setSyncErr(e.message || '저장 실패'); lastSavedRef.current = null; });
     }, 800);
   }, [data, ready]);
 
