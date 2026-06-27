@@ -12,7 +12,7 @@
 <script>
   // JSX를 import문 없이 React.createElement로 변환하도록 강제
   Babel.registerPreset('react-classic', {
-    presets: [['react', { runtime: 'classic' }]]
+    presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
   });
 </script>
 <style>
