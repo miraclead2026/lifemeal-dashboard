@@ -148,7 +148,7 @@ const migrateData = raw => ({
   outputs: (raw.outputs || []).map(o => ({ kpi: null, ...o })),
   plans: (raw.plans || []).map(p => { const b = { hold: false, desc: '', ...p }; b.kpis = b.kpis || (b.kpi ? [{ id: (b.kpi.id || ('k' + p.id)), name: b.kpi.name, unit: b.kpi.unit, target: b.kpi.target, targets: b.kpi.targets || {} }] : []); return b; }),
   subplans: (raw.subplans || []).map(s => { const ns = { files: [], perfRecorded: false, ...s }; if (ns.stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; return ns; }),
-  budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, ...b })),
+  budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, kind: '일반', ...b })),
   trash: raw.trash || [],
   notices: raw.notices || [],
   payments: raw.payments || [],
@@ -1464,12 +1464,53 @@ function MainKpiModal({ data, setData, onClose, edit }) {
   );
 }
 
+function KpiEditModal({ data, setData, planId, kpiId, onClose }) {
+  const srcPlan = data.plans.find(x => x.id === planId);
+  const k0 = (srcPlan && (srcPlan.kpis || []).find(x => x.id === kpiId)) || {};
+  const [name, setName] = useState(k0.name || '');
+  const [unit, setUnit] = useState(k0.unit || '');
+  const [target, setTarget] = useState(k0.target != null ? String(k0.target) : '');
+  const [toPlan, setToPlan] = useState(planId);
+  const planOpts = data.plans.map(p => { const o = data.outputs.find(x => x.id === p.outputId); return { v: p.id, l: (o ? o.code + ' ' : '') + p.name }; });
+  const save = () => {
+    if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
+    const updated = { ...k0, id: kpiId, name: name.trim(), unit: unit.trim(), target: Number(target) || 0 };
+    setData(d => {
+      let plans = d.plans.map(p => p.id === planId ? { ...p, kpis: (p.kpis || []).filter(x => x.id !== kpiId) } : p);
+      plans = plans.map(p => p.id === toPlan ? { ...p, kpis: [...(p.kpis || []), updated] } : p);
+      return { ...d, plans };
+    });
+    onClose();
+  };
+  const del = () => {
+    if (!confirm('이 KPI를 삭제할까요? 연결된 성과 기록과 메인 KPI 연결도 함께 해제됩니다.')) return;
+    setData(d => ({
+      ...d,
+      plans: d.plans.map(p => p.id === planId ? { ...p, kpis: (p.kpis || []).filter(x => x.id !== kpiId) } : p),
+      kpiLogs: (d.kpiLogs || []).filter(l => l.kpiId !== kpiId),
+      mainKpis: (d.mainKpis || []).map(mk => ({ ...mk, linkedKpiIds: (mk.linkedKpiIds || []).filter(id => id !== kpiId) })),
+    }));
+    onClose();
+  };
+  return (
+    <ModalShell title="KPI 수정" onClose={onClose}>
+      <div><Lbl c="KPI 이름" /><Inp value={name} onChange={setName} placeholder="예: 신규 고객 수" /></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="단위" /><Inp value={unit} onChange={setUnit} placeholder="명/원/건" /></div><div><Lbl c="기본 목표" /><Inp type="number" value={target} onChange={setTarget} placeholder="목표 수치" /></div></div>
+      <div><Lbl c="연결 실행계획 (프로젝트)" /><Sel value={toPlan} onChange={setToPlan} opts={planOpts} /></div>
+      <div style={{ fontSize: 11, color: '#A29C95' }}>월별 목표는 KPI 카드를 펼친 뒤 "월 목표"에서 설정할 수 있어요.</div>
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+      <button onClick={del} style={{ width: '100%', marginTop: 4, padding: 10, background: 'white', color: '#E53935', border: '1px solid #E53935', borderRadius: 8, fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>🗑 이 KPI 삭제</button>
+    </ModalShell>
+  );
+}
+
 function TabKpi({ data, setData }) {
   const [pStart, setPStart] = useState(monthRange(0).start);
   const [pEnd, setPEnd] = useState(monthRange(0).end);
   const [expanded, setExpanded] = useState(null);
   const [editLink, setEditLink] = useState(null);
   const [mkEdit, setMkEdit] = useState(undefined);
+  const [kpiEdit, setKpiEdit] = useState(null);
   const mainKpis = data.mainKpis || [];
   const logs = data.kpiLogs || [];
   const rangeMonths = monthsInRange(pStart, pEnd);
@@ -1550,6 +1591,7 @@ function TabKpi({ data, setData }) {
           <button onClick={() => setMkEdit(null)} style={{ marginLeft: 'auto', fontSize: 12, padding: '5px 12px', borderRadius: 7, border: 'none', background: GO, color: 'white', cursor: 'pointer', fontWeight: 700 }}>+ 메인 KPI 추가</button>
         </div>
         {mkEdit !== undefined && <MainKpiModal data={data} setData={setData} edit={mkEdit} onClose={() => setMkEdit(undefined)} />}
+        {kpiEdit && <KpiEditModal data={data} setData={setData} planId={kpiEdit.planId} kpiId={kpiEdit.kpiId} onClose={() => setKpiEdit(null)} />}
         {mainKpis.map(mk => {
           const linkedIds = mk.linkedKpiIds || [];
           const linked = linkedIds.map(kid => findKpi(kid)).filter(Boolean);
@@ -1644,38 +1686,30 @@ function TabKpi({ data, setData }) {
                 <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8, padding: '4px 2px' }}>📁 {o.code} {o.name}</div>
               )}
 
-              <div style={{ paddingLeft: 14, borderLeft: '2px solid #E3E0DC', marginLeft: 6 }}>
-                {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '6px 0' }}>이 프로젝트에 등록된 실행계획 KPI가 없습니다</div> :
-                  plansW.map(p => (
-                    <div key={p.id} style={{ marginBottom: 10 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: '#3A3631', margin: '4px 0 6px' }}>▸ {p.name} <span style={{ fontSize: 10, color: '#A29C95', fontWeight: 400 }}>· KPI {p.kpis.length}개</span></div>
-                      {p.kpis.map(k => {
-                        const achieved = sumForKpi(k.id); const target = effTarget(k); const klogs = logsForKpi(k.id);
-                        return (
-                          <Card key={k.id} style={{ marginBottom: 8 }}>
-                            <KpiHeader title={'🎯 ' + k.name} achieved={achieved} target={target} unit={k.unit} openKey={'kpi-' + k.id} accent={G} sub={`기본 목표 ${(k.target || 0).toLocaleString()} ${k.unit}`} />
-                            {expanded === 'kpi-' + k.id && (
-                              <div style={{ marginTop: 12, borderTop: '1px solid #F5F4F2', paddingTop: 12 }}>
-                                <TargetEditor targets={k.targets} onSet={(key, v) => setPlanKpiMonth(p.id, k.id, key, v)} unit={k.unit} />
-                                {klogs.length > 0 ? (
-                                  <div>
-                                    <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 6 }}>이 기간 기여 업무 ({klogs.length}건)</div>
-                                    {klogs.map(l => { const sub = data.subplans.find(s => s.id === l.subplanId); return (
-                                      <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '4px 0' }}>
-                                        <span style={{ flex: 1, color: '#3A3631' }}>{sub ? sub.name : '삭제된 업무'}</span>
-                                        <span style={{ fontSize: 11, color: '#A29C95' }}>{l.periodStart.slice(5)}~{l.periodEnd.slice(5)}</span>
-                                        <span style={{ fontWeight: 700, color: G }}>+{l.value.toLocaleString()}</span>
-                                      </div>
-                                    ); })}
-                                  </div>
-                                ) : <div style={{ fontSize: 11, color: '#A29C95' }}>이 기간에 기록된 달성 내역이 없습니다</div>}
-                              </div>
-                            )}
-                          </Card>
-                        );
-                      })}
-                    </div>
-                  ))}
+              <div style={{ marginTop: 4 }}>
+                {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '6px 0' }}>이 프로젝트에 등록된 실행계획 KPI가 없습니다</div> : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 10 }}>
+                    {plansW.flatMap(p => p.kpis.map(k => { const achieved = sumForKpi(k.id); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; return (
+                      <Card key={k.id} style={{ alignSelf: 'start' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
+                          <div onClick={() => setExpanded(open ? null : 'kpi-' + k.id)} style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>▸ {p.name}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 13, fontWeight: 800, flex: 1, minWidth: 0 }}>🎯 {k.name}</span><span style={{ fontSize: 10, color: '#A29C95' }}>{open ? '▲' : '▼'}</span></div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}><span style={{ fontSize: 17, fontWeight: 800, color: done ? '#1FA463' : G }}>{achieved.toLocaleString()}</span><span style={{ fontSize: 10, color: '#A29C95' }}>/ {Math.round(target).toLocaleString()} {k.unit}</span></div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}><div style={{ flex: 1 }}><Bar v={achieved} m={target || 1} h={5} /></div><span style={{ fontSize: 11, fontWeight: 700, color: done ? '#1FA463' : pr < 70 ? '#E53935' : '#E08700' }}>{pr}%</span></div>
+                          </div>
+                          <button onClick={() => setKpiEdit({ planId: p.id, kpiId: k.id })} style={{ border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 10, padding: '2px 7px', fontWeight: 600, flexShrink: 0 }}>수정</button>
+                        </div>
+                        {open && (
+                          <div style={{ marginTop: 10, borderTop: '1px solid #F5F4F2', paddingTop: 10 }}>
+                            <TargetEditor targets={k.targets} onSet={(key, v) => setPlanKpiMonth(p.id, k.id, key, v)} unit={k.unit} />
+                            {klogs.length > 0 ? (<div><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 6 }}>이 기간 기여 업무 ({klogs.length}건)</div>{klogs.map(l => { const sub = data.subplans.find(s => s.id === l.subplanId); return (<div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '4px 0' }}><span style={{ flex: 1, color: '#3A3631' }}>{sub ? sub.name : '삭제된 업무'}</span><span style={{ fontSize: 11, color: '#A29C95' }}>{l.periodStart.slice(5)}~{l.periodEnd.slice(5)}</span><span style={{ fontWeight: 700, color: G }}>+{l.value.toLocaleString()}</span></div>); })}</div>) : <div style={{ fontSize: 11, color: '#A29C95' }}>이 기간에 기록된 달성 내역이 없습니다</div>}
+                          </div>
+                        )}
+                      </Card>
+                    ); }))}
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -1715,7 +1749,7 @@ function TabHold({ data, setData, onEdit }) {
 const VAT_OPTS = ['별도', '포함'], PAY_OPTS = ['세금계산서', '카드결제'], BSTATUS = ['기안전', '기안완료', '결제완료'];
 const bStatusC = s => ({ '기안전': '#A29C95', '기안완료': '#2D5FE0', '결제완료': '#1FA463' }[s] || '#A29C95');
 
-function TabBudget({ data, setData }) {
+function TabBudget({ data, setData, goTab }) {
   const [subTab, setSubTab] = useState('plan');
   const [showAdd, setShowAdd] = useState(false);
   const [showDraft, setShowDraft] = useState(false);
@@ -1724,10 +1758,16 @@ function TabBudget({ data, setData }) {
   const [editPay, setEditPay] = useState(null);
   const [view, setView] = useState('date');
   const [mOff, setMOff] = useState(0);
+  const [monthMode, setMonthMode] = useState(false);
   const budgets = data.budgets || [];
   const payments = data.payments || [];
   const monthKey = (() => { const d = new Date(TODAY); d.setMonth(d.getMonth() + mOff); return d.toISOString().slice(0, 7); })();
   const inMonth = ds => ds && ds.slice(0, 7) === monthKey;
+  const planBudgets = monthMode ? budgets.filter(b => inMonth(b.date)) : budgets;
+  const planEst = planBudgets.reduce((a, b) => a + itemTotal(b), 0);
+  const planDraft = planBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료').reduce((a, b) => a + itemTotal(b), 0);
+  const outOfBudget = b => { let o = data.outputs.find(x => x.id === b.outputId); if (o) return o; if (b.planId) { const pl = data.plans.find(p => p.id === b.planId); if (pl) return data.outputs.find(x => x.id === pl.outputId); } return null; };
+  const vendorTotals = (() => { const m = {}; planBudgets.forEach(b => { const v = b.vendor || '(미지정)'; m[v] = (m[v] || 0) + itemTotal(b); }); return Object.entries(m).sort((a, b) => b[1] - a[1]); })();
   const estSum = budgets.filter(b => inMonth(b.date)).reduce((a, b) => a + itemTotal(b), 0);
   const draftSum = budgets.filter(b => inMonth(b.date) && (b.status === '기안완료' || b.status === '결제완료')).reduce((a, b) => a + itemTotal(b), 0);
   const payMonthSum = payments.filter(p => inMonth(p.paidDate)).reduce((a, p) => a + (Number(p.amount) || 0), 0);
@@ -1736,7 +1776,7 @@ function TabBudget({ data, setData }) {
   const togglePlanStatus = id => setData(d => ({ ...d, budgets: d.budgets.map(b => b.id === id ? { ...b, status: b.status === '기안완료' ? '기안전' : '기안완료' } : b) }));
   const del = id => setData(d => moveToTrash(d, 'budget', id));
   const delPay = id => { if (!confirm('이 실결제 기록을 삭제할까요? (드라이브 영수증 파일은 유지됩니다)')) return; setData(d => ({ ...d, payments: (d.payments || []).filter(p => p.id !== id) })); };
-  const groups = {}; budgets.forEach(b => { const k = view === 'week' ? weekKeyOf(b.date) : b.date; (groups[k] = groups[k] || []).push(b); });
+  const groups = {}; planBudgets.forEach(b => { const k = view === 'week' ? weekKeyOf(b.date) : b.date; (groups[k] = groups[k] || []).push(b); });
   const keys = Object.keys(groups).sort().reverse();
   const payGroups = {}; payments.forEach(p => { const k = p.paidDate || '미상'; (payGroups[k] = payGroups[k] || []).push(p); });
   const payKeys = Object.keys(payGroups).sort().reverse();
@@ -1767,27 +1807,37 @@ function TabBudget({ data, setData }) {
 
       {subTab === 'plan' ? (<>
         <Card style={{ marginBottom: 16, padding: 14 }}>
-          {monthNav}
+          {monthMode && monthNav}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10 }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#6E6863' }}>예상 예산 (계획)</div><div style={{ fontSize: 18, fontWeight: 800, color: '#6E6863' }}>{won(estSum)}</div></div>
-            <div style={{ background: '#EFF6FF', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#2D5FE0' }}>기안 (기안완료)</div><div style={{ fontSize: 18, fontWeight: 800, color: '#2D5FE0' }}>{won(draftSum)}</div></div>
+            <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#6E6863' }}>예상 예산 (계획)</div><div style={{ fontSize: 18, fontWeight: 800, color: '#6E6863' }}>{won(planEst)}</div></div>
+            <div style={{ background: '#EFF6FF', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#2D5FE0' }}>기안 (기안완료)</div><div style={{ fontSize: 18, fontWeight: 800, color: '#2D5FE0' }}>{won(planDraft)}</div></div>
           </div>
-          <div style={{ fontSize: 11, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>예상 = 해당 월 등록 예산 전체 · 기안 = 기안완료 처리된 금액 · 실제 결제는 [실결제] 탭에서 관리합니다</div>
+          {vendorTotals.length > 0 && (
+            <div style={{ marginTop: 10, borderTop: '1px solid #EDEBE7', paddingTop: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>🏢 업체별 합산 (VAT 포함)</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {vendorTotals.map(([v, amt]) => <span key={v} style={{ fontSize: 11, background: '#F5F4F2', borderRadius: 20, padding: '4px 10px' }}><b style={{ color: '#3A3631' }}>{v}</b> <span style={{ color: G, fontWeight: 700 }}>{won(amt)}</span></span>)}
+              </div>
+            </div>
+          )}
+          <div style={{ fontSize: 11, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>{monthMode ? monthKey + ' 기준' : '전체 기준'} · 예상 = 등록 예산 전체 · 기안 = 기안완료 금액 · 실제 결제는 [실결제] 탭에서 관리합니다</div>
         </Card>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           {[{ v: 'date', l: '날짜별' }, { v: 'week', l: '주간별' }].map(o => <button key={o.v} onClick={() => setView(o.v)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: view === o.v ? G : '#E3E0DC', color: view === o.v ? 'white' : '#3A3631' }}>{o.l}</button>)}
+          <span style={{ width: 1, height: 18, background: '#E3E0DC', margin: '0 2px' }} />
+          <button onClick={() => setMonthMode(!monthMode)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: monthMode ? GO : '#E3E0DC', color: monthMode ? 'white' : '#3A3631' }}>📅 월별 보기{monthMode ? ' ✓' : ''}</button>
         </div>
-        {!budgets.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>💰</div><div>등록된 예산이 없습니다</div></Card>) :
+        {!planBudgets.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>💰</div><div>{monthMode ? monthKey + '에 등록된 예산이 없습니다' : '등록된 예산이 없습니다'}</div></Card>) :
           keys.map(k => { const list = groups[k]; const sub = list.reduce((a, b) => a + itemTotal(b), 0); const head = view === 'week' ? (k.slice(5) + ' ~ ' + addDays(k, 6).slice(5) + ' 주간') : k; return (
             <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7' }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{head}</span><span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: G }}>{won(sub)}</span></div>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 680 }}>
-                  <thead><tr style={{ background: '#FAFAFA' }}>{['일자', '세부항목', '업체', '금액', '결제방법', '상태', ''].map(h => <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#6E6863', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                  <thead><tr style={{ background: '#FAFAFA' }}>{['일자', '세부항목', '업체', '금액', '결제방법', '상태', ''].map(h => <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#6E6863', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>{h === '금액' ? <span>금액 <span style={{ fontWeight: 400, color: '#A29C95', fontSize: 9 }}>(VAT 포함)</span></span> : h}</th>)}</tr></thead>
                   <tbody>{list.map(b => { const n = budgetNames(data, b); const isPaid = paidBudgetIds.has(b.id); return (
                     <tr key={b.id} style={{ borderBottom: '1px solid #F5F4F2' }}>
                       <td style={{ padding: '8px 10px', color: '#6E6863', whiteSpace: 'nowrap' }}>{b.date.slice(5)}</td>
-                      <td style={{ padding: '8px 10px', fontWeight: 600 }}>{n.detail}</td>
+                      <td style={{ padding: '8px 10px', fontWeight: 600 }}>{(() => { const out = outOfBudget(b); return out ? <span onClick={ev => { ev.stopPropagation(); goTab && goTab('프로젝트 진행 상황'); }} title="진행 상황으로 이동" style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, color: txtOn(clsC(out.type, data.categories)), background: clsC(out.type, data.categories), padding: '1px 6px', borderRadius: 5, marginRight: 6, cursor: 'pointer' }}>{out.code}</span> : null; })()}{n.detail}{b.kind === '정기' ? <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, color: '#2D5FE0', background: '#EFF6FF', borderRadius: 5, padding: '1px 6px' }}>🔁 정기</span> : null}</td>
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{b.vendor}</td>
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{won(itemTotal(b))}</td>
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{b.payMethod}</td>
@@ -2011,13 +2061,14 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
   const [account, setAccount] = useState(e.account || '');
   const [status, setStatus] = useState(e.status || '기안전');
   const [date, setDate] = useState(e.date || TODAY);
+  const [kind, setKind] = useState(e.kind || '일반');
   const [paidDate, setPaidDate] = useState(e.paidDate || TODAY);
   const [paidAmount, setPaidAmount] = useState(e.paidAmount != null && e.paidAmount !== '' ? String(e.paidAmount) : '');
   const plans = data.plans.filter(p => p.outputId === Number(outId));
   const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E3E0DC', color: val === o ? 'white' : '#3A3631' }}>{o}</button>)}</div>;
   const submit = () => {
     if (!outId || !vendor.trim() || !amount || Number(amount) <= 0) { alert('필수 항목을 입력하세요'); return; }
-    const fields = { outputId: Number(outId), planId: planId ? Number(planId) : null, vendor: vendor.trim(), amount: Number(amount), vat, payMethod: pay, account: account.trim(), status, date, paidDate: status === '결제완료' ? paidDate : (e.paidDate || ''), paidAmount: status === '결제완료' && paidAmount !== '' ? Number(paidAmount) : null };
+    const fields = { outputId: Number(outId), planId: planId ? Number(planId) : null, kind, vendor: vendor.trim(), amount: Number(amount), vat, payMethod: pay, account: account.trim(), status, date, paidDate: status === '결제완료' ? paidDate : (e.paidDate || ''), paidAmount: status === '결제완료' && paidAmount !== '' ? Number(paidAmount) : null };
     if (edit) setData(d => ({ ...d, budgets: d.budgets.map(b => b.id === edit.id ? { ...b, ...fields } : b) }));
     else setData(d => ({ ...d, nid: d.nid + 1, budgets: [...(d.budgets || []), { id: d.nid + 1, subplanId: null, checklistId: null, memo: '', ...fields }] }));
     onClose();
@@ -2026,6 +2077,7 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
     <ModalShell title={edit ? '예산 수정' : '예산 추가'} onClose={onClose}>
       <div><Lbl c="출력 프로젝트" /><Sel value={outId} onChange={v => { setOutId(v); setPlanId(''); }} ph="선택..." opts={data.outputs.map(o => ({ v: o.id, l: o.code + ' · ' + o.name }))} /></div>
       <div><Lbl c="실행계획 (선택)" /><Sel value={planId} onChange={setPlanId} ph="선택..." opts={plans.map(p => ({ v: p.id, l: p.name }))} /></div>
+      <div><Lbl c="구분" />{seg(kind, setKind, ['일반', '정기'])}</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 업체" /><Inp value={vendor} onChange={setVendor} placeholder="업체명" /></div><div><Lbl c="예상 금액 (원)" /><Inp type="number" value={amount} onChange={setAmount} placeholder="공급가" /></div></div>
       <div><Lbl c="VAT" />{seg(vat, setVat, VAT_OPTS)}</div>
       <div><Lbl c="결제방법" />{seg(pay, setPay, PAY_OPTS)}</div>
