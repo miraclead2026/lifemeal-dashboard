@@ -415,10 +415,11 @@ const SupportEditor = ({ support, setSupport }) => {
   );
 };
 
-const ModalShell = ({ title, onClose, children }) => (
+const ModalShell = ({ title, onClose, onBack, children }) => (
   <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 100, padding: '24px 12px', overflowY: 'auto' }}>
     <div style={{ background: 'white', borderRadius: 16, width: '100%', maxWidth: 560, boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
       <div style={{ background: G, color: 'white', padding: '16px 20px', borderRadius: '16px 16px 0 0', display: 'flex', alignItems: 'center' }}>
+        {onBack && <button onClick={onBack} style={{ background: 'rgba(255,255,255,0.18)', border: 'none', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer', borderRadius: 7, padding: '4px 11px', marginRight: 10 }}>← 뒤로</button>}
         <div style={{ fontSize: 16, fontWeight: 800 }}>{title}</div>
         <button onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'white', fontSize: 22, cursor: 'pointer' }}>×</button>
       </div>
@@ -518,7 +519,7 @@ function AddModal({ data, setData, onClose }) {
   );
 }
 
-function EditModal({ target, data, setData, onClose, onSwitch }) {
+function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }) {
   const kind = target.kind;
   const item = kind === 'output' ? data.outputs.find(o => o.id === target.id)
     : kind === 'plan' ? data.plans.find(p => p.id === target.id)
@@ -570,8 +571,8 @@ function EditModal({ target, data, setData, onClose, onSwitch }) {
 
   const del = () => { setData(d => moveToTrash(d, kind, item.id)); onClose(); };
 
-  const addChildPlan = () => { if (!newChild.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, plans: [...d.plans, { id: d.nid + 1, outputId: item.id, name: newChild.trim(), start: '', due: '', owner: ['현수'], support: [], kpi: null, dep: null, resolved: false, hold: false }] })); setNewChild(''); };
-  const addChildSub = () => { if (!newChild.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: item.id, name: newChild.trim(), stage: '예정', start: '', due: '', owner: (ownersOf(item).length ? ownersOf(item) : ['현수']), support: [], dep: null, resolved: false, files: [], perfRecorded: false }] })); setNewChild(''); };
+  const addChildPlan = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, plans: [...d.plans, { id: d.nid + 1, outputId: item.id, name: newChild.trim(), start: '', due: '', owner: ['현수'], support: [], kpi: null, dep: null, resolved: false, hold: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'plan', id: nv }); };
+  const addChildSub = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: item.id, name: newChild.trim(), stage: '예정', start: '', due: '', owner: (ownersOf(item).length ? ownersOf(item) : ['현수']), support: [], dep: null, resolved: false, files: [], perfRecorded: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'subplan', id: nv }); };
 
   const titleMap = { output: '출력 프로젝트 수정', plan: '실행계획 수정', subplan: '세부실행계획 수정' };
   const kpiBlock = (
@@ -582,7 +583,7 @@ function EditModal({ target, data, setData, onClose, onSwitch }) {
   );
 
   return (
-    <ModalShell title={titleMap[kind]} onClose={onClose}>
+    <ModalShell title={titleMap[kind]} onClose={onClose} onBack={canBack ? onBack : null}>
       <div><Lbl c="이름" /><Inp value={name} onChange={setName} /></div>
 
       {kind === 'subplan' && (
@@ -694,13 +695,20 @@ function TabTeam({ data }) {
 
 function TabProgress({ data, setData, onEdit }) {
   const [filter, setFilter] = useState('전체');
+  const [showCatOrder, setShowCatOrder] = useState(false);
   const toggleHold = id => setData(d => ({ ...d, plans: d.plans.map(p => p.id === id ? { ...p, hold: !p.hold } : p) }));
+  const catIdx = name => { const i = data.categories.findIndex(c => c.name === name); return i < 0 ? 999 : i; };
+  const sortedOutputs = [...data.outputs].sort((a, b) => catIdx(a.type) - catIdx(b.type));
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ fontSize: 17, fontWeight: 700, color: G, marginBottom: 14 }}>프로젝트 진행 상황</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: G }}>프로젝트 진행 상황</div>
+        <button onClick={() => setShowCatOrder(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>⠿ 분류 순서 변경</button>
+      </div>
       <FilterBar value={filter} onChange={setFilter} />
+      {showCatOrder && <CategoryOrderModal data={data} setData={setData} onClose={() => setShowCatOrder(false)} />}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {data.outputs.map(o => {
+        {sortedOutputs.map(o => {
           const plans = data.plans.filter(p => p.outputId === o.id && matchOwner(p, filter));
           if (!plans.length) return null;
           return (<Card key={o.id} style={{ padding: 0, overflow: 'hidden' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#F7FBF8', borderBottom: '1px solid #EEF0F2' }}><Badge label={o.code} color={clsC(o.type, data.categories)} /><span style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</span>{o.kpi && <Badge label="KPI" color={GO} />}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{o.type}</span><EditBtn onClick={() => onEdit({ kind: 'output', id: o.id })} /></div><div style={{ padding: '8px 16px 14px' }}>{plans.map(p => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; const prog = subs.length ? pct(done, subs.length) : 0; return (<div key={p.id} style={{ padding: '10px 0', borderBottom: '1px solid #F3F4F6', opacity: p.hold ? 0.65 : 1 }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}><span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>{p.hold && <Badge label="⏸ 보류" color="#94A3B8" />}{p.kpi && <Badge label="KPI" color={GO} />}<span style={{ fontSize: 11, color: '#6B7280' }}>{ownerAv(p)} {ownerNm(p)}</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{p.start || '미정'} ~ {p.due || '미정'}</span><button onClick={() => toggleHold(p.id)} style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF', cursor: 'pointer', fontSize: 10 }}>{p.hold ? '⏸ 해제' : '⏸'}</button><EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id })} /></div><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={done} m={subs.length || 1} h={6} /></div><span style={{ fontSize: 11, fontWeight: 700, color: prog >= 100 ? '#10B981' : '#6B7280', minWidth: 78, textAlign: 'right' }}>세부 {done}/{subs.length} ({prog}%)</span></div></div>); })}</div></Card>);
@@ -741,11 +749,12 @@ function TabKanban({ data, setData, onEdit }) {
 }
 
 function TabWeekly({ data, setData, onEdit }) {
-  const [filter, setFilter] = useState('전체'), [offset, setOffset] = useState(0), [exp, setExp] = useState(null), [dragOver, setDragOver] = useState(null);
+  const [filter, setFilter] = useState('전체'), [offset, setOffset] = useState(0), [colChk, setColChk] = useState({}), [newChk, setNewChk] = useState({}), [dragOver, setDragOver] = useState(null);
   const monday = (() => { const d = new Date(TODAY); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd + offset * 7); return d; })();
   const weekDates = DAYS.map((_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); return x.toISOString().slice(0, 10); });
   const diffDays = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
   const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
+  const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false }] })); setNewChk(n => ({ ...n, [id]: '' })); };
   const planName = id => { const p = data.plans.find(x => x.id === id); return p ? p.name : ''; };
   const onDragStart = (e, s, isSpan) => {
     e.stopPropagation();
@@ -776,6 +785,33 @@ function TabWeekly({ data, setData, onEdit }) {
   };
   const subs = data.subplans.filter(s => s.stage !== '보류' && matchOwner(s, filter));
   const spanning = subs.filter(s => s.start && s.due && s.start !== s.due && s.start <= weekDates[6] && s.due >= weekDates[0]);
+  const SPAN_GAP = 8;
+  const spanMeta = spanning.map(s => {
+    const sc = s.start <= weekDates[0] ? 0 : weekDates.indexOf(s.start);
+    const ec = s.due >= weekDates[6] ? 6 : weekDates.indexOf(s.due);
+    const cols = (sc >= 0 && ec >= 0 && sc <= ec) ? (ec - sc + 1) : 1;
+    const perLine = Math.max(5, cols * 8 - 3);
+    const titleLines = Math.min(3, Math.max(1, Math.ceil((s.name || '').length / perLine)));
+    const dateLines = cols <= 1 ? 2 : 1;
+    const chkN = data.checklists.filter(c => c.subplanId === s.id).length;
+    const chkH = colChk[s.id] ? 0 : (chkN * 17 + 28);
+    const h = Math.max(46, 14 + titleLines * 18 + dateLines * 14 + chkH);
+    return { sc, ec, h };
+  });
+  // 겹치지 않는 막대는 같은 줄에 채워넣기(lane packing)
+  const laneOf = {};
+  const lanes = [];
+  spanMeta.map((m, i) => i).sort((a, b) => spanMeta[a].sc - spanMeta[b].sc || a - b).forEach(i => {
+    const m = spanMeta[i];
+    let k = lanes.findIndex(l => l.endCol < m.sc);
+    if (k === -1) { lanes.push({ endCol: m.ec }); k = lanes.length - 1; } else { lanes[k].endCol = m.ec; }
+    laneOf[i] = k;
+  });
+  const laneHeight = lanes.map(() => 0);
+  spanMeta.forEach((m, i) => { laneHeight[laneOf[i]] = Math.max(laneHeight[laneOf[i]], m.h); });
+  const laneTop = [];
+  laneHeight.forEach((h, k) => { laneTop[k] = k === 0 ? 0 : laneTop[k - 1] + laneHeight[k - 1] + SPAN_GAP; });
+  const colReserve = i => { let h = 0; spanMeta.forEach((m, idx) => { if (m.sc >= 0 && m.ec >= 0 && m.sc <= i && i <= m.ec) h = Math.max(h, laneTop[laneOf[idx]] + laneHeight[laneOf[idx]] + SPAN_GAP); }); return h; };
   const getDayItems = date => subs.filter(s => { if (s.start && s.due && s.start !== s.due) return false; return s.due === date; });
   const unassigned = subs.filter(s => !s.due);
   const grouped = {};
@@ -795,7 +831,7 @@ function TabWeekly({ data, setData, onEdit }) {
       <Card key={s.id} draggable onDragStart={e => onDragStart(e, s, isSpan)} style={{ marginBottom: 6, padding: 8, cursor: 'grab' }}>
         {!hideParent && <div style={{ fontSize: 9, color: '#9CA3AF', marginBottom: 3 }}>{planName(s.planId)}</div>}
         <div style={{ display: 'flex', gap: 4, alignItems: 'flex-start' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, flex: 1, lineHeight: 1.3, cursor: 'pointer' }} onClick={() => setExp(exp === s.id ? null : s.id)}>{s.name}</div>
+          <div style={{ fontSize: 11, fontWeight: 600, flex: 1, lineHeight: 1.3, cursor: 'pointer' }} onClick={() => setColChk(cc => ({ ...cc, [s.id]: !cc[s.id] }))}>{s.name}</div>
           <EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id })} />
         </div>
         <div style={{ display: 'flex', gap: 5, marginTop: 4, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -804,7 +840,7 @@ function TabWeekly({ data, setData, onEdit }) {
           {chks.length > 0 && <span style={{ fontSize: 9, color: '#6B7280' }}>☑ {cd}/{chks.length}</span>}
           {files.length > 0 && <span style={{ fontSize: 9, color: '#4285F4' }}>📎{files.length}</span>}
         </div>
-        {exp === s.id && chks.length > 0 && <div style={{ background: '#F9FAFB', borderRadius: 6, padding: 6, marginTop: 6 }}>{chks.map(c => <div key={c.id} onClick={() => toggleChk(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 0', cursor: 'pointer' }}><Chk on={c.done} /><span style={{ fontSize: 10, color: c.done ? '#9CA3AF' : '#374151', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span></div>)}</div>}
+        {!colChk[s.id] && <div style={{ background: '#F9FAFB', borderRadius: 6, padding: 6, marginTop: 6 }}>{chks.map(c => <div key={c.id} onClick={() => toggleChk(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 0', cursor: 'pointer' }}><Chk on={c.done} /><span style={{ fontSize: 10, color: c.done ? '#9CA3AF' : '#374151', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span></div>)}<div style={{ display: 'flex', gap: 4, marginTop: chks.length ? 5 : 0 }}><input value={newChk[s.id] || ''} draggable={false} onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()} onChange={e => setNewChk(n => ({ ...n, [s.id]: e.target.value }))} onKeyDown={e => { if (e.key === 'Enter') addChk(s.id); }} placeholder="+ 체크 추가" style={{ flex: 1, fontSize: 10, padding: '3px 6px', border: '1px solid #E5E7EB', borderRadius: 5, outline: 'none', minWidth: 0 }} /><button onClick={e => { e.stopPropagation(); addChk(s.id); }} style={{ fontSize: 10, padding: '3px 8px', border: 'none', background: G, color: 'white', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}>추가</button></div></div>}
       </Card>
     );
   };
@@ -835,15 +871,7 @@ function TabWeekly({ data, setData, onEdit }) {
                 onDragOver={e => { e.preventDefault(); setDragOver('c' + i); }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null); }}
                 onDrop={e => handleDrop(e, date)}>
-                {(() => {
-                  let h = 0;
-                  spanning.forEach((s, idx) => {
-                    const sc = s.start <= weekDates[0] ? 0 : weekDates.indexOf(s.start);
-                    const ec = s.due >= weekDates[6] ? 6 : weekDates.indexOf(s.due);
-                    if (sc >= 0 && ec >= 0 && sc <= i && i <= ec) h = Math.max(h, (idx + 1) * 52);
-                  });
-                  return h > 0 ? <div style={{ height: h }} /> : null;
-                })()}
+                {(() => { const h = colReserve(i); return h > 0 ? <div style={{ height: h }} /> : null; })()}
                 <div style={{ minHeight: 70, padding: 4, borderRadius: 8, background: dragOver === 'c' + i ? '#E8F4EE' : weekDates[i] === TODAY ? '#F0F7F2' : 'transparent', border: dragOver === 'c' + i ? '2px dashed ' + G : '2px solid transparent', transition: 'all 0.15s' }}>
                   {getDayItems(date).map(s => renderMini(s))}
                 </div>
@@ -857,13 +885,16 @@ function TabWeekly({ data, setData, onEdit }) {
               const chks = data.checklists.filter(c => c.subplanId === s.id); const cd = chks.filter(c => c.done).length;
               return (
                 <div key={s.id} draggable onDragStart={e => onDragStart(e, s, true)}
-                  style={{ gridColumn: `${sc + 1} / ${ec + 2}`, gridRow: 1, alignSelf: 'start', marginTop: idx * 52, height: 44, position: 'relative', zIndex: 2, background: 'white', border: '1.5px solid ' + stC(s.stage), borderLeft: '5px solid ' + stC(s.stage), borderRadius: 10, padding: '0 14px', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'grab', overflow: 'hidden' }}>
-                  <Badge label={s.stage} color={stC(s.stage)} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</div>
-                    <div style={{ fontSize: 10, color: '#6B7280' }}>{ownerAv(s)} · {s.start.slice(5)}~{s.due.slice(5)} ({dur}일){chks.length > 0 ? ` · ☑ ${cd}/${chks.length}` : ''}</div>
+                  style={{ gridColumn: `${sc + 1} / ${ec + 2}`, gridRow: 1, alignSelf: 'start', marginTop: laneTop[laneOf[idx]], minHeight: spanMeta[idx].h, position: 'relative', zIndex: 2, background: 'white', border: '1.5px solid ' + stC(s.stage), borderLeft: '5px solid ' + stC(s.stage), borderRadius: 10, padding: '6px 12px', display: 'flex', flexDirection: 'column', gap: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'grab' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                    <Badge label={s.stage} color={stC(s.stage)} />
+                    <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => setColChk(cc => ({ ...cc, [s.id]: !cc[s.id] }))}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#111', whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: 1.25 }}>{s.name}</div>
+                      <div style={{ fontSize: 10, color: '#6B7280' }}>{ownerAv(s)} · {s.start.slice(5)}~{s.due.slice(5)} ({dur}일){chks.length > 0 ? ` · ☑ ${cd}/${chks.length}` : ''}</div>
+                    </div>
+                    <EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id })} />
                   </div>
-                  <EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id })} />
+                  {!colChk[s.id] && <div style={{ background: '#F9FAFB', borderRadius: 6, padding: 6 }}>{chks.map(c => <div key={c.id} onClick={() => toggleChk(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 0', cursor: 'pointer' }}><Chk on={c.done} /><span style={{ fontSize: 10, color: c.done ? '#9CA3AF' : '#374151', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span></div>)}<div style={{ display: 'flex', gap: 4, marginTop: chks.length ? 5 : 0 }}><input value={newChk[s.id] || ''} draggable={false} onMouseDown={e => e.stopPropagation()} onClick={e => e.stopPropagation()} onChange={e => setNewChk(n => ({ ...n, [s.id]: e.target.value }))} onKeyDown={e => { if (e.key === 'Enter') addChk(s.id); }} placeholder="+ 체크 추가" style={{ flex: 1, fontSize: 10, padding: '3px 6px', border: '1px solid #E5E7EB', borderRadius: 5, outline: 'none', minWidth: 0 }} /><button onClick={e => { e.stopPropagation(); addChk(s.id); }} style={{ fontSize: 10, padding: '3px 8px', border: 'none', background: G, color: 'white', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}>추가</button></div></div>}
                 </div>
               );
             })}
@@ -1076,7 +1107,7 @@ function TabKpi({ data, setData }) {
   const delManual = (mkId, mId) => setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === mkId ? { ...mk, manuals: (mk.manuals || []).filter(m => m.id !== mId) } : mk) }));
 
   const kpiPlansAll = data.plans.filter(p => p.kpi);
-  const kpiOutputs = data.outputs.filter(o => o.kpi || data.plans.some(p => p.outputId === o.id && p.kpi));
+  const kpiOutputs = data.outputs.filter(o => o.kpi || data.plans.some(p => p.outputId === o.id && p.kpi)).sort((a, b) => { const ci = n => { const i = data.categories.findIndex(c => c.name === n); return i < 0 ? 999 : i; }; return ci(a.type) - ci(b.type); });
 
   const TargetEditor = ({ targets, onSet, unit }) => (
     <div style={{ marginBottom: 12 }}>
@@ -1413,12 +1444,40 @@ function TabTrash({ data, setData }) {
   );
 }
 
+function CategoryOrderModal({ data, setData, onClose }) {
+  const [order, setOrder] = useState([...data.categories]);
+  const dragIdx = useRef(null);
+  const onDrop = i => { const di = dragIdx.current; if (di === null || di === i) return; const arr = [...order]; const [m] = arr.splice(di, 1); arr.splice(i, 0, m); setOrder(arr); dragIdx.current = null; };
+  const move = (i, dir) => { const j = i + dir; if (j < 0 || j >= order.length) return; const arr = [...order]; const t = arr[i]; arr[i] = arr[j]; arr[j] = t; setOrder(arr); };
+  const save = () => { setData(d => ({ ...d, categories: order })); onClose(); };
+  const arrowBtn = { width: 26, height: 24, border: '1px solid #E5E7EB', background: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 10, color: '#6B7280' };
+  return (
+    <ModalShell title="분류 순서 변경" onClose={onClose}>
+      <div style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.5 }}>드래그하거나 ▲▼ 버튼으로 순서를 바꾸세요. 저장하면 진행 상황 · KPI · 업무 추가 등 모든 곳의 분류 순서가 이 순서를 따릅니다.</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {order.map((c, i) => (
+          <div key={c.name} draggable onDragStart={() => { dragIdx.current = i; }} onDragOver={e => e.preventDefault()} onDrop={() => onDrop(i)}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: '#F7FBF8', border: '1px solid #E5E7EB', borderRadius: 10, cursor: 'grab' }}>
+            <span style={{ color: '#9CA3AF', fontSize: 15 }}>⠿</span>
+            <Badge label={c.prefix} color={CAT_PALETTE[i % CAT_PALETTE.length]} />
+            <span style={{ fontWeight: 600, fontSize: 14, flex: 1 }}>{c.name}</span>
+            <span style={{ fontSize: 11, color: '#9CA3AF', minWidth: 16, textAlign: 'center' }}>{i + 1}</span>
+            <button onClick={() => move(i, -1)} disabled={i === 0} style={{ ...arrowBtn, opacity: i === 0 ? 0.35 : 1 }}>▲</button>
+            <button onClick={() => move(i, 1)} disabled={i === order.length - 1} style={{ ...arrowBtn, opacity: i === order.length - 1 ? 0.35 : 1 }}>▼</button>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+    </ModalShell>
+  );
+}
+
 function App() {
   const [tab, setTab] = useState(0);
   const [data, setData] = useState(null);
   const [ready, setReady] = useState(false);
   const [modal, setModal] = useState(false);
-  const [editT, setEditT] = useState(null);
+  const [editStack, setEditStack] = useState([]);
   const [recordId, setRecordId] = useState(null);
   const [sync, setSync] = useState('loading');
   const [syncErr, setSyncErr] = useState('');
@@ -1494,10 +1553,10 @@ function App() {
         </div>
       </div>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-        <TabC data={data} setData={setData} onEdit={t => setEditT(t)} onRecord={id => setRecordId(id)} />
+        <TabC data={data} setData={setData} onEdit={t => setEditStack([t])} onRecord={id => setRecordId(id)} />
       </div>
       {modal && <AddModal data={data} setData={setData} onClose={() => setModal(false)} />}
-      {editT && <EditModal key={editT.kind + '-' + editT.id} target={editT} data={data} setData={setData} onClose={() => setEditT(null)} onSwitch={t => setEditT(t)} />}
+      {editStack.length > 0 && (() => { const cur = editStack[editStack.length - 1]; return <EditModal key={cur.kind + '-' + cur.id} target={cur} data={data} setData={setData} onClose={() => setEditStack([])} onSwitch={t => setEditStack(s => [...s, t])} canBack={editStack.length > 1} onBack={() => setEditStack(s => s.slice(0, -1))} />; })()}
       {recordId && <PerfModal subId={recordId} data={data} setData={setData} onClose={() => setRecordId(null)} />}
     </div>
   );
