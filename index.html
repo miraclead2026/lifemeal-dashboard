@@ -1200,7 +1200,7 @@ function TabWeekly({ data, setData, onEdit }) {
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null); }}
                 onDrop={e => handleDrop(e, date)}>
                 {(() => { const h = colReserve(i); return h > 0 ? <div style={{ height: h }} /> : null; })()}
-                <div style={{ minHeight: 70, padding: 4, borderRadius: 8, background: dragOver === 'c' + i ? '#E8F4EE' : weekDates[i] === TODAY ? '#FBF6EC' : 'transparent', border: dragOver === 'c' + i ? '2px dashed ' + G : weekDates[i] === TODAY ? '2px solid ' + GO : '2px solid transparent', transition: 'all 0.15s' }}>
+                <div style={{ minHeight: 70, padding: 4, borderRadius: 8, background: dragOver === 'c' + i ? '#E8F4EE' : 'transparent', border: dragOver === 'c' + i ? '2px dashed ' + G : '2px solid transparent', transition: 'all 0.15s' }}>
                   {getDayItems(date).map(s => renderMini(s))}
                 </div>
               </div>
@@ -1850,7 +1850,6 @@ function PaymentModal({ data, setData, edit, onClose }) {
   const [memo, setMemo] = useState(e.memo || '');
   const [receiptUrl, setReceiptUrl] = useState(e.receiptUrl || '');
   const [receiptName, setReceiptName] = useState(e.receiptName || '');
-  const [linkInput, setLinkInput] = useState('');
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
   const vendorItems = quoteItems.filter(b => b.vendor === vendor);
@@ -1860,10 +1859,9 @@ function PaymentModal({ data, setData, edit, onClose }) {
   const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E5E7EB', color: val === o ? 'white' : '#374151' }}>{o}</button>)}</div>;
   const pickReceipt = async file => {
     if (!file) return;
-    if (!projectName) { alert('먼저 결제할 기안 항목을 선택하세요. 영수증은 프로젝트 폴더에 저장됩니다.'); return; }
     setUploading(true); setUpErr('');
     try {
-      const folderId = await driveDeepFolder(['라이프밀', '영수증', projectName]);
+      const folderId = await driveDeepFolder(['라이프밀', '영수증', projectName || '미지정']);
       const r = await driveUploadFile(file, folderId);
       setReceiptUrl(r.link); setReceiptName(file.name);
     } catch (err) { setUpErr(err.message || '업로드 실패'); } finally { setUploading(false); }
@@ -1903,14 +1901,15 @@ function PaymentModal({ data, setData, edit, onClose }) {
             <a href={receiptUrl} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: '#4285F4', fontWeight: 600, textDecoration: 'none' }}>열기</a>
             <button onClick={() => { setReceiptUrl(''); setReceiptName(''); }} style={{ border: 'none', background: 'none', color: '#EF4444', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>제거</button>
           </div>
-        ) : (<>
-          <label style={{ display: 'block', border: '1.5px dashed #D1D5DB', borderRadius: 9, padding: '12px', textAlign: 'center', cursor: uploading ? 'default' : 'pointer', fontSize: 12, color: uploading ? '#9CA3AF' : '#6B7280', background: '#FAFAFA' }}>
-            {uploading ? '업로드 중…' : (projectName ? '📎 영수증 파일 선택 (드라이브 라이프밀/영수증/' + projectName + ' 에 저장)' : '먼저 위에서 기안 항목을 선택하세요')}
-            <input type="file" disabled={uploading || !projectName} onChange={ev => { const f = ev.target.files && ev.target.files[0]; if (f) pickReceipt(f); ev.target.value = ''; }} style={{ display: 'none' }} />
-          </label>
-          {upErr ? <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>⚠ {upErr}</div> : null}
-          <details style={{ marginTop: 6 }}><summary style={{ fontSize: 11, color: '#9CA3AF', cursor: 'pointer' }}>또는 링크 직접 입력</summary><div style={{ display: 'flex', gap: 6, marginTop: 6 }}><input value={linkInput} onChange={ev => setLinkInput(ev.target.value)} placeholder="https://..." style={{ flex: 1, padding: '7px 9px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 12, boxSizing: 'border-box' }} /><Btn v="secondary" onClick={() => { if (linkInput.trim()) { setReceiptUrl(linkInput.trim()); setReceiptName('영수증 링크'); setLinkInput(''); } }} style={{ padding: '7px 12px' }}>등록</Btn></div></details>
-        </>)}
+        ) : (
+          <div onClick={() => { if (!uploading) document.getElementById('rcpt-input').click(); }} style={{ border: '2px dashed #D1D5DB', borderRadius: 10, padding: 18, textAlign: 'center', cursor: uploading ? 'default' : 'pointer', background: '#F9FAFB' }}>
+            <div style={{ fontSize: 24, marginBottom: 4 }}>🧾</div>
+            <div style={{ fontSize: 13, color: '#6B7280', fontWeight: 600 }}>{uploading ? '업로드 중…' : '클릭해서 영수증 파일 선택'}</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 3 }}>선택하면 드라이브 라이프밀/영수증/{projectName || '미지정'} 에 저장돼요</div>
+            <input id="rcpt-input" type="file" disabled={uploading} onChange={ev => { const f = ev.target.files && ev.target.files[0]; if (f) pickReceipt(f); ev.target.value = ''; }} style={{ display: 'none' }} />
+          </div>
+        )}
+        {upErr ? <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>⚠ {upErr}</div> : null}
         <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6 }}>※ 처음 한 번 구글 로그인이 필요해요.</div>
       </div>
       <div><Lbl c="비고 (선택)" /><Inp value={memo} onChange={setMemo} placeholder="메모" /></div>
