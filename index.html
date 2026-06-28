@@ -1763,20 +1763,20 @@ function TabBudget({ data, setData, goTab }) {
   const payments = data.payments || [];
   const monthKey = (() => { const d = new Date(TODAY); d.setMonth(d.getMonth() + mOff); return d.toISOString().slice(0, 7); })();
   const inMonth = ds => ds && ds.slice(0, 7) === monthKey;
-  const planBudgets = monthMode ? budgets.filter(b => inMonth(b.date)) : budgets;
-  const planEst = planBudgets.reduce((a, b) => a + itemTotal(b), 0);
-  const planDraft = planBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료').reduce((a, b) => a + itemTotal(b), 0);
+  const monthBudgets = budgets.filter(b => inMonth(b.date));
+  const tableBudgets = monthMode ? monthBudgets : budgets;
+  const planEst = monthBudgets.reduce((a, b) => a + itemTotal(b), 0);
+  const planDraft = monthBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료').reduce((a, b) => a + itemTotal(b), 0);
   const outOfBudget = b => { let o = data.outputs.find(x => x.id === b.outputId); if (o) return o; if (b.planId) { const pl = data.plans.find(p => p.id === b.planId); if (pl) return data.outputs.find(x => x.id === pl.outputId); } return null; };
-  const vendorTotals = (() => { const m = {}; planBudgets.forEach(b => { const v = b.vendor || '(미지정)'; m[v] = (m[v] || 0) + itemTotal(b); }); return Object.entries(m).sort((a, b) => b[1] - a[1]); })();
-  const estSum = budgets.filter(b => inMonth(b.date)).reduce((a, b) => a + itemTotal(b), 0);
-  const draftSum = budgets.filter(b => inMonth(b.date) && (b.status === '기안완료' || b.status === '결제완료')).reduce((a, b) => a + itemTotal(b), 0);
+  const vendorTotals = (() => { const m = {}; monthBudgets.forEach(b => { const v = b.vendor || '(미지정)'; m[v] = (m[v] || 0) + itemTotal(b); }); return Object.entries(m).sort((a, b) => b[1] - a[1]); })();
+  const draftSum = monthBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료').reduce((a, b) => a + itemTotal(b), 0);
   const payMonthSum = payments.filter(p => inMonth(p.paidDate)).reduce((a, p) => a + (Number(p.amount) || 0), 0);
   const unpaid = Math.max(0, draftSum - payMonthSum);
   const paidBudgetIds = new Set(); payments.forEach(p => (p.coveredBudgetIds || []).forEach(id => paidBudgetIds.add(id)));
   const togglePlanStatus = id => setData(d => ({ ...d, budgets: d.budgets.map(b => b.id === id ? { ...b, status: b.status === '기안완료' ? '기안전' : '기안완료' } : b) }));
   const del = id => setData(d => moveToTrash(d, 'budget', id));
   const delPay = id => { if (!confirm('이 실결제 기록을 삭제할까요? (드라이브 영수증 파일은 유지됩니다)')) return; setData(d => ({ ...d, payments: (d.payments || []).filter(p => p.id !== id) })); };
-  const groups = {}; planBudgets.forEach(b => { const k = view === 'week' ? weekKeyOf(b.date) : b.date; (groups[k] = groups[k] || []).push(b); });
+  const groups = {}; tableBudgets.forEach(b => { const k = view === 'week' ? weekKeyOf(b.date) : b.date; (groups[k] = groups[k] || []).push(b); });
   const keys = Object.keys(groups).sort().reverse();
   const payGroups = {}; payments.forEach(p => { const k = p.paidDate || '미상'; (payGroups[k] = payGroups[k] || []).push(p); });
   const payKeys = Object.keys(payGroups).sort().reverse();
@@ -1807,7 +1807,7 @@ function TabBudget({ data, setData, goTab }) {
 
       {subTab === 'plan' ? (<>
         <Card style={{ marginBottom: 16, padding: 14 }}>
-          {monthMode && monthNav}
+          {monthNav}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 10 }}>
             <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#6E6863' }}>예상 예산 (계획)</div><div style={{ fontSize: 18, fontWeight: 800, color: '#6E6863' }}>{won(planEst)}</div></div>
             <div style={{ background: '#EFF6FF', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#2D5FE0' }}>기안 (기안완료)</div><div style={{ fontSize: 18, fontWeight: 800, color: '#2D5FE0' }}>{won(planDraft)}</div></div>
@@ -1820,14 +1820,14 @@ function TabBudget({ data, setData, goTab }) {
               </div>
             </div>
           )}
-          <div style={{ fontSize: 11, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>{monthMode ? monthKey + ' 기준' : '전체 기준'} · 예상 = 등록 예산 전체 · 기안 = 기안완료 금액 · 실제 결제는 [실결제] 탭에서 관리합니다</div>
+          <div style={{ fontSize: 11, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>요약은 {monthKey} 기준 · 아래 목록은 "월별 보기"로 전체/이 달 전환 · 실제 결제는 [실결제] 탭에서 관리합니다</div>
         </Card>
         <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           {[{ v: 'date', l: '날짜별' }, { v: 'week', l: '주간별' }].map(o => <button key={o.v} onClick={() => setView(o.v)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: view === o.v ? G : '#E3E0DC', color: view === o.v ? 'white' : '#3A3631' }}>{o.l}</button>)}
           <span style={{ width: 1, height: 18, background: '#E3E0DC', margin: '0 2px' }} />
-          <button onClick={() => setMonthMode(!monthMode)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: monthMode ? GO : '#E3E0DC', color: monthMode ? 'white' : '#3A3631' }}>📅 월별 보기{monthMode ? ' ✓' : ''}</button>
+          <span style={{ fontSize: 11, color: '#A29C95' }}>목록:</span><button onClick={() => setMonthMode(!monthMode)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: monthMode ? GO : '#E3E0DC', color: monthMode ? 'white' : '#3A3631' }}>{monthMode ? '📅 ' + monthKey + '만' : '📅 월별 보기'}</button>
         </div>
-        {!planBudgets.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>💰</div><div>{monthMode ? monthKey + '에 등록된 예산이 없습니다' : '등록된 예산이 없습니다'}</div></Card>) :
+        {!tableBudgets.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>💰</div><div>{monthMode ? monthKey + '에 등록된 예산이 없습니다' : '등록된 예산이 없습니다'}</div></Card>) :
           keys.map(k => { const list = groups[k]; const sub = list.reduce((a, b) => a + itemTotal(b), 0); const head = view === 'week' ? (k.slice(5) + ' ~ ' + addDays(k, 6).slice(5) + ' 주간') : k; return (
             <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7' }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{head}</span><span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: G }}>{won(sub)}</span></div>
