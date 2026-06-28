@@ -72,7 +72,7 @@ const migrateData = raw => ({
   mainKpis: raw.mainKpis || DEFAULT_MAIN_KPIS,
   kpiLogs: raw.kpiLogs || [],
   outputs: (raw.outputs || []).map(o => ({ kpi: null, ...o })),
-  plans: (raw.plans || []).map(p => ({ hold: false, ...p })),
+  plans: (raw.plans || []).map(p => ({ hold: false, desc: '', ...p })),
   subplans: (raw.subplans || []).map(s => { const ns = { files: [], perfRecorded: false, ...s }; if (ns.stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; return ns; }),
   budgets: raw.budgets || [],
   trash: raw.trash || [],
@@ -145,6 +145,20 @@ const moveToTrash = (d, type, id) => {
   } else return d;
   const entry = { id: Date.now(), type, label, deletedAt: TODAY, payload };
   return { ...d, outputs, plans, subplans, checklists, budgets, kpiLogs, mainKpis, trash: [entry, ...trash] };
+};
+
+const reorderSiblings = (list, id, parentField, dir) => {
+  const arr = [...list];
+  const item = arr.find(x => x.id === id);
+  if (!item) return list;
+  const pv = item[parentField];
+  const sib = arr.map((x, i) => (x[parentField] === pv ? i : -1)).filter(i => i >= 0);
+  const pos = sib.indexOf(arr.indexOf(item));
+  const np = pos + dir;
+  if (np < 0 || np >= sib.length) return list;
+  const i1 = sib[pos], i2 = sib[np];
+  const t = arr[i1]; arr[i1] = arr[i2]; arr[i2] = t;
+  return arr;
 };
 
 const pad = n => String(n).padStart(2, '0');
@@ -534,6 +548,9 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const [kpiOn, setKpiOn] = useState(!!(item.kpi)), [kpi, setKpi] = useState(() => { if (item.kpi) { const mk = Object.keys(item.kpi.targets || {}); const mo = mk[0] || TODAY.slice(0, 7); const tv = (item.kpi.targets || {})[mo]; return { name: item.kpi.name, unit: item.kpi.unit, month: mo, target: String(tv != null ? tv : (item.kpi.target || '')) }; } return { name: '', unit: kind === 'output' ? '원' : '%', month: TODAY.slice(0, 7), target: '' }; });
   const [confirmDel, setConfirmDel] = useState(false);
   const [newChild, setNewChild] = useState('');
+  const [desc, setDesc] = useState(item.desc || '');
+  const [newSubChk, setNewSubChk] = useState('');
+  const [showReorder, setShowReorder] = useState(false);
 
   const currentPlan = kind === 'subplan' ? data.plans.find(p => p.id === item.planId) : null;
   const currentOutput = currentPlan ? data.outputs.find(o => o.id === currentPlan.outputId) : null;
@@ -548,6 +565,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
   const childPlans = kind === 'output' ? data.plans.filter(p => p.outputId === item.id) : [];
   const childSubs = kind === 'plan' ? data.subplans.filter(s => s.planId === item.id) : [];
+  const subChks = kind === 'subplan' ? data.checklists.filter(c => c.subplanId === item.id) : [];
 
   const mkKpi = () => kpiOn ? buildKpi(kpi, item.kpi) : null;
 
@@ -564,7 +582,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
       if (stage === '완료' && !item.completedAt) f.completedAt = TODAY;
       if (showOutputChg && newPlanId) f.planId = Number(newPlanId);
     }
-    if (kind === 'plan') { f.kpi = mkKpi(); f.hold = hold; }
+    if (kind === 'plan') { f.kpi = mkKpi(); f.hold = hold; f.desc = desc; }
     setData(d => resolveAll(kind === 'plan' ? { ...d, plans: d.plans.map(p => p.id === item.id ? { ...p, ...f } : p) } : { ...d, subplans: d.subplans.map(s => s.id === item.id ? { ...s, ...f } : s) }));
     onClose();
   };
@@ -573,6 +591,11 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
   const addChildPlan = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, plans: [...d.plans, { id: d.nid + 1, outputId: item.id, name: newChild.trim(), start: '', due: '', owner: ['현수'], support: [], kpi: null, dep: null, resolved: false, hold: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'plan', id: nv }); };
   const addChildSub = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: item.id, name: newChild.trim(), stage: '예정', start: '', due: '', owner: (ownersOf(item).length ? ownersOf(item) : ['현수']), support: [], dep: null, resolved: false, files: [], perfRecorded: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'subplan', id: nv }); };
+  const movePlanChild = (id, dir) => setData(d => ({ ...d, plans: reorderSiblings(d.plans, id, 'outputId', dir) }));
+  const toggleSubChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
+  const delSubChk = id => setData(d => ({ ...d, checklists: d.checklists.filter(c => c.id !== id) }));
+  const addSubChk = () => { if (!newSubChk.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: item.id, text: newSubChk.trim(), done: false }] })); setNewSubChk(''); };
+  const moveSubChild = (id, dir) => setData(d => ({ ...d, subplans: reorderSiblings(d.subplans, id, 'planId', dir) }));
 
   const titleMap = { output: '출력 프로젝트 수정', plan: '실행계획 수정', subplan: '세부실행계획 수정' };
   const kpiBlock = (
@@ -585,6 +608,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   return (
     <ModalShell title={titleMap[kind]} onClose={onClose} onBack={canBack ? onBack : null}>
       <div><Lbl c="이름" /><Inp value={name} onChange={setName} /></div>
+      {kind === 'plan' && <div><Lbl c="간략 설명" /><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3} placeholder="이 실행계획의 목표·맥락을 간단히 (예: 쇼핑검색광고를 운영할 수 있는 시스템 구축이 최종 목표. 이후 이 시스템으로 반복 운영)" style={{ width: '100%', boxSizing: 'border-box', fontSize: 13, padding: '9px 11px', border: '1px solid #E5E7EB', borderRadius: 9, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }} /></div>}
 
       {kind === 'subplan' && (
         <div>
@@ -616,9 +640,9 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
       {kind === 'output' && (
         <div style={{ background: '#F9FAFB', borderRadius: 10, padding: 12, border: '1px solid #EEF0F2' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>📋 실행계획 ({childPlans.length})</div>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}><div style={{ fontSize: 13, fontWeight: 700, color: G }}>📋 실행계획 ({childPlans.length})</div>{childPlans.length > 1 && <button onClick={() => setShowReorder(true)} style={{ marginLeft: 'auto', fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서 변경</button>}</div>
           {childPlans.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 8 }}>등록된 실행계획이 없습니다</div> :
-            childPlans.map(p => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; return (
+            childPlans.map((p, pi) => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; return (
               <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 8, padding: '8px 10px', marginBottom: 5, border: '1px solid #E5E7EB' }}>
                 <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600 }}>{p.name}{p.kpi ? ' 🎯' : ''}{p.hold ? ' ⏸' : ''}</div><div style={{ fontSize: 10, color: '#9CA3AF' }}>{ownerAv(p)} {ownerNm(p)} · 세부 {done}/{subs.length}</div></div>
                 <EditBtn onClick={() => onSwitch && onSwitch({ kind: 'plan', id: p.id })} />
@@ -633,9 +657,9 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
       {kind === 'plan' && (
         <div style={{ background: '#F9FAFB', borderRadius: 10, padding: 12, border: '1px solid #EEF0F2' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>📋 세부 실행계획 ({childSubs.length})</div>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}><div style={{ fontSize: 13, fontWeight: 700, color: G }}>📋 세부 실행계획 ({childSubs.length})</div>{childSubs.length > 1 && <button onClick={() => setShowReorder(true)} style={{ marginLeft: 'auto', fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서 변경</button>}</div>
           {childSubs.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 8 }}>등록된 세부 실행계획이 없습니다</div> :
-            childSubs.map(s => (
+            childSubs.map((s, si) => (
               <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 8, padding: '8px 10px', marginBottom: 5, border: '1px solid #E5E7EB' }}>
                 <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 6, background: stC(s.stage), color: 'white' }}>{s.stage}</span>
                 <div style={{ flex: 1, fontSize: 12, fontWeight: 600 }}>{s.name}</div>
@@ -668,8 +692,28 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
         </div>
       )}
 
+      {kind === 'subplan' && (
+        <div style={{ background: '#F9FAFB', borderRadius: 10, padding: 12, border: '1px solid #EEF0F2' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>☑ 체크리스트 ({subChks.length})</div>
+          {subChks.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 8 }}>등록된 체크리스트가 없습니다</div> :
+            subChks.map(c => (
+              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 8, padding: '7px 10px', marginBottom: 5, border: '1px solid #E5E7EB' }}>
+                <span onClick={() => toggleSubChk(c.id)} style={{ cursor: 'pointer', display: 'flex' }}><Chk on={c.done} /></span>
+                <div style={{ flex: 1, fontSize: 12, color: c.done ? '#9CA3AF' : '#374151', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</div>
+                <button onClick={() => delSubChk(c.id)} style={{ border: 'none', background: 'none', color: '#EF4444', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
+              </div>
+            ))}
+          <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+            <input value={newSubChk} onChange={e => setNewSubChk(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addSubChk(); }} placeholder="새 체크리스트 항목" style={{ flex: 1, padding: '8px 9px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13 }} />
+            <Btn v="gold" onClick={addSubChk} style={{ padding: '8px 14px' }}>+ 추가</Btn>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn>{confirmDel ? <Btn v="danger" onClick={del}>휴지통으로 이동</Btn> : <Btn v="secondary" onClick={() => setConfirmDel(true)} style={{ color: '#EF4444' }}>삭제</Btn>}</div>
       {showFile && <FileModal subId={item.id} data={data} setData={setData} onClose={() => setShowFile(false)} />}
+      {showReorder && kind === 'output' && <ReorderModal title="실행계획 순서" items={childPlans.map(p => ({ id: p.id, label: p.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.plans.find(p => p.id === x.id)).filter(Boolean); let k = 0; return { ...d, plans: d.plans.map(p => p.outputId === item.id ? q[k++] : p) }; })} />}
+      {showReorder && kind === 'plan' && <ReorderModal title="세부 실행계획 순서" items={childSubs.map(s => ({ id: s.id, label: s.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.subplans.find(s => s.id === x.id)).filter(Boolean); let k = 0; return { ...d, subplans: d.subplans.map(s => s.planId === item.id ? q[k++] : s) }; })} />}
     </ModalShell>
   );
 }
@@ -696,7 +740,9 @@ function TabTeam({ data }) {
 function TabProgress({ data, setData, onEdit }) {
   const [filter, setFilter] = useState('전체');
   const [showCatOrder, setShowCatOrder] = useState(false);
+  const [orderPlansFor, setOrderPlansFor] = useState(null);
   const toggleHold = id => setData(d => ({ ...d, plans: d.plans.map(p => p.id === id ? { ...p, hold: !p.hold } : p) }));
+  const movePlan = (id, dir) => setData(d => ({ ...d, plans: reorderSiblings(d.plans, id, 'outputId', dir) }));
   const catIdx = name => { const i = data.categories.findIndex(c => c.name === name); return i < 0 ? 999 : i; };
   const sortedOutputs = [...data.outputs].sort((a, b) => catIdx(a.type) - catIdx(b.type));
   return (
@@ -707,11 +753,12 @@ function TabProgress({ data, setData, onEdit }) {
       </div>
       <FilterBar value={filter} onChange={setFilter} />
       {showCatOrder && <CategoryOrderModal data={data} setData={setData} onClose={() => setShowCatOrder(false)} />}
+      {orderPlansFor != null && (() => { const o = data.outputs.find(x => x.id === orderPlansFor); const ps = data.plans.filter(p => p.outputId === orderPlansFor); return <ReorderModal title={(o ? o.name + ' · ' : '') + '실행계획 순서'} items={ps.map(p => ({ id: p.id, label: p.name }))} onClose={() => setOrderPlansFor(null)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.plans.find(p => p.id === x.id)).filter(Boolean); let k = 0; return { ...d, plans: d.plans.map(p => p.outputId === orderPlansFor ? q[k++] : p) }; })} />; })()}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {sortedOutputs.map(o => {
           const plans = data.plans.filter(p => p.outputId === o.id && matchOwner(p, filter));
           if (!plans.length) return null;
-          return (<Card key={o.id} style={{ padding: 0, overflow: 'hidden' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#F7FBF8', borderBottom: '1px solid #EEF0F2' }}><Badge label={o.code} color={clsC(o.type, data.categories)} /><span style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</span>{o.kpi && <Badge label="KPI" color={GO} />}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{o.type}</span><EditBtn onClick={() => onEdit({ kind: 'output', id: o.id })} /></div><div style={{ padding: '8px 16px 14px' }}>{plans.map(p => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; const prog = subs.length ? pct(done, subs.length) : 0; return (<div key={p.id} style={{ padding: '10px 0', borderBottom: '1px solid #F3F4F6', opacity: p.hold ? 0.65 : 1 }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}><span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>{p.hold && <Badge label="⏸ 보류" color="#94A3B8" />}{p.kpi && <Badge label="KPI" color={GO} />}<span style={{ fontSize: 11, color: '#6B7280' }}>{ownerAv(p)} {ownerNm(p)}</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{p.start || '미정'} ~ {p.due || '미정'}</span><button onClick={() => toggleHold(p.id)} style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF', cursor: 'pointer', fontSize: 10 }}>{p.hold ? '⏸ 해제' : '⏸'}</button><EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id })} /></div><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={done} m={subs.length || 1} h={6} /></div><span style={{ fontSize: 11, fontWeight: 700, color: prog >= 100 ? '#10B981' : '#6B7280', minWidth: 78, textAlign: 'right' }}>세부 {done}/{subs.length} ({prog}%)</span></div></div>); })}</div></Card>);
+          return (<Card key={o.id} style={{ padding: 0, overflow: 'hidden' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#F7FBF8', borderBottom: '1px solid #EEF0F2' }}><Badge label={o.code} color={clsC(o.type, data.categories)} /><span style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</span>{o.kpi && <Badge label="KPI" color={GO} />}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{o.type}</span>{data.plans.filter(p => p.outputId === o.id).length > 1 && <button onClick={() => setOrderPlansFor(o.id)} style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서</button>}<EditBtn onClick={() => onEdit({ kind: 'output', id: o.id })} /></div><div style={{ padding: '8px 16px 14px' }}>{plans.map((p, pi) => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; const prog = subs.length ? pct(done, subs.length) : 0; return (<div key={p.id} style={{ padding: '10px 0', borderBottom: '1px solid #F3F4F6', opacity: p.hold ? 0.65 : 1 }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}><span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>{p.hold && <Badge label="⏸ 보류" color="#94A3B8" />}{p.kpi && <Badge label="KPI" color={GO} />}<span style={{ fontSize: 11, color: '#6B7280' }}>{ownerAv(p)} {ownerNm(p)}</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{p.start || '미정'} ~ {p.due || '미정'}</span><button onClick={() => toggleHold(p.id)} style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF', cursor: 'pointer', fontSize: 10 }}>{p.hold ? '⏸ 해제' : '⏸'}</button><EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id })} /></div>{p.desc && <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 8, lineHeight: 1.45, whiteSpace: 'pre-wrap', background: '#F9FAFB', borderRadius: 7, padding: '6px 9px' }}>{p.desc}</div>}<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={done} m={subs.length || 1} h={6} /></div><span style={{ fontSize: 11, fontWeight: 700, color: prog >= 100 ? '#10B981' : '#6B7280', minWidth: 78, textAlign: 'right' }}>세부 {done}/{subs.length} ({prog}%)</span></div></div>); })}</div></Card>);
         })}
       </div>
     </div>
@@ -1461,6 +1508,34 @@ function CategoryOrderModal({ data, setData, onClose }) {
             <span style={{ color: '#9CA3AF', fontSize: 15 }}>⠿</span>
             <Badge label={c.prefix} color={CAT_PALETTE[i % CAT_PALETTE.length]} />
             <span style={{ fontWeight: 600, fontSize: 14, flex: 1 }}>{c.name}</span>
+            <span style={{ fontSize: 11, color: '#9CA3AF', minWidth: 16, textAlign: 'center' }}>{i + 1}</span>
+            <button onClick={() => move(i, -1)} disabled={i === 0} style={{ ...arrowBtn, opacity: i === 0 ? 0.35 : 1 }}>▲</button>
+            <button onClick={() => move(i, 1)} disabled={i === order.length - 1} style={{ ...arrowBtn, opacity: i === order.length - 1 ? 0.35 : 1 }}>▼</button>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+    </ModalShell>
+  );
+}
+
+function ReorderModal({ title, items, onSave, onClose }) {
+  const [order, setOrder] = useState(items);
+  const dragIdx = useRef(null);
+  const onDropAt = i => { const di = dragIdx.current; if (di === null || di === i) return; const arr = [...order]; const [m] = arr.splice(di, 1); arr.splice(i, 0, m); setOrder(arr); dragIdx.current = null; };
+  const move = (i, dir) => { const j = i + dir; if (j < 0 || j >= order.length) return; const arr = [...order]; const t = arr[i]; arr[i] = arr[j]; arr[j] = t; setOrder(arr); };
+  const save = () => { onSave(order); onClose(); };
+  const arrowBtn = { width: 30, height: 26, border: '1px solid #E5E7EB', background: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 11, color: '#6B7280' };
+  return (
+    <ModalShell title={title} onClose={onClose}>
+      <div style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.5 }}>⠿ 를 잡고 드래그하거나 ▲▼ 버튼으로 순서를 바꾸세요.</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {order.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF' }}>항목이 없습니다</div> : order.map((it, i) => (
+          <div key={it.id} draggable onDragStart={() => { dragIdx.current = i; }} onDragOver={e => e.preventDefault()} onDrop={() => onDropAt(i)}
+            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: '#F7FBF8', border: '1px solid #E5E7EB', borderRadius: 10, cursor: 'grab' }}>
+            <span style={{ color: '#9CA3AF', fontSize: 16, lineHeight: 1 }}>⠿</span>
+            {it.badge ? <Badge label={it.badge} color={it.badgeColor || G} /> : null}
+            <span style={{ fontWeight: 600, fontSize: 14, flex: 1, wordBreak: 'break-word' }}>{it.label}</span>
             <span style={{ fontSize: 11, color: '#9CA3AF', minWidth: 16, textAlign: 'center' }}>{i + 1}</span>
             <button onClick={() => move(i, -1)} disabled={i === 0} style={{ ...arrowBtn, opacity: i === 0 ? 0.35 : 1 }}>▲</button>
             <button onClick={() => move(i, 1)} disabled={i === order.length - 1} style={{ ...arrowBtn, opacity: i === order.length - 1 ? 0.35 : 1 }}>▼</button>
