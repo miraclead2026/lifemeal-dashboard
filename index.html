@@ -31,7 +31,7 @@ firebase.initializeApp({
   projectId: "lifemeal-f0d71"
 });
 const db = firebase.database();
-const DB_PATH = '/dashboard_test';   // 테스트
+const DB_PATH = '/dashboard';   // 운영
 const { useState, useEffect, useRef } = React;
 
 const G = '#1B4D3E', GO = '#C8963E', BG = '#F0F4F1';
@@ -474,7 +474,7 @@ function DateBlock({ title, d, set, depOpts }) {
 
 const MemberMulti = ({ selected, onToggle }) => (
   <div style={{ display: 'flex', gap: 6 }}>
-    {MEMBERS.map(m => { const on = (selected || []).includes(m); return <button key={m} onClick={() => onToggle(m)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: on ? G : '#E5E7EB', color: on ? 'white' : '#374151' }}>{on ? '\u2713 ' : ''}{AV[m]} {m}</button>; })}
+    {MEMBERS.map(m => { const on = (selected || []).includes(m); return <button key={m} onClick={() => onToggle(m)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: on ? G : '#E5E7EB', color: on ? 'white' : '#374151' }}>{on ? '✓ ' : ''}{AV[m]} {m}</button>; })}
   </div>
 );
 
@@ -495,7 +495,7 @@ const KpiInput = ({ value, onChange, existingTargets }) => {
         <div><Lbl c="목표 적용 월" /><Sel value={value.month} onChange={v => set('month', v)} opts={MONTH_OPTS.map(mo => ({ v: mo, l: mo }))} /></div>
         <div><Lbl c="해당 월 목표" /><Inp type="number" value={value.target} onChange={v => set('target', v)} placeholder="목표값" /></div>
       </div>
-      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 6 }}>\u203b 선택한 월의 목표로 저장됩니다. 다른 달 목표는 [KPI] 탭에서 추가할 수 있어요.</div>
+      <div style={{ fontSize: 11, color: '#6B7280', marginTop: 6 }}>※ 선택한 월의 목표로 저장됩니다. 다른 달 목표는 [KPI] 탭에서 추가할 수 있어요.</div>
     </div>
   );
 };
@@ -515,7 +515,7 @@ const SupportEditor = ({ support, setSupport }) => {
   return (
     <div>
       <Lbl c="서포트 (다중 선택)" />
-      <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>{MEMBERS.map(mm => { const on = ms.includes(mm); return <button key={mm} onClick={() => toggle(mm)} style={{ flex: 1, padding: '7px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: on ? GO : '#E5E7EB', color: on ? 'white' : '#374151' }}>{on ? '\u2713 ' : ''}{AV[mm]} {mm}</button>; })}</div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>{MEMBERS.map(mm => { const on = ms.includes(mm); return <button key={mm} onClick={() => toggle(mm)} style={{ flex: 1, padding: '7px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: on ? GO : '#E5E7EB', color: on ? 'white' : '#374151' }}>{on ? '✓ ' : ''}{AV[mm]} {mm}</button>; })}</div>
       <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
         <input value={memo} onChange={e => setMemo(e.target.value)} placeholder="서포트 내용" style={{ flex: 1, padding: '8px 9px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13 }} />
         <Btn v="gold" onClick={add} style={{ padding: '8px 14px' }}>추가</Btn>
@@ -886,8 +886,8 @@ function NoticeModal({ data, setData, edit, onClose }) {
       <div><Lbl c="제목" /><Inp value={title} onChange={setTitle} placeholder="공지 제목" /></div>
       <div><Lbl c="내용" /><textarea value={content} onChange={e => setContent(e.target.value)} rows={5} placeholder="공지 내용을 입력하세요" style={{ width: '100%', boxSizing: 'border-box', fontSize: 13, padding: '9px 11px', border: '1px solid #E5E7EB', borderRadius: 9, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }} /></div>
       <div><Lbl c="작성자" /><div style={{ display: 'flex', gap: 6 }}>{MEMBERS.map(m => <button key={m} onClick={() => setAuthor(m)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, background: author === m ? G : '#E5E7EB', color: author === m ? 'white' : '#374151' }}>{AV[m]} {m}</button>)}</div></div>
-      <label onClick={() => setPinned(!pinned)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: pinned ? '#FBF6EC' : '#FAFAFA', border: '1.5px solid ' + (pinned ? GO : '#E5E7EB'), borderRadius: 10, padding: '10px 14px' }}><div style={{ width: 20, height: 20, borderRadius: 4, border: '2px solid ' + (pinned ? GO : '#D1D5DB'), background: pinned ? GO : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pinned ? <span style={{ color: 'white', fontSize: 12, fontWeight: 900 }}>\u2713</span> : null}</div><div><div style={{ fontSize: 13, fontWeight: 700 }}>\ud83d\udccc \uc0c1\ub2e8 \uace0\uc815</div><div style={{ fontSize: 11, color: '#9CA3AF' }}>\uace0\uc815\ud558\uba74 \uac8c\uc2dc\ud310 \uc704\uc5d0 \ub0b4\uc6a9\uc774 \ud06c\uac8c \ud45c\uc2dc\ub429\ub2c8\ub2e4 (\ud558\ub098\ub9cc \uace0\uc815)</div></div></label>
-      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>\uc800\uc7a5</Btn><Btn v="secondary" onClick={onClose}>\ucde8\uc18c</Btn></div>
+      <label onClick={() => setPinned(!pinned)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: pinned ? '#FBF6EC' : '#FAFAFA', border: '1.5px solid ' + (pinned ? GO : '#E5E7EB'), borderRadius: 10, padding: '10px 14px' }}><div style={{ width: 20, height: 20, borderRadius: 4, border: '2px solid ' + (pinned ? GO : '#D1D5DB'), background: pinned ? GO : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pinned ? <span style={{ color: 'white', fontSize: 12, fontWeight: 900 }}>✓</span> : null}</div><div><div style={{ fontSize: 13, fontWeight: 700 }}>📌 상단 고정</div><div style={{ fontSize: 11, color: '#9CA3AF' }}>고정하면 게시판 위에 내용이 크게 표시됩니다 (하나만 고정)</div></div></label>
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
     </ModalShell>
   );
 }
@@ -897,32 +897,32 @@ function NoticeBoard({ data, setData }) {
   const notices = data.notices || [];
   const pinned = notices.find(n => n.pinned);
   const rest = notices.filter(n => !n.pinned);
-  const del = id => { if (!confirm('\uc774 \uacf5\uc9c0\ub97c \uc0ad\uc81c\ud560\uae4c\uc694?')) return; setData(d => ({ ...d, notices: (d.notices || []).filter(n => n.id !== id) })); };
+  const del = id => { if (!confirm('이 공지를 삭제할까요?')) return; setData(d => ({ ...d, notices: (d.notices || []).filter(n => n.id !== id) })); };
   const togglePin = id => setData(d => ({ ...d, notices: (d.notices || []).map(n => n.id === id ? { ...n, pinned: !n.pinned } : (n.pinned ? { ...n, pinned: false } : n)) }));
   const actBtn = { padding: '4px 10px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: '#6B7280' };
   return (
     <div style={{ marginTop: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: G }}>\ud83d\udce2 \uacf5\uc9c0\uc0ac\ud56d</div>
-        <button onClick={() => setModal(true)} style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: G, color: 'white' }}>+ \uacf5\uc9c0 \uc791\uc131</button>
+        <div style={{ fontSize: 16, fontWeight: 700, color: G }}>📢 공지사항</div>
+        <button onClick={() => setModal(true)} style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: G, color: 'white' }}>+ 공지 작성</button>
       </div>
       {pinned && (
         <Card style={{ marginBottom: 14, padding: 0, overflow: 'hidden', border: '1px solid #F0E2C0' }}>
           <div style={{ borderLeft: '4px solid ' + GO, background: '#FBF6EC', padding: '14px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}><span style={{ fontSize: 11, fontWeight: 700, color: GO }}>\ud83d\udccc \uace0\uc815\ub41c \uacf5\uc9c0</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{AV[pinned.author]} {pinned.author} \u00b7 {pinned.createdAt}</span></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}><span style={{ fontSize: 11, fontWeight: 700, color: GO }}>📌 고정된 공지</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{AV[pinned.author]} {pinned.author} · {pinned.createdAt}</span></div>
             {pinned.title && <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8, color: '#1F2937' }}>{pinned.title}</div>}
             <div style={{ fontSize: 15, lineHeight: 1.65, whiteSpace: 'pre-wrap', color: '#374151' }}>{pinned.content}</div>
-            <div style={{ display: 'flex', gap: 6, marginTop: 12 }}><button onClick={() => togglePin(pinned.id)} style={{ ...actBtn, borderColor: GO, color: GO }}>\ud83d\udccc \uace0\uc815 \ud574\uc81c</button><button onClick={() => setModal(pinned)} style={actBtn}>\uc218\uc815</button><button onClick={() => del(pinned.id)} style={{ ...actBtn, color: '#EF4444' }}>\uc0ad\uc81c</button></div>
+            <div style={{ display: 'flex', gap: 6, marginTop: 12 }}><button onClick={() => togglePin(pinned.id)} style={{ ...actBtn, borderColor: GO, color: GO }}>📌 고정 해제</button><button onClick={() => setModal(pinned)} style={actBtn}>수정</button><button onClick={() => del(pinned.id)} style={{ ...actBtn, color: '#EF4444' }}>삭제</button></div>
           </div>
         </Card>
       )}
       {notices.length === 0 ? (
-        <Card style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}><div style={{ fontSize: 32, marginBottom: 8 }}>\ud83d\udce2</div><div>\ub4f1\ub85d\ub41c \uacf5\uc9c0\uac00 \uc5c6\uc2b5\ub2c8\ub2e4</div></Card>
+        <Card style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}><div style={{ fontSize: 32, marginBottom: 8 }}>📢</div><div>등록된 공지가 없습니다</div></Card>
       ) : rest.map(n => (
         <Card key={n.id} style={{ marginBottom: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>{n.title && <span style={{ fontSize: 14, fontWeight: 700 }}>{n.title}</span>}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{AV[n.author]} {n.author} \u00b7 {n.createdAt}</span></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>{n.title && <span style={{ fontSize: 14, fontWeight: 700 }}>{n.title}</span>}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{AV[n.author]} {n.author} · {n.createdAt}</span></div>
           {n.content && <div style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap', color: '#374151' }}>{n.content}</div>}
-          <div style={{ display: 'flex', gap: 6, marginTop: 10 }}><button onClick={() => togglePin(n.id)} style={actBtn}>\ud83d\udccc \uc0c1\ub2e8 \uace0\uc815</button><button onClick={() => setModal(n)} style={actBtn}>\uc218\uc815</button><button onClick={() => del(n.id)} style={{ ...actBtn, color: '#EF4444' }}>\uc0ad\uc81c</button></div>
+          <div style={{ display: 'flex', gap: 6, marginTop: 10 }}><button onClick={() => togglePin(n.id)} style={actBtn}>📌 상단 고정</button><button onClick={() => setModal(n)} style={actBtn}>수정</button><button onClick={() => del(n.id)} style={{ ...actBtn, color: '#EF4444' }}>삭제</button></div>
         </Card>
       ))}
       {modal && <NoticeModal data={data} setData={setData} edit={modal === true ? null : modal} onClose={() => setModal(false)} />}
