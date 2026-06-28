@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.21.0/babel.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
   Babel.registerPreset('react-classic', {
     presets: [[Babel.availablePresets['react'], { runtime: 'classic' }]]
@@ -30,7 +31,7 @@ firebase.initializeApp({
   projectId: "lifemeal-f0d71"
 });
 const db = firebase.database();
-const DB_PATH = '/dashboard';   // 운영. 테스트할 땐 '/dashboard_test' 로 변경
+const DB_PATH = '/dashboard';   // 운영
 const { useState, useEffect, useRef } = React;
 
 const G = '#1B4D3E', GO = '#C8963E', BG = '#F0F4F1';
@@ -42,6 +43,79 @@ const MAIN_STAGES = ['예정', '진행중', '검토중', '완료'];
 const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 const TODAY = new Date().toISOString().slice(0, 10);
 const CAT_PALETTE = [G, '#8B5CF6', '#6B7280', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899', '#14B8A6'];
+
+// ===== Google Drive 연동 (브라우저 OAuth, scope=drive) =====
+const DRIVE_CLIENT_ID = '922127709768-fblujicah9kbma4fn1pd6nup8h44siac.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
+let _driveToken = null, _driveTokenClient = null, _driveFolderCache = {};
+function driveReady() { return !!(window.google && window.google.accounts && window.google.accounts.oauth2); }
+function driveSignIn(forcePrompt) {
+  return new Promise((resolve, reject) => {
+    if (!driveReady()) { reject(new Error('구글 로그인 모듈 로딩 중입니다. 잠시 후 다시 시도하세요.')); return; }
+    if (!_driveTokenClient) _driveTokenClient = google.accounts.oauth2.initTokenClient({ client_id: DRIVE_CLIENT_ID, scope: DRIVE_SCOPE, callback: () => {} });
+    _driveTokenClient.callback = (resp) => { if (resp && resp.error) { reject(new Error(resp.error_description || resp.error)); return; } _driveToken = resp.access_token; resolve(_driveToken); };
+    _driveTokenClient.error_callback = (err) => reject(new Error((err && err.message) || '구글 로그인이 취소되었습니다.'));
+    _driveTokenClient.requestAccessToken({ prompt: forcePrompt ? 'consent' : '' });
+  });
+}
+async function driveEnsureToken() { if (_driveToken) return _driveToken; return await driveSignIn(false); }
+async function driveFetch(url, opts, retry) {
+  const token = await driveEnsureToken();
+  opts = opts || {};
+  const headers = Object.assign({}, opts.headers || {}, { Authorization: 'Bearer ' + token });
+  const res = await fetch(url, Object.assign({}, opts, { headers }));
+  if (res.status === 401 && retry !== false) { _driveToken = null; await driveSignIn(false); return driveFetch(url, opts, false); }
+  return res;
+}
+async function driveFindOrCreateFolder(name, parentId) {
+  const key = (parentId || 'root') + '/' + name;
+  if (_driveFolderCache[key]) return _driveFolderCache[key];
+  let q = "mimeType='application/vnd.google-apps.folder' and trashed=false and name='" + name.replace(/'/g, "\\'") + "'";
+  q += parentId ? (" and '" + parentId + "' in parents") : " and 'root' in parents";
+  const sres = await driveFetch('https://www.googleapis.com/drive/v3/files?spaces=drive&fields=files(id,name)&q=' + encodeURIComponent(q));
+  const sdata = await sres.json();
+  if (sdata.files && sdata.files.length) { _driveFolderCache[key] = sdata.files[0].id; return sdata.files[0].id; }
+  const meta = { name: name, mimeType: 'application/vnd.google-apps.folder' };
+  if (parentId) meta.parents = [parentId];
+  const cres = await driveFetch('https://www.googleapis.com/drive/v3/files?fields=id', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(meta) });
+  const cdata = await cres.json();
+  if (!cdata.id) throw new Error('폴더 생성 실패');
+  _driveFolderCache[key] = cdata.id;
+  return cdata.id;
+}
+async function driveBaseFolder(sub) { const root = await driveFindOrCreateFolder('라이프밀', null); return sub ? await driveFindOrCreateFolder(sub, root) : root; }
+async function driveDeepFolder(pathArr) { let parent = null; for (let i = 0; i < pathArr.length; i++) parent = await driveFindOrCreateFolder(pathArr[i], parent); return parent; }
+async function driveUploadFile(fileObj, parentId) {
+  const token = await driveEnsureToken();
+  const meta = { name: fileObj.name, parents: [parentId] };
+  const initRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,webViewLink', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': fileObj.type || 'application/octet-stream' }, body: JSON.stringify(meta) });
+  if (!initRes.ok) { if (initRes.status === 401) { _driveToken = null; await driveSignIn(false); return driveUploadFile(fileObj, parentId); } throw new Error('업로드 시작 실패 (' + initRes.status + ')'); }
+  const uploadUrl = initRes.headers.get('Location');
+  const putRes = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': fileObj.type || 'application/octet-stream' }, body: fileObj });
+  const pdata = await putRes.json();
+  if (!pdata.id) throw new Error('업로드 실패');
+  return { id: pdata.id, link: pdata.webViewLink || ('https://drive.google.com/file/d/' + pdata.id + '/view') };
+}
+async function driveSaveDraftPdf(html, baseName, parentId) {
+  const token = await driveEnsureToken();
+  const boundary = 'lmbnd' + Date.now();
+  const meta = { name: baseName, mimeType: 'application/vnd.google-apps.document', parents: [parentId] };
+  const body = '--' + boundary + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(meta) + '\r\n--' + boundary + '\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n' + html + '\r\n--' + boundary + '--';
+  const docRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'multipart/related; boundary=' + boundary }, body });
+  const docData = await docRes.json();
+  if (!docData.id) { if (docRes.status === 401) { _driveToken = null; await driveSignIn(false); return driveSaveDraftPdf(html, baseName, parentId); } throw new Error('문서 생성 실패'); }
+  const docId = docData.id;
+  const pdfRes = await driveFetch('https://www.googleapis.com/drive/v3/files/' + docId + '/export?mimeType=application/pdf');
+  const pdfBlob = await pdfRes.blob();
+  const pdfMeta = { name: baseName + '.pdf', parents: [parentId] };
+  const initRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,webViewLink', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': 'application/pdf' }, body: JSON.stringify(pdfMeta) });
+  const uploadUrl = initRes.headers.get('Location');
+  const putRes = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': 'application/pdf' }, body: pdfBlob });
+  const pput = await putRes.json();
+  if (!pput.id) throw new Error('PDF 저장 실패');
+  try { await driveFetch('https://www.googleapis.com/drive/v3/files/' + docId, { method: 'DELETE' }); } catch (e) {}
+  return { pdfId: pput.id, pdfLink: pput.webViewLink || ('https://drive.google.com/file/d/' + pput.id + '/view') };
+}
 
 const pct = (a, b) => (b > 0 ? Math.round((a / b) * 100) : 0);
 const stC = s => ({ '예정': '#9CA3AF', '진행중': '#3B82F6', '검토중': '#F59E0B', '완료': '#10B981', '보류': '#94A3B8' }[s] || '#9CA3AF');
@@ -69,17 +143,19 @@ const DEFAULT_MAIN_KPIS = [
 const migrateData = raw => ({
   ...raw,
   categories: raw.categories || [{ name: 'MD출력', prefix: 'MD' }, { name: '기타추가', prefix: 'P' }, { name: '반복지원', prefix: 'R' }],
-  mainKpis: raw.mainKpis || DEFAULT_MAIN_KPIS,
-  kpiLogs: raw.kpiLogs || [],
+  mainKpis: (raw.mainKpis || DEFAULT_MAIN_KPIS).map(mk => ({ ...mk, linkedKpiIds: mk.linkedKpiIds || (mk.linkedPlanIds || []).map(pid => 'k' + pid) })),
+  kpiLogs: (raw.kpiLogs || []).map(l => ({ kpiId: 'k' + l.planId, ...l })),
   outputs: (raw.outputs || []).map(o => ({ kpi: null, ...o })),
-  plans: (raw.plans || []).map(p => ({ hold: false, desc: '', ...p })),
+  plans: (raw.plans || []).map(p => { const b = { hold: false, desc: '', ...p }; b.kpis = b.kpis || (b.kpi ? [{ id: (b.kpi.id || ('k' + p.id)), name: b.kpi.name, unit: b.kpi.unit, target: b.kpi.target, targets: b.kpi.targets || {} }] : []); return b; }),
   subplans: (raw.subplans || []).map(s => { const ns = { files: [], perfRecorded: false, ...s }; if (ns.stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; return ns; }),
-  budgets: raw.budgets || [],
+  budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, ...b })),
   trash: raw.trash || [],
 });
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
 const itemTotal = b => b.vat === '별도' ? Math.round(b.amount * 1.1) : b.amount;
+const effDate = b => (b.status === '결제완료' && b.paidDate) ? b.paidDate : b.date;
+const effTotal = b => (b.status === '결제완료' && b.paidAmount != null && b.paidAmount !== '') ? Number(b.paidAmount) : itemTotal(b);
 const budgetNames = (data, b) => { const o = data.outputs.find(x => x.id === b.outputId); const p = b.planId ? data.plans.find(x => x.id === b.planId) : null; const s = b.subplanId ? data.subplans.find(x => x.id === b.subplanId) : null; const c = b.checklistId ? data.checklists.find(x => x.id === b.checklistId) : null; return { project: o ? outLabel(o) : '', plan: p ? p.name : '-', detail: c ? c.text : (s ? s.name : (p ? p.name : (o ? o.name : ''))) }; };
 const fmtSize = n => n > 1024*1024 ? (n/(1024*1024)).toFixed(1)+'MB' : (n/1024).toFixed(0)+'KB';
 
@@ -198,7 +274,7 @@ const INIT = {
     { id: 115, outputId: 5, name: 'QR 제작 및 카드 디자인 기획' }, { id: 116, outputId: 5, name: '상세페이지 제작(AD 협업)' },
     { id: 117, outputId: 6, name: '올인원 루틴 1·2차 기획안 전동' }, { id: 118, outputId: 6, name: '기획 최종 확정' }, { id: 119, outputId: 6, name: '정기회의 발표 및 승인' },
     { id: 120, outputId: 7, name: '행사 기획' }, { id: 121, outputId: 8, name: '체험단 모집' }, { id: 122, outputId: 8, name: '제품 발송' }, { id: 123, outputId: 8, name: '체험단 관리' }, { id: 124, outputId: 8, name: 'VIP선정' }, { id: 125, outputId: 8, name: '체험단 보고서' },
-  ].map(p => ({ start: '', due: '', owner: '현수', support: [], kpi: null, dep: null, resolved: false, hold: false, ...p })),
+  ].map(p => ({ start: '', due: '', owner: '현수', support: [], kpi: null, kpis: [], dep: null, resolved: false, hold: false, ...p })),
   subplans: [
     { id: 201, planId: 101, name: '단품 상품등록', stage: '진행중' }, { id: 202, planId: 101, name: '단품 로켓그로스 입고', stage: '진행중' },
     { id: 203, planId: 101, name: '번들 MD 협의', stage: '진행중' }, { id: 204, planId: 101, name: '번들 포장 기획', stage: '예정' },
@@ -267,6 +343,8 @@ function FileModal({ subId, data, setData, onClose }) {
   const [desc, setDesc] = useState('');
   const [url, setUrl] = useState('');
   const [dragOver, setDragOver] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [upErr, setUpErr] = useState('');
   const MAX = 5 * 1024 * 1024;
   const isLarge = file && file.size > MAX;
   const sub = data.subplans.find(s => s.id === subId);
@@ -281,6 +359,20 @@ function FileModal({ subId, data, setData, onClose }) {
     const f = { id: Date.now(), name: file.name, size: file.size, driveUrl: url.trim(), desc: desc.trim(), uploadedAt: TODAY };
     setData(prev => ({ ...prev, subplans: prev.subplans.map(s => s.id === subId ? { ...s, files: [...(s.files || []), f] } : s) }));
     onClose();
+  };
+  const doUpload = async () => {
+    if (!file) { alert('파일을 선택하세요'); return; }
+    setUploading(true); setUpErr('');
+    try {
+      const sub2 = data.subplans.find(s => s.id === subId);
+      const plan2 = sub2 ? data.plans.find(p => p.id === sub2.planId) : null;
+      const out2 = plan2 ? data.outputs.find(o => o.id === plan2.outputId) : null;
+      const folderId = await driveDeepFolder(['라이프밀', '업무첨부', out2 ? outLabel(out2) : '기타', plan2 ? plan2.name : '기타']);
+      const r = await driveUploadFile(file, folderId);
+      const f = { id: Date.now(), name: file.name, size: file.size, driveUrl: r.link, driveId: r.id, desc: desc.trim(), uploadedAt: TODAY };
+      setData(prev => ({ ...prev, subplans: prev.subplans.map(s => s.id === subId ? { ...s, files: [...(s.files || []), f] } : s) }));
+      onClose();
+    } catch (e) { setUpErr(e.message || '업로드 실패'); } finally { setUploading(false); }
   };
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 200, padding: '24px 12px', overflowY: 'auto' }}>
@@ -315,7 +407,7 @@ function FileModal({ subId, data, setData, onClose }) {
             style={{ border: '2px dashed ' + (dragOver ? G : '#D1D5DB'), borderRadius: 12, padding: 24, textAlign: 'center', cursor: 'pointer', background: dragOver ? '#F0F7F2' : '#F9FAFB' }}>
             <div style={{ fontSize: 28, marginBottom: 6 }}>📁</div>
             <div style={{ fontSize: 13, color: '#6B7280' }}>드래그하거나 클릭해서 선택</div>
-            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>파일 정보(이름·크기)만 기록돼요</div>
+            <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>선택하면 구글 드라이브로 바로 업로드돼요</div>
             <input id="fu-input" type="file" style={{ display: 'none' }} onChange={e => setFile(e.target.files[0])} />
           </div>
           {file && <div style={{ background: '#F0F7F2', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -324,16 +416,21 @@ function FileModal({ subId, data, setData, onClose }) {
             {isLarge && <Badge label="대용량" color="#F59E0B" />}
           </div>}
           {file && (
-            <div style={{ background: '#F9FAFB', borderRadius: 12, padding: 14, border: '1px solid #EEF0F2', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📂 구글드라이브에 올려주세요</div>
-              <div style={{ fontSize: 11, color: '#6B7280' }}>아래 폴더에 업로드한 뒤 공유 링크를 붙여넣어 주세요. (링크 없이 기록만 해도 됩니다)</div>
-              <div style={{ background: '#FEF3C7', borderRadius: 8, padding: '8px 12px', fontSize: 11, color: '#78350F', fontFamily: 'monospace', fontWeight: 600, wordBreak: 'break-all' }}>{folderPath}</div>
-              <a href={driveSearchUrl} target="_blank" rel="noreferrer" style={{ display: 'block', padding: 10, background: '#4285F4', color: 'white', borderRadius: 8, textAlign: 'center', fontWeight: 700, textDecoration: 'none', fontSize: 13 }}>📂 드라이브 폴더 열기 →</a>
-              <div>
-                <Lbl c="공유 링크 (선택)" />
+            <div style={{ background: '#F0F7F2', borderRadius: 12, padding: 14, border: '1px solid #A7F3D0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: G }}>🚀 구글 드라이브에 바로 업로드</div>
+              <div style={{ fontSize: 11, color: '#6B7280' }}>{folderPath} 폴더에 자동 저장되고, 링크만 대시보드에 기록됩니다. (처음 한 번 구글 로그인 필요)</div>
+              {upErr && <div style={{ fontSize: 11, color: '#EF4444', background: '#FEF2F2', borderRadius: 8, padding: '7px 10px' }}>⚠ {upErr}</div>}
+              <button onClick={doUpload} disabled={uploading} style={{ padding: 11, background: uploading ? '#9CA3AF' : '#4285F4', color: 'white', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: uploading ? 'default' : 'pointer' }}>{uploading ? '업로드 중…' : '📤 드라이브에 업로드 후 첨부'}</button>
+            </div>
+          )}
+          {file && (
+            <details style={{ background: '#F9FAFB', borderRadius: 12, padding: '10px 14px', border: '1px solid #EEF0F2' }}>
+              <summary style={{ fontSize: 12, color: '#6B7280', cursor: 'pointer' }}>직접 올린 링크로 기록하기 (수동)</summary>
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <a href={driveSearchUrl} target="_blank" rel="noreferrer" style={{ display: 'block', padding: 9, background: '#E5E7EB', color: '#374151', borderRadius: 8, textAlign: 'center', fontWeight: 600, textDecoration: 'none', fontSize: 12 }}>📂 드라이브 폴더 열기 →</a>
                 <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://drive.google.com/..." style={{ width: '100%', padding: '8px 9px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box' }} />
               </div>
-            </div>
+            </details>
           )}
           {file && (
             <div>
@@ -342,7 +439,7 @@ function FileModal({ subId, data, setData, onClose }) {
                 style={{ width: '100%', minHeight: 64, padding: '8px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit' }} />
             </div>
           )}
-          {file && <Btn onClick={save} style={{ width: '100%' }}>✅ 기록 추가</Btn>}
+          {file && url.trim() && <Btn onClick={save} style={{ width: '100%' }}>✅ 링크로 기록만 추가</Btn>}
           <Btn v="secondary" onClick={onClose} style={{ width: '100%' }}>닫기</Btn>
         </div>
       </div>
@@ -399,11 +496,12 @@ const KpiInput = ({ value, onChange, existingTargets }) => {
   );
 };
 
+const genKpiId = () => 'k' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36);
 const buildKpi = (st, existing) => {
   if (!st || !st.name) return null;
   const targets = { ...((existing && existing.targets) || {}) };
   if (st.month && st.target !== '' && st.target != null) targets[st.month] = Number(st.target) || 0;
-  return { name: st.name, unit: st.unit || '', target: Number(st.target) || 0, targets, manuals: (existing && existing.manuals) || [] };
+  return { id: (existing && existing.id) || genKpiId(), name: st.name, unit: st.unit || '', target: Number(st.target) || 0, targets };
 };
 
 const SupportEditor = ({ support, setSupport }) => {
@@ -474,8 +572,8 @@ function AddModal({ data, setData, onClose }) {
     if (oMode === 'new') { if (!oName.trim()) { alert('출력 프로젝트명 입력'); return; } outputId = next(); nd.outputs.push({ id: outputId, code: newCode, type: oCls, name: oName.trim() }); }
     else { if (!oSel) { alert('출력 프로젝트 선택'); return; } outputId = Number(oSel); }
     let planId;
-    if (pMode === 'new') { if (!pName.trim()) { alert('실행계획명 입력'); return; } planId = next(); const dep = parseDep(pDate); nd.plans.push({ id: planId, outputId, name: pName.trim(), start: dep ? '' : pDate.start, due: dep ? addDays(TODAY, dep.days) : pDate.due, owner, support: sMode === 'new' ? [] : support.slice(), kpi: kpiOn ? buildKpi(kpi) : null, dep, resolved: false, hold: false }); }
-    else { if (!pSel) { alert('실행계획 선택'); return; } planId = Number(pSel); if (kpiOn && !(existingPlan && existingPlan.kpi)) nd.plans = nd.plans.map(p => p.id === planId ? { ...p, kpi: buildKpi(kpi) } : p); }
+    if (pMode === 'new') { if (!pName.trim()) { alert('실행계획명 입력'); return; } planId = next(); const dep = parseDep(pDate); const nk = kpiOn ? buildKpi(kpi) : null; nd.plans.push({ id: planId, outputId, name: pName.trim(), start: dep ? '' : pDate.start, due: dep ? addDays(TODAY, dep.days) : pDate.due, owner, support: sMode === 'new' ? [] : support.slice(), kpis: nk ? [nk] : [], dep, resolved: false, hold: false }); }
+    else { if (!pSel) { alert('실행계획 선택'); return; } planId = Number(pSel); const nk = kpiOn ? buildKpi(kpi) : null; if (nk) nd.plans = nd.plans.map(p => p.id === planId ? { ...p, kpis: [...(p.kpis || []), nk] } : p); }
     let subId = null;
     if (sMode === 'new') { if (!sName.trim()) { alert('세부실행계획명 입력'); return; } subId = next(); const dep = parseDep(sDate); nd.subplans.push({ id: subId, planId, name: sName.trim(), stage: '예정', start: dep ? '' : sDate.start, due: dep ? addDays(TODAY, dep.days) : sDate.due, owner, support: support.slice(), dep, resolved: false, files: [], perfRecorded: false }); }
     else if (sMode === 'exist') { subId = Number(sSel); }
@@ -551,6 +649,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const [desc, setDesc] = useState(item.desc || '');
   const [newSubChk, setNewSubChk] = useState('');
   const [showReorder, setShowReorder] = useState(false);
+  const [planKpis, setPlanKpis] = useState(() => kind === 'plan' ? ((item.kpis || []).map(k => ({ id: k.id || genKpiId(), name: k.name, unit: k.unit, target: String(k.target != null ? k.target : ''), targets: k.targets || {} }))) : []);
 
   const currentPlan = kind === 'subplan' ? data.plans.find(p => p.id === item.planId) : null;
   const currentOutput = currentPlan ? data.outputs.find(o => o.id === currentPlan.outputId) : null;
@@ -568,6 +667,9 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const subChks = kind === 'subplan' ? data.checklists.filter(c => c.subplanId === item.id) : [];
 
   const mkKpi = () => kpiOn ? buildKpi(kpi, item.kpi) : null;
+  const addPlanKpi = () => setPlanKpis(ks => [...ks, { id: genKpiId(), name: '', unit: '%', target: '', targets: {} }]);
+  const updPlanKpi = (i, f2, v) => setPlanKpis(ks => ks.map((k, j) => j === i ? { ...k, [f2]: v } : k));
+  const delPlanKpi = i => setPlanKpis(ks => ks.filter((_, j) => j !== i));
 
   const save = () => {
     if (!name.trim()) { alert('이름 입력'); return; }
@@ -582,14 +684,14 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
       if (stage === '완료' && !item.completedAt) f.completedAt = TODAY;
       if (showOutputChg && newPlanId) f.planId = Number(newPlanId);
     }
-    if (kind === 'plan') { f.kpi = mkKpi(); f.hold = hold; f.desc = desc; }
+    if (kind === 'plan') { f.kpis = planKpis.filter(k => (k.name || '').trim()).map(k => ({ id: k.id, name: k.name.trim(), unit: (k.unit || '').trim() || '%', target: Number(k.target) || 0, targets: k.targets || {} })); f.kpi = null; f.hold = hold; f.desc = desc; }
     setData(d => resolveAll(kind === 'plan' ? { ...d, plans: d.plans.map(p => p.id === item.id ? { ...p, ...f } : p) } : { ...d, subplans: d.subplans.map(s => s.id === item.id ? { ...s, ...f } : s) }));
     onClose();
   };
 
   const del = () => { setData(d => moveToTrash(d, kind, item.id)); onClose(); };
 
-  const addChildPlan = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, plans: [...d.plans, { id: d.nid + 1, outputId: item.id, name: newChild.trim(), start: '', due: '', owner: ['현수'], support: [], kpi: null, dep: null, resolved: false, hold: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'plan', id: nv }); };
+  const addChildPlan = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, plans: [...d.plans, { id: d.nid + 1, outputId: item.id, name: newChild.trim(), start: '', due: '', owner: ['현수'], support: [], kpis: [], dep: null, resolved: false, hold: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'plan', id: nv }); };
   const addChildSub = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: item.id, name: newChild.trim(), stage: '예정', start: '', due: '', owner: (ownersOf(item).length ? ownersOf(item) : ['현수']), support: [], dep: null, resolved: false, files: [], perfRecorded: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'subplan', id: nv }); };
   const movePlanChild = (id, dir) => setData(d => ({ ...d, plans: reorderSiblings(d.plans, id, 'outputId', dir) }));
   const toggleSubChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
@@ -598,10 +700,26 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const moveSubChild = (id, dir) => setData(d => ({ ...d, subplans: reorderSiblings(d.subplans, id, 'planId', dir) }));
 
   const titleMap = { output: '출력 프로젝트 수정', plan: '실행계획 수정', subplan: '세부실행계획 수정' };
-  const kpiBlock = (
+  const kpiBlock = kind === 'output' ? (
     <div>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: G, cursor: 'pointer' }}><input type="checkbox" checked={kpiOn} onChange={e => setKpiOn(e.target.checked)} /> KPI {kind === 'output' ? '(프로젝트 단위)' : ''}</label>
-      {kpiOn && <><KpiInput value={kpi} onChange={setKpi} existingTargets={(item.kpi && item.kpi.targets) || {}} /><div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6 }}>※ 달성값은 [업무 성과] 탭의 성과 기록으로 집계됩니다{kind === 'output' ? '. 프로젝트 KPI는 소속 실행계획 KPI들을 합산합니다' : ''}</div></>}
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: G, cursor: 'pointer' }}><input type="checkbox" checked={kpiOn} onChange={e => setKpiOn(e.target.checked)} /> KPI (프로젝트 단위)</label>
+      {kpiOn && <><KpiInput value={kpi} onChange={setKpi} existingTargets={(item.kpi && item.kpi.targets) || {}} /><div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6 }}>※ 프로젝트 KPI는 소속 실행계획 KPI들의 성과 합계로 집계됩니다.</div></>}
+    </div>
+  ) : (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>🎯 KPI ({planKpis.length})</span><button onClick={addPlanKpi} style={{ marginLeft: 'auto', fontSize: 12, padding: '4px 11px', borderRadius: 7, border: 'none', background: GO, color: 'white', cursor: 'pointer', fontWeight: 700 }}>+ KPI 추가</button></div>
+      {planKpis.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF', marginTop: 8 }}>등록된 KPI가 없습니다. 여러 개 추가할 수 있어요.</div> :
+        planKpis.map((k, i) => (
+          <div key={k.id} style={{ background: '#F0F7F2', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0', marginTop: 8 }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+              <div style={{ flex: 2 }}><Lbl c="KPI명" /><Inp value={k.name} onChange={v => updPlanKpi(i, 'name', v)} placeholder="예: 전환율 / 신규고객" /></div>
+              <div style={{ flex: 1 }}><Lbl c="단위" /><Inp value={k.unit} onChange={v => updPlanKpi(i, 'unit', v)} placeholder="%/명/원" /></div>
+              <button onClick={() => delPlanKpi(i)} style={{ alignSelf: 'flex-end', border: 'none', background: '#FEE2E2', color: '#EF4444', borderRadius: 8, width: 36, height: 38, cursor: 'pointer', fontSize: 16 }}>×</button>
+            </div>
+            <div><Lbl c="기본 목표값" /><Inp type="number" value={k.target} onChange={v => updPlanKpi(i, 'target', v)} placeholder="목표값 (월별 목표는 KPI 탭에서)" /></div>
+          </div>
+        ))}
+      <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6 }}>※ 달성값은 [업무 성과] 탭에서 KPI별로 기록하고, 월별 목표는 [KPI] 탭에서 설정합니다.</div>
     </div>
   );
 
@@ -644,7 +762,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
           {childPlans.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 8 }}>등록된 실행계획이 없습니다</div> :
             childPlans.map((p, pi) => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; return (
               <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 8, padding: '8px 10px', marginBottom: 5, border: '1px solid #E5E7EB' }}>
-                <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600 }}>{p.name}{p.kpi ? ' 🎯' : ''}{p.hold ? ' ⏸' : ''}</div><div style={{ fontSize: 10, color: '#9CA3AF' }}>{ownerAv(p)} {ownerNm(p)} · 세부 {done}/{subs.length}</div></div>
+                <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600 }}>{p.name}{(p.kpis && p.kpis.length) ? ' 🎯' : ''}{p.hold ? ' ⏸' : ''}</div><div style={{ fontSize: 10, color: '#9CA3AF' }}>{ownerAv(p)} {ownerNm(p)} · 세부 {done}/{subs.length}</div></div>
                 <EditBtn onClick={() => onSwitch && onSwitch({ kind: 'plan', id: p.id })} />
               </div>
             ); })}
@@ -732,7 +850,7 @@ function TabTeam({ data }) {
           return (<Card key={m}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 15 }}>{m}</div><div style={{ fontSize: 11, color: '#6B7280' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 11, color: '#6B7280' }}>완료율</div><div style={{ fontSize: 16, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F0F7F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 10, color: '#6B7280' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 10, color: '#6B7280' }}>서포트</div></div></div></Card>);
         })}
       </div>
-      <div style={{ marginTop: 18 }}><SCards items={[{ label: '출력 프로젝트', value: data.outputs.length + '개', color: G }, { label: '실행계획', value: data.plans.length + '개', color: '#3B82F6' }, { label: '세부 실행계획', value: data.subplans.length + '개', color: '#F59E0B' }, { label: '등록 KPI', value: data.plans.filter(p => p.kpi).length + '개', color: GO }, { label: '보류 항목', value: heldTotal + '건', color: '#94A3B8' }]} /></div>
+      <div style={{ marginTop: 18 }}><SCards items={[{ label: '출력 프로젝트', value: data.outputs.length + '개', color: G }, { label: '실행계획', value: data.plans.length + '개', color: '#3B82F6' }, { label: '세부 실행계획', value: data.subplans.length + '개', color: '#F59E0B' }, { label: '등록 KPI', value: (data.plans.reduce((a, p) => a + (p.kpis ? p.kpis.length : 0), 0) + data.outputs.filter(o => o.kpi).length) + '개', color: GO }, { label: '보류 항목', value: heldTotal + '건', color: '#94A3B8' }]} /></div>
     </div>
   );
 }
@@ -758,7 +876,7 @@ function TabProgress({ data, setData, onEdit }) {
         {sortedOutputs.map(o => {
           const plans = data.plans.filter(p => p.outputId === o.id && matchOwner(p, filter));
           if (!plans.length) return null;
-          return (<Card key={o.id} style={{ padding: 0, overflow: 'hidden' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#F7FBF8', borderBottom: '1px solid #EEF0F2' }}><Badge label={o.code} color={clsC(o.type, data.categories)} /><span style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</span>{o.kpi && <Badge label="KPI" color={GO} />}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{o.type}</span>{data.plans.filter(p => p.outputId === o.id).length > 1 && <button onClick={() => setOrderPlansFor(o.id)} style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서</button>}<EditBtn onClick={() => onEdit({ kind: 'output', id: o.id })} /></div><div style={{ padding: '8px 16px 14px' }}>{plans.map((p, pi) => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; const prog = subs.length ? pct(done, subs.length) : 0; return (<div key={p.id} style={{ padding: '10px 0', borderBottom: '1px solid #F3F4F6', opacity: p.hold ? 0.65 : 1 }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}><span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>{p.hold && <Badge label="⏸ 보류" color="#94A3B8" />}{p.kpi && <Badge label="KPI" color={GO} />}<span style={{ fontSize: 11, color: '#6B7280' }}>{ownerAv(p)} {ownerNm(p)}</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{p.start || '미정'} ~ {p.due || '미정'}</span><button onClick={() => toggleHold(p.id)} style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF', cursor: 'pointer', fontSize: 10 }}>{p.hold ? '⏸ 해제' : '⏸'}</button><EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id })} /></div>{p.desc && <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 8, lineHeight: 1.45, whiteSpace: 'pre-wrap', background: '#F9FAFB', borderRadius: 7, padding: '6px 9px' }}>{p.desc}</div>}<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={done} m={subs.length || 1} h={6} /></div><span style={{ fontSize: 11, fontWeight: 700, color: prog >= 100 ? '#10B981' : '#6B7280', minWidth: 78, textAlign: 'right' }}>세부 {done}/{subs.length} ({prog}%)</span></div></div>); })}</div></Card>);
+          return (<Card key={o.id} style={{ padding: 0, overflow: 'hidden' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#F7FBF8', borderBottom: '1px solid #EEF0F2' }}><Badge label={o.code} color={clsC(o.type, data.categories)} /><span style={{ fontWeight: 700, fontSize: 14 }}>{o.name}</span>{o.kpi && <Badge label="KPI" color={GO} />}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{o.type}</span>{data.plans.filter(p => p.outputId === o.id).length > 1 && <button onClick={() => setOrderPlansFor(o.id)} style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서</button>}<EditBtn onClick={() => onEdit({ kind: 'output', id: o.id })} /></div><div style={{ padding: '8px 16px 14px' }}>{plans.map((p, pi) => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; const prog = subs.length ? pct(done, subs.length) : 0; return (<div key={p.id} style={{ padding: '10px 0', borderBottom: '1px solid #F3F4F6', opacity: p.hold ? 0.65 : 1 }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}><span style={{ fontWeight: 600, fontSize: 13 }}>{p.name}</span>{p.hold && <Badge label="⏸ 보류" color="#94A3B8" />}{(p.kpis && p.kpis.length > 0) && <Badge label={'KPI ' + p.kpis.length} color={GO} />}<span style={{ fontSize: 11, color: '#6B7280' }}>{ownerAv(p)} {ownerNm(p)}</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#9CA3AF' }}>{p.start || '미정'} ~ {p.due || '미정'}</span><button onClick={() => toggleHold(p.id)} style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #E5E7EB', background: 'white', color: '#9CA3AF', cursor: 'pointer', fontSize: 10 }}>{p.hold ? '⏸ 해제' : '⏸'}</button><EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id })} /></div>{p.desc && <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 8, lineHeight: 1.45, whiteSpace: 'pre-wrap', background: '#F9FAFB', borderRadius: 7, padding: '6px 9px' }}>{p.desc}</div>}<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={done} m={subs.length || 1} h={6} /></div><span style={{ fontSize: 11, fontWeight: 700, color: prog >= 100 ? '#10B981' : '#6B7280', minWidth: 78, textAlign: 'right' }}>세부 {done}/{subs.length} ({prog}%)</span></div></div>); })}</div></Card>);
         })}
       </div>
     </div>
@@ -797,6 +915,7 @@ function TabKanban({ data, setData, onEdit }) {
 
 function TabWeekly({ data, setData, onEdit }) {
   const [filter, setFilter] = useState('전체'), [offset, setOffset] = useState(0), [colChk, setColChk] = useState({}), [newChk, setNewChk] = useState({}), [dragOver, setDragOver] = useState(null);
+  const [monthView, setMonthView] = useState(false), [monthStart, setMonthStart] = useState(TODAY.slice(0, 7) + '-01');
   const monday = (() => { const d = new Date(TODAY); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd + offset * 7); return d; })();
   const weekDates = DAYS.map((_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); return x.toISOString().slice(0, 10); });
   const diffDays = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
@@ -836,16 +955,9 @@ function TabWeekly({ data, setData, onEdit }) {
   const spanMeta = spanning.map(s => {
     const sc = s.start <= weekDates[0] ? 0 : weekDates.indexOf(s.start);
     const ec = s.due >= weekDates[6] ? 6 : weekDates.indexOf(s.due);
-    const cols = (sc >= 0 && ec >= 0 && sc <= ec) ? (ec - sc + 1) : 1;
-    const perLine = Math.max(5, cols * 8 - 3);
-    const titleLines = Math.min(3, Math.max(1, Math.ceil((s.name || '').length / perLine)));
-    const dateLines = cols <= 1 ? 2 : 1;
-    const chkN = data.checklists.filter(c => c.subplanId === s.id).length;
-    const chkH = colChk[s.id] ? 0 : (chkN * 17 + 28);
-    const h = Math.max(46, 14 + titleLines * 18 + dateLines * 14 + chkH);
-    return { sc, ec, h };
+    return { sc, ec };
   });
-  // 겹치지 않는 막대는 같은 줄에 채워넣기(lane packing)
+  // 겹치지 않는 막대는 같은 줄(lane)에 배치
   const laneOf = {};
   const lanes = [];
   spanMeta.map((m, i) => i).sort((a, b) => spanMeta[a].sc - spanMeta[b].sc || a - b).forEach(i => {
@@ -854,11 +966,17 @@ function TabWeekly({ data, setData, onEdit }) {
     if (k === -1) { lanes.push({ endCol: m.ec }); k = lanes.length - 1; } else { lanes[k].endCol = m.ec; }
     laneOf[i] = k;
   });
-  const laneHeight = lanes.map(() => 0);
-  spanMeta.forEach((m, i) => { laneHeight[laneOf[i]] = Math.max(laneHeight[laneOf[i]], m.h); });
+  // 막대 실제 높이를 측정 → 줄별 최대 높이 (요일별로 자기 칸을 지나는 막대만큼만 자리 확보)
+  const spanRefs = useRef({});
+  const [laneH, setLaneH] = useState({});
+  React.useLayoutEffect(() => {
+    const h = {};
+    spanning.forEach((s, idx) => { const el = spanRefs.current[s.id]; if (el) { const k = laneOf[idx]; h[k] = Math.max(h[k] || 0, el.offsetHeight); } });
+    setLaneH(prev => (JSON.stringify(prev) === JSON.stringify(h) ? prev : h));
+  });
   const laneTop = [];
-  laneHeight.forEach((h, k) => { laneTop[k] = k === 0 ? 0 : laneTop[k - 1] + laneHeight[k - 1] + SPAN_GAP; });
-  const colReserve = i => { let h = 0; spanMeta.forEach((m, idx) => { if (m.sc >= 0 && m.ec >= 0 && m.sc <= i && i <= m.ec) h = Math.max(h, laneTop[laneOf[idx]] + laneHeight[laneOf[idx]] + SPAN_GAP); }); return h; };
+  lanes.forEach((_, k) => { laneTop[k] = k === 0 ? 0 : laneTop[k - 1] + (laneH[k - 1] || 46) + SPAN_GAP; });
+  const colReserve = i => { let h = 0; spanMeta.forEach((m, idx) => { if (m.sc >= 0 && m.ec >= 0 && m.sc <= i && i <= m.ec) h = Math.max(h, laneTop[laneOf[idx]] + (laneH[laneOf[idx]] || 46) + SPAN_GAP); }); return h; };
   const getDayItems = date => subs.filter(s => { if (s.start && s.due && s.start !== s.due) return false; return s.due === date; });
   const unassigned = subs.filter(s => !s.due);
   const grouped = {};
@@ -891,19 +1009,70 @@ function TabWeekly({ data, setData, onEdit }) {
       </Card>
     );
   };
+  const ymd = (y, m, d) => y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+  const shiftMonthDate = (ds, n) => { const d = new Date(ds + 'T00:00:00'); const day = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + n); const last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); d.setDate(Math.min(day, last)); return ymd(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
+  const mStartD = new Date(monthStart + 'T00:00:00');
+  const RANGE_DAYS = 30;
+  const mDates = [];
+  for (let i = 0; i < RANGE_DAYS; i++) { const d = new Date(mStartD); d.setDate(mStartD.getDate() + i); mDates.push(ymd(d.getFullYear(), d.getMonth() + 1, d.getDate())); }
+  const mLeadWd = (mStartD.getDay() + 6) % 7;
+  const monthCells = [];
+  for (let i = 0; i < mLeadWd; i++) monthCells.push(null);
+  mDates.forEach(dt => monthCells.push(dt));
+  while (monthCells.length % 7 !== 0) monthCells.push(null);
+  const monthWeeks = []; for (let i = 0; i < monthCells.length; i += 7) monthWeeks.push(monthCells.slice(i, i + 7));
+  const monthEnd = mDates[mDates.length - 1];
+  const monthItemsOf = date => subs.filter(s => { if (!s.due) return false; if (s.start && s.due && s.start !== s.due) return s.start <= date && date <= s.due; return s.due === date; });
   const navBtn = { border: '1px solid #E5E7EB', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '4px 10px' };
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>데일리 / 주간 업무</div>
-        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
-          <button onClick={() => setOffset(offset - 1)} style={navBtn}>◀</button>
-          <span style={{ fontSize: 12, color: '#6B7280', minWidth: 110, textAlign: 'center' }}>{weekDates[0].slice(5)} ~ {weekDates[6].slice(5)}{offset === 0 ? ' (이번 주)' : ''}</span>
-          <button onClick={() => setOffset(offset + 1)} style={navBtn}>▶</button>
+        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button onClick={() => setMonthView(v => !v)} style={{ ...navBtn, background: monthView ? G : 'white', color: monthView ? 'white' : '#374151', fontWeight: 600 }}>{monthView ? '주간 보기' : '📅 월간 보기'}</button>
+          {monthView ? (<>
+            <span style={{ fontSize: 11, color: '#6B7280' }}>조회 시작일</span>
+            <input type="date" value={monthStart} onChange={e => { if (e.target.value) setMonthStart(e.target.value); }} style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #E5E7EB', fontSize: 12 }} />
+            <button onClick={() => setMonthStart(shiftMonthDate(monthStart, -1))} style={navBtn}>◀</button>
+            <span style={{ fontSize: 12, color: '#6B7280', minWidth: 120, textAlign: 'center' }}>{monthStart.slice(5)} ~ {monthEnd.slice(5)} (30일)</span>
+            <button onClick={() => setMonthStart(shiftMonthDate(monthStart, 1))} style={navBtn}>▶</button>
+          </>) : (<>
+            <button onClick={() => setOffset(offset - 1)} style={navBtn}>◀</button>
+            <span style={{ fontSize: 12, color: '#6B7280', minWidth: 110, textAlign: 'center' }}>{weekDates[0].slice(5)} ~ {weekDates[6].slice(5)}{offset === 0 ? ' (이번 주)' : ''}</span>
+            <button onClick={() => setOffset(offset + 1)} style={navBtn}>▶</button>
+          </>)}
         </div>
       </div>
       <FilterBar value={filter} onChange={setFilter} />
-      <div style={{ overflowX: 'auto', marginBottom: 16 }}>
+      {monthView && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6, marginBottom: 6 }}>
+            {DAYS.map(day => <div key={day} style={{ textAlign: 'center', fontWeight: 700, fontSize: 12, color: G, padding: '4px 0' }}>{day}</div>)}
+          </div>
+          {monthWeeks.map((wk, wi) => (
+            <div key={wi} style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6, marginBottom: 6 }}>
+              {wk.map((date, di) => {
+                if (!date) return <div key={di} style={{ minHeight: 92, background: '#FAFAFA', borderRadius: 8 }} />;
+                const items = monthItemsOf(date);
+                const isToday = date === TODAY, isSel = date === monthStart;
+                return (
+                  <div key={di} onClick={() => setMonthStart(date)}
+                    onDragOver={e => { e.preventDefault(); setDragOver('m' + date); }}
+                    onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null); }}
+                    onDrop={e => handleDrop(e, date)}
+                    style={{ minHeight: 92, background: dragOver === 'm' + date ? '#E8F4EE' : 'white', border: '1px solid ' + (isSel ? G : isToday ? GO : '#EEF0F2'), borderRadius: 8, padding: 6, cursor: 'pointer', overflow: 'hidden' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: isSel ? G : isToday ? GO : '#374151', marginBottom: 4 }}>{date.slice(8) === '01' ? Number(date.slice(5, 7)) + '월 1' : Number(date.slice(8))}{isSel ? ' ·시작' : isToday ? ' ·오늘' : ''}</div>
+                    {items.slice(0, 4).map(s => <div key={s.id} style={{ fontSize: 9, padding: '2px 5px', borderRadius: 5, background: stC(s.stage), color: 'white', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>)}
+                    {items.length > 4 && <div style={{ fontSize: 9, color: '#9CA3AF' }}>+{items.length - 4}건</div>}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>날짜를 클릭하면 그 날부터 한 달(30일)로 조회 기간이 바뀝니다.</div>
+        </div>
+      )}
+      <div style={{ overflowX: 'auto', marginBottom: 16, display: monthView ? 'none' : 'block' }}>
         <div style={{ minWidth: 1000 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 8, marginBottom: 8 }}>
             {DAYS.map((day, i) => (
@@ -931,8 +1100,8 @@ function TabWeekly({ data, setData, onEdit }) {
               const dur = diffDays(s.start, s.due);
               const chks = data.checklists.filter(c => c.subplanId === s.id); const cd = chks.filter(c => c.done).length;
               return (
-                <div key={s.id} draggable onDragStart={e => onDragStart(e, s, true)}
-                  style={{ gridColumn: `${sc + 1} / ${ec + 2}`, gridRow: 1, alignSelf: 'start', marginTop: laneTop[laneOf[idx]], minHeight: spanMeta[idx].h, position: 'relative', zIndex: 2, background: 'white', border: '1.5px solid ' + stC(s.stage), borderLeft: '5px solid ' + stC(s.stage), borderRadius: 10, padding: '6px 12px', display: 'flex', flexDirection: 'column', gap: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'grab' }}>
+                <div key={s.id} ref={el => (spanRefs.current[s.id] = el)} draggable onDragStart={e => onDragStart(e, s, true)}
+                  style={{ gridColumn: `${sc + 1} / ${ec + 2}`, gridRow: 1, alignSelf: 'start', marginTop: laneTop[laneOf[idx]], position: 'relative', zIndex: 2, background: 'white', border: '1.5px solid ' + stC(s.stage), borderLeft: '5px solid ' + stC(s.stage), borderRadius: 10, padding: '6px 12px', display: 'flex', flexDirection: 'column', gap: 4, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'grab' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                     <Badge label={s.stage} color={stC(s.stage)} />
                     <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => setColChk(cc => ({ ...cc, [s.id]: !cc[s.id] }))}>
@@ -974,22 +1143,21 @@ function PerfModal({ subId, data, setData, onClose }) {
   const sub = data.subplans.find(s => s.id === subId);
   const plan = sub ? data.plans.find(p => p.id === sub.planId) : null;
   const out = plan ? data.outputs.find(o => o.id === plan.outputId) : null;
-  const hasKpi = plan && plan.kpi;
-  const existingLog = (data.kpiLogs || []).find(l => l.subplanId === subId);
-  const [value, setValue] = useState(existingLog ? String(existingLog.value) : '');
-  const [pStart, setPStart] = useState(existingLog ? existingLog.periodStart : addDay(TODAY, -30));
-  const [pEnd, setPEnd] = useState(existingLog ? existingLog.periodEnd : TODAY);
-  const [note, setNote] = useState(existingLog ? existingLog.note : '');
+  const planKpis = (plan && plan.kpis) || [];
+  const hasKpi = planKpis.length > 0;
+  const myLogs = (data.kpiLogs || []).filter(l => l.subplanId === subId);
+  const first = myLogs[0];
+  const [values, setValues] = useState(() => { const v = {}; myLogs.forEach(l => { v[l.kpiId || ('k' + l.planId)] = String(l.value); }); return v; });
+  const [pStart, setPStart] = useState(first ? first.periodStart : addDay(TODAY, -30));
+  const [pEnd, setPEnd] = useState(first ? first.periodEnd : TODAY);
+  const [note, setNote] = useState(first ? first.note : '');
   const [showFile, setShowFile] = useState(false);
   const files = (data.subplans.find(s => s.id === subId) || {}).files || [];
   if (!sub) return null;
   const save = () => {
-    if (hasKpi && (!value || Number(value) < 0)) { alert('KPI 달성값을 입력하세요'); return; }
     setData(d => {
       let logs = (d.kpiLogs || []).filter(l => l.subplanId !== subId);
-      if (hasKpi && value) {
-        logs = [...logs, { id: Date.now(), subplanId: subId, planId: plan.id, value: Number(value), periodStart: pStart, periodEnd: pEnd, note, recordedAt: TODAY }];
-      }
+      planKpis.forEach(k => { const val = values[k.id]; if (val !== '' && val != null && !isNaN(Number(val))) logs = [...logs, { id: Date.now() + Math.floor(Math.random() * 1000), subplanId: subId, planId: plan.id, kpiId: k.id, value: Number(val), periodStart: pStart, periodEnd: pEnd, note, recordedAt: TODAY }]; });
       return { ...d, kpiLogs: logs, subplans: d.subplans.map(s => s.id === subId ? { ...s, perfRecorded: true } : s) };
     });
     onClose();
@@ -1009,19 +1177,18 @@ function PerfModal({ subId, data, setData, onClose }) {
           </div>
           {hasKpi ? (
             <div style={{ background: '#F0F7F2', borderRadius: 10, padding: 14, border: '1px solid #A7F3D0' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>🎯 KPI 달성 기록</div>
-              <div style={{ fontSize: 12, color: '#374151', marginBottom: 10, background: 'white', borderRadius: 8, padding: '8px 10px' }}>
-                연결된 KPI: <strong>{plan.kpi.name}</strong> (목표 {plan.kpi.target.toLocaleString()} {plan.kpi.unit})
-              </div>
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>이 업무로 달성한 값</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {inp(value, setValue, 'number', '예: 120')}
-                  <span style={{ fontSize: 12, color: '#6B7280', whiteSpace: 'nowrap' }}>{plan.kpi.unit}</span>
+              <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>🎯 KPI 달성 기록 (KPI별 입력)</div>
+              {planKpis.map(k => (
+                <div key={k.id} style={{ background: 'white', borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, color: '#374151', marginBottom: 6 }}><strong>{k.name}</strong> <span style={{ color: '#9CA3AF' }}>(기본목표 {(k.target || 0).toLocaleString()} {k.unit})</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input type="number" value={values[k.id] || ''} onChange={e => setValues(v => ({ ...v, [k.id]: e.target.value }))} placeholder="달성값 (비우면 미기록)" style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box' }} />
+                    <span style={{ fontSize: 12, color: '#6B7280', whiteSpace: 'nowrap' }}>{k.unit}</span>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>달성 기간</div>
+              ))}
+              <div style={{ marginTop: 4 }}>
+                <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 4 }}>달성 기간 (KPI 공통)</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8 }}>
                   {inp(pStart, setPStart, 'date')}<span style={{ color: '#9CA3AF' }}>~</span>{inp(pEnd, setPEnd, 'date')}
                 </div>
@@ -1069,10 +1236,10 @@ function TabPerformance({ data, setData, onRecord }) {
   const notRecorded = completed.filter(s => !s.perfRecorded);
   const planOf = id => data.plans.find(p => p.id === id);
   const outOf = pid => { const p = planOf(pid); return p ? data.outputs.find(o => o.id === p.outputId) : null; };
-  const logOf = subId => (data.kpiLogs || []).find(l => l.subplanId === subId);
+  const logsOf = subId => (data.kpiLogs || []).filter(l => l.subplanId === subId);
   const renderCard = (s, isRecorded) => {
     const plan = planOf(s.planId); const out = outOf(s.planId);
-    const log = logOf(s.id); const files = s.files || [];
+    const logs = logsOf(s.id); const files = s.files || [];
     return (
       <Card key={s.id} style={{ marginBottom: 10, borderLeft: '4px solid ' + (isRecorded ? '#10B981' : '#F59E0B') }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -1080,10 +1247,14 @@ function TabPerformance({ data, setData, onRecord }) {
             <div style={{ fontSize: 11, color: '#9CA3AF', marginBottom: 3 }}>{out ? outLabel(out) : ''} ▸ {plan ? plan.name : ''}</div>
             <div style={{ fontSize: 14, fontWeight: 700 }}>{s.name}</div>
             <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>{ownerAv(s)} {ownerNm(s)} · 완료 {s.completedAt || '미기록'}</div>
-            {isRecorded && log && plan && plan.kpi && (
+            {isRecorded && logs.length > 0 && plan && (
               <div style={{ marginTop: 10, background: '#F0F7F2', borderRadius: 8, padding: '8px 12px' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: G }}>🎯 {plan.kpi.name}: {log.value.toLocaleString()} {plan.kpi.unit}</div>
-                <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>달성기간 {log.periodStart} ~ {log.periodEnd}</div>
+                {logs.map(l => { const k = (plan.kpis || []).find(kk => kk.id === l.kpiId); return (
+                  <div key={l.id} style={{ marginBottom: 4 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: G }}>🎯 {k ? k.name : 'KPI'}: {l.value.toLocaleString()} {k ? k.unit : ''}</div>
+                    <div style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>달성기간 {l.periodStart} ~ {l.periodEnd}</div>
+                  </div>
+                ); })}
               </div>
             )}
             {isRecorded && files.length > 0 && (
@@ -1125,16 +1296,73 @@ function TabPerformance({ data, setData, onRecord }) {
   );
 }
 
+function NumInput({ value, onCommit, placeholder, style }) {
+  const [v, setV] = useState(value == null || value === '' ? '' : String(value));
+  const focused = useRef(false);
+  useEffect(() => { if (!focused.current) setV(value == null || value === '' ? '' : String(value)); }, [value]);
+  return <input type="number" value={v} onFocus={e => { focused.current = true; e.target.select(); }} onChange={e => setV(e.target.value)} onBlur={() => { focused.current = false; onCommit(v); }} onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }} placeholder={placeholder} style={style} />;
+}
+function shiftMonth(base, n) { const p = base.split('-'); const d = new Date(Number(p[0]), Number(p[1]) - 1 + n, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+function TargetEditor({ targets, onSet, unit }) {
+  const [mo, setMo] = useState(TODAY.slice(0, 7));
+  const nav = { border: '1px solid #D1D5DB', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '4px 9px', fontSize: 12 };
+  const tg = targets || {};
+  const setKeys = Object.keys(tg).filter(k => tg[k]).sort();
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>🎯 월별 목표 설정</div>
+      <div style={{ background: '#F0F7F2', borderRadius: 8, padding: '10px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <button onClick={() => setMo(shiftMonth(mo, -1))} style={nav}>◀</button>
+          <span style={{ fontSize: 13, fontWeight: 700, color: G, minWidth: 78, textAlign: 'center' }}>{mo}</span>
+          <button onClick={() => setMo(shiftMonth(mo, 1))} style={nav}>▶</button>
+          <span style={{ fontSize: 11, color: '#6B7280' }}>목표 ({unit})</span>
+        </div>
+        <NumInput value={tg[mo]} onCommit={v => onSet(mo, v)} placeholder="이 달 목표 입력" style={{ width: 200, padding: '8px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box' }} />
+        {setKeys.length > 0 && (
+          <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            {setKeys.map(k => (
+              <button key={k} onClick={() => setMo(k)} style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, border: 'none', cursor: 'pointer', background: k === mo ? G : '#E5E7EB', color: k === mo ? '#fff' : '#374151', fontWeight: 600 }}>{k} · {Number(tg[k]).toLocaleString()}</button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MainKpiModal({ data, setData, onClose, edit }) {
+  const [name, setName] = useState(edit ? edit.name : '');
+  const [unit, setUnit] = useState(edit ? edit.unit : '원');
+  const save = () => {
+    if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
+    const u = unit.trim() || '개';
+    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u } : mk) }));
+    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [] }] }));
+    onClose();
+  };
+  return (
+    <ModalShell title={edit ? '메인 KPI 수정' : '메인 KPI 추가'} onClose={onClose}>
+      <div><Lbl c="KPI 이름" /><Inp value={name} onChange={setName} placeholder="예: 총매출 / 신규고객 / 전환율" /></div>
+      <div><Lbl c="단위" /><Inp value={unit} onChange={setUnit} placeholder="원 / 명 / % / 건" /></div>
+      <div style={{ display: 'flex', gap: 8 }}><Btn v="gold" onClick={save} style={{ flex: 1 }}>{edit ? '수정' : '추가'}</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+    </ModalShell>
+  );
+}
+
 function TabKpi({ data, setData }) {
   const [pStart, setPStart] = useState(monthRange(0).start);
   const [pEnd, setPEnd] = useState(monthRange(0).end);
   const [expanded, setExpanded] = useState(null);
   const [editLink, setEditLink] = useState(null);
+  const [mkEdit, setMkEdit] = useState(undefined);
   const mainKpis = data.mainKpis || [];
   const logs = data.kpiLogs || [];
   const rangeMonths = monthsInRange(pStart, pEnd);
   const isSingleMonth = rangeMonths.length === 1;
   const sumForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
+  const sumForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
+  const logsForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart);
   const logsForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart);
   const plansOfOutput = oid => data.plans.filter(p => p.outputId === oid);
   const sumForOutput = oid => plansOfOutput(oid).reduce((a, p) => a + sumForPlan(p.id), 0);
@@ -1147,33 +1375,16 @@ function TabKpi({ data, setData }) {
 
   const setMainMonth = (mkId, key, val) => setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === mkId ? { ...mk, targets: { ...(mk.targets || {}), [key]: Number(val) || 0 } } : mk) }));
   const setOutMonth = (oid, key, val) => setData(d => ({ ...d, outputs: d.outputs.map(o => o.id === oid && o.kpi ? { ...o, kpi: { ...o.kpi, targets: { ...(o.kpi.targets || {}), [key]: Number(val) || 0 } } } : o) }));
-  const setPlanMonth = (pid, key, val) => setData(d => ({ ...d, plans: d.plans.map(p => p.id === pid && p.kpi ? { ...p, kpi: { ...p.kpi, targets: { ...(p.kpi.targets || {}), [key]: Number(val) || 0 } } } : p) }));
-  const toggleLink = (mkId, planId) => setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => { if (mk.id !== mkId) return mk; const cur = mk.linkedPlanIds || []; return { ...mk, linkedPlanIds: cur.includes(planId) ? cur.filter(x => x !== planId) : [...cur, planId] }; }) }));
+  const setPlanKpiMonth = (pid, kid, key, val) => setData(d => ({ ...d, plans: d.plans.map(p => p.id === pid ? { ...p, kpis: (p.kpis || []).map(k => k.id === kid ? { ...k, targets: { ...(k.targets || {}), [key]: Number(val) || 0 } } : k) } : p) }));
+  const toggleLink = (mkId, kid) => setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => { if (mk.id !== mkId) return mk; const cur = mk.linkedKpiIds || []; return { ...mk, linkedKpiIds: cur.includes(kid) ? cur.filter(x => x !== kid) : [...cur, kid] }; }) }));
   const addManual = mkId => setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === mkId ? { ...mk, manuals: [...(mk.manuals || []), { id: Date.now(), value: 0, note: '' }] } : mk) }));
   const updManual = (mkId, mId, field, val) => setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === mkId ? { ...mk, manuals: (mk.manuals || []).map(m => m.id === mId ? { ...m, [field]: field === 'value' ? (Number(val) || 0) : val } : m) } : mk) }));
   const delManual = (mkId, mId) => setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === mkId ? { ...mk, manuals: (mk.manuals || []).filter(m => m.id !== mId) } : mk) }));
 
-  const kpiPlansAll = data.plans.filter(p => p.kpi);
-  const kpiOutputs = data.outputs.filter(o => o.kpi || data.plans.some(p => p.outputId === o.id && p.kpi)).sort((a, b) => { const ci = n => { const i = data.categories.findIndex(c => c.name === n); return i < 0 ? 999 : i; }; return ci(a.type) - ci(b.type); });
+  const allPlanKpis = []; data.plans.forEach(p => (p.kpis || []).forEach(k => allPlanKpis.push({ plan: p, kpi: k })));
+  const findKpi = kid => { for (const p of data.plans) { const k = (p.kpis || []).find(x => x.id === kid); if (k) return { plan: p, kpi: k }; } return null; };
+  const kpiOutputs = data.outputs.filter(o => o.kpi || data.plans.some(p => p.outputId === o.id && (p.kpis && p.kpis.length))).sort((a, b) => { const ci = n => { const i = data.categories.findIndex(c => c.name === n); return i < 0 ? 999 : i; }; return ci(a.type) - ci(b.type); });
 
-  const TargetEditor = ({ targets, onSet, unit }) => (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>🎯 월별 목표 설정</div>
-      {isSingleMonth ? (
-        <div style={{ background: '#F0F7F2', borderRadius: 8, padding: '10px 12px' }}>
-          <div style={{ fontSize: 11, color: '#6B7280', marginBottom: 6 }}>{rangeMonths[0].key} 목표 ({unit})</div>
-          <input type="number" value={(targets || {})[rangeMonths[0].key] || ''} onChange={e => onSet(rangeMonths[0].key, e.target.value)} placeholder="이 달 목표 입력" style={{ width: 200, padding: '8px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box' }} />
-        </div>
-      ) : (
-        <div style={{ background: '#FFF7ED', borderRadius: 8, padding: '10px 12px', border: '1px solid #FED7AA' }}>
-          <div style={{ fontSize: 12, color: '#92400E', fontWeight: 600, marginBottom: 6 }}>⚠️ 여러 월에 걸친 기간 — 월별 목표는 '이번 달/지난 달' 단일 월 선택 후 입력하세요</div>
-          {rangeMonths.map(mo => (
-            <div key={mo.key} style={{ fontSize: 11, color: '#78350F', marginBottom: 3 }}>{mo.key}: 월목표 {((targets || {})[mo.key] || 0).toLocaleString()} × {mo.days}/{mo.totalDays}일 = {Math.round(((targets || {})[mo.key] || 0) / mo.totalDays * mo.days).toLocaleString()}</div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 
   const KpiHeader = ({ title, achieved, target, unit, openKey, accent, sub }) => {
     const pr = pct(achieved, target); const done = target > 0 && pr >= 100; const open = expanded === openKey;
@@ -1222,11 +1433,13 @@ function TabKpi({ data, setData }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <span style={{ fontSize: 14, fontWeight: 800, color: GO }}>⭐ 메인 KPI</span>
           <span style={{ fontSize: 11, color: '#9CA3AF' }}>전사 전체 목표</span>
+          <button onClick={() => setMkEdit(null)} style={{ marginLeft: 'auto', fontSize: 12, padding: '5px 12px', borderRadius: 7, border: 'none', background: GO, color: 'white', cursor: 'pointer', fontWeight: 700 }}>+ 메인 KPI 추가</button>
         </div>
+        {mkEdit !== undefined && <MainKpiModal data={data} setData={setData} edit={mkEdit} onClose={() => setMkEdit(undefined)} />}
         {mainKpis.map(mk => {
-          const linkedIds = mk.linkedPlanIds || [];
-          const linked = linkedIds.map(pid => data.plans.find(p => p.id === pid)).filter(Boolean);
-          const linkedSum = linkedIds.reduce((a, pid) => a + sumForPlan(pid), 0);
+          const linkedIds = mk.linkedKpiIds || [];
+          const linked = linkedIds.map(kid => findKpi(kid)).filter(Boolean);
+          const linkedSum = linkedIds.reduce((a, kid) => a + sumForKpi(kid), 0);
           const manuals = mk.manuals || [];
           const manualSum = manuals.reduce((a, m) => a + (m.value || 0), 0);
           const achieved = linkedSum + manualSum;
@@ -1237,7 +1450,7 @@ function TabKpi({ data, setData }) {
               <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={`연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}`} />
               {expanded === 'main-' + mk.id && (
                 <div style={{ marginTop: 12, borderTop: '1px solid #F3F4F6', paddingTop: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}><button onClick={() => setData(d => moveToTrash(d, 'mainKpi', mk.id))} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #EF4444', background: 'white', color: '#EF4444', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🗑 이 메인 KPI 삭제 (휴지통)</button></div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginBottom: 10 }}><button onClick={() => setMkEdit(mk)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✏️ 수정</button><button onClick={() => setData(d => moveToTrash(d, 'mainKpi', mk.id))} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #EF4444', background: 'white', color: '#EF4444', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🗑 삭제 (휴지통)</button></div>
                   <TargetEditor targets={mk.targets} onSet={(k, v) => setMainMonth(mk.id, k, v)} unit={mk.unit} />
                   <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 130, background: '#F0F7F2', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#6B7280' }}>연결 KPI 합산</div><div style={{ fontSize: 15, fontWeight: 700, color: G }}>{linkedSum.toLocaleString()}</div></div>
@@ -1251,7 +1464,7 @@ function TabKpi({ data, setData }) {
                     {manuals.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF' }}>직접 입력한 값이 없습니다</div> :
                       manuals.map(m => (
                         <div key={m.id} style={{ display: 'flex', gap: 6, marginBottom: 6, alignItems: 'flex-start' }}>
-                          <input type="number" value={m.value || ''} onChange={e => updManual(mk.id, m.id, 'value', e.target.value)} placeholder="값" style={{ width: 100, padding: '8px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box', flexShrink: 0 }} />
+                          <NumInput value={m.value} onCommit={v => updManual(mk.id, m.id, 'value', v)} placeholder="값" style={{ width: 100, padding: '8px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box', flexShrink: 0 }} />
                           <input value={m.note || ''} onChange={e => updManual(mk.id, m.id, 'note', e.target.value)} placeholder="설명 (예: 오프라인 팝업 매출)" style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 13, boxSizing: 'border-box' }} />
                           <button onClick={() => delManual(mk.id, m.id)} style={{ border: 'none', background: '#F3F4F6', borderRadius: 8, color: '#9CA3AF', cursor: 'pointer', width: 34, height: 35, fontSize: 16, flexShrink: 0 }}>×</button>
                         </div>
@@ -1264,21 +1477,21 @@ function TabKpi({ data, setData }) {
                     </div>
                     {linking ? (
                       <div style={{ background: '#F9FAFB', borderRadius: 8, padding: 10 }}>
-                        {kpiPlansAll.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF' }}>연결 가능한 KPI가 없습니다</div> :
-                          kpiPlansAll.map(p => { const on = linkedIds.includes(p.id); const out = outOf(p.id); return (
-                            <label key={p.id} onClick={() => toggleLink(mk.id, p.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', cursor: 'pointer' }}>
+                        {allPlanKpis.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF' }}>연결 가능한 KPI가 없습니다</div> :
+                          allPlanKpis.map(({ plan: p, kpi: k }) => { const on = linkedIds.includes(k.id); const out = outOf(p.id); return (
+                            <label key={k.id} onClick={() => toggleLink(mk.id, k.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', cursor: 'pointer' }}>
                               <span style={{ width: 16, height: 16, borderRadius: 4, border: '2px solid ' + (on ? G : '#CBD5E1'), background: on ? G : 'white', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{on && <span style={{ color: 'white', fontSize: 10, fontWeight: 900 }}>✓</span>}</span>
-                              <span style={{ fontSize: 12, flex: 1 }}>{out ? out.name : ''} ▸ {p.kpi.name}</span>
-                              <span style={{ fontSize: 11, color: '#9CA3AF' }}>{(p.kpi.target || 0).toLocaleString()} {p.kpi.unit}</span>
+                              <span style={{ fontSize: 12, flex: 1 }}>{out ? out.name : ''} ▸ {p.name} · {k.name}</span>
+                              <span style={{ fontSize: 11, color: '#9CA3AF' }}>{(k.target || 0).toLocaleString()} {k.unit}</span>
                             </label>
                           ); })}
                       </div>
                     ) : (
                       linked.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF' }}>연결된 KPI가 없습니다. "KPI 연결 편집"으로 추가하세요.</div> :
-                        linked.map(p => { const a = sumForPlan(p.id); const out = outOf(p.id); return (
-                          <div key={p.id} style={{ background: '#F9FAFB', borderRadius: 8, padding: '8px 12px', marginBottom: 6 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}><span style={{ fontSize: 12, fontWeight: 600, flex: 1 }}>{out ? out.name : ''} ▸ {p.kpi.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: G }}>{a.toLocaleString()} / {effTarget(p.kpi).toLocaleString()} {p.kpi.unit}</span></div>
-                            <Bar v={a} m={effTarget(p.kpi) || 1} h={5} />
+                        linked.map(({ plan: p, kpi: k }) => { const a = sumForKpi(k.id); const out = outOf(p.id); return (
+                          <div key={k.id} style={{ background: '#F9FAFB', borderRadius: 8, padding: '8px 12px', marginBottom: 6 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}><span style={{ fontSize: 12, fontWeight: 600, flex: 1 }}>{out ? out.name : ''} ▸ {p.name} · {k.name}</span><span style={{ fontSize: 12, fontWeight: 700, color: G }}>{a.toLocaleString()} / {effTarget(k).toLocaleString()} {k.unit}</span></div>
+                            <Bar v={a} m={effTarget(k) || 1} h={5} />
                           </div>
                         ); })
                     )}
@@ -1297,14 +1510,15 @@ function TabKpi({ data, setData }) {
         </div>
         {kpiOutputs.length === 0 && <div style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>등록된 프로젝트/실행계획 KPI가 없습니다. 진행상황 탭에서 프로젝트·실행계획 수정으로 KPI를 등록하세요.</div>}
         {kpiOutputs.map(o => {
-          const planKpis = data.plans.filter(p => p.outputId === o.id && p.kpi);
+          const plansW = data.plans.filter(p => p.outputId === o.id && (p.kpis && p.kpis.length));
+          const kpiCount = plansW.reduce((a, p) => a + p.kpis.length, 0);
           const oAch = sumForOutput(o.id);
           const oTarget = o.kpi ? effTarget(o.kpi) : 0;
           return (
             <div key={o.id} style={{ marginBottom: 18 }}>
               {o.kpi ? (
                 <Card style={{ marginBottom: 8, borderLeft: '4px solid ' + G, background: '#FBFDFB' }}>
-                  <KpiHeader title={'📁 ' + o.name + ' · ' + o.kpi.name} achieved={oAch} target={oTarget} unit={o.kpi.unit} openKey={'out-' + o.id} accent={G} sub={`${o.code} · 실행계획 KPI ${planKpis.length}개 합산`} />
+                  <KpiHeader title={'📁 ' + o.name + ' · ' + o.kpi.name} achieved={oAch} target={oTarget} unit={o.kpi.unit} openKey={'out-' + o.id} accent={G} sub={`${o.code} · 실행계획 KPI ${kpiCount}개 합산`} />
                   {expanded === 'out-' + o.id && (
                     <div style={{ marginTop: 12, borderTop: '1px solid #F3F4F6', paddingTop: 12 }}>
                       <TargetEditor targets={o.kpi.targets} onSet={(k, v) => setOutMonth(o.id, k, v)} unit={o.kpi.unit} />
@@ -1317,32 +1531,37 @@ function TabKpi({ data, setData }) {
               )}
 
               <div style={{ paddingLeft: 14, borderLeft: '2px solid #E5E7EB', marginLeft: 6 }}>
-                {planKpis.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF', padding: '6px 0' }}>이 프로젝트에 등록된 실행계획 KPI가 없습니다</div> :
-                  planKpis.map(p => {
-                    const achieved = sumForPlan(p.id); const target = effTarget(p.kpi); const plogs = logsForPlan(p.id);
-                    return (
-                      <Card key={p.id} style={{ marginBottom: 8 }}>
-                        <KpiHeader title={'▸ ' + p.name + ' · ' + p.kpi.name} achieved={achieved} target={target} unit={p.kpi.unit} openKey={'plan-' + p.id} accent={G} sub={`기본 목표 ${(p.kpi.target || 0).toLocaleString()} ${p.kpi.unit}`} />
-                        {expanded === 'plan-' + p.id && (
-                          <div style={{ marginTop: 12, borderTop: '1px solid #F3F4F6', paddingTop: 12 }}>
-                            <TargetEditor targets={p.kpi.targets} onSet={(k, v) => setPlanMonth(p.id, k, v)} unit={p.kpi.unit} />
-                            {plogs.length > 0 ? (
-                              <div>
-                                <div style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>이 기간 기여 업무 ({plogs.length}건)</div>
-                                {plogs.map(l => { const sub = data.subplans.find(s => s.id === l.subplanId); return (
-                                  <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '4px 0' }}>
-                                    <span style={{ flex: 1, color: '#374151' }}>{sub ? sub.name : '삭제된 업무'}</span>
-                                    <span style={{ fontSize: 11, color: '#9CA3AF' }}>{l.periodStart.slice(5)}~{l.periodEnd.slice(5)}</span>
-                                    <span style={{ fontWeight: 700, color: G }}>+{l.value.toLocaleString()}</span>
+                {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#9CA3AF', padding: '6px 0' }}>이 프로젝트에 등록된 실행계획 KPI가 없습니다</div> :
+                  plansW.map(p => (
+                    <div key={p.id} style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#374151', margin: '4px 0 6px' }}>▸ {p.name} <span style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 400 }}>· KPI {p.kpis.length}개</span></div>
+                      {p.kpis.map(k => {
+                        const achieved = sumForKpi(k.id); const target = effTarget(k); const klogs = logsForKpi(k.id);
+                        return (
+                          <Card key={k.id} style={{ marginBottom: 8 }}>
+                            <KpiHeader title={'🎯 ' + k.name} achieved={achieved} target={target} unit={k.unit} openKey={'kpi-' + k.id} accent={G} sub={`기본 목표 ${(k.target || 0).toLocaleString()} ${k.unit}`} />
+                            {expanded === 'kpi-' + k.id && (
+                              <div style={{ marginTop: 12, borderTop: '1px solid #F3F4F6', paddingTop: 12 }}>
+                                <TargetEditor targets={k.targets} onSet={(key, v) => setPlanKpiMonth(p.id, k.id, key, v)} unit={k.unit} />
+                                {klogs.length > 0 ? (
+                                  <div>
+                                    <div style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>이 기간 기여 업무 ({klogs.length}건)</div>
+                                    {klogs.map(l => { const sub = data.subplans.find(s => s.id === l.subplanId); return (
+                                      <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '4px 0' }}>
+                                        <span style={{ flex: 1, color: '#374151' }}>{sub ? sub.name : '삭제된 업무'}</span>
+                                        <span style={{ fontSize: 11, color: '#9CA3AF' }}>{l.periodStart.slice(5)}~{l.periodEnd.slice(5)}</span>
+                                        <span style={{ fontWeight: 700, color: G }}>+{l.value.toLocaleString()}</span>
+                                      </div>
+                                    ); })}
                                   </div>
-                                ); })}
+                                ) : <div style={{ fontSize: 11, color: '#9CA3AF' }}>이 기간에 기록된 달성 내역이 없습니다</div>}
                               </div>
-                            ) : <div style={{ fontSize: 11, color: '#9CA3AF' }}>이 기간에 기록된 달성 내역이 없습니다</div>}
-                          </div>
-                        )}
-                      </Card>
-                    );
-                  })}
+                            )}
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  ))}
               </div>
             </div>
           );
@@ -1384,45 +1603,180 @@ const bStatusC = s => ({ '기안전': '#9CA3AF', '기안완료': '#3B82F6', '결
 
 function TabBudget({ data, setData }) {
   const [showAdd, setShowAdd] = useState(false);
+  const [showDraft, setShowDraft] = useState(false);
+  const [editB, setEditB] = useState(null);
+  const [view, setView] = useState('date');
+  const [mOff, setMOff] = useState(0);
   const budgets = data.budgets || [];
-  const month = TODAY.slice(0, 7);
-  const monthTotal = budgets.filter(b => b.date.slice(0, 7) === month).reduce((a, b) => a + itemTotal(b), 0);
-  const weeks = {}; budgets.forEach(b => { const k = weekKeyOf(b.date); (weeks[k] = weeks[k] || []).push(b); });
-  const weekKeys = Object.keys(weeks).sort().reverse();
-  const cycleStatus = id => setData(d => ({ ...d, budgets: d.budgets.map(b => b.id === id ? { ...b, status: BSTATUS[(BSTATUS.indexOf(b.status) + 1) % BSTATUS.length] } : b) }));
+  const monthKey = (() => { const d = new Date(TODAY); d.setMonth(d.getMonth() + mOff); return d.toISOString().slice(0, 7); })();
+  const inMonth = ds => ds && ds.slice(0, 7) === monthKey;
+  const estSum = budgets.filter(b => inMonth(b.date)).reduce((a, b) => a + itemTotal(b), 0);
+  const draftSum = budgets.filter(b => inMonth(b.date) && (b.status === '기안완료' || b.status === '결제완료')).reduce((a, b) => a + itemTotal(b), 0);
+  const paidSum = budgets.filter(b => b.status === '결제완료' && inMonth(b.paidDate || b.date)).reduce((a, b) => a + effTotal(b), 0);
+  const cycleStatus = id => setData(d => ({ ...d, budgets: d.budgets.map(b => { if (b.id !== id) return b; const ns = BSTATUS[(BSTATUS.indexOf(b.status) + 1) % BSTATUS.length]; const patch = { ...b, status: ns }; if (ns === '결제완료' && !b.paidDate) patch.paidDate = TODAY; return patch; }) }));
   const del = id => setData(d => moveToTrash(d, 'budget', id));
+  const groups = {};
+  budgets.forEach(b => { const k = view === 'week' ? weekKeyOf(effDate(b)) : effDate(b); (groups[k] = groups[k] || []).push(b); });
+  const keys = Object.keys(groups).sort().reverse();
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>예산 관리</div>
-        <button onClick={() => setShowAdd(true)} style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: GO, color: 'white' }}>+ 예산 추가</button>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <button onClick={() => setShowDraft(true)} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid ' + G, cursor: 'pointer', fontSize: 12, fontWeight: 600, background: 'white', color: G }}>📄 기안서 만들기</button>
+          <button onClick={() => setShowAdd(true)} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: GO, color: 'white' }}>+ 예산 추가</button>
+        </div>
       </div>
-      <SCards items={[{ label: '이번 달 총 예산', value: won(monthTotal), color: G }, { label: '전체 항목', value: budgets.length + '건', color: '#6B7280' }, { label: '기안전', value: budgets.filter(b => b.status === '기안전').length + '건', color: '#9CA3AF' }, { label: '결제완료', value: budgets.filter(b => b.status === '결제완료').length + '건', color: '#10B981' }]} />
+      <Card style={{ marginBottom: 16, padding: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <button onClick={() => setMOff(mOff - 1)} style={{ border: '1px solid #E5E7EB', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '3px 10px' }}>◀</button>
+          <span style={{ fontWeight: 700, color: G, fontSize: 14 }}>{monthKey} 예산</span>
+          <button onClick={() => setMOff(mOff + 1)} style={{ border: '1px solid #E5E7EB', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '3px 10px' }}>▶</button>
+          {mOff !== 0 && <button onClick={() => setMOff(0)} style={{ border: '1px solid #E5E7EB', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '3px 10px', fontSize: 11, color: '#6B7280' }}>이번 달</button>}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+          <div style={{ background: '#F0F4F1', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#6B7280' }}>예상 예산 (계획)</div><div style={{ fontSize: 16, fontWeight: 800, color: '#6B7280' }}>{won(estSum)}</div></div>
+          <div style={{ background: '#EFF6FF', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#3B82F6' }}>기안 (기안완료+)</div><div style={{ fontSize: 16, fontWeight: 800, color: '#3B82F6' }}>{won(draftSum)}</div></div>
+          <div style={{ background: '#ECFDF5', borderRadius: 10, padding: 12, textAlign: 'center' }}><div style={{ fontSize: 11, color: '#10B981' }}>실결제 (결제완료일)</div><div style={{ fontSize: 16, fontWeight: 800, color: '#10B981' }}>{won(paidSum)}</div></div>
+        </div>
+        <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8, lineHeight: 1.5 }}>예상 = 해당 월 등록 예산 전체 · 기안 = 기안완료/결제완료 · 실결제 = 결제완료 건을 결제완료일 기준으로 합산</div>
+      </Card>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+        {[{ v: 'date', l: '날짜별' }, { v: 'week', l: '주간별' }].map(o => <button key={o.v} onClick={() => setView(o.v)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: view === o.v ? G : '#E5E7EB', color: view === o.v ? 'white' : '#374151' }}>{o.l}</button>)}
+        <span style={{ fontSize: 11, color: '#9CA3AF', alignSelf: 'center', marginLeft: 4 }}>결제완료 건은 결제완료일 기준으로 표시</span>
+      </div>
       {!budgets.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}><div style={{ fontSize: 34, marginBottom: 10 }}>💰</div><div>등록된 예산이 없습니다</div></Card>) :
-        weekKeys.map(wk => { const list = weeks[wk]; const sub = list.reduce((a, b) => a + itemTotal(b), 0); const end = addDays(wk, 6); return (<Card key={wk} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}><div style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', background: '#F7FBF8', borderBottom: '1px solid #EEF0F2' }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{wk.slice(5)} ~ {end.slice(5)} 주간</span><span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: G }}>{won(sub)}</span></div><div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 600 }}><thead><tr style={{ background: '#FAFAFA' }}>{['일자', '세부항목', '업체', '금액', '결제방법', '상태', ''].map(h => <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#6B7280', fontSize: 11, fontWeight: 600 }}>{h}</th>)}</tr></thead><tbody>{list.map(b => { const n = budgetNames(data, b); return (<tr key={b.id} style={{ borderBottom: '1px solid #F3F4F6' }}><td style={{ padding: '8px 10px', color: '#6B7280' }}>{b.date.slice(5)}</td><td style={{ padding: '8px 10px', fontWeight: 600 }}>{n.detail}</td><td style={{ padding: '8px 10px' }}>{b.vendor}</td><td style={{ padding: '8px 10px' }}>{won(itemTotal(b))}</td><td style={{ padding: '8px 10px' }}>{b.payMethod}</td><td style={{ padding: '8px 10px' }}><span onClick={() => cycleStatus(b.id)} style={{ cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 10, background: bStatusC(b.status), color: 'white', fontWeight: 600 }}>{b.status}</span></td><td style={{ padding: '8px 10px' }}><button onClick={() => del(b.id)} style={{ border: 'none', background: 'none', color: '#D1D5DB', cursor: 'pointer', fontSize: 15 }}>×</button></td></tr>); })}</tbody></table></div></Card>); })}
-      {showAdd && <BudgetAddModal data={data} setData={setData} onClose={() => setShowAdd(false)} />}
+        keys.map(k => { const list = groups[k]; const sub = list.reduce((a, b) => a + effTotal(b), 0); const head = view === 'week' ? (k.slice(5) + ' ~ ' + addDays(k, 6).slice(5) + ' 주간') : k; return (
+          <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', background: '#F7FBF8', borderBottom: '1px solid #EEF0F2' }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{head}</span><span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: G }}>{won(sub)}</span></div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 720 }}>
+                <thead><tr style={{ background: '#FAFAFA' }}>{['일자', '세부항목', '업체', '금액', '결제방법', '상태', '결제완료일', ''].map(h => <th key={h} style={{ padding: '8px 10px', textAlign: 'left', color: '#6B7280', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>)}</tr></thead>
+                <tbody>{list.map(b => { const n = budgetNames(data, b); const diff = b.status === '결제완료' && b.paidAmount != null && b.paidAmount !== '' && Number(b.paidAmount) !== itemTotal(b); return (
+                  <tr key={b.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                    <td style={{ padding: '8px 10px', color: '#6B7280', whiteSpace: 'nowrap' }}>{effDate(b).slice(5)}</td>
+                    <td style={{ padding: '8px 10px', fontWeight: 600 }}>{n.detail}</td>
+                    <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{b.vendor}</td>
+                    <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{won(effTotal(b))}{diff ? <span style={{ fontSize: 9, color: '#9CA3AF', textDecoration: 'line-through', marginLeft: 4 }}>{won(itemTotal(b))}</span> : null}</td>
+                    <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{b.payMethod}</td>
+                    <td style={{ padding: '8px 10px' }}><span onClick={() => cycleStatus(b.id)} style={{ cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 10, background: bStatusC(b.status), color: 'white', fontWeight: 600, whiteSpace: 'nowrap' }}>{b.status}</span></td>
+                    <td style={{ padding: '8px 10px', color: '#6B7280', whiteSpace: 'nowrap' }}>{b.status === '결제완료' && b.paidDate ? b.paidDate.slice(5) : '-'}</td>
+                    <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}><button onClick={() => setEditB(b)} style={{ border: '1px solid #E5E7EB', background: 'white', borderRadius: 6, color: '#6B7280', cursor: 'pointer', fontSize: 10, padding: '2px 7px', fontWeight: 600, marginRight: 4 }}>수정</button><button onClick={() => del(b.id)} style={{ border: 'none', background: 'none', color: '#D1D5DB', cursor: 'pointer', fontSize: 15 }}>×</button></td>
+                  </tr>); })}</tbody>
+              </table>
+            </div>
+          </Card>); })}
+      {showAdd && <BudgetFormModal data={data} setData={setData} onClose={() => setShowAdd(false)} />}
+      {showDraft && <DraftModal data={data} setData={setData} onClose={() => setShowDraft(false)} />}
+      {editB && <BudgetFormModal data={data} setData={setData} edit={editB} onClose={() => setEditB(null)} />}
     </div>
   );
 }
 
-function BudgetAddModal({ data, setData, onClose }) {
-  const [outId, setOutId] = useState(''), [planId, setPlanId] = useState(''), [vendor, setVendor] = useState(''), [amount, setAmount] = useState(''), [vat, setVat] = useState('별도'), [pay, setPay] = useState('세금계산서'), [status, setStatus] = useState('기안전'), [date, setDate] = useState(TODAY);
-  const plans = data.plans.filter(p => p.outputId === Number(outId));
-  const submit = () => {
-    if (!outId || !vendor.trim() || !amount || Number(amount) <= 0) { alert('필수 항목을 입력하세요'); return; }
-    setData(d => ({ ...d, nid: d.nid + 1, budgets: [...(d.budgets || []), { id: d.nid + 1, outputId: Number(outId), planId: planId ? Number(planId) : null, subplanId: null, checklistId: null, vendor: vendor.trim(), amount: Number(amount), vat, payMethod: pay, account: '', status, date, memo: '' }] }));
+function DraftModal({ data, setData, onClose }) {
+  const [start, setStart] = useState(addDays(TODAY, -14));
+  const [end, setEnd] = useState(TODAY);
+  const [checked, setChecked] = useState({});
+  const [memos, setMemos] = useState({});
+  const [markDone, setMarkDone] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveErr, setSaveErr] = useState('');
+  const [savedLink, setSavedLink] = useState('');
+  const items = (data.budgets || []).filter(b => b.status === '기안전' && b.date >= start && b.date <= end);
+  const selected = items.filter(b => checked[b.id]);
+  const total = selected.reduce((a, b) => a + itemTotal(b), 0);
+  const make = () => {
+    if (!selected.length) { alert('기안서에 포함할 항목을 선택하세요'); return; }
+    const invalid = selected.find(b => b.payMethod === '세금계산서' && !(b.account || '').trim());
+    if (invalid) { alert('입금계좌가 등록되지않아 기안서 작성이 불가능합니다'); return; }
+    const heads = ['프로젝트명', '실행계획명', '세부항목', '업체', '금액', '결제방법', '입금계좌', '비고'];
+    const rows = selected.map(b => { const n = budgetNames(data, b); return [n.project, n.plan, n.detail, b.vendor, won(itemTotal(b)), b.payMethod, b.account || '-', (memos[b.id] || '').trim() || '-']; });
+    const w = window.open('', '_blank');
+    if (!w) { alert('팝업이 차단되었습니다. 팝업 허용 후 다시 시도하세요.'); return; }
+    const css = '@page{size:A4 landscape;margin:14mm}body{font-family:-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;color:#111;padding:0}h1{font-size:18px;margin:0 0 4px}.sub{color:#6B7280;font-size:12px;margin-bottom:14px}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #999;padding:6px 8px;text-align:left;vertical-align:top}th{background:#1B4D3E;color:#fff}tfoot td{font-weight:700;background:#F0F4F1}@media print{.noprint{display:none}}';
+    const body = '<h1>예산 기안서</h1><div class="sub">기간 ' + start + ' ~ ' + end + ' · 총 ' + selected.length + '건 · 합계 ' + won(total) + '</div><table><thead><tr>' + heads.map(h => '<th>' + h + '</th>').join('') + '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody><tfoot><tr><td colspan="4">합계</td><td>' + won(total) + '</td><td colspan="3"></td></tr></tfoot></table><button class="noprint" onclick="window.print()" style="margin-top:18px;padding:9px 18px;border:none;border-radius:8px;background:#1B4D3E;color:#fff;font-weight:600;cursor:pointer">인쇄 / PDF로 저장</button>';
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>예산 기안서</title><style>' + css + '</style></head><body>' + body + '</body></html>');
+    w.document.close();
+    if (markDone) setData(d => ({ ...d, budgets: d.budgets.map(b => checked[b.id] ? { ...b, status: '기안완료', memo: (memos[b.id] || '').trim() } : b) }));
     onClose();
   };
-  const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E5E7EB', color: val === o ? 'white' : '#374151' }}>{o}</button>)}</div>;
+  const buildDocHtml = () => {
+    const heads = ['프로젝트명', '실행계획명', '세부항목', '업체', '금액', '결제방법', '입금계좌', '비고'];
+    const th = heads.map(h => '<td style="background:#1B4D3E;color:#ffffff;font-weight:bold;padding:6px;">' + h + '</td>').join('');
+    const trs = selected.map(b => { const n = budgetNames(data, b); const r = [n.project, n.plan, n.detail, b.vendor, won(itemTotal(b)), b.payMethod, b.account || '-', (memos[b.id] || '').trim() || '-']; return '<tr>' + r.map(c => '<td style="padding:6px;">' + String(c) + '</td>').join('') + '</tr>'; }).join('');
+    return '<html><head><meta charset="utf-8"></head><body><h2>예산 기안서</h2><p>기간 ' + start + ' ~ ' + end + ' &middot; 총 ' + selected.length + '건 &middot; 합계 ' + won(total) + '</p><table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;font-size:11px;width:100%;"><tr>' + th + '</tr>' + trs + '<tr><td colspan="4" style="font-weight:bold;padding:6px;">합계</td><td style="font-weight:bold;padding:6px;">' + won(total) + '</td><td colspan="3"></td></tr></table></body></html>';
+  };
+  const saveToDrive = async () => {
+    if (!selected.length) { alert('기안서에 포함할 항목을 선택하세요'); return; }
+    const invalid = selected.find(b => b.payMethod === '세금계산서' && !(b.account || '').trim());
+    if (invalid) { alert('입금계좌가 등록되지않아 기안서 작성이 불가능합니다'); return; }
+    setSaving(true); setSaveErr(''); setSavedLink('');
+    try {
+      const folderId = await driveBaseFolder('기안서');
+      const r = await driveSaveDraftPdf(buildDocHtml(), '예산기안서_' + start + '_' + end, folderId);
+      setSavedLink(r.pdfLink);
+      if (markDone) setData(d => ({ ...d, budgets: d.budgets.map(b => checked[b.id] ? { ...b, status: '기안완료', memo: (memos[b.id] || '').trim() } : b) }));
+    } catch (e) { setSaveErr(e.message || '저장 실패'); } finally { setSaving(false); }
+  };
   return (
-    <ModalShell title="예산 추가" onClose={onClose}>
+    <ModalShell title="기안서 만들기" onClose={onClose}>
+      <div><Lbl c="기안서를 만들 기간을 선택하세요" /><div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8 }}><Inp type="date" value={start} onChange={setStart} /><span style={{ color: '#9CA3AF' }}>~</span><Inp type="date" value={end} onChange={setEnd} /></div></div>
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: G, marginBottom: 8 }}>기안전 예산 ({items.length}건)</div>
+        {!items.length ? <div style={{ fontSize: 12, color: '#9CA3AF', padding: '12px 0' }}>선택한 기간에 기안전 상태의 예산이 없습니다.</div> : null}
+        {items.map(b => { const n = budgetNames(data, b); const on = !!checked[b.id]; const noAcc = b.payMethod === '세금계산서' && !(b.account || '').trim(); return (
+          <div key={b.id} style={{ border: '1px solid #EEF0F2', borderRadius: 10, padding: 10, marginBottom: 8, background: on ? '#F6FBF7' : 'white' }}>
+            <div onClick={() => setChecked({ ...checked, [b.id]: !on })} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <Chk on={on} />
+              <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600 }}>{n.detail} <span style={{ color: '#9CA3AF', fontWeight: 400 }}>· {b.vendor}</span></div><div style={{ fontSize: 11, color: '#6B7280' }}>{n.project} · {won(itemTotal(b))} · {b.payMethod}{noAcc ? ' · ⚠ 입금계좌 없음' : ''}</div></div>
+              <span style={{ fontSize: 11, color: '#9CA3AF' }}>{b.date.slice(5)}</span>
+            </div>
+            {on ? (<div style={{ marginTop: 8 }}><input value={memos[b.id] || ''} onChange={e => setMemos({ ...memos, [b.id]: e.target.value })} placeholder="비고 입력 (선택)" style={{ width: '100%', padding: '7px 9px', borderRadius: 8, border: '1px solid #D1D5DB', fontSize: 12, boxSizing: 'border-box' }} />{noAcc ? <div style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>※ 세금계산서인데 입금계좌가 없습니다 — 예산 수정에서 먼저 등록하세요.</div> : null}</div>) : null}
+          </div>); })}
+      </div>
+      {selected.length ? <div style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>선택 {selected.length}건 · 합계 {won(total)}</div> : null}
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#374151', cursor: 'pointer' }}><input type="checkbox" checked={markDone} onChange={e => setMarkDone(e.target.checked)} /> 기안서 생성 후 선택 항목을 '기안완료'로 변경</label>
+      {savedLink ? <div style={{ background: '#F0F7F2', border: '1px solid #A7F3D0', borderRadius: 10, padding: '10px 12px', fontSize: 12, color: G }}>✅ 라이프밀/기안서 폴더에 저장됐어요. <a href={savedLink} target="_blank" rel="noreferrer" style={{ color: '#4285F4', fontWeight: 700, textDecoration: 'none' }}>PDF 열기 →</a></div> : null}
+      {saveErr ? <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '10px 12px', fontSize: 12, color: '#EF4444' }}>⚠ {saveErr}</div> : null}
+      <div style={{ fontSize: 11, color: '#9CA3AF' }}>※ 처음 한 번 구글 로그인이 필요해요. 드라이브 라이프밀/기안서 폴더에 PDF로 저장됩니다.</div>
+      <div style={{ display: 'flex', gap: 8 }}><Btn v="gold" onClick={saveToDrive} disabled={saving} style={{ flex: 1 }}>{saving ? '저장 중…' : '📤 드라이브에 저장 (PDF)'}</Btn><Btn v="secondary" onClick={make}>🖨 인쇄</Btn><Btn v="secondary" onClick={onClose}>닫기</Btn></div>
+    </ModalShell>
+  );
+}
+
+function BudgetFormModal({ data, setData, onClose, edit }) {
+  const e = edit || {};
+  const [outId, setOutId] = useState(e.outputId ? String(e.outputId) : '');
+  const [planId, setPlanId] = useState(e.planId ? String(e.planId) : '');
+  const [vendor, setVendor] = useState(e.vendor || '');
+  const [amount, setAmount] = useState(e.amount != null ? String(e.amount) : '');
+  const [vat, setVat] = useState(e.vat || '별도');
+  const [pay, setPay] = useState(e.payMethod || '세금계산서');
+  const [account, setAccount] = useState(e.account || '');
+  const [status, setStatus] = useState(e.status || '기안전');
+  const [date, setDate] = useState(e.date || TODAY);
+  const [paidDate, setPaidDate] = useState(e.paidDate || TODAY);
+  const [paidAmount, setPaidAmount] = useState(e.paidAmount != null && e.paidAmount !== '' ? String(e.paidAmount) : '');
+  const plans = data.plans.filter(p => p.outputId === Number(outId));
+  const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E5E7EB', color: val === o ? 'white' : '#374151' }}>{o}</button>)}</div>;
+  const submit = () => {
+    if (!outId || !vendor.trim() || !amount || Number(amount) <= 0) { alert('필수 항목을 입력하세요'); return; }
+    const fields = { outputId: Number(outId), planId: planId ? Number(planId) : null, vendor: vendor.trim(), amount: Number(amount), vat, payMethod: pay, account: account.trim(), status, date, paidDate: status === '결제완료' ? paidDate : (e.paidDate || ''), paidAmount: status === '결제완료' && paidAmount !== '' ? Number(paidAmount) : null };
+    if (edit) setData(d => ({ ...d, budgets: d.budgets.map(b => b.id === edit.id ? { ...b, ...fields } : b) }));
+    else setData(d => ({ ...d, nid: d.nid + 1, budgets: [...(d.budgets || []), { id: d.nid + 1, subplanId: null, checklistId: null, memo: '', ...fields }] }));
+    onClose();
+  };
+  return (
+    <ModalShell title={edit ? '예산 수정' : '예산 추가'} onClose={onClose}>
       <div><Lbl c="출력 프로젝트" /><Sel value={outId} onChange={v => { setOutId(v); setPlanId(''); }} ph="선택..." opts={data.outputs.map(o => ({ v: o.id, l: o.code + ' · ' + o.name }))} /></div>
       <div><Lbl c="실행계획 (선택)" /><Sel value={planId} onChange={setPlanId} ph="선택..." opts={plans.map(p => ({ v: p.id, l: p.name }))} /></div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 업체" /><Inp value={vendor} onChange={setVendor} placeholder="업체명" /></div><div><Lbl c="금액 (원)" /><Inp type="number" value={amount} onChange={setAmount} placeholder="공급가" /></div></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 업체" /><Inp value={vendor} onChange={setVendor} placeholder="업체명" /></div><div><Lbl c="예상 금액 (원)" /><Inp type="number" value={amount} onChange={setAmount} placeholder="공급가" /></div></div>
       <div><Lbl c="VAT" />{seg(vat, setVat, VAT_OPTS)}</div>
       <div><Lbl c="결제방법" />{seg(pay, setPay, PAY_OPTS)}</div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="상태" /><Sel value={status} onChange={setStatus} opts={BSTATUS} /></div><div><Lbl c="일자" /><Inp type="date" value={date} onChange={setDate} /></div></div>
-      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={submit} style={{ flex: 1 }}>추가</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+      {pay === '세금계산서' && <div><Lbl c="입금 계좌 (선택)" /><Inp value={account} onChange={setAccount} placeholder="은행 / 계좌번호 / 예금주" /></div>}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="상태" /><Sel value={status} onChange={setStatus} opts={BSTATUS} /></div><div><Lbl c="기안/등록 일자" /><Inp type="date" value={date} onChange={setDate} /></div></div>
+      {status === '결제완료' && <div style={{ background: '#ECFDF5', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0' }}><div style={{ fontSize: 12, fontWeight: 700, color: '#10B981', marginBottom: 8 }}>✓ 결제 완료 정보</div><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 완료일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div><div><Lbl c="실결제 금액 (선택)" /><Inp type="number" value={paidAmount} onChange={setPaidAmount} placeholder="비우면 예상금액 사용" /></div></div><div style={{ fontSize: 11, color: '#6B7280', marginTop: 6 }}>※ 결제완료일 기준으로 월 집계 및 날짜별 표시가 반영됩니다.</div></div>}
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={submit} style={{ flex: 1 }}>{edit ? '저장' : '추가'}</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
     </ModalShell>
   );
 }
