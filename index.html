@@ -1448,17 +1448,22 @@ function TargetEditor({ targets, onSet, unit }) {
 function MainKpiModal({ data, setData, onClose, edit }) {
   const [name, setName] = useState(edit ? edit.name : '');
   const [unit, setUnit] = useState(edit ? edit.unit : '원');
+  const [salesAuto, setSalesAuto] = useState(edit ? !!edit.salesAuto : false);
   const save = () => {
     if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
     const u = unit.trim() || '개';
-    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u } : mk) }));
-    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [] }] }));
+    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto } : mk) }));
+    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto }] }));
     onClose();
   };
   return (
     <ModalShell title={edit ? '메인 KPI 수정' : '메인 KPI 추가'} onClose={onClose}>
       <div><Lbl c="KPI 이름" /><Inp value={name} onChange={setName} placeholder="예: 총매출 / 신규고객 / 전환율" /></div>
       <div><Lbl c="단위" /><Inp value={unit} onChange={setUnit} placeholder="원 / 명 / % / 건" /></div>
+      <div style={{ background: '#F5F4F2', borderRadius: 10, padding: '10px 12px' }}>
+        <label onClick={() => setSalesAuto(!salesAuto)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}><span style={{ width: 18, height: 18, borderRadius: 5, border: '2px solid ' + (salesAuto ? G : '#CBD5E1'), background: salesAuto ? G : 'white', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{salesAuto && <span style={{ color: 'white', fontSize: 11, fontWeight: 900 }}>✓</span>}</span><span style={{ fontSize: 13, fontWeight: 600, color: '#3A3631' }}>📡 네이버 매출 자동 연동</span></label>
+        <div style={{ fontSize: 11, color: '#6E6863', marginTop: 6, paddingLeft: 28 }}>켜면 이번 달 네이버 누적 매출이 이 KPI 달성값에 실시간으로 더해집니다.</div>
+      </div>
       <div style={{ display: 'flex', gap: 8 }}><Btn v="gold" onClick={save} style={{ flex: 1 }}>{edit ? '수정' : '추가'}</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
     </ModalShell>
   );
@@ -1511,6 +1516,9 @@ function TabKpi({ data, setData }) {
   const [editLink, setEditLink] = useState(null);
   const [mkEdit, setMkEdit] = useState(undefined);
   const [kpiEdit, setKpiEdit] = useState(null);
+  const [naverRev, setNaverRev] = useState(0);
+  const [naverInfo, setNaverInfo] = useState(null);
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (alive && j && j.month && j.month.summary && j.month.summary.revenue) { setNaverRev(j.month.summary.revenue.value || 0); setNaverInfo({ label: j.month.label || '', updatedAt: j.updatedAt || '' }); } }).catch(() => {}); return () => { alive = false; }; }, []);
   const mainKpis = data.mainKpis || [];
   const logs = data.kpiLogs || [];
   const rangeMonths = monthsInRange(pStart, pEnd);
@@ -1598,12 +1606,13 @@ function TabKpi({ data, setData }) {
           const linkedSum = linkedIds.reduce((a, kid) => a + sumForKpi(kid), 0);
           const manuals = mk.manuals || [];
           const manualSum = manuals.reduce((a, m) => a + (m.value || 0), 0);
-          const achieved = linkedSum + manualSum;
+          const salesVal = mk.salesAuto ? naverRev : 0;
+          const achieved = linkedSum + manualSum + salesVal;
           const target = effTarget(mk);
           const linking = editLink === mk.id;
           return (
             <Card key={mk.id} style={{ marginBottom: 10, borderLeft: '4px solid ' + GO }}>
-              <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={`연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}`} />
+              <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={`연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}${mk.salesAuto ? ' · 📡 네이버 연동' : ''}`} />
               {expanded === 'main-' + mk.id && (
                 <div style={{ marginTop: 12, borderTop: '1px solid #F5F4F2', paddingTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginBottom: 10 }}><button onClick={() => setMkEdit(mk)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✏️ 수정</button><button onClick={() => setData(d => moveToTrash(d, 'mainKpi', mk.id))} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #E53935', background: 'white', color: '#E53935', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🗑 삭제 (휴지통)</button></div>
@@ -1611,6 +1620,7 @@ function TabKpi({ data, setData }) {
                   <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 130, background: '#F5F4F2', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#6E6863' }}>연결 KPI 합산</div><div style={{ fontSize: 15, fontWeight: 700, color: G }}>{linkedSum.toLocaleString()}</div></div>
                     <div style={{ flex: 1, minWidth: 130, background: '#FAF6EE', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#6E6863' }}>수동 입력 합계</div><div style={{ fontSize: 15, fontWeight: 700, color: GO }}>{manualSum.toLocaleString()}</div></div>
+                    {mk.salesAuto && <div style={{ flex: 1, minWidth: 130, background: '#ECFDF5', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#1FA463' }}>📡 네이버 매출(이번 달)</div><div style={{ fontSize: 15, fontWeight: 700, color: '#1FA463' }}>{naverRev.toLocaleString()}</div>{naverInfo && naverInfo.updatedAt && <div style={{ fontSize: 9, color: '#A29C95', marginTop: 2 }}>{naverInfo.updatedAt}</div>}</div>}
                   </div>
                   <div style={{ marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -2089,6 +2099,159 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
   );
 }
 
+const SALES_SAMPLE = {
+  channel: 'naver', updatedAt: '2026-06-29 14:30 (샘플)',
+  month: {
+    label: '2026년 6월 (샘플)', periodStart: '2026-06-01', periodEnd: '2026-06-29',
+    summary: { revenue: { value: 18500000, deltaValue: 2100000, deltaPct: 12.8 }, orders: { value: 290, deltaValue: 40, deltaPct: 16.0 }, aov: { value: 63793, deltaValue: -1500, deltaPct: -2.3 }, refund: { value: 850000, deltaValue: 120000, deltaPct: 16.4 } },
+    daily: [{ date: '2026-06-01', revenue: 620000 }, { date: '2026-06-05', revenue: 540000 }, { date: '2026-06-09', revenue: 710000 }, { date: '2026-06-12', revenue: 480000 }, { date: '2026-06-15', revenue: 710070 }, { date: '2026-06-18', revenue: 722310 }, { date: '2026-06-21', revenue: 1219870 }, { date: '2026-06-24', revenue: 660000 }, { date: '2026-06-27', revenue: 590000 }, { date: '2026-06-29', revenue: 815000 }],
+    channels: [{ name: '쇼핑', revenue: 6800000, deltaValue: 300000, sharePct: 36.8, visitors: 1800 }, { name: '검색', revenue: 4500000, deltaValue: 900000, sharePct: 24.3, visitors: 720 }, { name: '검색광고', revenue: 4200000, deltaValue: 350000, sharePct: 22.7, visitors: 690 }, { name: '웹사이트', revenue: 1900000, deltaValue: 120000, sharePct: 10.3, visitors: 210 }, { name: '광고', revenue: 1100000, deltaValue: 430000, sharePct: 5.9, visitors: 380 }],
+    products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', revenue: 5200000, deltaValue: 600000, qty: 58 }, { rank: 2, name: '황성주 박사의 1일 1생식 라이프밀', revenue: 4100000, deltaValue: 320000, qty: 31 }, { rank: 3, name: '라이프밀 단백질 쉐이크 16팩', revenue: 3300000, deltaValue: 410000, qty: 72 }, { rank: 4, name: '황성주 박사의 동결건조 과일칩 6종', revenue: 2400000, deltaValue: 2400000, qty: 120 }, { rank: 5, name: '라이프밀 그래놀라', revenue: 1500000, deltaValue: -180000, qty: 38 }]
+  },
+  week: {
+    label: '6월 4주차 · 6/23~6/29 (샘플)', periodStart: '2026-06-23', periodEnd: '2026-06-29',
+    summary: { revenue: { value: 5012970, deltaValue: 357000, deltaPct: 7.7 }, orders: { value: 77, deltaValue: 27, deltaPct: 54.0 }, aov: { value: 65103, deltaValue: -28000, deltaPct: -30.1 }, refund: { value: 265860, deltaValue: 93000, deltaPct: 54.6 } },
+    daily: [{ date: '2026-06-23', revenue: 710070 }, { date: '2026-06-24', revenue: 833690 }, { date: '2026-06-25', revenue: 551730 }, { date: '2026-06-26', revenue: 722310 }, { date: '2026-06-27', revenue: 280100 }, { date: '2026-06-28', revenue: 695200 }, { date: '2026-06-29', revenue: 1219870 }],
+    channels: [{ name: '쇼핑', revenue: 1504360, deltaValue: -71000, sharePct: 36.5, visitors: 447 }, { name: '검색', revenue: 1139520, deltaValue: 845000, sharePct: 27.6, visitors: 161 }, { name: '검색광고', revenue: 1134870, deltaValue: 109000, sharePct: 27.5, visitors: 160 }, { name: '웹사이트', revenue: 218380, deltaValue: 34000, sharePct: 5.3, visitors: 32 }, { name: '광고', revenue: 127100, deltaValue: 127100, sharePct: 3.1, visitors: 99 }],
+    products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', revenue: 761680, deltaValue: -238000, qty: 8 }, { rank: 2, name: '황성주 박사의 1일 1생식 라이프밀', revenue: 616280, deltaValue: 129000, qty: 4 }, { rank: 3, name: '라이프밀 단백질 쉐이크 16팩', revenue: 512000, deltaValue: 80000, qty: 12 }]
+  },
+  today: {
+    label: '6월 29일 (샘플)', periodStart: '2026-06-29', periodEnd: '2026-06-29',
+    summary: { revenue: { value: 815000, deltaValue: -404870, deltaPct: -33.2 }, orders: { value: 13, deltaValue: -6, deltaPct: -31.6 }, aov: { value: 62692, deltaValue: 1200, deltaPct: 1.9 }, refund: { value: 0, deltaValue: 0, deltaPct: 0 } },
+    daily: [{ date: '2026-06-29', revenue: 815000 }],
+    channels: [{ name: '쇼핑', revenue: 360000, deltaValue: 20000, sharePct: 44.2, visitors: 62 }, { name: '검색', revenue: 240000, deltaValue: 40000, sharePct: 29.4, visitors: 28 }, { name: '검색광고', revenue: 150000, deltaValue: -30000, sharePct: 18.4, visitors: 22 }, { name: '웹사이트', revenue: 65000, deltaValue: 5000, sharePct: 8.0, visitors: 6 }],
+    products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', revenue: 280000, deltaValue: 30000, qty: 3 }, { rank: 2, name: '라이프밀 단백질 쉐이크 16팩', revenue: 220000, deltaValue: 20000, qty: 5 }, { rank: 3, name: '황성주 박사의 1일 1생식 라이프밀', revenue: 180000, deltaValue: -10000, qty: 1 }]
+  }
+};
+
+function TabSales({ data, setData }) {
+  const [mode, setMode] = useState('month');
+  const [full, setFull] = useState(null);
+  const [status, setStatus] = useState('loading');
+  const [sample, setSample] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const BASE = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/';
+  useEffect(() => {
+    let alive = true; setStatus('loading');
+    fetch(BASE + 'naver-sales.json?t=' + Date.now())
+      .then(res => { if (!res.ok) throw new Error('nofile'); return res.json(); })
+      .then(j => { if (!alive) return; setFull(j); setStatus('ok'); setSample(false); })
+      .catch(() => { if (!alive) return; setFull(SALES_SAMPLE); setStatus('empty'); setSample(true); });
+    return () => { alive = false; };
+  }, [reloadKey]);
+
+  const won2 = n => (Number(n) || 0).toLocaleString() + '원';
+  const deltaChip = (d, invert) => { if (!d || d.deltaValue == null) return null; const up = d.deltaValue > 0; const zero = d.deltaValue === 0; const good = invert ? !up : up; const color = zero ? '#A29C95' : good ? '#1FA463' : '#E53935'; return <span style={{ fontSize: 11, color, fontWeight: 700 }}>{zero ? '–' : up ? '▲' : '▼'} {Math.abs(d.deltaValue).toLocaleString()}{d.deltaPct != null ? ' (' + (d.deltaPct > 0 ? '+' : '') + d.deltaPct + '%)' : ''}</span>; };
+  const th = { padding: '8px 10px', textAlign: 'left', color: '#6E6863', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' };
+  const td = { padding: '8px 10px', whiteSpace: 'nowrap' };
+
+  const r = full ? full[mode] : null;
+  const sum = (r && r.summary) || {}; const daily = (r && r.daily) || []; const channels = (r && r.channels) || []; const products = (r && r.products) || [];
+  const maxRev = Math.max(1, ...daily.map(x => x.revenue || 0));
+  const monthRev = full && full.month && full.month.summary && full.month.summary.revenue ? full.month.summary.revenue.value : 0;
+  const autoKpis = (data.mainKpis || []).filter(mk => mk.salesAuto);
+  const modeLabel = { month: '월간', week: '주간', today: '일간' };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: G }}>💵 네이버 매출</div>
+        <span style={{ fontSize: 11, color: 'white', background: '#03C75A', borderRadius: 6, padding: '2px 8px', fontWeight: 700 }}>NAVER</span>
+        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexWrap: 'wrap' }}>
+          {[['month', '월간'], ['week', '주간'], ['today', '일간']].map(([v, l]) => <button key={v} onClick={() => setMode(v)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: mode === v ? G : '#E3E0DC', color: mode === v ? 'white' : '#3A3631' }}>{l}</button>)}
+          <button onClick={() => setReloadKey(k => k + 1)} style={{ padding: '6px 12px', borderRadius: 20, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#6E6863' }}>↻ 새로고침</button>
+        </div>
+      </div>
+      <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 14 }}>{full && full.updatedAt ? '실시간 갱신: ' + full.updatedAt : ''}{r && r.label ? ' · ' + r.label : ''}</div>
+
+      {status === 'loading' && <Card style={{ textAlign: 'center', padding: 30, color: '#A29C95' }}>불러오는 중…</Card>}
+
+      {sample && status !== 'loading' && (
+        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, padding: 14, marginBottom: 14, fontSize: 12, color: '#92400E', lineHeight: 1.6 }}>
+          <b>🔌 연동 대기 중 — 아래는 샘플 미리보기예요.</b><br />
+          매출 자동화 PC가 <b>data/naver-sales.json</b> 한 파일을 이 저장소에 올리면, 월간/주간/일간이 모두 실제 네이버 매출로 자동 표시됩니다.
+        </div>
+      )}
+
+      {status !== 'loading' && !r && (
+        <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>이 기간({modeLabel[mode]}) 데이터가 아직 없습니다</Card>
+      )}
+
+      {r && status !== 'loading' && (<>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10, marginBottom: 18 }}>
+          {[{ k: 'revenue', l: modeLabel[mode] + ' 매출', cnt: false, inv: false }, { k: 'orders', l: '결제 건수', cnt: true, inv: false }, { k: 'aov', l: '건당 매출', cnt: false, inv: false }, { k: 'refund', l: '환불', cnt: false, inv: true }].map(c => { const d = sum[c.k]; return (
+            <div key={c.k} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 4 }}>{c.l}</div>
+              <div style={{ fontSize: 19, fontWeight: 800, color: c.k === 'refund' ? '#E53935' : G }}>{d ? (c.cnt ? (d.value || 0).toLocaleString() + '건' : won2(d.value)) : '-'}</div>
+              <div style={{ marginTop: 4 }}>{deltaChip(d, c.inv)}</div>
+            </div>
+          ); })}
+        </div>
+
+        {daily.length > 0 && (
+          <Card style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 14 }}>📊 일자별 매출</div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, overflowX: 'auto' }}>
+              {daily.map(x => { const h = Math.round((x.revenue || 0) / maxRev * 120); return (
+                <div key={x.date} style={{ flex: 1, textAlign: 'center', minWidth: 30 }}>
+                  <div style={{ fontSize: 9, color: '#6E6863', fontWeight: 600, marginBottom: 2 }}>{Math.round((x.revenue || 0) / 10000)}만</div>
+                  <div style={{ background: G, borderRadius: '6px 6px 0 0', height: Math.max(4, h), minHeight: 4 }} title={won2(x.revenue)} />
+                  <div style={{ fontSize: 9, color: '#A29C95', marginTop: 3 }}>{(x.date || '').slice(5)}</div>
+                </div>
+              ); })}
+            </div>
+          </Card>
+        )}
+
+        {channels.length > 0 && (
+          <Card style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '12px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7', fontSize: 13, fontWeight: 700, color: G }}>🧭 채널별 매출</div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 440 }}>
+                <thead><tr style={{ background: '#FAFAFA' }}>{['채널', '매출', '비중', '방문자'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
+                <tbody>{channels.map(c => (
+                  <tr key={c.name} style={{ borderBottom: '1px solid #F5F4F2' }}>
+                    <td style={{ ...td, fontWeight: 600 }}>{c.name}</td>
+                    <td style={td}>{won2(c.revenue)} {deltaChip({ deltaValue: c.deltaValue })}</td>
+                    <td style={td}>{c.sharePct != null ? c.sharePct + '%' : '-'}</td>
+                    <td style={td}>{c.visitors != null ? c.visitors.toLocaleString() : '-'}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
+        {products.length > 0 && (
+          <Card style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '12px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7', fontSize: 13, fontWeight: 700, color: G }}>🏆 상품별 매출 순위</div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 460 }}>
+                <thead><tr style={{ background: '#FAFAFA' }}>{['#', '상품', '매출', '수량'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
+                <tbody>{products.map(p => (
+                  <tr key={p.rank} style={{ borderBottom: '1px solid #F5F4F2' }}>
+                    <td style={{ ...td, fontWeight: 700, color: G }}>{p.rank}</td>
+                    <td style={{ padding: '8px 10px', fontWeight: 600 }}>{p.name}</td>
+                    <td style={td}>{won2(p.revenue)} {deltaChip({ deltaValue: p.deltaValue })}</td>
+                    <td style={td}>{p.qty != null ? p.qty.toLocaleString() + '개' : '-'}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
+        <Card style={{ background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#1FA463', marginBottom: 6 }}>📡 메인 KPI 자동 연동</div>
+          {autoKpis.length > 0
+            ? <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.6 }}>이번 달 네이버 누적 매출 <b>{won2(monthRev)}</b> 이(가) 다음 메인 KPI에 실시간 자동 반영 중입니다: <b style={{ color: '#1FA463' }}>{autoKpis.map(k => k.name).join(', ')}</b></div>
+            : <div style={{ fontSize: 12, color: '#6E6863', lineHeight: 1.6 }}>아직 연동된 메인 KPI가 없어요. <b>KPI 탭 → 메인 KPI 수정</b>에서 "📡 네이버 매출 자동 연동"을 켜면, 이번 달 누적 매출({won2(monthRev)})이 자동으로 KPI 달성값에 반영됩니다. (월간/주간/일간 어느 화면을 봐도 KPI는 항상 월 누적 기준)</div>}
+        </Card>
+      </>)}
+    </div>
+  );
+}
+
 function TabTrash({ data, setData }) {
   const trash = data.trash || [];
   const [confirmId, setConfirmId] = useState(null);
@@ -2260,6 +2423,7 @@ function App() {
     { icon: '🗂️', label: '칸반', C: TabKanban },
     { icon: '🏆', label: '업무 성과', C: TabPerformance },
     { icon: '📊', label: 'KPI', C: TabKpi },
+    { icon: '💵', label: '매출', C: TabSales },
     { icon: '⏸', label: '보류', C: TabHold, badge: heldCount },
     { icon: '💰', label: '예산', C: TabBudget },
     { icon: '🗑', label: '휴지통', C: TabTrash, badge: trashCount },
