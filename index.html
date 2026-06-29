@@ -1516,7 +1516,7 @@ function TabKpi({ data, setData }) {
   const [naverRev, setNaverRev] = useState(0);
   const [naverDaily, setNaverDaily] = useState([]);
   const [naverInfo, setNaverInfo] = useState(null);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (alive && j && j.month) { if (j.month.summary && j.month.summary.revenue) setNaverRev(j.month.summary.revenue.value || 0); setNaverDaily(j.month.daily || []); setNaverInfo({ label: j.month.label || '', updatedAt: j.updatedAt || '' }); } }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (!alive || !j) return; const months = Array.isArray(j.months) ? j.months : (j.month ? [j.month] : []); const all = []; months.forEach(m => (m.daily || []).forEach(d => { if (d && d.date) all.push({ date: d.date, revenue: d.revenue || 0 }); })); setNaverDaily(all); const ym = (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })(); const cur = months.find(m => (m.key || '').slice(0, 7) === ym) || months[0]; if (cur && cur.summary && cur.summary.revenue) setNaverRev(cur.summary.revenue.value || 0); setNaverInfo({ label: cur ? (cur.label || '') : '', updatedAt: j.updatedAt || '' }); }).catch(() => {}); return () => { alive = false; }; }, []);
   const mainKpis = data.mainKpis || [];
   const logs = data.kpiLogs || [];
   const naverInRange = naverDaily.filter(d => d.date && d.date >= pStart && d.date <= pEnd).reduce((a, d) => a + (d.revenue || 0), 0);
@@ -2101,27 +2101,42 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
 
 const SALES_SAMPLE = {
   channel: 'naver', updatedAt: '2026-06-29 14:30 (샘플)',
-  month: {
-    label: '2026년 6월 (샘플)', periodStart: '2026-06-01', periodEnd: '2026-06-29',
-    summary: { revenue: { value: 18500000, deltaValue: 2100000, deltaPct: 12.8 }, orders: { value: 290, deltaValue: 40, deltaPct: 16.0 }, aov: { value: 63793, deltaValue: -1500, deltaPct: -2.3 }, refund: { value: 850000, deltaValue: 120000, deltaPct: 16.4 } },
-    daily: [{ date: '2026-06-01', revenue: 620000 }, { date: '2026-06-05', revenue: 540000 }, { date: '2026-06-09', revenue: 710000 }, { date: '2026-06-12', revenue: 480000 }, { date: '2026-06-15', revenue: 710070 }, { date: '2026-06-18', revenue: 722310 }, { date: '2026-06-21', revenue: 1219870 }, { date: '2026-06-24', revenue: 660000 }, { date: '2026-06-27', revenue: 590000 }, { date: '2026-06-29', revenue: 815000 }],
-    channels: [{ name: '쇼핑', revenue: 6800000, deltaValue: 300000, sharePct: 36.8, visitors: 1800 }, { name: '검색', revenue: 4500000, deltaValue: 900000, sharePct: 24.3, visitors: 720 }, { name: '검색광고', revenue: 4200000, deltaValue: 350000, sharePct: 22.7, visitors: 690 }, { name: '웹사이트', revenue: 1900000, deltaValue: 120000, sharePct: 10.3, visitors: 210 }, { name: '광고', revenue: 1100000, deltaValue: 430000, sharePct: 5.9, visitors: 380 }],
-    products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', revenue: 5200000, deltaValue: 600000, qty: 58 }, { rank: 2, name: '황성주 박사의 1일 1생식 라이프밀', revenue: 4100000, deltaValue: 320000, qty: 31 }, { rank: 3, name: '라이프밀 단백질 쉐이크 16팩', revenue: 3300000, deltaValue: 410000, qty: 72 }, { rank: 4, name: '황성주 박사의 동결건조 과일칩 6종', revenue: 2400000, deltaValue: 2400000, qty: 120 }, { rank: 5, name: '라이프밀 그래놀라', revenue: 1500000, deltaValue: -180000, qty: 38 }]
-  },
-  week: {
-    label: '6월 4주차 · 6/23~6/29 (샘플)', periodStart: '2026-06-23', periodEnd: '2026-06-29',
-    summary: { revenue: { value: 5012970, deltaValue: 357000, deltaPct: 7.7 }, orders: { value: 77, deltaValue: 27, deltaPct: 54.0 }, aov: { value: 65103, deltaValue: -28000, deltaPct: -30.1 }, refund: { value: 265860, deltaValue: 93000, deltaPct: 54.6 } },
-    daily: [{ date: '2026-06-23', revenue: 710070 }, { date: '2026-06-24', revenue: 833690 }, { date: '2026-06-25', revenue: 551730 }, { date: '2026-06-26', revenue: 722310 }, { date: '2026-06-27', revenue: 280100 }, { date: '2026-06-28', revenue: 695200 }, { date: '2026-06-29', revenue: 1219870 }],
-    channels: [{ name: '쇼핑', revenue: 1504360, deltaValue: -71000, sharePct: 36.5, visitors: 447 }, { name: '검색', revenue: 1139520, deltaValue: 845000, sharePct: 27.6, visitors: 161 }, { name: '검색광고', revenue: 1134870, deltaValue: 109000, sharePct: 27.5, visitors: 160 }, { name: '웹사이트', revenue: 218380, deltaValue: 34000, sharePct: 5.3, visitors: 32 }, { name: '광고', revenue: 127100, deltaValue: 127100, sharePct: 3.1, visitors: 99 }],
-    products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', revenue: 761680, deltaValue: -238000, qty: 8 }, { rank: 2, name: '황성주 박사의 1일 1생식 라이프밀', revenue: 616280, deltaValue: 129000, qty: 4 }, { rank: 3, name: '라이프밀 단백질 쉐이크 16팩', revenue: 512000, deltaValue: 80000, qty: 12 }]
-  },
-  today: {
-    label: '6월 29일 (샘플)', periodStart: '2026-06-29', periodEnd: '2026-06-29',
-    summary: { revenue: { value: 815000, deltaValue: -404870, deltaPct: -33.2 }, orders: { value: 13, deltaValue: -6, deltaPct: -31.6 }, aov: { value: 62692, deltaValue: 1200, deltaPct: 1.9 }, refund: { value: 0, deltaValue: 0, deltaPct: 0 } },
-    daily: [{ date: '2026-06-29', revenue: 815000 }],
-    channels: [{ name: '쇼핑', revenue: 360000, deltaValue: 20000, sharePct: 44.2, visitors: 62 }, { name: '검색', revenue: 240000, deltaValue: 40000, sharePct: 29.4, visitors: 28 }, { name: '검색광고', revenue: 150000, deltaValue: -30000, sharePct: 18.4, visitors: 22 }, { name: '웹사이트', revenue: 65000, deltaValue: 5000, sharePct: 8.0, visitors: 6 }],
-    products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', revenue: 280000, deltaValue: 30000, qty: 3 }, { rank: 2, name: '라이프밀 단백질 쉐이크 16팩', revenue: 220000, deltaValue: 20000, qty: 5 }, { rank: 3, name: '황성주 박사의 1일 1생식 라이프밀', revenue: 180000, deltaValue: -10000, qty: 1 }]
-  }
+  months: [
+    { key: '2026-06', label: '2026년 6월 (샘플)', periodStart: '2026-06-01', periodEnd: '2026-06-28',
+      summary: { revenue: { value: 35399820, deltaValue: 20194920, deltaPct: 132.8 }, orders: { value: 540, deltaValue: 210, deltaPct: 63.6 }, aov: { value: 65555, deltaValue: -8000, deltaPct: -10.9 }, refund: { value: 1250000, deltaValue: 300000, deltaPct: 31.6 } },
+      daily: [{ date: '2026-06-01', revenue: 620000 }, { date: '2026-06-05', revenue: 540000 }, { date: '2026-06-09', revenue: 710000 }, { date: '2026-06-12', revenue: 480000 }, { date: '2026-06-15', revenue: 710070 }, { date: '2026-06-18', revenue: 722310 }, { date: '2026-06-21', revenue: 1219870 }, { date: '2026-06-24', revenue: 833690 }, { date: '2026-06-27', revenue: 590000 }, { date: '2026-06-28', revenue: 815000 }],
+      channels: [{ name: '네이버 ADVoost쇼핑', revenue: 6557890, sharePct: 23.5, visitors: 1337 }, { name: '검색', revenue: 4500000, sharePct: 16.1, visitors: 720 }, { name: '검색광고', revenue: 4200000, sharePct: 15.0, visitors: 690 }, { name: '쇼핑', revenue: 3800000, sharePct: 13.6, visitors: 560 }, { name: '웹사이트', revenue: 1900000, sharePct: 6.8, visitors: 210 }],
+      products: [{ rank: 1, name: '황성주 박사의 1일 1생식 라이프밀', productId: '1276', revenue: 5104840, qty: 34 }, { rank: 2, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', productId: '1277', revenue: 4200000, qty: 45 }, { rank: 3, name: '라이프밀 단백질 쉐이크 16팩', productId: '1278', revenue: 3300000, qty: 72 }, { rank: 4, name: '황성주 박사의 동결건조 과일칩 6종', productId: '1279', revenue: 2400000, qty: 120 }, { rank: 5, name: '라이프밀 그래놀라', productId: '1280', revenue: 1500000, qty: 38 }] },
+    { key: '2026-05', label: '2026년 5월 (샘플)', periodStart: '2026-05-01', periodEnd: '2026-05-31',
+      summary: { revenue: { value: 15204900, deltaValue: 1200000, deltaPct: 8.6 }, orders: { value: 330, deltaValue: 30, deltaPct: 10.0 }, aov: { value: 46075, deltaValue: -2000, deltaPct: -4.2 }, refund: { value: 950000, deltaValue: -100000, deltaPct: -9.5 } },
+      daily: [{ date: '2026-05-03', revenue: 420000 }, { date: '2026-05-10', revenue: 510000 }, { date: '2026-05-17', revenue: 480000 }, { date: '2026-05-24', revenue: 600000 }, { date: '2026-05-31', revenue: 550000 }],
+      channels: [{ name: '쇼핑', revenue: 5200000, sharePct: 34.2, visitors: 1400 }, { name: '검색', revenue: 4100000, sharePct: 27.0, visitors: 650 }, { name: '검색광고', revenue: 3500000, sharePct: 23.0, visitors: 600 }],
+      products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', productId: '1277', revenue: 3800000, qty: 40 }, { rank: 2, name: '황성주 박사의 1일 1생식 라이프밀', productId: '1276', revenue: 3200000, qty: 22 }] }
+  ],
+  weeks: [
+    { key: '2026-W26', label: '6월 4주차 · 6/22~6/28 (샘플)', periodStart: '2026-06-22', periodEnd: '2026-06-28',
+      summary: { revenue: { value: 16363800, deltaValue: 11350830, deltaPct: 226.4 }, orders: { value: 251, deltaValue: 174, deltaPct: 225.9 }, aov: { value: 65194, deltaValue: 91, deltaPct: 0.1 }, refund: { value: 420000, deltaValue: 150000, deltaPct: 55.5 } },
+      daily: [{ date: '2026-06-22', revenue: 833690 }, { date: '2026-06-23', revenue: 710070 }, { date: '2026-06-24', revenue: 551730 }, { date: '2026-06-25', revenue: 722310 }, { date: '2026-06-26', revenue: 280100 }, { date: '2026-06-27', revenue: 695200 }, { date: '2026-06-28', revenue: 1219870 }],
+      channels: [{ name: '네이버 ADVoost쇼핑', revenue: 6430790, sharePct: 45.4, visitors: 1238 }, { name: '검색', revenue: 3100000, sharePct: 21.9, visitors: 320 }, { name: '검색광고', revenue: 2800000, sharePct: 19.8, visitors: 290 }],
+      products: [{ rank: 1, name: '황성주 박사의 1일 1생식 라이프밀', productId: '1276', revenue: 3256000, qty: 22 }, { rank: 2, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', productId: '1277', revenue: 2100000, qty: 24 }] },
+    { key: '2026-W25', label: '6월 3주차 · 6/15~6/21 (샘플)', periodStart: '2026-06-15', periodEnd: '2026-06-21',
+      summary: { revenue: { value: 5012970, deltaValue: 357000, deltaPct: 7.7 }, orders: { value: 77, deltaValue: 27, deltaPct: 54.0 }, aov: { value: 65103, deltaValue: -28000, deltaPct: -30.1 }, refund: { value: 265860, deltaValue: 93000, deltaPct: 54.6 } },
+      daily: [{ date: '2026-06-15', revenue: 710070 }, { date: '2026-06-16', revenue: 833690 }, { date: '2026-06-17', revenue: 551730 }, { date: '2026-06-18', revenue: 722310 }, { date: '2026-06-19', revenue: 280100 }, { date: '2026-06-20', revenue: 695200 }, { date: '2026-06-21', revenue: 1219870 }],
+      channels: [{ name: '쇼핑', revenue: 1504360, sharePct: 36.5, visitors: 447 }, { name: '검색', revenue: 1139520, sharePct: 27.6, visitors: 161 }, { name: '검색광고', revenue: 1134870, sharePct: 27.5, visitors: 160 }],
+      products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', productId: '1277', revenue: 761680, qty: 8 }, { rank: 2, name: '황성주 박사의 1일 1생식 라이프밀', productId: '1276', revenue: 616280, qty: 4 }] }
+  ],
+  days: [
+    { key: '2026-06-28', label: '6월 28일 (일) (샘플)', periodStart: '2026-06-28', periodEnd: '2026-06-28',
+      summary: { revenue: { value: 2581530, deltaValue: 1361660, deltaPct: 111.6 }, orders: { value: 40, deltaValue: 21, deltaPct: 110.5 }, aov: { value: 64538, deltaValue: 200, deltaPct: 0.3 }, refund: { value: 0, deltaValue: 0, deltaPct: 0 } },
+      daily: [{ date: '2026-06-28', revenue: 2581530 }],
+      channels: [{ name: '네이버 브랜드검색(일반형)', revenue: 978810, sharePct: 44.7, visitors: 69 }, { name: '쇼핑', revenue: 720000, sharePct: 32.9, visitors: 88 }, { name: '검색', revenue: 490000, sharePct: 22.4, visitors: 41 }],
+      products: [{ rank: 1, name: '황성주 박사의 라이프밀 데일리 아침 식사 대용 선식', productId: '1277', revenue: 550590, qty: 6 }, { rank: 2, name: '라이프밀 단백질 쉐이크 16팩', productId: '1278', revenue: 320000, qty: 7 }] },
+    { key: '2026-06-27', label: '6월 27일 (토) (샘플)', periodStart: '2026-06-27', periodEnd: '2026-06-27',
+      summary: { revenue: { value: 590000, deltaValue: -105200, deltaPct: -15.1 }, orders: { value: 9, deltaValue: -2, deltaPct: -18.2 }, aov: { value: 65556, deltaValue: 2000, deltaPct: 3.1 }, refund: { value: 30000, deltaValue: 30000, deltaPct: null } },
+      daily: [{ date: '2026-06-27', revenue: 590000 }],
+      channels: [{ name: '쇼핑', revenue: 280000, sharePct: 47.5, visitors: 40 }, { name: '검색', revenue: 180000, sharePct: 30.5, visitors: 22 }],
+      products: [{ rank: 1, name: '황성주 박사의 1일 1생식 라이프밀', productId: '1276', revenue: 280000, qty: 2 }] }
+  ]
 };
 
 function TabSales({ data, setData }) {
@@ -2132,13 +2147,22 @@ function TabSales({ data, setData }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [hoverBar, setHoverBar] = useState(null);
   const [hoverDow, setHoverDow] = useState(null);
+  const [idx, setIdx] = useState({ month: 0, week: 0, day: 0 });
   const BASE = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/';
+
+  const normalize = j => {
+    if (!j) return null;
+    if (Array.isArray(j.months) || Array.isArray(j.weeks) || Array.isArray(j.days)) return { updatedAt: j.updatedAt || '', months: j.months || [], weeks: j.weeks || [], days: j.days || [] };
+    const wrap = (o, k) => o ? [{ ...o, key: o.key || k, label: o.label || k }] : [];
+    return { updatedAt: j.updatedAt || '', months: wrap(j.month, 'month'), weeks: wrap(j.week, 'week'), days: wrap(j.today, 'today') };
+  };
+
   useEffect(() => {
     let alive = true; setStatus('loading');
     fetch(BASE + 'naver-sales.json?t=' + Date.now())
       .then(res => { if (!res.ok) throw new Error('nofile'); return res.json(); })
-      .then(j => { if (!alive) return; setFull(j); setStatus('ok'); setSample(false); })
-      .catch(() => { if (!alive) return; setFull(SALES_SAMPLE); setStatus('empty'); setSample(true); });
+      .then(j => { if (!alive) return; setFull(normalize(j)); setStatus('ok'); setSample(false); })
+      .catch(() => { if (!alive) return; setFull(normalize(SALES_SAMPLE)); setStatus('empty'); setSample(true); });
     return () => { alive = false; };
   }, [reloadKey]);
 
@@ -2146,42 +2170,65 @@ function TabSales({ data, setData }) {
   const deltaChip = (d, invert) => { if (!d || d.deltaValue == null) return null; const up = d.deltaValue > 0; const zero = d.deltaValue === 0; const good = invert ? !up : up; const color = zero ? '#A29C95' : good ? '#1FA463' : '#E53935'; return <span style={{ fontSize: 11, color, fontWeight: 700 }}>{zero ? '–' : up ? '▲' : '▼'} {Math.abs(d.deltaValue).toLocaleString()}{d.deltaPct != null ? ' (' + (d.deltaPct > 0 ? '+' : '') + d.deltaPct + '%)' : ''}</span>; };
   const th = { padding: '8px 10px', textAlign: 'left', color: '#6E6863', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' };
   const td = { padding: '8px 10px', whiteSpace: 'nowrap' };
-
-  const r = full ? full[mode] : null;
-  const sum = (r && r.summary) || {}; const daily = (r && r.daily) || []; const channels = (r && r.channels) || []; const products = (r && r.products) || [];
-  const maxRev = Math.max(1, ...daily.map(x => x.revenue || 0));
   const DOW = ['일', '월', '화', '수', '목', '금', '토'];
   const dowOf = ds => { if (!ds) return ''; const p = ds.split('-'); const dt = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])); return DOW[dt.getDay()]; };
   const fmtMan = v => { const n = Math.round((v || 0) / 10000); return n.toLocaleString() + '만'; };
+
+  const modeKeyMap = { month: 'months', week: 'weeks', day: 'days' };
+  const modeLabel = { month: '월간', week: '주간', day: '일간' };
+  const list = (full && full[modeKeyMap[mode]]) || [];
+  const curIdx = Math.min(idx[mode] || 0, Math.max(0, list.length - 1));
+  const r = list[curIdx] || null;
+  const sum = (r && r.summary) || {}; const daily = (r && r.daily) || []; const channels = (r && r.channels) || []; const products = (r && r.products) || [];
+  const maxRev = Math.max(1, ...daily.map(x => x.revenue || 0));
   const dowStats = (() => { const order = ['월', '화', '수', '목', '금', '토', '일']; const m = {}; order.forEach(d => m[d] = { sum: 0, cnt: 0, days: [] }); daily.forEach(x => { const d = dowOf(x.date); if (m[d]) { m[d].sum += (x.revenue || 0); m[d].cnt += 1; m[d].days.push({ date: x.date, revenue: x.revenue || 0 }); } }); return order.map(d => ({ dow: d, avg: m[d].cnt ? Math.round(m[d].sum / m[d].cnt) : 0, sum: m[d].sum, cnt: m[d].cnt, days: m[d].days })); })();
   const maxDowAvg = Math.max(1, ...dowStats.map(d => d.avg));
-  const monthRev = full && full.month && full.month.summary && full.month.summary.revenue ? full.month.summary.revenue.value : 0;
+
+  const monthsArr = (full && full.months) || [];
+  const ymNow = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })();
+  const curMonth = monthsArr.find(m => (m.key || '').slice(0, 7) === ymNow) || monthsArr[0];
+  const monthRev = curMonth && curMonth.summary && curMonth.summary.revenue ? curMonth.summary.revenue.value : 0;
   const autoKpis = (data.mainKpis || []).filter(mk => (mk.name || '').indexOf('매출') >= 0);
-  const modeLabel = { month: '월간', week: '주간', today: '일간' };
+
+  const setMode2 = m => { setMode(m); setHoverBar(null); setHoverDow(null); };
 
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>💵 네이버 매출</div>
         <span style={{ fontSize: 11, color: 'white', background: '#03C75A', borderRadius: 6, padding: '2px 8px', fontWeight: 700 }}>NAVER</span>
         <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexWrap: 'wrap' }}>
-          {[['month', '월간'], ['week', '주간'], ['today', '일간']].map(([v, l]) => <button key={v} onClick={() => setMode(v)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: mode === v ? G : '#E3E0DC', color: mode === v ? 'white' : '#3A3631' }}>{l}</button>)}
+          {[['month', '월간'], ['week', '주간'], ['day', '일간']].map(([v, l]) => <button key={v} onClick={() => setMode2(v)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: mode === v ? G : '#E3E0DC', color: mode === v ? 'white' : '#3A3631' }}>{l}</button>)}
           <button onClick={() => setReloadKey(k => k + 1)} style={{ padding: '6px 12px', borderRadius: 20, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#6E6863' }}>↻ 새로고침</button>
         </div>
       </div>
-      <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 14 }}>{full && full.updatedAt ? '실시간 갱신: ' + full.updatedAt : ''}{r && r.label ? ' · ' + r.label : ''}</div>
+
+      {status !== 'loading' && list.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          {mode === 'month' ? (<>
+            <button onClick={() => setIdx(s => ({ ...s, month: Math.min((s.month || 0) + 1, list.length - 1) }))} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', cursor: curIdx >= list.length - 1 ? 'default' : 'pointer', color: '#3A3631', fontSize: 12, opacity: curIdx >= list.length - 1 ? 0.35 : 1 }}>◀</button>
+            <span style={{ fontSize: 16, fontWeight: 800, color: G, minWidth: 86, textAlign: 'center' }}>{r ? (r.key || r.label) : ''}</span>
+            <button onClick={() => setIdx(s => ({ ...s, month: Math.max((s.month || 0) - 1, 0) }))} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', cursor: curIdx <= 0 ? 'default' : 'pointer', color: '#3A3631', fontSize: 12, opacity: curIdx <= 0 ? 0.35 : 1 }}>▶</button>
+          </>) : (
+            <select value={curIdx} onChange={e => setIdx(s => ({ ...s, [mode]: Number(e.target.value) }))} style={{ padding: '8px 12px', border: '1px solid #E3E0DC', borderRadius: 9, fontSize: 13, fontWeight: 600, background: 'white', minWidth: 200, color: '#3A3631' }}>
+              {list.map((it, i) => <option key={it.key || i} value={i}>{it.label || it.key}</option>)}
+            </select>
+          )}
+          <span style={{ fontSize: 11, color: '#A29C95' }}>{full && full.updatedAt ? '갱신 ' + full.updatedAt : ''}</span>
+        </div>
+      )}
 
       {status === 'loading' && <Card style={{ textAlign: 'center', padding: 30, color: '#A29C95' }}>불러오는 중…</Card>}
 
       {sample && status !== 'loading' && (
         <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, padding: 14, marginBottom: 14, fontSize: 12, color: '#92400E', lineHeight: 1.6 }}>
           <b>🔌 연동 대기 중 — 아래는 샘플 미리보기예요.</b><br />
-          매출 자동화 PC가 <b>data/naver-sales.json</b> 한 파일을 이 저장소에 올리면, 월간/주간/일간이 모두 실제 네이버 매출로 자동 표시됩니다.
+          매출 자동화 PC가 <b>data/naver-sales.json</b>(months/weeks/days 구조)을 이 저장소에 올리면, 월간/주간/일간이 모두 실제 네이버 매출로 자동 표시됩니다.
         </div>
       )}
 
-      {status !== 'loading' && !r && (
-        <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>이 기간({modeLabel[mode]}) 데이터가 아직 없습니다</Card>
+      {status !== 'loading' && list.length === 0 && (
+        <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>{modeLabel[mode]} 데이터가 아직 없습니다</Card>
       )}
 
       {r && status !== 'loading' && (<>
@@ -2195,7 +2242,7 @@ function TabSales({ data, setData }) {
           ); })}
         </div>
 
-        {daily.length > 0 && mode !== 'today' && (
+        {daily.length > 0 && mode !== 'day' && (
           <Card style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📊 {mode === 'week' ? '요일별 매출' : '일자별 매출'}</div>
@@ -2237,8 +2284,8 @@ function TabSales({ data, setData }) {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 440 }}>
                 <thead><tr style={{ background: '#FAFAFA' }}>{['채널', '매출', '비중', '방문자'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
-                <tbody>{channels.map(c => (
-                  <tr key={c.name} style={{ borderBottom: '1px solid #F5F4F2' }}>
+                <tbody>{channels.map((c, i) => (
+                  <tr key={c.name + i} style={{ borderBottom: '1px solid #F5F4F2' }}>
                     <td style={{ ...td, fontWeight: 600 }}>{c.name}</td>
                     <td style={td}>{won2(c.revenue)} {deltaChip({ deltaValue: c.deltaValue })}</td>
                     <td style={td}>{c.sharePct != null ? c.sharePct + '%' : '-'}</td>
@@ -2256,8 +2303,8 @@ function TabSales({ data, setData }) {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 460 }}>
                 <thead><tr style={{ background: '#FAFAFA' }}>{['#', '상품', '매출', '수량'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
-                <tbody>{products.map(p => (
-                  <tr key={p.rank} style={{ borderBottom: '1px solid #F5F4F2' }}>
+                <tbody>{products.map((p, i) => (
+                  <tr key={(p.productId || p.rank) + '-' + i} style={{ borderBottom: '1px solid #F5F4F2' }}>
                     <td style={{ ...td, fontWeight: 700, color: G }}>{p.rank}</td>
                     <td style={{ padding: '8px 10px', fontWeight: 600 }}>{p.name}</td>
                     <td style={td}>{won2(p.revenue)} {deltaChip({ deltaValue: p.deltaValue })}</td>
