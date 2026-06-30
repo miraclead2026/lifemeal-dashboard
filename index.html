@@ -1525,7 +1525,7 @@ function TabKpi({ data, setData }) {
   const subInRange = naverSubDays.filter(d => d.date && d.date >= pStart && d.date <= pEnd);
   const subAddedInRange = subInRange.reduce((a, d) => a + (d.added || 0), 0);
   const subTotalAtEnd = (() => { const le = naverSubDays.filter(d => d.date && d.date <= pEnd); if (!le.length) return 0; le.sort((a, b) => a.date < b.date ? -1 : 1); return le[le.length - 1].total || 0; })();
-  const isSubKpi = mk => { const n = mk.name || ''; return n.indexOf('구독') >= 0 || n.indexOf('알림') >= 0; };
+  const isSubKpi = mk => { const n = mk.name || ''; return n.indexOf('구독') >= 0 || n.indexOf('알림') >= 0 || n.indexOf('고객') >= 0; };
   const rangeMonths = monthsInRange(pStart, pEnd);
   const isSingleMonth = rangeMonths.length === 1;
   const sumForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
