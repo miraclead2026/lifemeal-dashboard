@@ -2175,7 +2175,7 @@ function TabSales({ data, setData }) {
   }, [reloadKey]);
 
   const won2 = n => (Number(n) || 0).toLocaleString() + '원';
-  const deltaChip = (d, invert) => { if (!d || d.deltaValue == null) return null; const up = d.deltaValue > 0; const zero = d.deltaValue === 0; const good = invert ? !up : up; const color = zero ? '#A29C95' : good ? '#1FA463' : '#E53935'; return <span style={{ fontSize: 11, color, fontWeight: 700 }}>{zero ? '–' : up ? '▲' : '▼'} {Math.abs(d.deltaValue).toLocaleString()}{d.deltaPct != null ? ' (' + (d.deltaPct > 0 ? '+' : '') + d.deltaPct + '%)' : ''}</span>; };
+  const deltaChip = (d, invert, suffix) => { if (!d || d.deltaValue == null) return null; const up = d.deltaValue > 0; const zero = d.deltaValue === 0; const good = invert ? !up : up; const color = zero ? '#A29C95' : good ? '#1FA463' : '#E53935'; return <span style={{ fontSize: 11, color, fontWeight: 700 }}>{zero ? '–' : up ? '▲' : '▼'} {Math.abs(d.deltaValue).toLocaleString()}{suffix || ''}{d.deltaPct != null ? ' (' + (d.deltaPct > 0 ? '+' : '') + d.deltaPct + '%)' : ''}</span>; };
   const th = { padding: '8px 10px', textAlign: 'left', color: '#6E6863', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' };
   const td = { padding: '8px 10px', whiteSpace: 'nowrap' };
   const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -2245,13 +2245,29 @@ function TabSales({ data, setData }) {
 
       {r && status !== 'loading' && (<>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10, marginBottom: 18 }}>
-          {[{ k: 'revenue', l: modeLabel[mode] + ' 매출', cnt: false, inv: false }, { k: 'orders', l: '결제 건수', cnt: true, inv: false }, { k: 'aov', l: '건당 매출', cnt: false, inv: false }, { k: 'refund', l: '환불', cnt: false, inv: true }].map(c => { const d = sum[c.k]; return (
-            <div key={c.k} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 12, padding: 14 }}>
-              <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 4 }}>{c.l}</div>
-              <div style={{ fontSize: 19, fontWeight: 800, color: c.k === 'refund' ? '#E53935' : G }}>{d ? (c.cnt ? (d.value || 0).toLocaleString() + '건' : won2(d.value)) : '-'}</div>
-              <div style={{ marginTop: 4 }}>{deltaChip(d, c.inv)}</div>
-            </div>
-          ); })}
+          {(() => {
+            const chVisitors = channels.reduce((a, c) => a + (c.visitors || 0), 0);
+            const ordVal = sum.orders ? (sum.orders.value || 0) : 0;
+            const vData = sum.visitors || (chVisitors > 0 ? { value: chVisitors, deltaValue: null, deltaPct: null } : null);
+            const vEst = !sum.visitors && !!vData;
+            const cData = sum.conversion || (chVisitors > 0 ? { value: Math.round(ordVal / chVisitors * 10000) / 100, deltaValue: null, deltaPct: null } : null);
+            const cEst = !sum.conversion && !!cData;
+            const cards = [
+              { k: 'revenue', l: modeLabel[mode] + ' 매출', d: sum.revenue, fmt: v => won2(v) },
+              { k: 'orders', l: '결제 건수', d: sum.orders, fmt: v => (v || 0).toLocaleString() + '건' },
+              { k: 'aov', l: '건당 매출', d: sum.aov, fmt: v => won2(v) },
+              { k: 'visitors', l: '방문자', d: vData, fmt: v => (v || 0).toLocaleString() + '명', est: vEst },
+              { k: 'conversion', l: '전환율', d: cData, fmt: v => (v == null ? '-' : v + '%'), sfx: '%p', est: cEst },
+              { k: 'refund', l: '환불', d: sum.refund, fmt: v => won2(v), inv: true, red: true },
+            ];
+            return cards.map(c => (
+              <div key={c.k} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 12, padding: 14 }}>
+                <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 4 }}>{c.l}{c.est && <span style={{ fontSize: 9, color: '#A29C95', fontWeight: 400 }}> · 채널 합산 추정</span>}</div>
+                <div style={{ fontSize: 19, fontWeight: 800, color: c.red ? '#E53935' : G }}>{c.d ? c.fmt(c.d.value) : '-'}</div>
+                <div style={{ marginTop: 4, minHeight: 14 }}>{deltaChip(c.d, c.inv, c.sfx)}</div>
+              </div>
+            ));
+          })()}
         </div>
 
         {daily.length > 0 && mode !== 'day' && (
