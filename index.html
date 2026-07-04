@@ -1514,6 +1514,7 @@ function KpiEditModal({ data, setData, planId, kpiId, onClose }) {
 function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
   const L = kpi.link || null;
   const [mode, setMode] = useState(L && L.type === 'manual' ? 'manual' : 'sales');
+  const [srcTab, setSrcTab] = useState(L && L.type === 'kakao' ? 'kakao' : 'sales');
   const [metric, setMetric] = useState((L && L.metric) || 'productRevenue');
   const [prodSel, setProdSel] = useState(() => ((L && L.productIds) || []).map(String));
   const [groupSel, setGroupSel] = useState(() => ((L && L.groupIds) || []).map(String));
@@ -1524,7 +1525,10 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
   const groups = data.productGroups || [];
   const catalog = (() => { const m = {}; (days || []).forEach(d => (d.products || []).forEach(pp => { const id = String(pp.productId || ''); if (!id) return; if (!m[id]) m[id] = { id, name: pp.name || id, rev: 0 }; m[id].rev += pp.revenue || 0; if (pp.name) m[id].name = pp.name; })); return Object.values(m).sort((a, b) => b.rev - a.rev); })();
   const coverage = (() => { const ds = (days || []).map(d => d.date).sort(); return ds.length ? ds[0] + ' ~ ' + ds[ds.length - 1] : '없음'; })();
-  const METRICS = [['productRevenue', '상품별 매출'], ['productRevenueShare', '상품 매출 비중(%)'], ['productQtyShare', '판매 점유율(%)'], ['conversion', '전환율'], ['visitors', '방문자수'], ['orders', '결제건수'], ['aov', '객단가']];
+  const SALES_METRICS = [['productRevenue', '상품별 매출'], ['productRevenueShare', '상품 매출 비중(%)'], ['productQtyShare', '판매 점유율(%)'], ['conversion', '전환율'], ['visitors', '방문자수'], ['orders', '결제건수'], ['aov', '객단가']];
+  const KAKAO_METRICS = [['kakaoTotal', '누적 친구수'], ['kakaoNew', '신규 친구'], ['kakaoNet', '순증감']];
+  const METRICS = srcTab === 'kakao' ? KAKAO_METRICS : SALES_METRICS;
+  const pickTab = t => { setSrcTab(t); setMetric(t === 'kakao' ? ((L && L.type === 'kakao' && L.metric) || 'kakaoNew') : ((L && L.type === 'sales' && L.metric) || 'productRevenue')); };
   const isProdMetric = m => ['productRevenue', 'productRevenueShare', 'productQtyShare'].indexOf(m) >= 0;
   const toggleProd = id => setProdSel(s => s.indexOf(id) >= 0 ? s.filter(x => x !== id) : [...s, id]);
   const toggleGroup = id => setGroupSel(s => s.indexOf(id) >= 0 ? s.filter(x => x !== id) : [...s, id]);
@@ -1545,7 +1549,8 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
     } else {
       if (!ls) { alert('집계일을 선택하세요'); return; }
       if (isProdMetric(metric) && !prodSel.length && !groupSel.length) { alert('상품 또는 그룹을 1개 이상 선택하세요'); return; }
-      onSave({ type: 'sales', tab: '매출', metric, productIds: isProdMetric(metric) ? prodSel : [], groupIds: isProdMetric(metric) ? groupSel : [], start: ls, end: le || '' });
+      if (srcTab === 'kakao') onSave({ type: 'kakao', tab: '카카오', metric, start: ls, end: le || '' });
+      else onSave({ type: 'sales', tab: '매출', metric, productIds: isProdMetric(metric) ? prodSel : [], groupIds: isProdMetric(metric) ? groupSel : [], start: ls, end: le || '' });
     }
   };
   const mbtn = on => ({ flex: 1, padding: '8px 0', borderRadius: 8, border: '1px solid ' + (on ? G : '#E3E0DC'), background: on ? G : 'white', color: on ? 'white' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 700 });
@@ -1559,10 +1564,10 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
       </div>
       {mode === 'sales' ? (<div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>연동할 탭</div>
-        <div style={{ marginBottom: 10 }}><span style={chip(true)}>💵 매출</span></div>
+        <div style={{ marginBottom: 10, display: 'flex', gap: 6 }}><button onClick={() => pickTab('sales')} style={chip(srcTab === 'sales')}>💵 매출</button><button onClick={() => pickTab('kakao')} style={chip(srcTab === 'kakao')}>💬 카카오</button></div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>지표 선택</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>{METRICS.map(pair => <button key={pair[0]} onClick={() => setMetric(pair[0])} style={chip(metric === pair[0])}>{pair[1]}</button>)}</div>
-        {isProdMetric(metric) && (
+        {srcTab === 'sales' && isProdMetric(metric) && (
           <div style={{ marginBottom: 10 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>상품 그룹 선택{groupSel.length > 0 ? ' (' + groupSel.length + '개)' : ''}</div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
@@ -1623,7 +1628,7 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
           <div style={{ flex: 1, minWidth: 130 }}><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 4 }}>집계일 (시작)</div>{inp(ls, setLs, 'date')}</div>
           <div style={{ flex: 1, minWidth: 130 }}><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 4 }}>종료일 (선택)</div>{inp(le, setLe, 'date')}</div>
         </div>
-        <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 10 }}>종료일을 비우면 집계일부터 계속 누적됩니다 · 일별 데이터 보유: {coverage}</div>
+        <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 10 }}>{metric === 'kakaoTotal' ? '누적 친구수는 집계기간과 무관하게 "기간 종료일 시점의 누적값"이 달성값이 됩니다' : '종료일을 비우면 집계일부터 계속 누적됩니다' + (srcTab === 'sales' ? ' · 일별 데이터 보유: ' + coverage : '')}</div>
       </div>) : (<div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>수동 기록 (적용일 · 값 · 메모)</div>
         {entries.map((e, i) => (
@@ -1658,9 +1663,11 @@ function TabKpi({ data, setData }) {
   const [naverDaily, setNaverDaily] = useState([]);
   const [naverSubDays, setNaverSubDays] = useState([]);
   const [naverDays, setNaverDays] = useState([]);
+  const [kakaoDaily, setKakaoDaily] = useState([]);
   const [linkCfg, setLinkCfg] = useState(null);
   const [naverInfo, setNaverInfo] = useState(null);
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (!alive || !j) return; const months = Array.isArray(j.months) ? j.months : (j.month ? [j.month] : []); const all = []; months.forEach(m => (m.daily || []).forEach(d => { if (d && d.date) all.push({ date: d.date, revenue: d.revenue || 0 }); })); setNaverDaily(all); const subAll = []; (Array.isArray(j.days) ? j.days : []).forEach(d => { if (d && d.key) { const n = (d.subscribers && d.subscribers.notify) || {}; subAll.push({ date: d.key, total: n.total || 0, added: n.added || 0 }); } }); setNaverSubDays(subAll); setNaverDays((Array.isArray(j.days) ? j.days : []).map(dd => ({ date: dd.key, summary: dd.summary || {}, products: dd.products || [] })).filter(dd => dd.date)); const ym = (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })(); const cur = months.find(m => (m.key || '').slice(0, 7) === ym) || months[0]; if (cur && cur.summary && cur.summary.revenue) setNaverRev(cur.summary.revenue.value || 0); setNaverInfo({ label: cur ? (cur.label || '') : '', updatedAt: j.updatedAt || '' }); }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); }).catch(() => {}); return () => { alive = false; }; }, []);
   const mainKpis = data.mainKpis || [];
   const logs = data.kpiLogs || [];
   const naverInRange = naverDaily.filter(d => d.date && d.date >= pStart && d.date <= pEnd).reduce((a, d) => a + (d.revenue || 0), 0);
@@ -1675,13 +1682,21 @@ function TabKpi({ data, setData }) {
   const sumForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
   const logsForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart);
   const logsForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart);
-  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가' };
+  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가', kakaoTotal: '누적 친구수', kakaoNew: '신규 친구', kakaoNet: '순증감' };
   const resolveProdIds = L => { const gs = data.productGroups || []; const ids = ((L && L.productIds) || []).map(String); ((L && L.groupIds) || []).forEach(gid => { const gr = gs.find(x => String(x.id) === String(gid)); if (gr) (gr.productIds || []).forEach(pid => { const s = String(pid); if (ids.indexOf(s) < 0) ids.push(s); }); }); return ids; };
   const linkValue = k => {
     const L = k && k.link; if (!L || !L.type) return null;
     if (L.type === 'manual') return (L.entries || []).filter(e => e && e.date && e.date <= pEnd).reduce((a, e) => a + (Number(e.value) || 0), 0);
     const ls = L.start || '0000-01-01'; const le = L.end || '9999-12-31';
     const from = pStart > ls ? pStart : ls; const to = pEnd < le ? pEnd : le;
+    if (L.type === 'kakao') {
+      if (L.metric === 'kakaoTotal') { const upto = kakaoDaily.filter(d => d.date <= pEnd); return upto.length ? upto[upto.length - 1].cum : 0; }
+      if (from > to) return 0;
+      const krows = kakaoDaily.filter(d => d.date >= from && d.date <= to);
+      if (L.metric === 'kakaoNew') return krows.reduce((a, r) => a + r.add, 0);
+      if (L.metric === 'kakaoNet') return krows.reduce((a, r) => a + r.net, 0);
+      return 0;
+    }
     if (from > to) return 0;
     const rows = naverDays.filter(d => d.date >= from && d.date <= to);
     const sumF = f => rows.reduce((a, r) => a + (((r.summary || {})[f] || {}).value || 0), 0);
@@ -1902,7 +1917,7 @@ function TabKpi({ data, setData }) {
                           <div style={{ marginTop: 10, borderTop: '1px solid #F5F4F2', paddingTop: 10 }}>
                             {lk && (
                               <div onClick={() => setLinkCfg({ planId: p.id, kpiId: k.id })} style={{ display: 'flex', alignItems: 'center', gap: 6, background: lk.type === 'manual' ? '#EFF6FF' : '#ECFDF5', borderRadius: 8, padding: '7px 10px', marginBottom: 10, cursor: 'pointer', fontSize: 11, fontWeight: 600, color: lk.type === 'manual' ? '#2D5FE0' : '#1FA463' }}>
-                                {lk.type === 'manual' ? <span>✍ 수동입력 · 기록 {(lk.entries || []).length}건</span> : <span>📡 매출 · {METRIC_DEF[lk.metric] || lk.metric}{(() => { const gc = (lk.groupIds || []).length, pc2 = (lk.productIds || []).length; return (gc || pc2) ? ' (' + [gc ? '그룹 ' + gc : '', pc2 ? '상품 ' + pc2 : ''].filter(Boolean).join(' · ') + ')' : ''; })()} · {lk.start}~{lk.end || '계속'}</span>}
+                                {lk.type === 'manual' ? <span>✍ 수동입력 · 기록 {(lk.entries || []).length}건</span> : <span>{lk.type === 'kakao' ? '💬 카카오' : '📡 매출'} · {METRIC_DEF[lk.metric] || lk.metric}{(() => { const gc = (lk.groupIds || []).length, pc2 = (lk.productIds || []).length; return (gc || pc2) ? ' (' + [gc ? '그룹 ' + gc : '', pc2 ? '상품 ' + pc2 : ''].filter(Boolean).join(' · ') + ')' : ''; })()} · {lk.start}~{lk.end || '계속'}</span>}
                                 <span style={{ marginLeft: 'auto', color: '#A29C95', fontWeight: 400 }}>설정 ›</span>
                               </div>
                             )}
@@ -2345,6 +2360,93 @@ const SALES_SAMPLE = {
       products: [{ rank: 1, name: '황성주 박사의 1일 1생식 라이프밀', productId: '1276', revenue: 280000, qty: 2 }] }
   ]
 };
+
+function TabKakao() {
+  const [raw, setRaw] = useState(null);
+  const [status, setStatus] = useState('loading');
+  const [rangeKey, setRangeKey] = useState('30');
+  const [hoverBar, setHoverBar] = useState(null);
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && j.friends && j.friends.daily) { setRaw(j); setStatus('ok'); } else setStatus('error'); }).catch(() => { if (alive) setStatus('error'); }); return () => { alive = false; }; }, []);
+  if (status === 'loading') return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>카카오 채널 데이터를 불러오는 중…</Card></div>;
+  if (status === 'error' || !raw) return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>카카오 채널 데이터를 불러오지 못했습니다.<br /><span style={{ fontSize: 11 }}>data/kakao-stats.json 이 아직 없거나 형식이 다릅니다.</span></Card></div>;
+  const fdAll = (raw.friends.daily || []).slice().sort((a, b) => a.date < b.date ? -1 : 1);
+  const fsAll = ((raw.friendSources && raw.friendSources.daily) || []).slice().sort((a, b) => a.date < b.date ? -1 : 1);
+  const latest = fdAll[fdAll.length - 1];
+  const latestDate = latest ? latest.date : TODAY;
+  const RANGES = [['7', '최근 7일'], ['30', '최근 30일'], ['90', '최근 90일'], ['thisM', '이번 달'], ['lastM', '지난 달']];
+  const rng = (() => {
+    if (rangeKey === 'thisM') { const p = latestDate.slice(0, 7); return { s: p + '-01', e: latestDate, label: p }; }
+    if (rangeKey === 'lastM') { const p = shiftMonth(latestDate.slice(0, 7), -1); return { s: p + '-01', e: p + '-31', label: p }; }
+    const n = Number(rangeKey); return { s: addDay(latestDate, -(n - 1)), e: latestDate, label: '최근 ' + n + '일' };
+  })();
+  const rows = fdAll.filter(x => x.date >= rng.s && x.date <= rng.e);
+  const srows = fsAll.filter(x => x.date >= rng.s && x.date <= rng.e);
+  const days = rows.length;
+  const prevRows = (() => { const pe = addDay(rng.s, -1); const ps = addDay(pe, -(days - 1)); return fdAll.filter(x => x.date >= ps && x.date <= pe); })();
+  const sum = (arr, f) => arr.reduce((a, x) => a + (x[f] == null ? 0 : x[f]), 0);
+  const newSum = sum(rows, 'newFriends'), netSum = sum(rows, 'netChange'), churnSum = sum(rows, 'estimatedChurn');
+  const pNew = sum(prevRows, 'newFriends'), pNet = sum(prevRows, 'netChange'), pChurn = sum(prevRows, 'estimatedChurn');
+  const cum = rows.length ? rows[rows.length - 1].cumulativeFriends : (latest ? latest.cumulativeFriends : 0);
+  const chip = (v, prev, invert, suffix) => { if (prevRows.length === 0) return null; const d = v - prev; if (d === 0) return <span style={{ fontSize: 11, color: '#A29C95', fontWeight: 700 }}>– 0{suffix || ''}</span>; const up = d > 0; const good = invert ? !up : up; return <span style={{ fontSize: 11, color: good ? '#1FA463' : '#E53935', fontWeight: 700 }}>{up ? '▲' : '▼'} {Math.abs(d).toLocaleString()}{suffix || ''} <span style={{ color: '#A29C95', fontWeight: 400 }}>vs 직전 {days}일</span></span>; };
+  const cards = [
+    { l: '누적 친구수', v: cum.toLocaleString() + '명', c: <span style={{ fontSize: 11, color: netSum >= 0 ? '#1FA463' : '#E53935', fontWeight: 700 }}>{(netSum >= 0 ? '+' : '') + netSum.toLocaleString()}명 <span style={{ color: '#A29C95', fontWeight: 400 }}>기간 순증감</span></span> },
+    { l: '신규 친구', v: newSum.toLocaleString() + '명', c: chip(newSum, pNew, false, '명') },
+    { l: '순증감', v: (netSum >= 0 ? '+' : '') + netSum.toLocaleString() + '명', c: chip(netSum, pNet, false, '명'), red: netSum < 0 },
+    { l: '추정 이탈', v: churnSum.toLocaleString() + '명', c: chip(churnSum, pChurn, true, '명'), red: true },
+  ];
+  const maxAbs = Math.max(1, ...rows.map(x => Math.abs(x.netChange == null ? 0 : x.netChange)));
+  const srcTot = (() => { const t = {}; srows.forEach(x => Object.keys(x).forEach(k => { if (k !== 'date' && k !== '합계') t[k] = (t[k] || 0) + (x[k] || 0); })); return t; })();
+  const srcSum = Object.values(srcTot).reduce((a, v) => a + v, 0);
+  const srcList = Object.keys(srcTot).map(k => ({ k, v: srcTot[k] })).filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: G }}>💬 카카오 채널</div>
+        <span style={{ fontSize: 12, color: '#6E6863' }}>{raw.channel}</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{latestDate} 기준 · 전일까지 확정치 (하루 지연) · 매일 자동 갱신</span>
+      </div>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '10px 0 14px' }}>
+        {RANGES.map(pair => { const on = rangeKey === pair[0]; return <button key={pair[0]} onClick={() => setRangeKey(pair[0])} style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid ' + (on ? G : '#E3E0DC'), background: on ? G : 'white', color: on ? 'white' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>{pair[1]}</button>; })}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10, marginBottom: 18 }}>
+        {cards.map(c => (
+          <div key={c.l} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 12, padding: 14 }}>
+            <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 4 }}>{c.l}</div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: c.red ? '#E53935' : G }}>{c.v}</div>
+            <div style={{ marginTop: 4, minHeight: 14 }}>{c.c}</div>
+          </div>
+        ))}
+      </div>
+      <Card style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📊 일별 순증감</div>
+          <div style={{ marginLeft: 'auto', minHeight: 16 }}>{hoverBar ? <span style={{ fontSize: 12, fontWeight: 700, color: G }}>{hoverBar.d.slice(5).replace('-', '/')} · 신규 {hoverBar.add}명 · 순증감 <span style={{ color: hoverBar.net >= 0 ? '#1FA463' : '#E53935' }}>{(hoverBar.net >= 0 ? '+' : '') + hoverBar.net}</span> · 이탈추정 {hoverBar.churn}</span> : <span style={{ fontSize: 11, color: '#A29C95' }}>막대에 마우스를 올리면 상세가 표시됩니다</span>}</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: rows.length > 40 ? 2 : 4, overflowX: 'auto', paddingTop: 4 }}>
+          {rows.map(x => { const net = x.netChange == null ? 0 : x.netChange; const h = Math.round(Math.abs(net) / maxAbs * 62); const active = hoverBar && hoverBar.d === x.date; return (
+            <div key={x.date} onMouseEnter={() => setHoverBar({ d: x.date, add: x.newFriends || 0, net, churn: x.estimatedChurn == null ? 0 : x.estimatedChurn })} onMouseLeave={() => setHoverBar(null)} style={{ flex: 1, minWidth: rows.length > 40 ? 8 : 18, cursor: 'default', textAlign: 'center' }}>
+              <div style={{ height: 66, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>{net > 0 && <div style={{ background: active ? '#178A54' : '#1FA463', borderRadius: '3px 3px 0 0', height: Math.max(3, h) }} />}</div>
+              <div style={{ height: 2, background: '#E3E0DC' }} />
+              <div style={{ height: 66 }}>{net < 0 && <div style={{ background: active ? '#C62828' : '#E53935', borderRadius: '0 0 3px 3px', height: Math.max(3, h) }} />}</div>
+              {rows.length <= 40 && <div style={{ fontSize: 8, color: '#A29C95', marginTop: 2 }}>{x.date.slice(8)}</div>}
+            </div>
+          ); })}
+        </div>
+      </Card>
+      <Card>
+        <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 12 }}>🚪 친구 유입 경로 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({rng.label} · 신규 {srcSum.toLocaleString()}명)</span></div>
+        {srcList.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>이 기간에 신규 유입이 없습니다</div> : srcList.map(x => { const p = srcSum ? Math.round(x.v / srcSum * 100) : 0; return (
+          <div key={x.k} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '5px 0' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#3A3631', minWidth: 90 }}>{x.k}</span>
+            <div style={{ flex: 1, background: '#F5F4F2', borderRadius: 6, height: 14, overflow: 'hidden' }}><div style={{ width: p + '%', height: '100%', background: '#FEE500', borderRadius: 6, minWidth: x.v > 0 ? 4 : 0 }} /></div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: G, minWidth: 70, textAlign: 'right' }}>{x.v.toLocaleString()}명 ({p}%)</span>
+          </div>
+        ); })}
+        <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>순증감은 실측(전일 대비), 추정 이탈은 근사치입니다</div>
+      </Card>
+    </div>
+  );
+}
 
 function TabSales({ data, setData }) {
   const [mode, setMode] = useState('month');
@@ -3207,6 +3309,7 @@ function App() {
     { icon: '🏆', label: '업무 성과', C: TabPerformance },
     { icon: '📊', label: 'KPI', C: TabKpi },
     { icon: '💵', label: '매출', C: TabSales },
+    { icon: '💬', label: '카카오', C: TabKakao },
     { icon: '🗓', label: '회의', C: TabMeeting },
     { icon: '⏸', label: '보류', C: TabHold, badge: heldCount },
     { icon: '💰', label: '예산', C: TabBudget },
