@@ -2,7 +2,7 @@
   "channel": "황성주박사의 라이프밀 스토어",
   "channelId": "_DLVYn",
   "source": "business.kakao.com/insight/statistics/friend",
-  "updatedAt": "2026-07-04T05:23:13.707Z",
+  "updatedAt": "2026-07-04T05:38:20.550Z",
   "note": "estimatedChurn 은 (친구추가수 - 순증감) 추정치이며, 친구추가수가 버튼클릭 기준이라 실제 이탈과 오차 가능. netChange 는 실측.",
   "friends": {
     "daily": [
@@ -2349,6 +2349,90 @@
         "체크아웃": 0,
         "게임플레이": 0,
         "기타": 0
+      }
+    ]
+  },
+  "coupons": {
+    "note": "쿠폰별 응모수/당첨수는 유입 성과 지표입니다. 쿠폰 당첨은 채널친구 상태에서만 가능하지만, 이미 채널친구인 사용자도 응모·당첨에 포함될 수 있어 실제 \"친구추가수\"와는 상이할 수 있습니다. (친구추가 실측이 아닌 유입 근사치)",
+    "list": [
+      {
+        "couponId": "973967",
+        "title": "라이프밀 WELCOME KIT",
+        "benefitType": "무료증정",
+        "status": "응모기간만료",
+        "startDate": "2026.06.04",
+        "expireDate": "2026.06.30",
+        "remaining": 688,
+        "issued": 900,
+        "stats": {
+          "조회수": 364,
+          "응모수": 212,
+          "당첨수": 212,
+          "공유수": 2,
+          "사용수": 145
+        }
+      },
+      {
+        "couponId": "973767",
+        "title": "라이프밀 텀블러 증정 쿠폰",
+        "benefitType": "무료증정",
+        "status": "즉시종료",
+        "startDate": "2026.06.04",
+        "expireDate": "2026.06.30",
+        "remaining": 499,
+        "issued": 500,
+        "stats": {
+          "조회수": 8,
+          "응모수": 1,
+          "당첨수": 1,
+          "공유수": 0,
+          "사용수": 0
+        }
+      },
+      {
+        "couponId": null,
+        "title": "[홍대 팝업] 현장 쿠폰",
+        "benefitType": "할인금액",
+        "status": "임시저장",
+        "startDate": "2026.01.14",
+        "expireDate": "2026.12.31",
+        "remaining": null,
+        "issued": null,
+        "stats": null
+      },
+      {
+        "couponId": "900852",
+        "title": "라이프밀 첫방문 기념 쿠폰",
+        "benefitType": "할인율",
+        "status": "즉시종료",
+        "startDate": "2025.12.18",
+        "expireDate": "2027.03.31",
+        "remaining": 492,
+        "issued": 500,
+        "stats": {
+          "조회수": 108,
+          "응모수": 8,
+          "당첨수": 8,
+          "공유수": 0,
+          "사용수": 0
+        }
+      },
+      {
+        "couponId": "900083",
+        "title": "팝업스토어 전제품 할인 쿠폰",
+        "benefitType": "할인율",
+        "status": "응모기간만료",
+        "startDate": "2026.02.13",
+        "expireDate": "2026.02.22",
+        "remaining": 635,
+        "issued": 1000,
+        "stats": {
+          "조회수": 390,
+          "응모수": 365,
+          "당첨수": 365,
+          "공유수": 0,
+          "사용수": 1
+        }
       }
     ]
   }
