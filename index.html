@@ -1511,13 +1511,14 @@ function KpiEditModal({ data, setData, planId, kpiId, onClose }) {
   );
 }
 
-function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
+function KpiLinkPanel({ kpi, days, kakaoCoupons, data, setData, onSave, onClose }) {
   const L = kpi.link || null;
   const [mode, setMode] = useState(L && L.type === 'manual' ? 'manual' : 'sales');
   const [srcTab, setSrcTab] = useState(L && L.type === 'kakao' ? 'kakao' : 'sales');
   const [metric, setMetric] = useState((L && L.metric) || 'productRevenue');
   const [prodSel, setProdSel] = useState(() => ((L && L.productIds) || []).map(String));
   const [groupSel, setGroupSel] = useState(() => ((L && L.groupIds) || []).map(String));
+  const [cpnSel, setCpnSel] = useState(() => ((L && L.couponIds) || []).map(String));
   const [ls, setLs] = useState((L && L.type === 'sales' && L.start) || (TODAY.slice(0, 7) + '-01'));
   const [le, setLe] = useState((L && L.type === 'sales' && L.end) || '');
   const [entries, setEntries] = useState(() => (L && L.entries ? L.entries.map(e => ({ ...e })) : []));
@@ -1526,7 +1527,8 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
   const catalog = (() => { const m = {}; (days || []).forEach(d => (d.products || []).forEach(pp => { const id = String(pp.productId || ''); if (!id) return; if (!m[id]) m[id] = { id, name: pp.name || id, rev: 0 }; m[id].rev += pp.revenue || 0; if (pp.name) m[id].name = pp.name; })); return Object.values(m).sort((a, b) => b.rev - a.rev); })();
   const coverage = (() => { const ds = (days || []).map(d => d.date).sort(); return ds.length ? ds[0] + ' ~ ' + ds[ds.length - 1] : '없음'; })();
   const SALES_METRICS = [['productRevenue', '상품별 매출'], ['productRevenueShare', '상품 매출 비중(%)'], ['productQtyShare', '판매 점유율(%)'], ['conversion', '전환율'], ['visitors', '방문자수'], ['orders', '결제건수'], ['aov', '객단가']];
-  const KAKAO_METRICS = [['kakaoTotal', '누적 친구수'], ['kakaoNew', '신규 친구'], ['kakaoNet', '순증감']];
+  const KAKAO_METRICS = [['kakaoTotal', '누적 친구수'], ['kakaoNew', '신규 친구'], ['kakaoNet', '순증감'], ['couponApply', '쿠폰 응모수'], ['couponWin', '쿠폰 당첨수(유입 근사)'], ['couponUse', '쿠폰 사용수']];
+  const isCouponMetric = m => ['couponApply', 'couponWin', 'couponUse'].indexOf(m) >= 0;
   const METRICS = srcTab === 'kakao' ? KAKAO_METRICS : SALES_METRICS;
   const pickTab = t => { setSrcTab(t); setMetric(t === 'kakao' ? ((L && L.type === 'kakao' && L.metric) || 'kakaoNew') : ((L && L.type === 'sales' && L.metric) || 'productRevenue')); };
   const isProdMetric = m => ['productRevenue', 'productRevenueShare', 'productQtyShare'].indexOf(m) >= 0;
@@ -1549,7 +1551,10 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
     } else {
       if (!ls) { alert('집계일을 선택하세요'); return; }
       if (isProdMetric(metric) && !prodSel.length && !groupSel.length) { alert('상품 또는 그룹을 1개 이상 선택하세요'); return; }
-      if (srcTab === 'kakao') onSave({ type: 'kakao', tab: '카카오', metric, start: ls, end: le || '' });
+      if (srcTab === 'kakao') {
+        if (isCouponMetric(metric) && !cpnSel.length) { alert('쿠폰을 1개 이상 선택하세요'); return; }
+        onSave({ type: 'kakao', tab: '카카오', metric, couponIds: isCouponMetric(metric) ? cpnSel : [], start: ls, end: le || '' });
+      }
       else onSave({ type: 'sales', tab: '매출', metric, productIds: isProdMetric(metric) ? prodSel : [], groupIds: isProdMetric(metric) ? groupSel : [], start: ls, end: le || '' });
     }
   };
@@ -1567,6 +1572,24 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
         <div style={{ marginBottom: 10, display: 'flex', gap: 6 }}><button onClick={() => pickTab('sales')} style={chip(srcTab === 'sales')}>💵 매출</button><button onClick={() => pickTab('kakao')} style={chip(srcTab === 'kakao')}>💬 카카오</button></div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>지표 선택</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>{METRICS.map(pair => <button key={pair[0]} onClick={() => setMetric(pair[0])} style={chip(metric === pair[0])}>{pair[1]}</button>)}</div>
+        {srcTab === 'kakao' && isCouponMetric(metric) && (
+          <div style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>적용할 쿠폰 ({cpnSel.length}개 선택)</div>
+            <div style={{ maxHeight: 180, overflowY: 'auto', background: 'white', border: '1px solid #E3E0DC', borderRadius: 8, padding: '2px 8px' }}>
+              {(kakaoCoupons || []).length === 0 ? <div style={{ fontSize: 11, color: '#A29C95', padding: 6 }}>쿠폰 데이터 로딩 중이거나 등록된 쿠폰이 없습니다</div> : (kakaoCoupons || []).map(c => (
+                <label key={c.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '6px 2px', cursor: 'pointer', fontSize: 11, borderBottom: '1px solid #F5F4F2' }}>
+                  <input type="checkbox" checked={cpnSel.indexOf(c.id) >= 0} onChange={() => setCpnSel(s => s.indexOf(c.id) >= 0 ? s.filter(x => x !== c.id) : [...s, c.id])} style={{ marginTop: 2 }} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: 'block', lineHeight: 1.4, wordBreak: 'break-all', fontWeight: 600 }}>{c.title} <span style={{ fontSize: 9, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', borderRadius: 4, padding: '1px 5px' }}>{c.status}</span></span>
+                    <span style={{ display: 'block', fontSize: 9, color: '#A29C95', marginTop: 1 }}>🗓 {c.period}</span>
+                  </span>
+                  <span style={{ color: '#A29C95', flexShrink: 0, fontSize: 10 }}>응모 {c.apply.toLocaleString()} · 당첨 {c.win.toLocaleString()}</span>
+                </label>
+              ))}
+            </div>
+            <div style={{ fontSize: 10, color: '#A29C95', marginTop: 4 }}>쿠폰 지표는 현재 누적값(스냅샷)이라 집계기간의 영향을 받지 않습니다 · 당첨수는 친구추가 실측이 아닌 유입 근사치입니다</div>
+          </div>
+        )}
         {srcTab === 'sales' && isProdMetric(metric) && (
           <div style={{ marginBottom: 10 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>상품 그룹 선택{groupSel.length > 0 ? ' (' + groupSel.length + '개)' : ''}</div>
@@ -1624,11 +1647,11 @@ function KpiLinkPanel({ kpi, days, data, setData, onSave, onClose }) {
             <div style={{ fontSize: 10, color: '#A29C95', marginTop: 4 }}>그룹을 선택하면 나중에 그룹에 상품을 추가/제거해도 이 KPI에 자동 반영됩니다</div>
           </div>
         )}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+        {!(srcTab === 'kakao' && isCouponMetric(metric)) && <div style={{ display: 'flex', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 130 }}><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 4 }}>집계일 (시작)</div>{inp(ls, setLs, 'date')}</div>
           <div style={{ flex: 1, minWidth: 130 }}><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 4 }}>종료일 (선택)</div>{inp(le, setLe, 'date')}</div>
-        </div>
-        <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 10 }}>{metric === 'kakaoTotal' ? '누적 친구수는 집계기간과 무관하게 "기간 종료일 시점의 누적값"이 달성값이 됩니다' : '종료일을 비우면 집계일부터 계속 누적됩니다' + (srcTab === 'sales' ? ' · 일별 데이터 보유: ' + coverage : '')}</div>
+        </div>}
+        {!(srcTab === 'kakao' && isCouponMetric(metric)) && <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 10 }}>{metric === 'kakaoTotal' ? '누적 친구수는 집계기간과 무관하게 "기간 종료일 시점의 누적값"이 달성값이 됩니다' : '종료일을 비우면 집계일부터 계속 누적됩니다' + (srcTab === 'sales' ? ' · 일별 데이터 보유: ' + coverage : '')}</div>}
       </div>) : (<div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>수동 기록 (적용일 · 값 · 메모)</div>
         {entries.map((e, i) => (
@@ -1664,10 +1687,11 @@ function TabKpi({ data, setData }) {
   const [naverSubDays, setNaverSubDays] = useState([]);
   const [naverDays, setNaverDays] = useState([]);
   const [kakaoDaily, setKakaoDaily] = useState([]);
+  const [kakaoCoupons, setKakaoCoupons] = useState([]);
   const [linkCfg, setLinkCfg] = useState(null);
   const [naverInfo, setNaverInfo] = useState(null);
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (!alive || !j) return; const months = Array.isArray(j.months) ? j.months : (j.month ? [j.month] : []); const all = []; months.forEach(m => (m.daily || []).forEach(d => { if (d && d.date) all.push({ date: d.date, revenue: d.revenue || 0 }); })); setNaverDaily(all); const subAll = []; (Array.isArray(j.days) ? j.days : []).forEach(d => { if (d && d.key) { const n = (d.subscribers && d.subscribers.notify) || {}; subAll.push({ date: d.key, total: n.total || 0, added: n.added || 0 }); } }); setNaverSubDays(subAll); setNaverDays((Array.isArray(j.days) ? j.days : []).map(dd => ({ date: dd.key, summary: dd.summary || {}, products: dd.products || [] })).filter(dd => dd.date)); const ym = (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })(); const cur = months.find(m => (m.key || '').slice(0, 7) === ym) || months[0]; if (cur && cur.summary && cur.summary.revenue) setNaverRev(cur.summary.revenue.value || 0); setNaverInfo({ label: cur ? (cur.label || '') : '', updatedAt: j.updatedAt || '' }); }).catch(() => {}); return () => { alive = false; }; }, []);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); setKakaoCoupons(((j.coupons && j.coupons.list) || []).filter(x => x.couponId != null && x.stats).map(x => ({ id: String(x.couponId), title: x.title || '', status: x.status || '', period: ((x.startDate || '') + '~' + (x.expireDate || '')).replace(/\./g, '/'), apply: x.stats['응모수'] || 0, win: x.stats['당첨수'] || 0, use: x.stats['사용수'] || 0 }))); }).catch(() => {}); return () => { alive = false; }; }, []);
   const mainKpis = data.mainKpis || [];
   const logs = data.kpiLogs || [];
   const naverInRange = naverDaily.filter(d => d.date && d.date >= pStart && d.date <= pEnd).reduce((a, d) => a + (d.revenue || 0), 0);
@@ -1682,7 +1706,7 @@ function TabKpi({ data, setData }) {
   const sumForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
   const logsForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart);
   const logsForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart);
-  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가', kakaoTotal: '누적 친구수', kakaoNew: '신규 친구', kakaoNet: '순증감' };
+  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가', kakaoTotal: '누적 친구수', kakaoNew: '신규 친구', kakaoNet: '순증감', couponApply: '쿠폰 응모수', couponWin: '쿠폰 당첨수(유입 근사)', couponUse: '쿠폰 사용수' };
   const resolveProdIds = L => { const gs = data.productGroups || []; const ids = ((L && L.productIds) || []).map(String); ((L && L.groupIds) || []).forEach(gid => { const gr = gs.find(x => String(x.id) === String(gid)); if (gr) (gr.productIds || []).forEach(pid => { const s = String(pid); if (ids.indexOf(s) < 0) ids.push(s); }); }); return ids; };
   const linkValue = k => {
     const L = k && k.link; if (!L || !L.type) return null;
@@ -1690,6 +1714,7 @@ function TabKpi({ data, setData }) {
     const ls = L.start || '0000-01-01'; const le = L.end || '9999-12-31';
     const from = pStart > ls ? pStart : ls; const to = pEnd < le ? pEnd : le;
     if (L.type === 'kakao') {
+      if (L.metric === 'couponApply' || L.metric === 'couponWin' || L.metric === 'couponUse') { const ids = (L.couponIds || []).map(String); const f = L.metric === 'couponApply' ? 'apply' : L.metric === 'couponWin' ? 'win' : 'use'; return kakaoCoupons.filter(c => ids.indexOf(c.id) >= 0).reduce((a, c) => a + (c[f] || 0), 0); }
       if (L.metric === 'kakaoTotal') { const upto = kakaoDaily.filter(d => d.date <= pEnd); return upto.length ? upto[upto.length - 1].cum : 0; }
       if (from > to) return 0;
       const krows = kakaoDaily.filter(d => d.date >= from && d.date <= to);
@@ -1799,7 +1824,7 @@ function TabKpi({ data, setData }) {
         </div>
         {mkEdit !== undefined && <MainKpiModal data={data} setData={setData} edit={mkEdit} onClose={() => setMkEdit(undefined)} />}
         {kpiEdit && <KpiEditModal data={data} setData={setData} planId={kpiEdit.planId} kpiId={kpiEdit.kpiId} onClose={() => setKpiEdit(null)} />}
-        {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
+        {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} kakaoCoupons={kakaoCoupons} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
         {mainKpis.map(mk => {
           const linkedIds = mk.linkedKpiIds || [];
           const linked = linkedIds.map(kid => findKpi(kid)).filter(Boolean);
@@ -1917,7 +1942,7 @@ function TabKpi({ data, setData }) {
                           <div style={{ marginTop: 10, borderTop: '1px solid #F5F4F2', paddingTop: 10 }}>
                             {lk && (
                               <div onClick={() => setLinkCfg({ planId: p.id, kpiId: k.id })} style={{ display: 'flex', alignItems: 'center', gap: 6, background: lk.type === 'manual' ? '#EFF6FF' : '#ECFDF5', borderRadius: 8, padding: '7px 10px', marginBottom: 10, cursor: 'pointer', fontSize: 11, fontWeight: 600, color: lk.type === 'manual' ? '#2D5FE0' : '#1FA463' }}>
-                                {lk.type === 'manual' ? <span>✍ 수동입력 · 기록 {(lk.entries || []).length}건</span> : <span>{lk.type === 'kakao' ? '💬 카카오' : '📡 매출'} · {METRIC_DEF[lk.metric] || lk.metric}{(() => { const gc = (lk.groupIds || []).length, pc2 = (lk.productIds || []).length; return (gc || pc2) ? ' (' + [gc ? '그룹 ' + gc : '', pc2 ? '상품 ' + pc2 : ''].filter(Boolean).join(' · ') + ')' : ''; })()} · {lk.start}~{lk.end || '계속'}</span>}
+                                {lk.type === 'manual' ? <span>✍ 수동입력 · 기록 {(lk.entries || []).length}건</span> : <span>{lk.type === 'kakao' ? '💬 카카오' : '📡 매출'} · {METRIC_DEF[lk.metric] || lk.metric}{(() => { const gc = (lk.groupIds || []).length, pc2 = (lk.productIds || []).length, cc = (lk.couponIds || []).length; return (gc || pc2 || cc) ? ' (' + [gc ? '그룹 ' + gc : '', pc2 ? '상품 ' + pc2 : '', cc ? '쿠폰 ' + cc : ''].filter(Boolean).join(' · ') + ')' : ''; })()} · {lk.start}~{lk.end || '계속'}</span>}
                                 <span style={{ marginLeft: 'auto', color: '#A29C95', fontWeight: 400 }}>설정 ›</span>
                               </div>
                             )}
@@ -2444,6 +2469,32 @@ function TabKakao() {
         ); })}
         <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>순증감은 실측(전일 대비), 추정 이탈은 근사치입니다</div>
       </Card>
+      {raw.coupons && (raw.coupons.list || []).length > 0 && (() => { const cl = raw.coupons.list || []; const maxApply = Math.max(1, ...cl.map(x => (x.stats && x.stats['응모수']) || 0)); return (
+        <Card style={{ marginTop: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 12 }}>🎟 쿠폰 현황 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({cl.length}개 · 누적 기준)</span></div>
+          <div style={{ display: 'flex', fontSize: 10, fontWeight: 700, color: '#A29C95', padding: '0 0 6px', borderBottom: '1px solid #EDEBE7', gap: 8 }}>
+            <span style={{ flex: 1, minWidth: 0 }}>쿠폰</span><span style={{ width: 76, textAlign: 'right' }}>발급/잔여</span><span style={{ width: 52, textAlign: 'right' }}>조회수</span><span style={{ width: 52, textAlign: 'right' }}>응모수</span><span style={{ width: 88, textAlign: 'right' }}>당첨수(유입 근사)</span><span style={{ width: 52, textAlign: 'right' }}>사용수</span>
+          </div>
+          {cl.map((x, i) => { const s = x.stats; const stC2 = x.status === '임시저장' ? '#A29C95' : (x.status || '').indexOf('만료') >= 0 || (x.status || '').indexOf('종료') >= 0 ? '#989088' : '#1FA463'; return (
+            <div key={x.couponId || 'tmp' + i} style={{ borderBottom: '1px solid #F5F4F2', padding: '8px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: '#3A3631' }}>{x.title}</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, color: 'white', background: stC2, borderRadius: 4, padding: '1px 6px', marginLeft: 6, whiteSpace: 'nowrap' }}>{x.status}</span>
+                  <span style={{ display: 'block', fontSize: 10, color: '#A29C95', marginTop: 2 }}>🗓 {(x.startDate || '?').replace(/\./g, '/')} ~ {(x.expireDate || '?').replace(/\./g, '/')}{x.benefitType ? ' · ' + x.benefitType : ''}</span>
+                </span>
+                <span style={{ width: 76, textAlign: 'right', fontSize: 11, color: '#6E6863' }}>{x.issued != null ? x.issued.toLocaleString() + '/' + (x.remaining != null ? x.remaining.toLocaleString() : '-') : '-'}</span>
+                <span style={{ width: 52, textAlign: 'right', fontSize: 12, color: '#3A3631' }}>{s ? (s['조회수'] || 0).toLocaleString() : '-'}</span>
+                <span style={{ width: 52, textAlign: 'right', fontSize: 12, fontWeight: 700, color: G }}>{s ? (s['응모수'] || 0).toLocaleString() : '-'}</span>
+                <span style={{ width: 88, textAlign: 'right', fontSize: 12, fontWeight: 700, color: '#B45309' }}>{s ? (s['당첨수'] || 0).toLocaleString() : '-'}</span>
+                <span style={{ width: 52, textAlign: 'right', fontSize: 12, color: '#3A3631' }}>{s ? (s['사용수'] || 0).toLocaleString() : '-'}</span>
+              </div>
+              {s && <div style={{ marginTop: 5, background: '#F5F4F2', borderRadius: 5, height: 8, overflow: 'hidden' }}><div style={{ width: Math.round(((s['응모수'] || 0) / maxApply) * 100) + '%', height: '100%', background: '#FEE500', minWidth: (s['응모수'] || 0) > 0 ? 4 : 0 }} /></div>}
+            </div>
+          ); })}
+          {raw.coupons.note && <div style={{ fontSize: 10, color: '#A29C95', marginTop: 10, lineHeight: 1.5 }}>※ {raw.coupons.note}</div>}
+        </Card>
+      ); })()}
     </div>
   );
 }
