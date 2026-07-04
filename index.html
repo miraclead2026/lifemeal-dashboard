@@ -1421,6 +1421,48 @@ function NumInput({ value, onCommit, placeholder, style }) {
   useEffect(() => { if (!focused.current) setV(value == null || value === '' ? '' : String(value)); }, [value]);
   return <input type="number" value={v} onFocus={e => { focused.current = true; e.target.select(); }} onChange={e => setV(e.target.value)} onBlur={() => { focused.current = false; onCommit(v); }} onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }} placeholder={placeholder} style={style} />;
 }
+function buildDailyPeriods(dates) {
+  const ds = dates.slice().sort();
+  const DOW2 = ['일', '월', '화', '수', '목', '금', '토'];
+  const months = {}, weeks = {}, days = [];
+  ds.forEach(d => {
+    const m = d.slice(0, 7);
+    if (!months[m]) months[m] = { key: m, s: m + '-01', e: m + '-31', label: m };
+    const dt = new Date(d + 'T00:00:00');
+    const mon = addDays(d, -((dt.getDay() + 6) % 7));
+    if (!weeks[mon]) weeks[mon] = { key: mon, s: mon, e: addDays(mon, 6), label: mon.slice(5).replace('-', '/') + ' ~ ' + addDays(mon, 6).slice(5).replace('-', '/') + ' 주간' };
+    days.push({ key: d, s: d, e: d, label: d + ' (' + DOW2[dt.getDay()] + ')' });
+  });
+  const desc = o => Object.values(o).sort((a, b) => b.key.localeCompare(a.key));
+  return { month: desc(months), week: desc(weeks), day: days.reverse() };
+}
+
+function PeriodPicker({ mode, setMode, idx, setIdx, periods }) {
+  const list = periods[mode] || [];
+  const curIdx = Math.min(idx[mode] || 0, Math.max(0, list.length - 1));
+  const cur = list[curIdx] || null;
+  const modeLabel = { month: '월간', week: '주간', day: '일간' };
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', margin: '10px 0 14px' }}>
+      <div style={{ display: 'flex', gap: 6 }}>
+        {[['month', '월간'], ['week', '주간'], ['day', '일간']].map(pair => <button key={pair[0]} onClick={() => setMode(pair[0])} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: mode === pair[0] ? G : '#E3E0DC', color: mode === pair[0] ? 'white' : '#3A3631' }}>{pair[1]}</button>)}
+      </div>
+      {mode === 'month' ? (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => setIdx(s => ({ ...s, month: Math.min((s.month || 0) + 1, list.length - 1) }))} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', cursor: curIdx >= list.length - 1 ? 'default' : 'pointer', color: '#3A3631', fontSize: 12, opacity: curIdx >= list.length - 1 ? 0.35 : 1 }}>◀</button>
+          <span style={{ fontSize: 15, fontWeight: 800, color: G, minWidth: 80, textAlign: 'center' }}>{cur ? cur.key : ''}</span>
+          <button onClick={() => setIdx(s => ({ ...s, month: Math.max((s.month || 0) - 1, 0) }))} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', cursor: curIdx <= 0 ? 'default' : 'pointer', color: '#3A3631', fontSize: 12, opacity: curIdx <= 0 ? 0.35 : 1 }}>▶</button>
+        </span>
+      ) : (
+        <select value={curIdx} onChange={e => setIdx(s => ({ ...s, [mode]: Number(e.target.value) }))} style={{ padding: '7px 12px', border: '1px solid #E3E0DC', borderRadius: 9, fontSize: 13, fontWeight: 600, background: 'white', minWidth: 190, color: '#3A3631' }}>
+          {list.map((it, i) => <option key={it.key} value={i}>{it.label}</option>)}
+        </select>
+      )}
+      <span style={{ fontSize: 11, color: '#A29C95' }}>{modeLabel[mode]} 단위 · 직접 선택 가능</span>
+    </div>
+  );
+}
+
 function shiftMonth(base, n) { const p = base.split('-'); const d = new Date(Number(p[0]), Number(p[1]) - 1 + n, 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 function TargetEditor({ targets, onSet, unit }) {
   const [mo, setMo] = useState(TODAY.slice(0, 7));
@@ -2396,7 +2438,8 @@ function TabAds() {
   const won2 = n => (Number(n) || 0).toLocaleString() + '원';
   const [raw, setRaw] = useState(null);
   const [status, setStatus] = useState('loading');
-  const [rangeKey, setRangeKey] = useState('7');
+  const [mode, setMode] = useState('month');
+  const [idx, setIdx] = useState({ month: 0, week: 0, day: 0 });
   const [chF, setChF] = useState('all');
   const [hoverBar, setHoverBar] = useState(null);
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-ads.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && Array.isArray(j.days)) { setRaw(j); setStatus('ok'); } else setStatus('error'); }).catch(() => { if (alive) setStatus('error'); }); return () => { alive = false; }; }, []);
@@ -2406,23 +2449,21 @@ function TabAds() {
   const chOf = g => g.channel || 'display';
   const hasSearch = daysAll.some(x => (x.groups || []).some(g => chOf(g) === 'search'));
   const latestDate = daysAll.length ? daysAll[daysAll.length - 1].date : TODAY;
-  const RANGES = [['7', '최근 7일'], ['30', '최근 30일'], ['thisM', '이번 달'], ['lastM', '지난 달'], ['all', '전체']];
-  const rng = (() => {
-    if (rangeKey === 'thisM') { const p = latestDate.slice(0, 7); return { s: p + '-01', e: latestDate, label: p }; }
-    if (rangeKey === 'lastM') { const p = shiftMonth(latestDate.slice(0, 7), -1); return { s: p + '-01', e: p + '-31', label: p }; }
-    if (rangeKey === 'all') { return { s: daysAll.length ? daysAll[0].date : latestDate, e: latestDate, label: '전체' }; }
-    const n = Number(rangeKey); return { s: addDay(latestDate, -(n - 1)), e: latestDate, label: '최근 ' + n + '일' };
-  })();
+  const periods = buildDailyPeriods(daysAll.map(x => x.date));
+  const list = periods[mode] || [];
+  const curIdx = Math.min(idx[mode] || 0, Math.max(0, list.length - 1));
+  const rng = list[curIdx] || { s: latestDate, e: latestDate, label: '' };
+  const prevRng = list[curIdx + 1] || null;
   const rows = daysAll.filter(x => x.date >= rng.s && x.date <= rng.e);
-  const nDays = rows.length;
-  const prevRows = (() => { const pe = addDay(rng.s, -1); const ps = addDay(pe, -(nDays - 1)); return daysAll.filter(x => x.date >= ps && x.date <= pe); })();
+  const prevRows = prevRng ? daysAll.filter(x => x.date >= prevRng.s && x.date <= prevRng.e) : [];
+  const prevLabel = { month: '전월', week: '전주', day: '전일' }[mode];
   const agg = rs => { const t = { spend: 0, rev: 0, conv: 0, clicks: 0, imp: 0 }; rs.forEach(x => { (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.conversions || 0; t.clicks += g.clicks || 0; t.imp += g.impressions || 0; }); }); return t; };
   const cur = agg(rows), prev = agg(prevRows);
   const roas = cur.spend ? Math.round(cur.rev / cur.spend * 100) : 0;
   const pRoas = prev.spend ? Math.round(prev.rev / prev.spend * 100) : null;
   const cvr = cur.clicks ? Math.round(cur.conv / cur.clicks * 1000) / 10 : 0;
   const cpc = cur.clicks ? Math.round(cur.spend / cur.clicks) : 0;
-  const chip = (v, p, invert, suffix) => { if (!prevRows.length || p == null) return null; const dd = v - p; if (dd === 0) return <span style={{ fontSize: 11, color: '#A29C95', fontWeight: 700 }}>– 0{suffix || ''}</span>; const up = dd > 0; const good = invert ? !up : up; return <span style={{ fontSize: 11, color: good ? '#1FA463' : '#E53935', fontWeight: 700 }}>{up ? '▲' : '▼'} {Math.abs(Math.round(dd * 10) / 10).toLocaleString()}{suffix || ''} <span style={{ color: '#A29C95', fontWeight: 400 }}>vs 직전 {nDays}일</span></span>; };
+  const chip = (v, p, invert, suffix) => { if (!prevRows.length || p == null) return null; const dd = v - p; if (dd === 0) return <span style={{ fontSize: 11, color: '#A29C95', fontWeight: 700 }}>– 0{suffix || ''}</span>; const up = dd > 0; const good = invert ? !up : up; return <span style={{ fontSize: 11, color: good ? '#1FA463' : '#E53935', fontWeight: 700 }}>{up ? '▲' : '▼'} {Math.abs(Math.round(dd * 10) / 10).toLocaleString()}{suffix || ''} <span style={{ color: '#A29C95', fontWeight: 400 }}>vs {prevLabel}</span></span>; };
   const roasColor = roas >= 350 ? '#1FA463' : roas >= 300 ? '#E08700' : '#E53935';
   const cards = [
     { l: '광고비', v: won2(cur.spend), c: chip(cur.spend, prev.spend, true, '') },
@@ -2443,9 +2484,9 @@ function TabAds() {
         <span style={{ fontSize: 12, color: '#6E6863' }}>네이버 광고 성과</span>
         <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{latestDate}까지 · D-2 확정치 · 매출은 구매완료 기여 기준 (정산 매출과 다름)</span>
       </div>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '10px 0 14px', alignItems: 'center' }}>
-        {RANGES.map(pair => { const on = rangeKey === pair[0]; return <button key={pair[0]} onClick={() => setRangeKey(pair[0])} style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid ' + (on ? G : '#E3E0DC'), background: on ? G : 'white', color: on ? 'white' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>{pair[1]}</button>; })}
-        {hasSearch && <span style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>{[['all', '전체'], ['display', '디스플레이'], ['search', '검색']].map(pair => { const on = chF === pair[0]; return <button key={pair[0]} onClick={() => setChF(pair[0])} style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid ' + (on ? '#2D5FE0' : '#E3E0DC'), background: on ? '#EFF6FF' : 'white', color: on ? '#2D5FE0' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>{pair[1]}</button>; })}</span>}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexWrap: 'wrap' }}>
+        <PeriodPicker mode={mode} setMode={setMode} idx={idx} setIdx={setIdx} periods={periods} />
+        {hasSearch && <span style={{ marginLeft: 'auto', display: 'flex', gap: 6, marginTop: 10 }}>{[['all', '전체'], ['display', '디스플레이'], ['search', '검색']].map(pair => { const on = chF === pair[0]; return <button key={pair[0]} onClick={() => setChF(pair[0])} style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid ' + (on ? '#2D5FE0' : '#E3E0DC'), background: on ? '#EFF6FF' : 'white', color: on ? '#2D5FE0' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>{pair[1]}</button>; })}</span>}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10, marginBottom: 18 }}>
         {cards.map(c => (
@@ -2504,14 +2545,46 @@ function TabAds() {
         {pAgg.length > 20 && <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6 }}>상위 20개 표시 (전체 {pAgg.length}개)</div>}
         <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>전환매출은 광고 기여 기준 — 스마트스토어 정산 매출과 다를 수 있습니다 · 클릭 표본이 적은 상품은 ROAS 해석에 주의</div>
       </Card>
+      <AdStrategyDocs />
     </div>
+  );
+}
+
+function AdStrategyDocs() {
+  const [docs, setDocs] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    const BASE2 = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/meetings/';
+    fetch(BASE2 + 'index.json?t=' + Date.now()).then(r => r.ok ? r.json() : []).then(idx2 => {
+      if (!alive) return;
+      const ads = (idx2 || []).filter(m => String(m.id || '').indexOf('-ads') >= 0);
+      Promise.all(ads.map(m => fetch(BASE2 + m.id + '.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)))
+        .then(full => { if (alive) setDocs(ads.map((m, i) => ({ ...m, actions: (full[i] && full[i].actions) || [] })).sort((a, b) => (b.date || '').localeCompare(a.date || ''))); });
+    }).catch(() => { if (alive) setDocs([]); });
+    return () => { alive = false; };
+  }, []);
+  return (
+    <Card style={{ marginTop: 16 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>📋 광고 세분화 전략 문서 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>(광고 에이전트가 데이터 분석 후 자동 생성)</span></div>
+      {docs === null && <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div>}
+      {docs && docs.length === 0 && <div style={{ fontSize: 12, color: '#A29C95' }}>아직 등록된 전략 문서가 없습니다</div>}
+      {docs && docs.map(m => (
+        <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid #F5F4F2' }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', borderRadius: 8, padding: '5px 9px', whiteSpace: 'nowrap' }}>{m.date}</span>
+          <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: '#3A3631' }}>{m.title}</span>
+          <span style={{ fontSize: 11, color: '#A29C95', whiteSpace: 'nowrap' }}>실행 항목 {m.actions.length}건</span>
+        </div>
+      ))}
+      <div style={{ fontSize: 11, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8, padding: '8px 10px', marginTop: 10 }}>📌 문서 열람과 실행 항목 반영은 <b>🗓 회의 탭</b>에서 — 문서를 클릭해 근거를 확인하고, 하단 <b>📥 대시보드 입력</b>에서 버튼으로 등록/수정하세요.</div>
+    </Card>
   );
 }
 
 function TabKakao() {
   const [raw, setRaw] = useState(null);
   const [status, setStatus] = useState('loading');
-  const [rangeKey, setRangeKey] = useState('30');
+  const [mode, setMode] = useState('month');
+  const [idx, setIdx] = useState({ month: 0, week: 0, day: 0 });
   const [hoverBar, setHoverBar] = useState(null);
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && j.friends && j.friends.daily) { setRaw(j); setStatus('ok'); } else setStatus('error'); }).catch(() => { if (alive) setStatus('error'); }); return () => { alive = false; }; }, []);
   if (status === 'loading') return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>카카오 채널 데이터를 불러오는 중…</Card></div>;
@@ -2520,21 +2593,20 @@ function TabKakao() {
   const fsAll = ((raw.friendSources && raw.friendSources.daily) || []).slice().sort((a, b) => a.date < b.date ? -1 : 1);
   const latest = fdAll[fdAll.length - 1];
   const latestDate = latest ? latest.date : TODAY;
-  const RANGES = [['7', '최근 7일'], ['30', '최근 30일'], ['90', '최근 90일'], ['thisM', '이번 달'], ['lastM', '지난 달']];
-  const rng = (() => {
-    if (rangeKey === 'thisM') { const p = latestDate.slice(0, 7); return { s: p + '-01', e: latestDate, label: p }; }
-    if (rangeKey === 'lastM') { const p = shiftMonth(latestDate.slice(0, 7), -1); return { s: p + '-01', e: p + '-31', label: p }; }
-    const n = Number(rangeKey); return { s: addDay(latestDate, -(n - 1)), e: latestDate, label: '최근 ' + n + '일' };
-  })();
+  const periods = buildDailyPeriods(fdAll.map(x => x.date));
+  const list = periods[mode] || [];
+  const curIdx = Math.min(idx[mode] || 0, Math.max(0, list.length - 1));
+  const rng = list[curIdx] || { s: latestDate, e: latestDate, label: '' };
+  const prevRng = list[curIdx + 1] || null;
   const rows = fdAll.filter(x => x.date >= rng.s && x.date <= rng.e);
   const srows = fsAll.filter(x => x.date >= rng.s && x.date <= rng.e);
-  const days = rows.length;
-  const prevRows = (() => { const pe = addDay(rng.s, -1); const ps = addDay(pe, -(days - 1)); return fdAll.filter(x => x.date >= ps && x.date <= pe); })();
+  const prevRows = prevRng ? fdAll.filter(x => x.date >= prevRng.s && x.date <= prevRng.e) : [];
+  const prevLabel = { month: '전월', week: '전주', day: '전일' }[mode];
   const sum = (arr, f) => arr.reduce((a, x) => a + (x[f] == null ? 0 : x[f]), 0);
   const newSum = sum(rows, 'newFriends'), netSum = sum(rows, 'netChange'), churnSum = sum(rows, 'estimatedChurn');
   const pNew = sum(prevRows, 'newFriends'), pNet = sum(prevRows, 'netChange'), pChurn = sum(prevRows, 'estimatedChurn');
   const cum = rows.length ? rows[rows.length - 1].cumulativeFriends : (latest ? latest.cumulativeFriends : 0);
-  const chip = (v, prev, invert, suffix) => { if (prevRows.length === 0) return null; const d = v - prev; if (d === 0) return <span style={{ fontSize: 11, color: '#A29C95', fontWeight: 700 }}>– 0{suffix || ''}</span>; const up = d > 0; const good = invert ? !up : up; return <span style={{ fontSize: 11, color: good ? '#1FA463' : '#E53935', fontWeight: 700 }}>{up ? '▲' : '▼'} {Math.abs(d).toLocaleString()}{suffix || ''} <span style={{ color: '#A29C95', fontWeight: 400 }}>vs 직전 {days}일</span></span>; };
+  const chip = (v, prev, invert, suffix) => { if (prevRows.length === 0) return null; const d = v - prev; if (d === 0) return <span style={{ fontSize: 11, color: '#A29C95', fontWeight: 700 }}>– 0{suffix || ''}</span>; const up = d > 0; const good = invert ? !up : up; return <span style={{ fontSize: 11, color: good ? '#1FA463' : '#E53935', fontWeight: 700 }}>{up ? '▲' : '▼'} {Math.abs(d).toLocaleString()}{suffix || ''} <span style={{ color: '#A29C95', fontWeight: 400 }}>vs {prevLabel}</span></span>; };
   const cards = [
     { l: '누적 친구수', v: cum.toLocaleString() + '명', c: <span style={{ fontSize: 11, color: netSum >= 0 ? '#1FA463' : '#E53935', fontWeight: 700 }}>{(netSum >= 0 ? '+' : '') + netSum.toLocaleString()}명 <span style={{ color: '#A29C95', fontWeight: 400 }}>기간 순증감</span></span> },
     { l: '신규 친구', v: newSum.toLocaleString() + '명', c: chip(newSum, pNew, false, '명') },
@@ -2552,9 +2624,7 @@ function TabKakao() {
         <span style={{ fontSize: 12, color: '#6E6863' }}>{raw.channel}</span>
         <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{latestDate} 기준 · 전일까지 확정치 (하루 지연) · 매일 자동 갱신</span>
       </div>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '10px 0 14px' }}>
-        {RANGES.map(pair => { const on = rangeKey === pair[0]; return <button key={pair[0]} onClick={() => setRangeKey(pair[0])} style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid ' + (on ? G : '#E3E0DC'), background: on ? G : 'white', color: on ? 'white' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>{pair[1]}</button>; })}
-      </div>
+      <PeriodPicker mode={mode} setMode={setMode} idx={idx} setIdx={setIdx} periods={periods} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10, marginBottom: 18 }}>
         {cards.map(c => (
           <div key={c.l} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 12, padding: 14 }}>
