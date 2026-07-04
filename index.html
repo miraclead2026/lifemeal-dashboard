@@ -2393,6 +2393,7 @@ const SALES_SAMPLE = {
 };
 
 function TabAds() {
+  const won2 = n => (Number(n) || 0).toLocaleString() + '원';
   const [raw, setRaw] = useState(null);
   const [status, setStatus] = useState('loading');
   const [rangeKey, setRangeKey] = useState('7');
