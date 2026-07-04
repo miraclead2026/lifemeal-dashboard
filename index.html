@@ -2458,25 +2458,28 @@ function TabAds({ data, setData }) {
   const rows = daysAll.filter(x => x.date >= rng.s && x.date <= rng.e);
   const prevRows = prevRng ? daysAll.filter(x => x.date >= prevRng.s && x.date <= prevRng.e) : [];
   const prevLabel = { month: '전월', week: '전주', day: '전일' }[mode];
-  const agg = rs => { const t = { spend: 0, rev: 0, conv: 0, clicks: 0, imp: 0 }; rs.forEach(x => { (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.conversions || 0; t.clicks += g.clicks || 0; t.imp += g.impressions || 0; }); }); return t; };
+  const agg = rs => { const t = { spend: 0, rev: 0, conv: 0, tconv: 0, clicks: 0, imp: 0 }; rs.forEach(x => { (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.purchaseConv || 0; t.tconv += g.totalConv || 0; t.clicks += g.clicks || 0; t.imp += g.impressions || 0; }); }); return t; };
   const cur = agg(rows), prev = agg(prevRows);
   const roas = cur.spend ? Math.round(cur.rev / cur.spend * 100) : 0;
   const pRoas = prev.spend ? Math.round(prev.rev / prev.spend * 100) : null;
   const cvr = cur.clicks ? Math.round(cur.conv / cur.clicks * 1000) / 10 : 0;
   const cpc = cur.clicks ? Math.round(cur.spend / cur.clicks) : 0;
+  const purR = cur.tconv ? Math.round(cur.conv / cur.tconv * 1000) / 10 : 0;
+  const pPurR = prev.tconv ? Math.round(prev.conv / prev.tconv * 1000) / 10 : null;
   const chip = (v, p, invert, suffix) => { if (!prevRows.length || p == null) return null; const dd = v - p; if (dd === 0) return <span style={{ fontSize: 11, color: '#A29C95', fontWeight: 700 }}>– 0{suffix || ''}</span>; const up = dd > 0; const good = invert ? !up : up; return <span style={{ fontSize: 11, color: good ? '#1FA463' : '#E53935', fontWeight: 700 }}>{up ? '▲' : '▼'} {Math.abs(Math.round(dd * 10) / 10).toLocaleString()}{suffix || ''} <span style={{ color: '#A29C95', fontWeight: 400 }}>vs {prevLabel}</span></span>; };
   const roasColor = roas >= 350 ? '#1FA463' : roas >= 300 ? '#E08700' : '#E53935';
   const cards = [
     { l: '광고비', v: won2(cur.spend), c: chip(cur.spend, prev.spend, true, '') },
     { l: '전환매출 (구매완료·기여)', v: won2(cur.rev), c: chip(cur.rev, prev.rev, false, '') },
     { l: 'ROAS (목표 350%)', v: roas + '%', vc: roasColor, c: chip(roas, pRoas, false, '%p') },
-    { l: '전환수', v: cur.conv.toLocaleString() + '건', c: chip(cur.conv, prev.conv, false, '건') },
-    { l: 'CVR (전환/클릭)', v: cvr + '%', c: chip(cvr, prev.clicks ? Math.round(prev.conv / prev.clicks * 1000) / 10 : null, false, '%p') },
+    { l: '구매완료 전환수', v: cur.conv.toLocaleString() + '건', c: chip(cur.conv, prev.conv, false, '건') },
+    { l: 'CVR (구매완료/클릭)', v: cvr + '%', c: chip(cvr, prev.clicks ? Math.round(prev.conv / prev.clicks * 1000) / 10 : null, false, '%p') },
+    { l: '구매 전환율 (구매/총전환)', v: cur.tconv ? purR + '%' : '-', c: chip(purR, pPurR, false, '%p'), sub: '총전환 ' + cur.tconv.toLocaleString() + '건 중 구매 ' + cur.conv.toLocaleString() },
     { l: 'CPC', v: cpc.toLocaleString() + '원', c: chip(cpc, prev.clicks ? Math.round(prev.spend / prev.clicks) : null, true, '원') },
   ];
   const maxRev = Math.max(1, ...rows.map(x => (x.groups || []).reduce((a, g) => a + ((chF !== 'all' && chOf(g) !== chF) ? 0 : (g.convRevenue || 0)), 0)));
-  const gAgg = (() => { const m = {}; rows.forEach(x => (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; const k = String(g.adGroupId || g.campaignId); if (!m[k]) m[k] = { camp: g.campaignName || '', name: g.adGroupName || '', ch: chOf(g), spend: 0, rev: 0, conv: 0, clicks: 0 }; const t = m[k]; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.conversions || 0; t.clicks += g.clicks || 0; })); return Object.values(m).sort((a, b) => b.spend - a.spend); })();
-  const pAgg = (() => { const m = {}; rows.forEach(x => (x.products || []).forEach(p => { if (chF !== 'all' && (p.channel || 'display') !== chF) return; const k = String(p.productId); if (!m[k]) m[k] = { name: p.name || k, spend: 0, rev: 0, conv: 0 }; const t = m[k]; t.spend += p.spend || 0; t.rev += p.convRevenue || 0; t.conv += p.conversions || 0; })); return Object.values(m).filter(p => p.spend > 0 || p.conv > 0).sort((a, b) => b.spend - a.spend); })();
+  const gAgg = (() => { const m = {}; rows.forEach(x => (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; const k = String(g.adGroupId || g.campaignId); if (!m[k]) m[k] = { camp: g.campaignName || '', name: g.adGroupName || '', ch: chOf(g), spend: 0, rev: 0, conv: 0, tconv: 0, clicks: 0 }; const t = m[k]; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.purchaseConv || 0; t.tconv += g.totalConv || 0; t.clicks += g.clicks || 0; })); return Object.values(m).sort((a, b) => b.spend - a.spend); })();
+  const pAgg = (() => { const m = {}; rows.forEach(x => (x.products || []).forEach(p => { if (chF !== 'all' && (p.channel || 'display') !== chF) return; const k = String(p.productId); if (!m[k]) m[k] = { name: p.name || k, spend: 0, rev: 0, conv: 0, tconv: 0 }; const t = m[k]; t.spend += p.spend || 0; t.rev += p.convRevenue || 0; t.conv += p.purchaseConv || 0; t.tconv += p.totalConv || 0; })); return Object.values(m).filter(p => p.spend > 0 || p.tconv > 0).sort((a, b) => b.spend - a.spend); })();
   const rc = v => v >= 350 ? '#1FA463' : v >= 300 ? '#E08700' : v > 0 ? '#E53935' : '#A29C95';
   return (
     <div style={{ padding: 20 }}>
@@ -2496,17 +2499,18 @@ function TabAds({ data, setData }) {
             <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 4 }}>{c.l}</div>
             <div style={{ fontSize: 19, fontWeight: 800, color: c.vc || G }}>{c.v}</div>
             <div style={{ marginTop: 4, minHeight: 14 }}>{c.c}</div>
+            {c.sub && <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>{c.sub}</div>}
           </div>
         ))}
       </div>
       <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📊 일별 전환매출 · ROAS</div>
-          <div style={{ marginLeft: 'auto', minHeight: 16 }}>{hoverBar ? <span style={{ fontSize: 12, fontWeight: 700, color: G }}>{hoverBar.d.slice(5).replace('-', '/')} · 광고비 {won2(hoverBar.sp)} · 매출 {won2(hoverBar.rv)} · <span style={{ color: rc(hoverBar.ro) }}>ROAS {hoverBar.ro}%</span> · {hoverBar.cv}건{hoverBar.prov ? ' · ⏳잠정' : ''}</span> : <span style={{ fontSize: 11, color: '#A29C95' }}>막대에 마우스를 올리면 상세가 표시됩니다</span>}</div>
+          <div style={{ marginLeft: 'auto', minHeight: 16 }}>{hoverBar ? <span style={{ fontSize: 12, fontWeight: 700, color: G }}>{hoverBar.d.slice(5).replace('-', '/')} · 광고비 {won2(hoverBar.sp)} · 매출 {won2(hoverBar.rv)} · <span style={{ color: rc(hoverBar.ro) }}>ROAS {hoverBar.ro}%</span> · 구매 {hoverBar.cv}건 (총 {hoverBar.tcv}){hoverBar.prov ? ' · ⏳잠정' : ''}</span> : <span style={{ fontSize: 11, color: '#A29C95' }}>막대에 마우스를 올리면 상세가 표시됩니다</span>}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: rows.length > 40 ? 2 : 4, overflowX: 'auto', height: 130 }}>
-          {rows.map(x => { let sp = 0, rv = 0, cv = 0; (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; sp += g.spend || 0; rv += g.convRevenue || 0; cv += g.conversions || 0; }); const ro = sp ? Math.round(rv / sp * 100) : 0; const h = Math.max(3, Math.round(rv / maxRev * 100)); const active = hoverBar && hoverBar.d === x.date; const prov = !!x.provisional; return (
-            <div key={x.date} onMouseEnter={() => setHoverBar({ d: x.date, sp, rv, ro, cv, prov })} onMouseLeave={() => setHoverBar(null)} style={{ flex: 1, minWidth: rows.length > 40 ? 8 : 18, textAlign: 'center' }}>
+          {rows.map(x => { let sp = 0, rv = 0, cv = 0, tcv = 0; (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; sp += g.spend || 0; rv += g.convRevenue || 0; cv += g.purchaseConv || 0; tcv += g.totalConv || 0; }); const ro = sp ? Math.round(rv / sp * 100) : 0; const h = Math.max(3, Math.round(rv / maxRev * 100)); const active = hoverBar && hoverBar.d === x.date; const prov = !!x.provisional; return (
+            <div key={x.date} onMouseEnter={() => setHoverBar({ d: x.date, sp, rv, ro, cv, tcv, prov })} onMouseLeave={() => setHoverBar(null)} style={{ flex: 1, minWidth: rows.length > 40 ? 8 : 18, textAlign: 'center' }}>
               <div style={{ height: 100, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}><div style={{ background: active ? '#153A66' : rc(ro), opacity: active ? 1 : (prov ? 0.4 : 0.85), border: prov ? '1px dashed #A29C95' : 'none', boxSizing: 'border-box', borderRadius: '3px 3px 0 0', height: h }} /></div>
               {rows.length <= 40 && <div style={{ fontSize: 8, color: '#A29C95', marginTop: 2 }}>{x.date.slice(8)}</div>}
             </div>
@@ -2517,15 +2521,15 @@ function TabAds({ data, setData }) {
       <Card style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>📁 캠페인 · 그룹별 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({rng.label})</span></div>
         <div style={{ display: 'flex', fontSize: 10, fontWeight: 700, color: '#A29C95', padding: '0 0 6px', borderBottom: '1px solid #EDEBE7', gap: 8 }}>
-          <span style={{ flex: 1, minWidth: 0 }}>캠페인 / 그룹</span><span style={{ width: 82, textAlign: 'right' }}>광고비</span><span style={{ width: 90, textAlign: 'right' }}>전환매출</span><span style={{ width: 46, textAlign: 'right' }}>전환</span><span style={{ width: 56, textAlign: 'right' }}>CVR</span><span style={{ width: 60, textAlign: 'right' }}>ROAS</span>
+          <span style={{ flex: 1, minWidth: 0 }}>캠페인 / 그룹</span><span style={{ width: 82, textAlign: 'right' }}>광고비</span><span style={{ width: 90, textAlign: 'right' }}>전환매출</span><span style={{ width: 68, textAlign: 'right' }}>구매/총전환</span><span style={{ width: 60, textAlign: 'right' }}>구매전환율</span><span style={{ width: 60, textAlign: 'right' }}>ROAS</span>
         </div>
         {gAgg.map((g2, i) => { const ro = g2.spend ? Math.round(g2.rev / g2.spend * 100) : 0; return (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid #F5F4F2', fontSize: 12 }}>
             <span style={{ flex: 1, minWidth: 0 }}><span style={{ fontWeight: 700, color: '#3A3631' }}>{g2.camp}</span><span style={{ display: 'block', fontSize: 10, color: '#A29C95' }}>{g2.name}{hasSearch ? ' · ' + (g2.ch === 'search' ? '검색' : '디스플레이') : ''}</span></span>
             <span style={{ width: 82, textAlign: 'right' }}>{g2.spend.toLocaleString()}</span>
             <span style={{ width: 90, textAlign: 'right', fontWeight: 700 }}>{g2.rev.toLocaleString()}</span>
-            <span style={{ width: 46, textAlign: 'right' }}>{g2.conv}</span>
-            <span style={{ width: 56, textAlign: 'right' }}>{g2.clicks ? Math.round(g2.conv / g2.clicks * 1000) / 10 + '%' : '-'}</span>
+            <span style={{ width: 68, textAlign: 'right' }}>{g2.conv}/{g2.tconv}</span>
+            <span style={{ width: 60, textAlign: 'right', color: g2.tconv && (g2.conv / g2.tconv) < 0.4 ? '#E53935' : '#3A3631' }}>{g2.tconv ? Math.round(g2.conv / g2.tconv * 100) + '%' : '-'}</span>
             <span style={{ width: 60, textAlign: 'right', fontWeight: 800, color: rc(ro) }}>{ro}%</span>
           </div>
         ); })}
@@ -2533,19 +2537,20 @@ function TabAds({ data, setData }) {
       <Card>
         <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>📦 상품별 광고 성과 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({rng.label} · 광고비 순)</span></div>
         <div style={{ display: 'flex', fontSize: 10, fontWeight: 700, color: '#A29C95', padding: '0 0 6px', borderBottom: '1px solid #EDEBE7', gap: 8 }}>
-          <span style={{ flex: 1, minWidth: 0 }}>상품</span><span style={{ width: 82, textAlign: 'right' }}>광고비</span><span style={{ width: 90, textAlign: 'right' }}>전환매출</span><span style={{ width: 46, textAlign: 'right' }}>전환</span><span style={{ width: 60, textAlign: 'right' }}>ROAS</span>
+          <span style={{ flex: 1, minWidth: 0 }}>상품</span><span style={{ width: 82, textAlign: 'right' }}>광고비</span><span style={{ width: 90, textAlign: 'right' }}>전환매출</span><span style={{ width: 68, textAlign: 'right' }}>구매/총전환</span><span style={{ width: 56, textAlign: 'right' }}>구매전환율</span><span style={{ width: 60, textAlign: 'right' }}>ROAS</span>
         </div>
         {pAgg.slice(0, 20).map((p2, i) => { const ro = p2.spend ? Math.round(p2.rev / p2.spend * 100) : 0; return (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid #F5F4F2', fontSize: 12 }}>
             <span style={{ flex: 1, minWidth: 0, lineHeight: 1.35, wordBreak: 'break-all' }}>{p2.name}</span>
             <span style={{ width: 82, textAlign: 'right', flexShrink: 0 }}>{p2.spend.toLocaleString()}</span>
             <span style={{ width: 90, textAlign: 'right', fontWeight: 700, flexShrink: 0 }}>{p2.rev.toLocaleString()}</span>
-            <span style={{ width: 46, textAlign: 'right', flexShrink: 0 }}>{p2.conv}</span>
+            <span style={{ width: 68, textAlign: 'right', flexShrink: 0 }}>{p2.conv}/{p2.tconv}</span>
+            <span style={{ width: 56, textAlign: 'right', flexShrink: 0, color: p2.tconv && (p2.conv / p2.tconv) < 0.4 ? '#E53935' : '#3A3631' }}>{p2.tconv ? Math.round(p2.conv / p2.tconv * 100) + '%' : '-'}</span>
             <span style={{ width: 60, textAlign: 'right', fontWeight: 800, color: rc(ro), flexShrink: 0 }}>{ro}%</span>
           </div>
         ); })}
         {pAgg.length > 20 && <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6 }}>상위 20개 표시 (전체 {pAgg.length}개)</div>}
-        <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>전환매출은 광고 기여 기준 — 스마트스토어 정산 매출과 다를 수 있습니다 · 클릭 표본이 적은 상품은 ROAS 해석에 주의</div>
+        <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>전환매출·ROAS·전환수는 모두 구매완료 기준 · 구매전환율 = 구매완료÷총전환 (40% 미만 빨강 = 담기는 되는데 구매 약함) · 전환매출은 광고 기여 기준으로 정산 매출과 다를 수 있습니다</div>
       </Card>
       <AdsStrategyPanel data={data} setData={setData} />
     </div>
