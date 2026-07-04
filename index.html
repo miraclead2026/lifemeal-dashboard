@@ -2483,12 +2483,13 @@ function TabAds({ data, setData }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>📣 광고</div>
         <span style={{ fontSize: 12, color: '#6E6863' }}>네이버 광고 성과</span>
-        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{latestDate}까지 · D-2 확정치 · 매출은 구매완료 기여 기준 (정산 매출과 다름)</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{latestDate}까지{daysAll.length && daysAll[daysAll.length - 1].provisional ? ' (잠정)' : ''} · 확정치 D-2 · 매출은 구매완료 기여 기준 (정산 매출과 다름)</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexWrap: 'wrap' }}>
         <PeriodPicker mode={mode} setMode={setMode} idx={idx} setIdx={setIdx} periods={periods} />
         {hasSearch && <span style={{ marginLeft: 'auto', display: 'flex', gap: 6, marginTop: 10 }}>{[['all', '전체'], ['display', '디스플레이'], ['search', '검색']].map(pair => { const on = chF === pair[0]; return <button key={pair[0]} onClick={() => setChF(pair[0])} style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid ' + (on ? '#2D5FE0' : '#E3E0DC'), background: on ? '#EFF6FF' : 'white', color: on ? '#2D5FE0' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>{pair[1]}</button>; })}</span>}
       </div>
+      {rows.some(x => x.provisional) && <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8, padding: '5px 10px', marginBottom: 10, fontSize: 11, fontWeight: 700, color: '#B45309' }}>⏳ 이 기간에 잠정치(어제)가 포함되어 있습니다 — 확정 시(±48h) 수치가 소폭 변동될 수 있어요</div>}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10, marginBottom: 18 }}>
         {cards.map(c => (
           <div key={c.l} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 12, padding: 14 }}>
@@ -2501,17 +2502,17 @@ function TabAds({ data, setData }) {
       <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📊 일별 전환매출 · ROAS</div>
-          <div style={{ marginLeft: 'auto', minHeight: 16 }}>{hoverBar ? <span style={{ fontSize: 12, fontWeight: 700, color: G }}>{hoverBar.d.slice(5).replace('-', '/')} · 광고비 {won2(hoverBar.sp)} · 매출 {won2(hoverBar.rv)} · <span style={{ color: rc(hoverBar.ro) }}>ROAS {hoverBar.ro}%</span> · {hoverBar.cv}건</span> : <span style={{ fontSize: 11, color: '#A29C95' }}>막대에 마우스를 올리면 상세가 표시됩니다</span>}</div>
+          <div style={{ marginLeft: 'auto', minHeight: 16 }}>{hoverBar ? <span style={{ fontSize: 12, fontWeight: 700, color: G }}>{hoverBar.d.slice(5).replace('-', '/')} · 광고비 {won2(hoverBar.sp)} · 매출 {won2(hoverBar.rv)} · <span style={{ color: rc(hoverBar.ro) }}>ROAS {hoverBar.ro}%</span> · {hoverBar.cv}건{hoverBar.prov ? ' · ⏳잠정' : ''}</span> : <span style={{ fontSize: 11, color: '#A29C95' }}>막대에 마우스를 올리면 상세가 표시됩니다</span>}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: rows.length > 40 ? 2 : 4, overflowX: 'auto', height: 130 }}>
-          {rows.map(x => { let sp = 0, rv = 0, cv = 0; (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; sp += g.spend || 0; rv += g.convRevenue || 0; cv += g.conversions || 0; }); const ro = sp ? Math.round(rv / sp * 100) : 0; const h = Math.max(3, Math.round(rv / maxRev * 100)); const active = hoverBar && hoverBar.d === x.date; return (
-            <div key={x.date} onMouseEnter={() => setHoverBar({ d: x.date, sp, rv, ro, cv })} onMouseLeave={() => setHoverBar(null)} style={{ flex: 1, minWidth: rows.length > 40 ? 8 : 18, textAlign: 'center' }}>
-              <div style={{ height: 100, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}><div style={{ background: active ? '#153A66' : rc(ro), opacity: active ? 1 : 0.85, borderRadius: '3px 3px 0 0', height: h }} /></div>
+          {rows.map(x => { let sp = 0, rv = 0, cv = 0; (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; sp += g.spend || 0; rv += g.convRevenue || 0; cv += g.conversions || 0; }); const ro = sp ? Math.round(rv / sp * 100) : 0; const h = Math.max(3, Math.round(rv / maxRev * 100)); const active = hoverBar && hoverBar.d === x.date; const prov = !!x.provisional; return (
+            <div key={x.date} onMouseEnter={() => setHoverBar({ d: x.date, sp, rv, ro, cv, prov })} onMouseLeave={() => setHoverBar(null)} style={{ flex: 1, minWidth: rows.length > 40 ? 8 : 18, textAlign: 'center' }}>
+              <div style={{ height: 100, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}><div style={{ background: active ? '#153A66' : rc(ro), opacity: active ? 1 : (prov ? 0.4 : 0.85), border: prov ? '1px dashed #A29C95' : 'none', boxSizing: 'border-box', borderRadius: '3px 3px 0 0', height: h }} /></div>
               {rows.length <= 40 && <div style={{ fontSize: 8, color: '#A29C95', marginTop: 2 }}>{x.date.slice(8)}</div>}
             </div>
           ); })}
         </div>
-        <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6 }}>막대 높이 = 전환매출 · 색 = ROAS (초록 ≥350% / 주황 300~350% / 빨강 &lt;300%)</div>
+        <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6 }}>막대 높이 = 전환매출 · 색 = ROAS (초록 ≥350% / 주황 300~350% / 빨강 &lt;300%) · 반투명 점선 막대 = 잠정치</div>
       </Card>
       <Card style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>📁 캠페인 · 그룹별 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({rng.label})</span></div>
@@ -2555,6 +2556,7 @@ function AdsStrategyPanel({ data, setData }) {
   const [strat, setStrat] = useState(null);
   const [status, setStatus] = useState('loading');
   const [showLog, setShowLog] = useState(false);
+  const [rej, setRej] = useState(null);
   useEffect(() => {
     let alive = true;
     fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/ads-strategy.json?t=' + Date.now())
@@ -2566,7 +2568,7 @@ function AdsStrategyPanel({ data, setData }) {
   const log = data.adsLog || [];
   const logIds = log.map(l => String(l.id));
   const items = strat ? (strat.items || []).filter(it => logIds.indexOf(String(it.id)) < 0) : [];
-  const mark = (it, st) => setData(d => ({ ...d, adsLog: [...(d.adsLog || []), { id: String(it.id), target: it.target || '', action: it.action || '', insight: it.insight || '', status: st, date: TODAY }] }));
+  const mark = (it, st, reason) => setData(d => ({ ...d, adsLog: [...(d.adsLog || []), { id: String(it.id), target: it.target || '', action: it.action || '', insight: it.insight || '', status: st, reason: reason || '', date: TODAY }] }));
   const unmark = id => setData(d => ({ ...d, adsLog: (d.adsLog || []).filter(l => String(l.id) !== String(id)) }));
   const sevC = { high: { bg: '#FEF2F2', bd: '#FECACA', tx: '#E53935', l: '중요' }, mid: { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309', l: '권장' }, low: { bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863', l: '참고' } };
   const sortedItems = items.slice().sort((a, b) => ({ high: 0, mid: 1, low: 2 }[a.severity] || 1) - ({ high: 0, mid: 1, low: 2 }[b.severity] || 1));
@@ -2594,9 +2596,19 @@ function AdsStrategyPanel({ data, setData }) {
             {it.expectedEffect && <span style={{ fontSize: 10, color: '#B45309' }}>기대: {it.expectedEffect}</span>}
             <span style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
               <button onClick={() => mark(it, 'done')} style={{ padding: '5px 12px', borderRadius: 7, border: 'none', background: '#1FA463', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✅ 조치 완료</button>
-              <button onClick={() => mark(it, 'dismissed')} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✖ 반려</button>
+              <button onClick={() => setRej(rej && rej.id === it.id ? null : { id: it.id, text: '' })} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: rej && rej.id === it.id ? '#F5F4F2' : 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✖ 반려</button>
             </span>
           </div>
+          {rej && rej.id === it.id && (
+            <div style={{ marginTop: 8, background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 8, padding: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 5 }}>반려 사유 (광고 에이전트가 읽고 다음 전략에 반영합니다)</div>
+              <textarea value={rej.text} onChange={ev => { const v = ev.target.value; setRej(r => ({ ...r, text: v })); }} placeholder="예: 이 상품은 재고 소진 예정이라 확대 불가 / 브랜드 노출 목적이라 ROAS로 판단 안 함" rows={2} style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 12, fontFamily: 'inherit', resize: 'vertical' }} />
+              <div style={{ display: 'flex', gap: 6, marginTop: 6, justifyContent: 'flex-end' }}>
+                <button onClick={() => { if (!rej.text.trim()) { alert('반려 사유를 입력해주세요 — 에이전트 학습에 사용됩니다'); return; } mark(it, 'dismissed', rej.text.trim()); setRej(null); }} style={{ padding: '6px 14px', borderRadius: 7, border: 'none', background: '#6E6863', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>반려 확정</button>
+                <button onClick={() => setRej(null)} style={{ padding: '6px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11 }}>취소</button>
+              </div>
+            </div>
+          )}
         </div>
       ); })}
       {log.length > 0 && (
@@ -2606,7 +2618,7 @@ function AdsStrategyPanel({ data, setData }) {
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#6E6863', padding: '5px 0', borderBottom: '1px solid #F5F4F2' }}>
               <span style={{ flexShrink: 0 }}>{l.status === 'done' ? '✅' : '✖'}</span>
               <span style={{ flexShrink: 0, color: '#A29C95' }}>{l.date}</span>
-              <span style={{ flex: 1, minWidth: 0 }}>{l.target ? '[' + l.target + '] ' : ''}{l.action}{l.status === 'dismissed' ? ' (반려)' : ''}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>{l.target ? '[' + l.target + '] ' : ''}{l.action}{l.status === 'dismissed' ? <span style={{ color: '#B45309' }}> — 반려: {l.reason || '(사유 없음)'}</span> : null}</span>
               <button onClick={() => unmark(l.id)} style={{ border: 'none', background: 'none', color: '#A29C95', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>↩ 되돌리기</button>
             </div>
           ))}
