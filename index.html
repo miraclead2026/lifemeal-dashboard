@@ -2556,7 +2556,7 @@ function AdsStrategyPanel({ data, setData }) {
   const [strat, setStrat] = useState(null);
   const [status, setStatus] = useState('loading');
   const [showLog, setShowLog] = useState(false);
-  const [rej, setRej] = useState(null);
+  const [rej, setRej] = useState(null); // { id, mode: 'done'|'dismissed'|'question', text }
   useEffect(() => {
     let alive = true;
     fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/ads-strategy.json?t=' + Date.now())
@@ -2594,21 +2594,26 @@ function AdsStrategyPanel({ data, setData }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 7, flexWrap: 'wrap' }}>
             {it.evidence && <span style={{ fontSize: 10, color: '#A29C95' }}>근거: {it.evidence}</span>}
             {it.expectedEffect && <span style={{ fontSize: 10, color: '#B45309' }}>기대: {it.expectedEffect}</span>}
-            <span style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-              <button onClick={() => mark(it, 'done')} style={{ padding: '5px 12px', borderRadius: 7, border: 'none', background: '#1FA463', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✅ 조치 완료</button>
-              <button onClick={() => setRej(rej && rej.id === it.id ? null : { id: it.id, text: '' })} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: rej && rej.id === it.id ? '#F5F4F2' : 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✖ 반려</button>
+            <span style={{ marginLeft: 'auto', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <button onClick={() => setRej(rej && rej.id === it.id && rej.mode === 'done' ? null : { id: it.id, mode: 'done', text: '' })} style={{ padding: '5px 12px', borderRadius: 7, border: 'none', background: '#1FA463', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✅ 조치 완료</button>
+              <button onClick={() => setRej(rej && rej.id === it.id && rej.mode === 'question' ? null : { id: it.id, mode: 'question', text: '' })} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #2D5FE0', background: rej && rej.id === it.id && rej.mode === 'question' ? '#EFF6FF' : 'white', color: '#2D5FE0', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🔍 추가 분석 요청</button>
+              <button onClick={() => setRej(rej && rej.id === it.id && rej.mode === 'dismissed' ? null : { id: it.id, mode: 'dismissed', text: '' })} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: rej && rej.id === it.id && rej.mode === 'dismissed' ? '#F5F4F2' : 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✖ 반려</button>
             </span>
           </div>
-          {rej && rej.id === it.id && (
+          {rej && rej.id === it.id && (() => { const M = {
+            done: { t: '어떤 조치를 했는지 기록 (효과 추적의 기준이 됩니다)', ph: '예: 상세페이지 상단 구성 개선 + 첫 리뷰 노출 / 옵션 3개→2개 정리 / 노출 제외 처리', btn: '완료 기록', bg: '#1FA463', alertMsg: '조치 내용을 입력해주세요 — 무엇을 했는지 알아야 효과 검증이 가능합니다' },
+            question: { t: '추가로 확인하고 싶은 것 (에이전트가 다음 갱신 때 답을 포함해 재제안합니다)', ph: '예: 클릭수·CTR도 같이 보여줘 — 유입이 없는 건지, 유입은 되는데 전환이 안 되는 건지', btn: '분석 요청', bg: '#2D5FE0', alertMsg: '질문을 입력해주세요' },
+            dismissed: { t: '반려 사유 (에이전트가 읽고 다음 전략에 반영합니다)', ph: '예: 이 상품은 재고 소진 예정이라 확대 불가 / 브랜드 노출 목적이라 ROAS로 판단 안 함', btn: '반려 확정', bg: '#6E6863', alertMsg: '반려 사유를 입력해주세요 — 에이전트 학습에 사용됩니다' },
+          }[rej.mode]; return (
             <div style={{ marginTop: 8, background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 8, padding: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 5 }}>반려 사유 (광고 에이전트가 읽고 다음 전략에 반영합니다)</div>
-              <textarea value={rej.text} onChange={ev => { const v = ev.target.value; setRej(r => ({ ...r, text: v })); }} placeholder="예: 이 상품은 재고 소진 예정이라 확대 불가 / 브랜드 노출 목적이라 ROAS로 판단 안 함" rows={2} style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 12, fontFamily: 'inherit', resize: 'vertical' }} />
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 5 }}>{M.t}</div>
+              <textarea value={rej.text} onChange={ev => { const v = ev.target.value; setRej(r => ({ ...r, text: v })); }} placeholder={M.ph} rows={2} style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 12, fontFamily: 'inherit', resize: 'vertical' }} />
               <div style={{ display: 'flex', gap: 6, marginTop: 6, justifyContent: 'flex-end' }}>
-                <button onClick={() => { if (!rej.text.trim()) { alert('반려 사유를 입력해주세요 — 에이전트 학습에 사용됩니다'); return; } mark(it, 'dismissed', rej.text.trim()); setRej(null); }} style={{ padding: '6px 14px', borderRadius: 7, border: 'none', background: '#6E6863', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>반려 확정</button>
+                <button onClick={() => { if (!rej.text.trim()) { alert(M.alertMsg); return; } mark(it, rej.mode, rej.text.trim()); setRej(null); }} style={{ padding: '6px 14px', borderRadius: 7, border: 'none', background: M.bg, color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{M.btn}</button>
                 <button onClick={() => setRej(null)} style={{ padding: '6px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11 }}>취소</button>
               </div>
             </div>
-          )}
+          ); })()}
         </div>
       ); })}
       {log.length > 0 && (
@@ -2616,15 +2621,15 @@ function AdsStrategyPanel({ data, setData }) {
           <button onClick={() => setShowLog(v => !v)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#6E6863', padding: 0 }}>{showLog ? '▾' : '▸'} 처리 기록 {log.length}건</button>
           {showLog && doneLog.map((l, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#6E6863', padding: '5px 0', borderBottom: '1px solid #F5F4F2' }}>
-              <span style={{ flexShrink: 0 }}>{l.status === 'done' ? '✅' : '✖'}</span>
+              <span style={{ flexShrink: 0 }}>{l.status === 'done' ? '✅' : l.status === 'question' ? '🔍' : '✖'}</span>
               <span style={{ flexShrink: 0, color: '#A29C95' }}>{l.date}</span>
-              <span style={{ flex: 1, minWidth: 0 }}>{l.target ? '[' + l.target + '] ' : ''}{l.action}{l.status === 'dismissed' ? <span style={{ color: '#B45309' }}> — 반려: {l.reason || '(사유 없음)'}</span> : null}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>{l.target ? '[' + l.target + '] ' : ''}{l.action}{l.status === 'done' && l.reason ? <span style={{ color: '#1FA463' }}> — 조치: {l.reason}</span> : null}{l.status === 'question' ? <span style={{ color: '#2D5FE0' }}> — 질문: {l.reason || ''} (답변 대기)</span> : null}{l.status === 'dismissed' ? <span style={{ color: '#B45309' }}> — 반려: {l.reason || '(사유 없음)'}</span> : null}</span>
               <button onClick={() => unmark(l.id)} style={{ border: 'none', background: 'none', color: '#A29C95', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>↩ 되돌리기</button>
             </div>
           ))}
         </div>
       )}
-      <div style={{ fontSize: 10, color: '#A29C95', marginTop: 10 }}>✅ 완료 = 광고 시스템에서 실제 조치 후 클릭 (기록은 효과 추적의 기준일이 됩니다) · ✖ 반려 = 제안을 채택하지 않음 (재제안되지 않음)</div>
+      <div style={{ fontSize: 10, color: '#A29C95', marginTop: 10 }}>✅ 완료 = 실제 조치 후 내용과 함께 기록 (효과 추적 기준) · 🔍 추가 분석 = 판단에 필요한 데이터를 질문 (다음 갱신 때 답변 포함 재제안) · ✖ 반려 = 사유와 함께 채택 안 함 (재제안 안 됨)</div>
     </Card>
   );
 }
