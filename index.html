@@ -1882,13 +1882,13 @@ function TabKpi({ data, setData }) {
 
               <div style={{ marginTop: 4 }}>
                 {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '6px 0' }}>이 프로젝트에 등록된 실행계획 KPI가 없습니다</div> : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 10 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'stretch' }}>
                     {plansW.flatMap(p => p.kpis.map(k => { const achieved = kpiAchieved(k); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; const lk = k.link; const lkStyle = lk ? (lk.type === 'manual' ? { border: '1px solid #2D5FE0', color: '#2D5FE0' } : { border: '1px solid #1FA463', color: '#1FA463' }) : { border: '1px solid #E3E0DC', color: '#A29C95' }; return (
-                      <Card key={k.id} style={{ alignSelf: 'start' }}>
+                      <Card key={k.id} style={{ flex: '1 1 auto', minWidth: 210, maxWidth: 480, boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
                           <div onClick={() => setExpanded(open ? null : 'kpi-' + k.id)} style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>▸ {p.name}</div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 13, fontWeight: 800, flex: 1, minWidth: 0 }}>🎯 {k.name}</span><span style={{ fontSize: 10, color: '#A29C95' }}>{open ? '▲' : '▼'}</span></div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 13, fontWeight: 800, flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>🎯 {k.name}</span><span style={{ fontSize: 10, color: '#A29C95' }}>{open ? '▲' : '▼'}</span></div>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}><span style={{ fontSize: 17, fontWeight: 800, color: done ? '#1FA463' : G }}>{achieved.toLocaleString()}</span><span style={{ fontSize: 10, color: '#A29C95' }}>/ {Math.round(target).toLocaleString()} {k.unit}</span></div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}><div style={{ flex: 1 }}><Bar v={achieved} m={target || 1} h={5} /></div><span style={{ fontSize: 11, fontWeight: 700, color: done ? '#1FA463' : pr < 70 ? '#E53935' : '#E08700' }}>{pr}%</span></div>
                           </div>
