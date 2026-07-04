@@ -157,6 +157,7 @@ const migrateData = raw => ({
   meetings: raw.meetings || [],
   payments: raw.payments || [],
   productGroups: raw.productGroups || [],
+  adsLog: raw.adsLog || [],
 });
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
@@ -2434,7 +2435,7 @@ const SALES_SAMPLE = {
   ]
 };
 
-function TabAds() {
+function TabAds({ data, setData }) {
   const won2 = n => (Number(n) || 0).toLocaleString() + '원';
   const [raw, setRaw] = useState(null);
   const [status, setStatus] = useState('loading');
@@ -2545,37 +2546,73 @@ function TabAds() {
         {pAgg.length > 20 && <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6 }}>상위 20개 표시 (전체 {pAgg.length}개)</div>}
         <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>전환매출은 광고 기여 기준 — 스마트스토어 정산 매출과 다를 수 있습니다 · 클릭 표본이 적은 상품은 ROAS 해석에 주의</div>
       </Card>
-      <AdStrategyDocs />
+      <AdsStrategyPanel data={data} setData={setData} />
     </div>
   );
 }
 
-function AdStrategyDocs() {
-  const [docs, setDocs] = useState(null);
+function AdsStrategyPanel({ data, setData }) {
+  const [strat, setStrat] = useState(null);
+  const [status, setStatus] = useState('loading');
+  const [showLog, setShowLog] = useState(false);
   useEffect(() => {
     let alive = true;
-    const BASE2 = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/meetings/';
-    fetch(BASE2 + 'index.json?t=' + Date.now()).then(r => r.ok ? r.json() : []).then(idx2 => {
-      if (!alive) return;
-      const ads = (idx2 || []).filter(m => String(m.id || '').indexOf('-ads') >= 0);
-      Promise.all(ads.map(m => fetch(BASE2 + m.id + '.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)))
-        .then(full => { if (alive) setDocs(ads.map((m, i) => ({ ...m, actions: (full[i] && full[i].actions) || [] })).sort((a, b) => (b.date || '').localeCompare(a.date || ''))); });
-    }).catch(() => { if (alive) setDocs([]); });
+    fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/ads-strategy.json?t=' + Date.now())
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (!alive) return; if (j && Array.isArray(j.items)) { setStrat(j); setStatus('ok'); } else setStatus('none'); })
+      .catch(() => { if (alive) setStatus('none'); });
     return () => { alive = false; };
   }, []);
+  const log = data.adsLog || [];
+  const logIds = log.map(l => String(l.id));
+  const items = strat ? (strat.items || []).filter(it => logIds.indexOf(String(it.id)) < 0) : [];
+  const mark = (it, st) => setData(d => ({ ...d, adsLog: [...(d.adsLog || []), { id: String(it.id), target: it.target || '', action: it.action || '', insight: it.insight || '', status: st, date: TODAY }] }));
+  const unmark = id => setData(d => ({ ...d, adsLog: (d.adsLog || []).filter(l => String(l.id) !== String(id)) }));
+  const sevC = { high: { bg: '#FEF2F2', bd: '#FECACA', tx: '#E53935', l: '중요' }, mid: { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309', l: '권장' }, low: { bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863', l: '참고' } };
+  const sortedItems = items.slice().sort((a, b) => ({ high: 0, mid: 1, low: 2 }[a.severity] || 1) - ({ high: 0, mid: 1, low: 2 }[b.severity] || 1));
+  const doneLog = log.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return (
     <Card style={{ marginTop: 16 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>📋 광고 세분화 전략 문서 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>(광고 에이전트가 데이터 분석 후 자동 생성)</span></div>
-      {docs === null && <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div>}
-      {docs && docs.length === 0 && <div style={{ fontSize: 12, color: '#A29C95' }}>아직 등록된 전략 문서가 없습니다</div>}
-      {docs && docs.map(m => (
-        <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid #F5F4F2' }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', borderRadius: 8, padding: '5px 9px', whiteSpace: 'nowrap' }}>{m.date}</span>
-          <span style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: '#3A3631' }}>{m.title}</span>
-          <span style={{ fontSize: 11, color: '#A29C95', whiteSpace: 'nowrap' }}>실행 항목 {m.actions.length}건</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: G }}>🎯 세분화 전략</div>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>광고 에이전트가 최신 데이터에서 인사이트를 도출해 자동 갱신</span>
+        {strat && <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{strat.basedOn ? strat.basedOn + ' 데이터 기준' : ''}{strat.updatedAt ? ' · 갱신 ' + strat.updatedAt : ''}</span>}
+      </div>
+      {status === 'loading' && <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div>}
+      {status === 'none' && <div style={{ fontSize: 12, color: '#A29C95', background: '#F8F7F5', borderRadius: 8, padding: '10px 12px' }}>아직 전략 데이터가 없습니다 — 광고 에이전트가 <b>data/ads-strategy.json</b>을 push하면 여기에 인사이트와 제안이 표시됩니다.</div>}
+      {status === 'ok' && sortedItems.length === 0 && <div style={{ fontSize: 12, color: '#1FA463', background: '#ECFDF5', borderRadius: 8, padding: '10px 12px' }}>✓ 현재 제안된 전략을 모두 처리했습니다</div>}
+      {status === 'ok' && sortedItems.map(it => { const sv = sevC[it.severity] || sevC.mid; return (
+        <div key={it.id} style={{ border: '1px solid ' + sv.bd, background: 'white', borderRadius: 10, padding: 12, marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 5 }}>
+            <span style={{ fontSize: 10, fontWeight: 800, color: sv.tx, background: sv.bg, border: '1px solid ' + sv.bd, borderRadius: 5, padding: '2px 7px' }}>{sv.l}</span>
+            {it.target && <span style={{ fontSize: 11, fontWeight: 700, color: '#6E6863' }}>{it.target}</span>}
+          </div>
+          <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.55 }}>{it.insight}</div>
+          <div style={{ marginTop: 7, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '8px 10px', fontSize: 12.5, fontWeight: 700, color: '#166534' }}>▸ {it.action}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 7, flexWrap: 'wrap' }}>
+            {it.evidence && <span style={{ fontSize: 10, color: '#A29C95' }}>근거: {it.evidence}</span>}
+            {it.expectedEffect && <span style={{ fontSize: 10, color: '#B45309' }}>기대: {it.expectedEffect}</span>}
+            <span style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+              <button onClick={() => mark(it, 'done')} style={{ padding: '5px 12px', borderRadius: 7, border: 'none', background: '#1FA463', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>✅ 조치 완료</button>
+              <button onClick={() => mark(it, 'dismissed')} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✖ 반려</button>
+            </span>
+          </div>
         </div>
-      ))}
-      <div style={{ fontSize: 11, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8, padding: '8px 10px', marginTop: 10 }}>📌 문서 열람과 실행 항목 반영은 <b>🗓 회의 탭</b>에서 — 문서를 클릭해 근거를 확인하고, 하단 <b>📥 대시보드 입력</b>에서 버튼으로 등록/수정하세요.</div>
+      ); })}
+      {log.length > 0 && (
+        <div style={{ marginTop: 12, borderTop: '1px dashed #E3E0DC', paddingTop: 10 }}>
+          <button onClick={() => setShowLog(v => !v)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, color: '#6E6863', padding: 0 }}>{showLog ? '▾' : '▸'} 처리 기록 {log.length}건</button>
+          {showLog && doneLog.map((l, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#6E6863', padding: '5px 0', borderBottom: '1px solid #F5F4F2' }}>
+              <span style={{ flexShrink: 0 }}>{l.status === 'done' ? '✅' : '✖'}</span>
+              <span style={{ flexShrink: 0, color: '#A29C95' }}>{l.date}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>{l.target ? '[' + l.target + '] ' : ''}{l.action}{l.status === 'dismissed' ? ' (반려)' : ''}</span>
+              <button onClick={() => unmark(l.id)} style={{ border: 'none', background: 'none', color: '#A29C95', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>↩ 되돌리기</button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div style={{ fontSize: 10, color: '#A29C95', marginTop: 10 }}>✅ 완료 = 광고 시스템에서 실제 조치 후 클릭 (기록은 효과 추적의 기준일이 됩니다) · ✖ 반려 = 제안을 채택하지 않음 (재제안되지 않음)</div>
     </Card>
   );
 }
