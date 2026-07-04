@@ -1527,7 +1527,7 @@ function KpiLinkPanel({ kpi, days, kakaoCoupons, data, setData, onSave, onClose 
   const catalog = (() => { const m = {}; (days || []).forEach(d => (d.products || []).forEach(pp => { const id = String(pp.productId || ''); if (!id) return; if (!m[id]) m[id] = { id, name: pp.name || id, rev: 0 }; m[id].rev += pp.revenue || 0; if (pp.name) m[id].name = pp.name; })); return Object.values(m).sort((a, b) => b.rev - a.rev); })();
   const coverage = (() => { const ds = (days || []).map(d => d.date).sort(); return ds.length ? ds[0] + ' ~ ' + ds[ds.length - 1] : '없음'; })();
   const SALES_METRICS = [['productRevenue', '상품별 매출'], ['productRevenueShare', '상품 매출 비중(%)'], ['productQtyShare', '판매 점유율(%)'], ['conversion', '전환율'], ['visitors', '방문자수'], ['orders', '결제건수'], ['aov', '객단가']];
-  const KAKAO_METRICS = [['kakaoTotal', '누적 친구수'], ['kakaoNew', '신규 친구'], ['kakaoNet', '순증감'], ['couponApply', '쿠폰 응모수'], ['couponWin', '쿠폰 당첨수(유입 근사)'], ['couponUse', '쿠폰 사용수']];
+  const KAKAO_METRICS = [['kakaoTotal', '누적 친구수'], ['kakaoNew', '신규 친구'], ['kakaoNet', '순증감'], ['couponWin', '쿠폰 당첨수(유입 근사)'], ['couponUse', '쿠폰 사용수']];
   const isCouponMetric = m => ['couponApply', 'couponWin', 'couponUse'].indexOf(m) >= 0;
   const METRICS = srcTab === 'kakao' ? KAKAO_METRICS : SALES_METRICS;
   const pickTab = t => { setSrcTab(t); setMetric(t === 'kakao' ? ((L && L.type === 'kakao' && L.metric) || 'kakaoNew') : ((L && L.type === 'sales' && L.metric) || 'productRevenue')); };
@@ -1587,7 +1587,7 @@ function KpiLinkPanel({ kpi, days, kakaoCoupons, data, setData, onSave, onClose 
                 </label>
               ))}
             </div>
-            <div style={{ fontSize: 10, color: '#A29C95', marginTop: 4 }}>쿠폰 지표는 현재 누적값(스냅샷)이라 집계기간의 영향을 받지 않습니다 · 당첨수는 친구추가 실측이 아닌 유입 근사치입니다</div>
+            <div style={{ fontSize: 10, color: '#A29C95', marginTop: 4 }}>일별 데이터가 있는 쿠폰은 집계기간에 해당하는 일별 실측을 합산하고, 없는 쿠폰은 응모기간이 집계기간과 겹칠 때 누적 전체 값으로 근사합니다 · 당첨수는 친구추가 실측이 아닌 유입 근사치입니다</div>
           </div>
         )}
         {srcTab === 'sales' && isProdMetric(metric) && (
@@ -1691,7 +1691,7 @@ function TabKpi({ data, setData }) {
   const [linkCfg, setLinkCfg] = useState(null);
   const [naverInfo, setNaverInfo] = useState(null);
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (!alive || !j) return; const months = Array.isArray(j.months) ? j.months : (j.month ? [j.month] : []); const all = []; months.forEach(m => (m.daily || []).forEach(d => { if (d && d.date) all.push({ date: d.date, revenue: d.revenue || 0 }); })); setNaverDaily(all); const subAll = []; (Array.isArray(j.days) ? j.days : []).forEach(d => { if (d && d.key) { const n = (d.subscribers && d.subscribers.notify) || {}; subAll.push({ date: d.key, total: n.total || 0, added: n.added || 0 }); } }); setNaverSubDays(subAll); setNaverDays((Array.isArray(j.days) ? j.days : []).map(dd => ({ date: dd.key, summary: dd.summary || {}, products: dd.products || [] })).filter(dd => dd.date)); const ym = (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })(); const cur = months.find(m => (m.key || '').slice(0, 7) === ym) || months[0]; if (cur && cur.summary && cur.summary.revenue) setNaverRev(cur.summary.revenue.value || 0); setNaverInfo({ label: cur ? (cur.label || '') : '', updatedAt: j.updatedAt || '' }); }).catch(() => {}); return () => { alive = false; }; }, []);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); setKakaoCoupons(((j.coupons && j.coupons.list) || []).filter(x => x.couponId != null && x.stats).map(x => ({ id: String(x.couponId), title: x.title || '', status: x.status || '', period: ((x.startDate || '') + '~' + (x.expireDate || '')).replace(/\./g, '/'), apply: x.stats['응모수'] || 0, win: x.stats['당첨수'] || 0, use: x.stats['사용수'] || 0 }))); }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); setKakaoCoupons(((j.coupons && j.coupons.list) || []).filter(x => x.couponId != null && x.stats).map(x => ({ id: String(x.couponId), title: x.title || '', status: x.status || '', period: ((x.startDate || '') + '~' + (x.expireDate || '')).replace(/\./g, '/'), sd: (x.startDate || '').replace(/\./g, '-'), ed: (x.expireDate || '9999.12.31').replace(/\./g, '-'), apply: x.stats['응모수'] || 0, win: x.stats['당첨수'] || 0, use: x.stats['사용수'] || 0, daily: (x.daily || []).filter(dd => dd && dd.date).map(dd => ({ date: dd.date, win: dd['당첨수'] || 0, use: dd['사용수'] || 0 })) }))); }).catch(() => {}); return () => { alive = false; }; }, []);
   const mainKpis = data.mainKpis || [];
   const logs = data.kpiLogs || [];
   const naverInRange = naverDaily.filter(d => d.date && d.date >= pStart && d.date <= pEnd).reduce((a, d) => a + (d.revenue || 0), 0);
@@ -1714,7 +1714,13 @@ function TabKpi({ data, setData }) {
     const ls = L.start || '0000-01-01'; const le = L.end || '9999-12-31';
     const from = pStart > ls ? pStart : ls; const to = pEnd < le ? pEnd : le;
     if (L.type === 'kakao') {
-      if (L.metric === 'couponApply' || L.metric === 'couponWin' || L.metric === 'couponUse') { const ids = (L.couponIds || []).map(String); const f = L.metric === 'couponApply' ? 'apply' : L.metric === 'couponWin' ? 'win' : 'use'; return kakaoCoupons.filter(c => ids.indexOf(c.id) >= 0).reduce((a, c) => a + (c[f] || 0), 0); }
+      if (L.metric === 'couponApply' || L.metric === 'couponWin' || L.metric === 'couponUse') {
+        const ids = (L.couponIds || []).map(String); const f = L.metric === 'couponUse' ? 'use' : 'win';
+        return kakaoCoupons.filter(c => ids.indexOf(c.id) >= 0).reduce((a, c) => {
+          if (c.daily && c.daily.length) return a + c.daily.filter(dd => dd.date >= pStart && dd.date <= pEnd).reduce((x2, dd) => x2 + (dd[f] || 0), 0);
+          return a + (((c.sd || '0000') <= pEnd && (c.ed || '9999') >= pStart) ? (c[f] || 0) : 0);
+        }, 0);
+      }
       if (L.metric === 'kakaoTotal') { const upto = kakaoDaily.filter(d => d.date <= pEnd); return upto.length ? upto[upto.length - 1].cum : 0; }
       if (from > to) return 0;
       const krows = kakaoDaily.filter(d => d.date >= from && d.date <= to);
