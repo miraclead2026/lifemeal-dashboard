@@ -1554,10 +1554,10 @@ function KpiEditModal({ data, setData, planId, kpiId, onClose }) {
   );
 }
 
-function KpiLinkPanel({ kpi, days, kakaoCoupons, data, setData, onSave, onClose }) {
+function KpiLinkPanel({ kpi, days, kakaoCoupons, adsDays, data, setData, onSave, onClose }) {
   const L = kpi.link || null;
   const [mode, setMode] = useState(L && L.type === 'manual' ? 'manual' : 'sales');
-  const [srcTab, setSrcTab] = useState(L && L.type === 'kakao' ? 'kakao' : 'sales');
+  const [srcTab, setSrcTab] = useState(L && L.type === 'kakao' ? 'kakao' : L && L.type === 'ads' ? 'ads' : 'sales');
   const [metric, setMetric] = useState((L && L.metric) || 'productRevenue');
   const [prodSel, setProdSel] = useState(() => ((L && L.productIds) || []).map(String));
   const [groupSel, setGroupSel] = useState(() => ((L && L.groupIds) || []).map(String));
@@ -1571,9 +1571,10 @@ function KpiLinkPanel({ kpi, days, kakaoCoupons, data, setData, onSave, onClose 
   const coverage = (() => { const ds = (days || []).map(d => d.date).sort(); return ds.length ? ds[0] + ' ~ ' + ds[ds.length - 1] : '없음'; })();
   const SALES_METRICS = [['productRevenue', '상품별 매출'], ['productRevenueShare', '상품 매출 비중(%)'], ['productQtyShare', '판매 점유율(%)'], ['conversion', '전환율'], ['visitors', '방문자수'], ['orders', '결제건수'], ['aov', '객단가'], ['subRevenue', '정기구독 매출'], ['subActive', '정기구독자 수(활성)'], ['subNew', '신규 구독']];
   const KAKAO_METRICS = [['kakaoTotal', '누적 친구수'], ['kakaoNew', '신규 친구'], ['kakaoNet', '순증감'], ['couponWin', '쿠폰 당첨수(유입 근사)'], ['couponUse', '쿠폰 사용수']];
+  const ADS_METRICS = [['adRoas', '광고 ROAS(%)'], ['adRevenue', '광고 전환매출'], ['adSpend', '광고비'], ['adConv', '광고 구매전환수']];
   const isCouponMetric = m => ['couponApply', 'couponWin', 'couponUse'].indexOf(m) >= 0;
-  const METRICS = srcTab === 'kakao' ? KAKAO_METRICS : SALES_METRICS;
-  const pickTab = t => { setSrcTab(t); setMetric(t === 'kakao' ? ((L && L.type === 'kakao' && L.metric) || 'kakaoNew') : ((L && L.type === 'sales' && L.metric) || 'productRevenue')); };
+  const METRICS = srcTab === 'kakao' ? KAKAO_METRICS : srcTab === 'ads' ? ADS_METRICS : SALES_METRICS;
+  const pickTab = t => { setSrcTab(t); setMetric(t === 'kakao' ? ((L && L.type === 'kakao' && L.metric) || 'kakaoNew') : t === 'ads' ? ((L && L.type === 'ads' && L.metric) || 'adRoas') : ((L && L.type === 'sales' && L.metric) || 'productRevenue')); };
   const isProdMetric = m => ['productRevenue', 'productRevenueShare', 'productQtyShare'].indexOf(m) >= 0;
   const toggleProd = id => setProdSel(s => s.indexOf(id) >= 0 ? s.filter(x => x !== id) : [...s, id]);
   const toggleGroup = id => setGroupSel(s => s.indexOf(id) >= 0 ? s.filter(x => x !== id) : [...s, id]);
@@ -1598,6 +1599,7 @@ function KpiLinkPanel({ kpi, days, kakaoCoupons, data, setData, onSave, onClose 
         if (isCouponMetric(metric) && !cpnSel.length) { alert('쿠폰을 1개 이상 선택하세요'); return; }
         onSave({ type: 'kakao', tab: '카카오', metric, couponIds: isCouponMetric(metric) ? cpnSel : [], start: ls, end: le || '' });
       }
+      else if (srcTab === 'ads') { onSave({ type: 'ads', tab: '광고', metric, start: ls, end: le || '' }); }
       else onSave({ type: 'sales', tab: '매출', metric, productIds: isProdMetric(metric) ? prodSel : [], groupIds: isProdMetric(metric) ? groupSel : [], start: ls, end: le || '' });
     }
   };
@@ -1612,7 +1614,7 @@ function KpiLinkPanel({ kpi, days, kakaoCoupons, data, setData, onSave, onClose 
       </div>
       {mode === 'sales' ? (<div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>연동할 탭</div>
-        <div style={{ marginBottom: 10, display: 'flex', gap: 6 }}><button onClick={() => pickTab('sales')} style={chip(srcTab === 'sales')}>💵 매출</button><button onClick={() => pickTab('kakao')} style={chip(srcTab === 'kakao')}>💬 카카오</button></div>
+        <div style={{ marginBottom: 10, display: 'flex', gap: 6 }}><button onClick={() => pickTab('sales')} style={chip(srcTab === 'sales')}>💵 매출</button><button onClick={() => pickTab('kakao')} style={chip(srcTab === 'kakao')}>💬 카카오</button><button onClick={() => pickTab('ads')} style={chip(srcTab === 'ads')}>📣 광고</button></div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 5 }}>지표 선택</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>{METRICS.map(pair => <button key={pair[0]} onClick={() => setMetric(pair[0])} style={chip(metric === pair[0])}>{pair[1]}</button>)}</div>
         {srcTab === 'kakao' && isCouponMetric(metric) && (
@@ -1731,11 +1733,12 @@ function TabKpi({ data, setData }) {
   const [naverDays, setNaverDays] = useState([]);
   const [kakaoDaily, setKakaoDaily] = useState([]);
   const [kakaoCoupons, setKakaoCoupons] = useState([]);
+  const [adsDays, setAdsDays] = useState([]);
   const [linkCfg, setLinkCfg] = useState(null);
   const [naverInfo, setNaverInfo] = useState(null);
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (!alive || !j) return; const months = Array.isArray(j.months) ? j.months : (j.month ? [j.month] : []); const all = []; months.forEach(m => (m.daily || []).forEach(d => { if (d && d.date) all.push({ date: d.date, revenue: d.revenue || 0 }); })); setNaverDaily(all); const subAll = []; (Array.isArray(j.days) ? j.days : []).forEach(d => { if (d && d.key) { const n = (d.subscribers && d.subscribers.notify) || {}; subAll.push({ date: d.key, total: n.total || 0, added: n.added || 0 }); } }); setNaverSubDays(subAll); setNaverDays((Array.isArray(j.days) ? j.days : []).map(dd => ({ date: dd.key, summary: dd.summary || {}, products: dd.products || [], subscription: dd.subscription || null })).filter(dd => dd.date)); const ym = (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })(); const cur = months.find(m => (m.key || '').slice(0, 7) === ym) || months[0]; if (cur && cur.summary && cur.summary.revenue) setNaverRev(cur.summary.revenue.value || 0); setNaverInfo({ label: cur ? (cur.label || '') : '', updatedAt: j.updatedAt || '' }); }).catch(() => {}); return () => { alive = false; }; }, []);
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); setKakaoCoupons(((j.coupons && j.coupons.list) || []).filter(x => x.couponId != null && x.stats).map(x => ({ id: String(x.couponId), title: x.title || '', status: x.status || '', period: ((x.startDate || '') + '~' + (x.expireDate || '')).replace(/\./g, '/'), sd: (x.startDate || '').replace(/\./g, '-'), ed: (x.expireDate || '9999.12.31').replace(/\./g, '-'), apply: x.stats['응모수'] || 0, win: x.stats['당첨수'] || 0, use: x.stats['사용수'] || 0, daily: (x.daily || []).filter(dd => dd && dd.date).map(dd => ({ date: dd.date, win: dd['당첨수'] || 0, use: dd['사용수'] || 0 })) }))); }).catch(() => {}); return () => { alive = false; }; }, []);
-  const mainKpis = data.mainKpis || [];
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-ads.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !Array.isArray(j.days)) return; setAdsDays(j.days.map(x => { let sp = 0, rv = 0, pc = 0, cl = 0; (x.groups || []).forEach(g => { sp += g.spend || 0; rv += g.convRevenue || 0; pc += g.purchaseConv || 0; cl += g.clicks || 0; }); return { date: x.date, spend: sp, rev: rv, conv: pc, clicks: cl }; }).filter(x => x.date).sort((a, b) => a.date < b.date ? -1 : 1)); }).catch(() => {}); return () => { alive = false; }; }, []);
   const logs = data.kpiLogs || [];
   const naverInRange = naverDaily.filter(d => d.date && d.date >= pStart && d.date <= pEnd).reduce((a, d) => a + (d.revenue || 0), 0);
   const isSalesKpi = mk => (mk.name || '').indexOf('매출') >= 0;
@@ -1749,7 +1752,7 @@ function TabKpi({ data, setData }) {
   const sumForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
   const logsForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart);
   const logsForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart);
-  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가', subRevenue: '정기구독 매출', subActive: '정기구독자 수(활성)', subNew: '신규 구독', kakaoTotal: '누적 친구수', kakaoNew: '신규 친구', kakaoNet: '순증감', couponApply: '쿠폰 응모수', couponWin: '쿠폰 당첨수(유입 근사)', couponUse: '쿠폰 사용수' };
+  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가', subRevenue: '정기구독 매출', subActive: '정기구독자 수(활성)', subNew: '신규 구독', kakaoTotal: '누적 친구수', kakaoNew: '신규 친구', kakaoNet: '순증감', couponApply: '쿠폰 응모수', couponWin: '쿠폰 당첨수(유입 근사)', couponUse: '쿠폰 사용수', adRoas: '광고 ROAS', adSpend: '광고비', adRevenue: '광고 전환매출', adConv: '광고 구매전환수' };
   const resolveProdIds = L => { const gs = data.productGroups || []; const ids = ((L && L.productIds) || []).map(String); ((L && L.groupIds) || []).forEach(gid => { const gr = gs.find(x => String(x.id) === String(gid)); if (gr) (gr.productIds || []).forEach(pid => { const s = String(pid); if (ids.indexOf(s) < 0) ids.push(s); }); }); return ids; };
   const linkValue = k => {
     const L = k && k.link; if (!L || !L.type) return null;
@@ -1769,6 +1772,17 @@ function TabKpi({ data, setData }) {
       const krows = kakaoDaily.filter(d => d.date >= from && d.date <= to);
       if (L.metric === 'kakaoNew') return krows.reduce((a, r) => a + r.add, 0);
       if (L.metric === 'kakaoNet') return krows.reduce((a, r) => a + r.net, 0);
+      return 0;
+    }
+    if (L.type === 'ads') {
+      if (from > to) return 0;
+      const arows = adsDays.filter(d => d.date >= from && d.date <= to);
+      const spend = arows.reduce((a, r) => a + r.spend, 0);
+      const rev = arows.reduce((a, r) => a + r.rev, 0);
+      if (L.metric === 'adSpend') return spend;
+      if (L.metric === 'adRevenue') return rev;
+      if (L.metric === 'adConv') return arows.reduce((a, r) => a + r.conv, 0);
+      if (L.metric === 'adRoas') return spend ? Math.round(rev / spend * 100) : 0;
       return 0;
     }
     if (from > to) return 0;
@@ -1885,7 +1899,7 @@ function TabKpi({ data, setData }) {
         </div>
         {mkEdit !== undefined && <MainKpiModal data={data} setData={setData} edit={mkEdit} onClose={() => setMkEdit(undefined)} />}
         {kpiEdit && <KpiEditModal data={data} setData={setData} planId={kpiEdit.planId} kpiId={kpiEdit.kpiId} onClose={() => setKpiEdit(null)} />}
-        {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); if (linkCfg.subId != null) { const sub = data.subplans.find(s => s.id === linkCfg.subId); const ck = sub && (sub.kpis || []).find(c => c.id === linkCfg.ckId); return ck ? <KpiLinkPanel kpi={ck} days={naverDays} kakaoCoupons={kakaoCoupons} data={data} setData={setData} onSave={l => { setSubKpiLink(linkCfg.subId, linkCfg.ckId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; } const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} kakaoCoupons={kakaoCoupons} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
+        {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); if (linkCfg.subId != null) { const sub = data.subplans.find(s => s.id === linkCfg.subId); const ck = sub && (sub.kpis || []).find(c => c.id === linkCfg.ckId); return ck ? <KpiLinkPanel kpi={ck} days={naverDays} kakaoCoupons={kakaoCoupons} adsDays={adsDays} data={data} setData={setData} onSave={l => { setSubKpiLink(linkCfg.subId, linkCfg.ckId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; } const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} kakaoCoupons={kakaoCoupons} adsDays={adsDays} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
         {mainKpis.map(mk => {
           const linkedIds = mk.linkedKpiIds || [];
           const linked = linkedIds.map(kid => findKpi(kid)).filter(Boolean);
@@ -2020,7 +2034,7 @@ function TabKpi({ data, setData }) {
                                       <div style={{ flex: 1 }}><Bar v={cAch} m={cTgt || 1} h={4} /></div>
                                       <span style={{ fontSize: 10, fontWeight: 700, color: cDone ? '#1FA463' : cPr < 70 ? '#E53935' : '#E08700' }}>{cPr}%</span>
                                     </div>
-                                    {clk && <div style={{ fontSize: 9, color: '#A29C95', marginTop: 4 }}>{clk.type === 'manual' ? '✍ 수동입력 ' + (clk.entries || []).length + '건' : (clk.type === 'kakao' ? '💬 카카오' : '📡 매출') + ' · ' + (METRIC_DEF[clk.metric] || clk.metric)}</div>}
+                                    {clk && <div style={{ fontSize: 9, color: '#A29C95', marginTop: 4 }}>{clk.type === 'manual' ? '✍ 수동입력 ' + (clk.entries || []).length + '건' : (clk.type === 'kakao' ? '💬 카카오' : clk.type === 'ads' ? '📣 광고' : '📡 매출') + ' · ' + (METRIC_DEF[clk.metric] || clk.metric)}</div>}
                                   </div>
                                 ); })}
                                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
@@ -2034,7 +2048,7 @@ function TabKpi({ data, setData }) {
                             ); })()}
                             {!hasChild && lk && (
                               <div onClick={() => setLinkCfg({ planId: p.id, kpiId: k.id })} style={{ display: 'flex', alignItems: 'center', gap: 6, background: lk.type === 'manual' ? '#EFF6FF' : '#ECFDF5', borderRadius: 8, padding: '7px 10px', marginBottom: 10, cursor: 'pointer', fontSize: 11, fontWeight: 600, color: lk.type === 'manual' ? '#2D5FE0' : '#1FA463' }}>
-                                {lk.type === 'manual' ? <span>✍ 수동입력 · 기록 {(lk.entries || []).length}건</span> : <span>{lk.type === 'kakao' ? '💬 카카오' : '📡 매출'} · {METRIC_DEF[lk.metric] || lk.metric}{(() => { const gc = (lk.groupIds || []).length, pc2 = (lk.productIds || []).length, cc = (lk.couponIds || []).length; return (gc || pc2 || cc) ? ' (' + [gc ? '그룹 ' + gc : '', pc2 ? '상품 ' + pc2 : '', cc ? '쿠폰 ' + cc : ''].filter(Boolean).join(' · ') + ')' : ''; })()} · {lk.start}~{lk.end || '계속'}</span>}
+                                {lk.type === 'manual' ? <span>✍ 수동입력 · 기록 {(lk.entries || []).length}건</span> : <span>{lk.type === 'kakao' ? '💬 카카오' : lk.type === 'ads' ? '📣 광고' : '📡 매출'} · {METRIC_DEF[lk.metric] || lk.metric}{(() => { const gc = (lk.groupIds || []).length, pc2 = (lk.productIds || []).length, cc = (lk.couponIds || []).length; return (gc || pc2 || cc) ? ' (' + [gc ? '그룹 ' + gc : '', pc2 ? '상품 ' + pc2 : '', cc ? '쿠폰 ' + cc : ''].filter(Boolean).join(' · ') + ')' : ''; })()} · {lk.start}~{lk.end || '계속'}</span>}
                                 <span style={{ marginLeft: 'auto', color: '#A29C95', fontWeight: 400 }}>설정 ›</span>
                               </div>
                             )}
