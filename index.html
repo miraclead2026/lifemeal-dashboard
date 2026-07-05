@@ -156,6 +156,7 @@ const migrateData = raw => ({
   notices: raw.notices || [],
   meetings: raw.meetings || [],
   payments: raw.payments || [],
+  vendors: raw.vendors || [],
   productGroups: raw.productGroups || [],
   adsLog: raw.adsLog || [],
 });
@@ -2246,7 +2247,7 @@ function TabBudget({ data, setData, goTab }) {
           </div>
           <div style={{ fontSize: 11, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>실결제 = 결제일이 해당 월인 실결제 기록 합계 · 영수증은 드라이브 라이프밀/영수증/(프로젝트) 폴더에 저장됩니다</div>
         </Card>
-        {!payments.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>🧾</div><div>등록된 실결제 기록이 없습니다</div><div style={{ fontSize: 12, marginTop: 6 }}>업체를 고르고 기안 항목을 선택해 결제를 기록하세요</div></Card>) :
+        {!payments.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>🧾</div><div>등록된 실결제 기록이 없습니다</div><div style={{ fontSize: 12, marginTop: 6 }}>업체를 선택하고 결제 금액을 입력해 기록하세요</div></Card>) :
           payKeys.map(k => { const list = payGroups[k]; const sub = list.reduce((a, p) => a + (Number(p.amount) || 0), 0); return (
             <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7' }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{k}</span><span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: G }}>{won(sub)}</span></div>
@@ -2280,10 +2281,12 @@ function TabBudget({ data, setData, goTab }) {
 
 function PaymentModal({ data, setData, edit, onClose }) {
   const e = edit || {};
-  const quoteItems = (data.budgets || []).filter(b => b.status === '기안완료');
-  const vendors = [...new Set(quoteItems.map(b => b.vendor).filter(Boolean))];
-  const [vendor, setVendor] = useState(e.vendor || vendors[0] || '');
-  const [covered, setCovered] = useState(() => { const m = {}; (e.coveredBudgetIds || []).forEach(id => { m[id] = true; }); return m; });
+  const budgetVendors = [...new Set((data.budgets || []).map(b => b.vendor).filter(Boolean))];
+  const regVendors = data.vendors || [];
+  const allVendors = [...new Set([...regVendors, ...budgetVendors])].sort();
+  const [vendor, setVendor] = useState(e.vendor || allVendors[0] || '');
+  const [newVendor, setNewVendor] = useState('');
+  const [addingVendor, setAddingVendor] = useState(false);
   const [amount, setAmount] = useState(e.amount != null ? String(e.amount) : '');
   const [payMethod, setPayMethod] = useState(e.payMethod || '세금계산서');
   const [paidDate, setPaidDate] = useState(e.paidDate || TODAY);
@@ -2293,10 +2296,8 @@ function PaymentModal({ data, setData, edit, onClose }) {
   const [receiptFile, setReceiptFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
-  const vendorItems = quoteItems.filter(b => b.vendor === vendor);
-  const checkedItems = vendorItems.filter(b => covered[b.id]);
-  const coveredSum = checkedItems.reduce((a, b) => a + itemTotal(b), 0);
-  const projectName = (() => { const first = checkedItems[0] || vendorItems[0]; if (!first) return ''; return budgetNames(data, first).project; })();
+  const projectName = vendor || '미지정';
+  const confirmAddVendor = () => { const v = newVendor.trim(); if (!v) return; if (allVendors.indexOf(v) < 0) setData(d => ({ ...d, vendors: [...(d.vendors || []), v] })); setVendor(v); setNewVendor(''); setAddingVendor(false); };
   const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E3E0DC', color: val === o ? 'white' : '#3A3631' }}>{o}</button>)}</div>;
   const pickReceipt = async file => {
     if (!file) return;
@@ -2310,26 +2311,28 @@ function PaymentModal({ data, setData, edit, onClose }) {
   const save = () => {
     if (!vendor) { alert('업체를 선택하세요'); return; }
     if (!amount || Number(amount) <= 0) { alert('결제 금액을 입력하세요'); return; }
-    const fields = { vendor, amount: Number(amount), payMethod, paidDate, coveredBudgetIds: checkedItems.map(b => b.id), receiptUrl, receiptName, project: projectName, memo: memo.trim() };
+    const fields = { vendor, amount: Number(amount), payMethod, paidDate, coveredBudgetIds: [], receiptUrl, receiptName, project: projectName, memo: memo.trim() };
     if (edit) setData(d => ({ ...d, payments: (d.payments || []).map(p => p.id === edit.id ? { ...p, ...fields } : p) }));
     else setData(d => ({ ...d, payments: [{ id: Date.now(), createdAt: TODAY, ...fields }, ...(d.payments || [])] }));
     onClose();
   };
   return (
     <ModalShell title={edit ? '실결제 수정' : '실결제 추가'} onClose={onClose}>
-      {vendors.length === 0 && !edit ? (
-        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 10, padding: 14, fontSize: 12, color: '#92400E', lineHeight: 1.6 }}>기안완료된 예산이 없습니다.<br />먼저 [예상/기안] 탭에서 항목을 <b>기안완료</b>로 바꾼 뒤 실결제를 기록하세요.</div>
-      ) : null}
-      <div><Lbl c="결제 업체" /><Sel value={vendor} onChange={v => { setVendor(v); setCovered({}); }} ph="업체 선택..." opts={vendors.map(v => ({ v, l: v }))} /></div>
       <div>
-        <Lbl c="이 결제로 처리할 기안 항목 (체크)" />
-        {vendorItems.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '8px 0' }}>이 업체의 기안완료 항목이 없습니다.</div> :
-          vendorItems.map(b => { const n = budgetNames(data, b); const on = !!covered[b.id]; return (
-            <div key={b.id} onClick={() => setCovered({ ...covered, [b.id]: !on })} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', border: '1px solid #EDEBE7', borderRadius: 9, padding: '8px 10px', marginBottom: 6, background: on ? '#F6FBF7' : 'white' }}>
-              <Chk on={on} />
-              <div style={{ flex: 1 }}><div style={{ fontSize: 12, fontWeight: 600 }}>{n.detail}</div><div style={{ fontSize: 11, color: '#6E6863' }}>{n.project} · {won(itemTotal(b))} · {b.payMethod}</div></div>
-            </div>); })}
-        {checkedItems.length > 0 ? <div style={{ fontSize: 11, color: '#3A3631', marginTop: 2 }}>선택 {checkedItems.length}건 · 기안 합계 {won(coveredSum)} <button onClick={() => setAmount(String(coveredSum))} style={{ marginLeft: 6, fontSize: 11, padding: '2px 8px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>금액에 적용</button></div> : null}
+        <Lbl c="결제 업체" />
+        {addingVendor ? (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <input value={newVendor} onChange={ev => setNewVendor(ev.target.value)} onKeyDown={ev => { if (ev.key === 'Enter') confirmAddVendor(); }} placeholder="새 업체명 입력" autoFocus style={{ flex: 1, padding: '9px 11px', borderRadius: 9, border: '1px solid #E3E0DC', fontSize: 13, boxSizing: 'border-box' }} />
+            <button onClick={confirmAddVendor} style={{ padding: '0 14px', borderRadius: 9, border: 'none', background: G, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>추가</button>
+            <button onClick={() => { setAddingVendor(false); setNewVendor(''); }} style={{ padding: '0 12px', borderRadius: 9, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 12 }}>취소</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ flex: 1 }}><Sel value={vendor} onChange={setVendor} ph="업체 선택..." opts={allVendors.map(v => ({ v, l: v }))} /></div>
+            <button onClick={() => setAddingVendor(true)} style={{ padding: '0 14px', borderRadius: 9, border: '1px dashed ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>+ 새 업체</button>
+          </div>
+        )}
+        {allVendors.length === 0 && !addingVendor && <div style={{ fontSize: 11, color: '#A29C95', marginTop: 5 }}>등록된 업체가 없습니다. [+ 새 업체]로 추가하세요.</div>}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="실결제 금액 (원)" /><Inp type="number" value={amount} onChange={setAmount} placeholder="실제 결제 금액" /></div><div><Lbl c="결제일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div></div>
       <div><Lbl c="결제방법" />{seg(payMethod, setPayMethod, PAY_OPTS)}</div>
