@@ -1498,11 +1498,12 @@ function MainKpiModal({ data, setData, onClose, edit }) {
   const [unit, setUnit] = useState(edit ? edit.unit : '원');
   const [salesAuto, setSalesAuto] = useState(edit ? !!edit.salesAuto : false);
   const [kakaoAuto, setKakaoAuto] = useState(edit ? !!edit.kakaoAuto : false);
+  const [roasAuto, setRoasAuto] = useState(edit ? !!edit.roasAuto : false);
   const save = () => {
     if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
-    const u = unit.trim() || '개';
-    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto, kakaoAuto } : mk) }));
-    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto }] }));
+    const u = roasAuto ? '%' : (unit.trim() || '개');
+    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto, kakaoAuto, roasAuto } : mk) }));
+    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto, roasAuto }] }));
     onClose();
   };
   return (
@@ -1513,6 +1514,10 @@ function MainKpiModal({ data, setData, onClose, edit }) {
       <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: '#FEF9E7', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
         <input type="checkbox" checked={kakaoAuto} onChange={e => setKakaoAuto(e.target.checked)} style={{ marginTop: 2 }} />
         <span style={{ fontSize: 11, color: '#B8860B', lineHeight: 1.5 }}>💬 <b>카카오 친구 연동</b> — 켜면 카카오 채널 누적 친구수(기간 종료일 시점)가 달성값에 합산됩니다. 누적 고객·전체 회원 같은 KPI에 사용하세요.</span>
+      </label>
+      <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: '#F0F5FF', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
+        <input type="checkbox" checked={roasAuto} onChange={e => setRoasAuto(e.target.checked)} style={{ marginTop: 2 }} />
+        <span style={{ fontSize: 11, color: '#2D5FE0', lineHeight: 1.5 }}>📊 <b>마케팅 ROAS 자동 계산</b> — 켜면 이 KPI는 <b>네이버 전체 매출 ÷ 결제완료된 마케팅 예산 × 100</b>으로 계산됩니다 (단위 자동 %). 다른 연동·수동값은 무시되고 이 공식만 적용돼요. 목표에는 목표 ROAS(예: 330)를 입력하세요.</span>
       </label>
       <div style={{ display: 'flex', gap: 8 }}><Btn v="gold" onClick={save} style={{ flex: 1 }}>{edit ? '수정' : '추가'}</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
     </ModalShell>
@@ -1753,6 +1758,7 @@ function TabKpi({ data, setData }) {
   const subTotalAtEnd = (() => { const le = naverSubDays.filter(d => d.date && d.date <= pEnd); if (!le.length) return 0; le.sort((a, b) => a.date < b.date ? -1 : 1); return le[le.length - 1].total || 0; })();
   const isSubKpi = mk => { const n = mk.name || ''; return n.indexOf('구독') >= 0 || n.indexOf('알림') >= 0 || n.indexOf('고객') >= 0; };
   const kakaoTotalAtEnd = (() => { const le = kakaoDaily.filter(d => d.date && d.date <= pEnd); if (!le.length) return 0; le.sort((a, b) => a.date < b.date ? -1 : 1); return le[le.length - 1].cum || 0; })();
+  const mktCostInRange = (data.budgets || []).filter(b => b.status === '결제완료' && effDate(b) >= pStart && effDate(b) <= pEnd).reduce((a, b) => a + effTotal(b), 0);
   const rangeMonths = monthsInRange(pStart, pEnd);
   const isSingleMonth = rangeMonths.length === 1;
   const sumForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
@@ -1916,12 +1922,12 @@ function TabKpi({ data, setData }) {
           const salesVal = isSalesKpi(mk) ? naverInRange : 0;
           const subVal = isSubKpi(mk) ? subTotalAtEnd : 0;
           const kakaoVal = mk.kakaoAuto ? kakaoTotalAtEnd : 0;
-          const achieved = linkedSum + manualSum + salesVal + subVal + kakaoVal;
+          const achieved = mk.roasAuto ? (mktCostInRange ? Math.round(naverInRange / mktCostInRange * 100) : 0) : (linkedSum + manualSum + salesVal + subVal + kakaoVal);
           const target = effTarget(mk);
           const linking = editLink === mk.id;
           return (
             <Card key={mk.id} style={{ marginBottom: 10, borderLeft: '4px solid ' + GO }}>
-              <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={`연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}${isSalesKpi(mk) ? ' · 📡 네이버 매출 연동' : ''}${isSubKpi(mk) ? ' · 📡 네이버 구독자 연동' : ''}${mk.kakaoAuto ? ' · 💬 카카오 친구 연동' : ''}`} />
+              <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={mk.roasAuto ? `📊 마케팅 ROAS · 매출 ÷ 결제완료 비용` : `연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}${isSalesKpi(mk) ? ' · 📡 네이버 매출 연동' : ''}${isSubKpi(mk) ? ' · 📡 네이버 구독자 연동' : ''}${mk.kakaoAuto ? ' · 💬 카카오 친구 연동' : ''}`} />
               {expanded === 'main-' + mk.id && (
                 <div style={{ marginTop: 12, borderTop: '1px solid #F5F4F2', paddingTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginBottom: 10 }}><button onClick={() => setMkEdit(mk)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✏️ 수정</button><button onClick={() => setData(d => moveToTrash(d, 'mainKpi', mk.id))} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #E53935', background: 'white', color: '#E53935', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🗑 삭제 (휴지통)</button></div>
@@ -1932,6 +1938,17 @@ function TabKpi({ data, setData }) {
                     {isSalesKpi(mk) && <div style={{ flex: 1, minWidth: 130, background: '#ECFDF5', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#1FA463' }}>📡 네이버 매출 (이 기간)</div><div style={{ fontSize: 15, fontWeight: 700, color: '#1FA463' }}>{naverInRange.toLocaleString()}</div>{naverInfo && naverInfo.updatedAt && <div style={{ fontSize: 9, color: '#A29C95', marginTop: 2 }}>{naverInfo.updatedAt} · 일별 합산</div>}</div>}
                     {isSubKpi(mk) && <div style={{ flex: 1, minWidth: 130, background: '#EFF6FF', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#2D5FE0' }}>📡 알림 구독자 (기간 끝 누적)</div><div style={{ fontSize: 15, fontWeight: 700, color: '#2D5FE0' }}>{subTotalAtEnd.toLocaleString()}명</div><div style={{ fontSize: 9, color: '#A29C95', marginTop: 2 }}>기간 순증 +{subAddedInRange.toLocaleString()}명</div></div>}
                     {mk.kakaoAuto && <div style={{ flex: 1, minWidth: 130, background: '#FEF9E7', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#B8860B' }}>💬 카카오 친구 (기간 끝 누적)</div><div style={{ fontSize: 15, fontWeight: 700, color: '#B8860B' }}>{kakaoTotalAtEnd.toLocaleString()}명</div><div style={{ fontSize: 9, color: '#A29C95', marginTop: 2 }}>카카오 채널 누적 친구수</div></div>}
+                    {mk.roasAuto && <div style={{ flex: 1, minWidth: 260, background: '#F0F5FF', borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 10, color: '#2D5FE0', fontWeight: 700, marginBottom: 6 }}>📊 마케팅 ROAS 계산 (이 기간)</div>
+                      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                        <div><div style={{ fontSize: 9, color: '#6E6863' }}>매출 (분자)</div><div style={{ fontSize: 14, fontWeight: 800, color: '#1FA463' }}>{naverInRange.toLocaleString()}원</div></div>
+                        <div style={{ alignSelf: 'center', fontSize: 16, color: '#A29C95' }}>÷</div>
+                        <div><div style={{ fontSize: 9, color: '#6E6863' }}>마케팅 비용 (분모)</div><div style={{ fontSize: 14, fontWeight: 800, color: '#E08700' }}>{mktCostInRange.toLocaleString()}원</div></div>
+                        <div style={{ alignSelf: 'center', fontSize: 16, color: '#A29C95' }}>=</div>
+                        <div><div style={{ fontSize: 9, color: '#6E6863' }}>ROAS</div><div style={{ fontSize: 14, fontWeight: 800, color: achieved >= (target || 0) ? '#1FA463' : '#E53935' }}>{achieved.toLocaleString()}%</div></div>
+                      </div>
+                      <div style={{ fontSize: 9, color: '#A29C95', marginTop: 6 }}>매출 = 네이버 전체 매출(일별 합산) · 비용 = 예산 탭 결제완료 항목의 실결제액 (결제일 기준)</div>
+                    </div>}
                   </div>
                   <div style={{ marginBottom: 14 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
