@@ -2503,7 +2503,7 @@ function TabAds({ data, setData }) {
           </div>
         ))}
       </div>
-      <Card style={{ marginBottom: 16 }}>
+      {mode !== 'day' && <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📊 일별 전환매출 · ROAS</div>
           <div style={{ marginLeft: 'auto', minHeight: 16 }}>{hoverBar ? <span style={{ fontSize: 12, fontWeight: 700, color: G }}>{hoverBar.d.slice(5).replace('-', '/')} · 광고비 {won2(hoverBar.sp)} · 매출 {won2(hoverBar.rv)} · <span style={{ color: rc(hoverBar.ro) }}>ROAS {hoverBar.ro}%</span> · 구매 {hoverBar.cv}건 (총 {hoverBar.tcv}){hoverBar.prov ? ' · ⏳잠정' : ''}</span> : <span style={{ fontSize: 11, color: '#A29C95' }}>막대에 마우스를 올리면 상세가 표시됩니다</span>}</div>
@@ -2517,7 +2517,31 @@ function TabAds({ data, setData }) {
           ); })}
         </div>
         <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6 }}>막대 높이 = 전환매출 · 색 = ROAS (초록 ≥350% / 주황 300~350% / 빨강 &lt;300%) · 반투명 점선 막대 = 잠정치</div>
-      </Card>
+      </Card>}
+      {mode === 'month' && (() => {
+        const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+        const buck = DOW.map(() => ({ sp: 0, rv: 0, n: 0 }));
+        rows.forEach(x => { let sp = 0, rv = 0; (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; sp += g.spend || 0; rv += g.convRevenue || 0; }); const w = new Date(x.date + 'T00:00:00').getDay(); buck[w].sp += sp; buck[w].rv += rv; if (sp > 0) buck[w].n += 1; });
+        const order = [1, 2, 3, 4, 5, 6, 0];
+        const roasOf = b => b.sp ? Math.round(b.rv / b.sp * 100) : 0;
+        const maxR = Math.max(1, ...buck.map(roasOf));
+        return (
+          <Card style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 12 }}>📅 요일별 평균 ROAS <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({rng.label} · 요일 누적 매출÷광고비)</span></div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 120 }}>
+              {order.map(w => { const b = buck[w]; const ro = roasOf(b); const h = Math.max(3, Math.round(ro / maxR * 92)); return (
+                <div key={w} style={{ flex: 1, textAlign: 'center' }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: rc(ro), marginBottom: 3 }}>{b.n ? ro + '%' : '-'}</div>
+                  <div style={{ height: 92, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}><div style={{ background: rc(ro), opacity: 0.85, borderRadius: '4px 4px 0 0', height: b.n ? h : 0 }} /></div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: w === 0 ? '#E53935' : w === 6 ? '#2D5FE0' : '#6E6863', marginTop: 4 }}>{DOW[w]}</div>
+                  <div style={{ fontSize: 9, color: '#A29C95' }}>{b.n}일</div>
+                </div>
+              ); })}
+            </div>
+            <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6 }}>집행일이 있는 요일만 계산 · 특정 요일이 지속적으로 낮으면 요일별 예산 배분 조정 신호</div>
+          </Card>
+        );
+      })()}
       <Card style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 10 }}>📁 캠페인 · 그룹별 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({rng.label})</span></div>
         <div style={{ display: 'flex', fontSize: 10, fontWeight: 700, color: '#A29C95', padding: '0 0 6px', borderBottom: '1px solid #EDEBE7', gap: 8 }}>
