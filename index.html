@@ -2565,10 +2565,10 @@ function TabAds({ data, setData }) {
         return (
           <Card style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 12 }}>📅 요일별 평균 ROAS <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>({rng.label} · 요일 누적 매출÷광고비)</span></div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 120 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
               {order.map(w => { const b = buck[w]; const ro = roasOf(b); const h = Math.max(3, Math.round(ro / maxR * 92)); return (
                 <div key={w} style={{ flex: 1, textAlign: 'center' }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: rc(ro), marginBottom: 3 }}>{b.n ? ro + '%' : '-'}</div>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: rc(ro), marginBottom: 3, height: 15 }}>{b.n ? ro + '%' : '-'}</div>
                   <div style={{ height: 92, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}><div style={{ background: rc(ro), opacity: 0.85, borderRadius: '4px 4px 0 0', height: b.n ? h : 0 }} /></div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: w === 0 ? '#E53935' : w === 6 ? '#2D5FE0' : '#6E6863', marginTop: 4 }}>{DOW[w]}</div>
                   <div style={{ fontSize: 9, color: '#A29C95' }}>{b.n}일</div>
