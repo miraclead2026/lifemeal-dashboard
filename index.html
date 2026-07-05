@@ -703,7 +703,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const del = () => { setData(d => moveToTrash(d, kind, item.id)); onClose(); };
 
   const addChildPlan = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, plans: [...d.plans, { id: d.nid + 1, outputId: item.id, name: newChild.trim(), start: '', due: '', owner: ['현수'], support: [], kpis: [], dep: null, resolved: false, hold: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'plan', id: nv }); };
-  const addChildSub = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: item.id, name: newChild.trim(), stage: '예정', start: '', due: '', owner: (ownersOf(item).length ? ownersOf(item) : ['현수']), support: [], dep: null, resolved: false, files: [], perfRecorded: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'subplan', id: nv }); };
+  const addChildSub = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: item.id, name: newChild.trim(), stage: '예정', start: '', due: '', owner: (ownersOf(item).length ? ownersOf(item) : ['현수']), support: [], dep: null, resolved: false, files: [], perfRecorded: false, kpis: [] }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'subplan', id: nv }); };
   const movePlanChild = (id, dir) => setData(d => ({ ...d, plans: reorderSiblings(d.plans, id, 'outputId', dir) }));
   const toggleSubChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
   const delSubChk = id => setData(d => ({ ...d, checklists: d.checklists.filter(c => c.id !== id) }));
@@ -1784,7 +1784,7 @@ function TabKpi({ data, setData }) {
     if (L.metric === 'aov') { const o = sumF('orders'), rv = sumF('revenue'); return o ? Math.round(rv / o) : 0; }
     return 0;
   };
-  const kpiAchieved = k => { const lv = linkValue(k); return lv != null ? lv : sumForKpi(k.id); };
+  const kpiAchieved = k => { if (!k.parentKpiId && k._planId != null) { const ch = []; data.subplans.filter(s => s.planId === k._planId && !s.resolved).forEach(s => (s.kpis || []).forEach(c => { if (String(c.parentKpiId) === String(k.id)) ch.push(c); })); if (ch.length) return ch.reduce((a, c) => a + kpiAchieved(c), 0); } const lv = linkValue(k); return lv != null ? lv : sumForKpi(k.id); };
   const productInsight = L => {
     const ls = L.start || '0000-01-01'; const le = L.end || '9999-12-31';
     const from = pStart > ls ? pStart : ls; const to = pEnd < le ? pEnd : le;
@@ -1800,10 +1800,19 @@ function TabKpi({ data, setData }) {
     return { prodRev, prodQty, revShare: totRev ? Math.round(prodRev / totRev * 1000) / 10 : 0, qtyShare: totQty ? Math.round(prodQty / totQty * 1000) / 10 : 0, aov, aovEx };
   };
   const setPlanKpiLink = (pid, kid, link) => setData(d => ({ ...d, plans: d.plans.map(p => p.id === pid ? { ...p, kpis: (p.kpis || []).map(k => k.id === kid ? { ...k, link: link || null } : k) } : p) }));
+  // ===== 세부실행계획(subplan) KPI = 부모(plan) KPI의 자식 =====
+  const subsOfPlan = pid => data.subplans.filter(s => s.planId === pid && !s.resolved);
+  const childKpisOf = (pid, parentKpiId) => { const out = []; subsOfPlan(pid).forEach(s => (s.kpis || []).forEach(ck => { if (String(ck.parentKpiId) === String(parentKpiId)) out.push({ ...ck, subId: s.id, subName: s.name }); })); return out; };
+  const childTargetSum = (pid, parentKpiId) => childKpisOf(pid, parentKpiId).reduce((a, ck) => a + (Number(effTarget(ck)) || 0), 0);
+  const childAchievedSum = (pid, parentKpiId) => childKpisOf(pid, parentKpiId).reduce((a, ck) => a + kpiAchieved(ck), 0);
+  const addChildKpi = (subId, parentK) => setData(d => ({ ...d, subplans: d.subplans.map(s => s.id === subId ? { ...s, kpis: [...(s.kpis || []), { id: 'ck' + Date.now(), parentKpiId: parentK.id, name: parentK.name, unit: parentK.unit, targets: {}, baseTarget: 0, link: null }] } : s) }));
+  const setSubKpiField = (subId, ckId, patch) => setData(d => ({ ...d, subplans: d.subplans.map(s => s.id === subId ? { ...s, kpis: (s.kpis || []).map(ck => ck.id === ckId ? { ...ck, ...patch } : ck) } : s) }));
+  const setSubKpiLink = (subId, ckId, link) => setSubKpiField(subId, ckId, { link: link || null });
+  const removeChildKpi = (subId, ckId) => setData(d => ({ ...d, subplans: d.subplans.map(s => s.id === subId ? { ...s, kpis: (s.kpis || []).filter(ck => ck.id !== ckId) } : s) }));
   const plansOfOutput = oid => data.plans.filter(p => p.outputId === oid);
   const sumForOutput = oid => plansOfOutput(oid).reduce((a, p) => a + ((p.kpis && p.kpis.length) ? p.kpis.reduce((x, k) => x + kpiAchieved(k), 0) : sumForPlan(p.id)), 0);
   const outOf = pid => { const p = data.plans.find(x => x.id === pid); return p ? data.outputs.find(o => o.id === p.outputId) : null; };
-  const effTarget = kpi => { const t = (kpi && kpi.targets) || {}; const keys = Object.keys(t); if (keys.length) { return rangeMonths.reduce((acc, mo) => { const v = t[mo.key] || 0; return isSingleMonth ? v : acc + (mo.totalDays ? v / mo.totalDays * mo.days : 0); }, 0); } return Number(kpi && kpi.target) || 0; };
+  const effTarget = kpi => { const t = (kpi && kpi.targets) || {}; const keys = Object.keys(t); if (keys.length) { return rangeMonths.reduce((acc, mo) => { const v = t[mo.key] || 0; return isSingleMonth ? v : acc + (mo.totalDays ? v / mo.totalDays * mo.days : 0); }, 0); } if (kpi && kpi.parentKpiId != null) return Number(kpi.baseTarget) || 0; return Number(kpi && kpi.target) || 0; };
 
   const presetDays = days => { setPStart(addDay(TODAY, -days)); setPEnd(TODAY); };
   const presetMonth = offset => { const r = monthRange(offset); setPStart(r.start); setPEnd(r.end); };
@@ -1873,7 +1882,7 @@ function TabKpi({ data, setData }) {
         </div>
         {mkEdit !== undefined && <MainKpiModal data={data} setData={setData} edit={mkEdit} onClose={() => setMkEdit(undefined)} />}
         {kpiEdit && <KpiEditModal data={data} setData={setData} planId={kpiEdit.planId} kpiId={kpiEdit.kpiId} onClose={() => setKpiEdit(null)} />}
-        {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} kakaoCoupons={kakaoCoupons} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
+        {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); if (linkCfg.subId != null) { const sub = data.subplans.find(s => s.id === linkCfg.subId); const ck = sub && (sub.kpis || []).find(c => c.id === linkCfg.ckId); return ck ? <KpiLinkPanel kpi={ck} days={naverDays} kakaoCoupons={kakaoCoupons} data={data} setData={setData} onSave={l => { setSubKpiLink(linkCfg.subId, linkCfg.ckId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; } const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} kakaoCoupons={kakaoCoupons} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
         {mainKpis.map(mk => {
           const linkedIds = mk.linkedKpiIds || [];
           const linked = linkedIds.map(kid => findKpi(kid)).filter(Boolean);
@@ -1975,27 +1984,58 @@ function TabKpi({ data, setData }) {
               <div style={{ marginTop: 4 }}>
                 {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '6px 0' }}>이 프로젝트에 등록된 실행계획 KPI가 없습니다</div> : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'stretch' }}>
-                    {plansW.flatMap(p => p.kpis.map(k => { const achieved = kpiAchieved(k); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; const lk = k.link; const lkStyle = lk ? (lk.type === 'manual' ? { border: '1px solid #2D5FE0', color: '#2D5FE0' } : { border: '1px solid #1FA463', color: '#1FA463' }) : { border: '1px solid #E3E0DC', color: '#A29C95' }; return (
+                    {plansW.flatMap(p => p.kpis.map(k0 => { const k = { ...k0, _planId: p.id }; const achieved = kpiAchieved(k); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; const lk = k.link; const lkStyle = lk ? (lk.type === 'manual' ? { border: '1px solid #2D5FE0', color: '#2D5FE0' } : { border: '1px solid #1FA463', color: '#1FA463' }) : { border: '1px solid #E3E0DC', color: '#A29C95' }; const childs = childKpisOf(p.id, k.id); const hasChild = childs.length > 0; const cTgtSum = childTargetSum(p.id, k.id); const tgtMismatch = hasChild && Math.round(cTgtSum) !== Math.round(target); return (
                       <Card key={k.id} style={{ flex: '1 1 auto', minWidth: 210, maxWidth: 480, boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
                           <div onClick={() => setExpanded(open ? null : 'kpi-' + k.id)} style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>▸ {p.name}</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 13, fontWeight: 800, flex: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>🎯 {k.name}</span><span style={{ fontSize: 10, color: '#A29C95' }}>{open ? '▲' : '▼'}</span></div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}><span style={{ fontSize: 17, fontWeight: 800, color: done ? '#1FA463' : G }}>{achieved.toLocaleString()}</span><span style={{ fontSize: 10, color: '#A29C95' }}>/ {Math.round(target).toLocaleString()} {k.unit}</span></div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginTop: 6 }}><span style={{ fontSize: 17, fontWeight: 800, color: done ? '#1FA463' : G }}>{achieved.toLocaleString()}</span><span style={{ fontSize: 10, color: '#A29C95' }}>/ {Math.round(target).toLocaleString()} {k.unit}</span>{hasChild && <span style={{ fontSize: 9, fontWeight: 700, color: '#2D5FE0', background: '#EFF6FF', borderRadius: 4, padding: '1px 5px' }}>세부 {childs.length}</span>}</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}><div style={{ flex: 1 }}><Bar v={achieved} m={target || 1} h={5} /></div><span style={{ fontSize: 11, fontWeight: 700, color: done ? '#1FA463' : pr < 70 ? '#E53935' : '#E08700' }}>{pr}%</span></div>
+                            {tgtMismatch && <div style={{ fontSize: 10, fontWeight: 700, color: '#E08700', background: '#FEF3C7', borderRadius: 6, padding: '4px 8px', marginTop: 6 }}>⚠ 목표 상이 — 세부 합계 {Math.round(cTgtSum).toLocaleString()}{k.unit} · 부모 목표를 {Math.round(cTgtSum).toLocaleString()}(으)로 수정 권장</div>}
                           </div>
-                          <button onClick={() => setLinkCfg({ planId: p.id, kpiId: k.id })} style={{ background: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 10, padding: '2px 7px', fontWeight: 600, flexShrink: 0, ...lkStyle }}>{lk ? (lk.type === 'manual' ? '✍ 수동' : '📡 연동완료') : '연동전'}</button>
+                          {!hasChild && <button onClick={() => setLinkCfg({ planId: p.id, kpiId: k.id })} style={{ background: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 10, padding: '2px 7px', fontWeight: 600, flexShrink: 0, ...lkStyle }}>{lk ? (lk.type === 'manual' ? '✍ 수동' : '📡 연동완료') : '연동전'}</button>}
                           <button onClick={() => setKpiEdit({ planId: p.id, kpiId: k.id })} style={{ border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 10, padding: '2px 7px', fontWeight: 600, flexShrink: 0 }}>수정</button>
                         </div>
                         {open && (
                           <div style={{ marginTop: 10, borderTop: '1px solid #F5F4F2', paddingTop: 10 }}>
-                            {lk && (
+                            {(() => { const subs = subsOfPlan(p.id); return (
+                              <div style={{ marginBottom: 12, background: '#F7FAFD', border: '1px solid #D9E7F5', borderRadius: 8, padding: 10 }}>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: '#2D5FE0', marginBottom: 8 }}>🔗 세부실행계획 KPI <span style={{ fontWeight: 400, color: '#A29C95' }}>(단위 · 유형은 부모 KPI를 따릅니다: {k.unit})</span></div>
+                                {childs.length > 0 && childs.map(ck => { const cAch = kpiAchieved(ck); const cTgt = effTarget(ck); const cPr = cTgt > 0 ? pct(cAch, cTgt) : 0; const cDone = cTgt > 0 && cPr >= 100; const clk = ck.link; return (
+                                  <div key={ck.id} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 8, padding: 9, marginBottom: 6 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                                      <span style={{ fontSize: 12, fontWeight: 700, color: '#3A3631', flex: 1, minWidth: 0 }}>{ck.subName}</span>
+                                      <button onClick={() => setLinkCfg({ planId: p.id, kpiId: k.id, subId: ck.subId, ckId: ck.id })} style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 5, cursor: 'pointer', border: '1px solid ' + (clk ? '#1FA463' : '#E3E0DC'), background: 'white', color: clk ? '#1FA463' : '#A29C95' }}>{clk ? (clk.type === 'manual' ? '✍ 수동' : '📡 연동완료') : '연동전'}</button>
+                                      <button onClick={() => removeChildKpi(ck.subId, ck.id)} style={{ fontSize: 11, border: 'none', background: 'none', color: '#E53935', cursor: 'pointer' }}>×</button>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                      <span style={{ fontSize: 14, fontWeight: 800, color: cDone ? '#1FA463' : G }}>{cAch.toLocaleString()}</span>
+                                      <span style={{ fontSize: 9, color: '#A29C95' }}>/</span>
+                                      <input type="number" value={ck.baseTarget == null ? '' : ck.baseTarget} onChange={e => { const v = e.target.value; setSubKpiField(ck.subId, ck.id, { baseTarget: v === '' ? 0 : Number(v) }); }} placeholder="목표" style={{ width: 74, padding: '4px 6px', borderRadius: 6, border: '1px solid #E3E0DC', fontSize: 11, boxSizing: 'border-box' }} />
+                                      <span style={{ fontSize: 10, color: '#A29C95' }}>{k.unit}</span>
+                                      <div style={{ flex: 1 }}><Bar v={cAch} m={cTgt || 1} h={4} /></div>
+                                      <span style={{ fontSize: 10, fontWeight: 700, color: cDone ? '#1FA463' : cPr < 70 ? '#E53935' : '#E08700' }}>{cPr}%</span>
+                                    </div>
+                                    {clk && <div style={{ fontSize: 9, color: '#A29C95', marginTop: 4 }}>{clk.type === 'manual' ? '✍ 수동입력 ' + (clk.entries || []).length + '건' : (clk.type === 'kakao' ? '💬 카카오' : '📡 매출') + ' · ' + (METRIC_DEF[clk.metric] || clk.metric)}</div>}
+                                  </div>
+                                ); })}
+                                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
+                                  <select value="" onChange={e => { if (e.target.value) { addChildKpi(Number(e.target.value), k); e.target.value = ''; } }} style={{ flex: 1, padding: '6px 8px', borderRadius: 7, border: '1px dashed #A29C95', fontSize: 11, background: 'white', color: '#6E6863' }}>
+                                    <option value="">+ 세부실행계획 KPI 등록 …</option>
+                                    {subs.filter(s => !(s.kpis || []).some(c => String(c.parentKpiId) === String(k.id))).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                  </select>
+                                </div>
+                                {subs.length === 0 && <div style={{ fontSize: 10, color: '#A29C95', marginTop: 4 }}>이 실행계획에 세부실행계획이 없습니다 — 프로젝트 탭에서 먼저 추가하세요</div>}
+                              </div>
+                            ); })()}
+                            {!hasChild && lk && (
                               <div onClick={() => setLinkCfg({ planId: p.id, kpiId: k.id })} style={{ display: 'flex', alignItems: 'center', gap: 6, background: lk.type === 'manual' ? '#EFF6FF' : '#ECFDF5', borderRadius: 8, padding: '7px 10px', marginBottom: 10, cursor: 'pointer', fontSize: 11, fontWeight: 600, color: lk.type === 'manual' ? '#2D5FE0' : '#1FA463' }}>
                                 {lk.type === 'manual' ? <span>✍ 수동입력 · 기록 {(lk.entries || []).length}건</span> : <span>{lk.type === 'kakao' ? '💬 카카오' : '📡 매출'} · {METRIC_DEF[lk.metric] || lk.metric}{(() => { const gc = (lk.groupIds || []).length, pc2 = (lk.productIds || []).length, cc = (lk.couponIds || []).length; return (gc || pc2 || cc) ? ' (' + [gc ? '그룹 ' + gc : '', pc2 ? '상품 ' + pc2 : '', cc ? '쿠폰 ' + cc : ''].filter(Boolean).join(' · ') + ')' : ''; })()} · {lk.start}~{lk.end || '계속'}</span>}
                                 <span style={{ marginLeft: 'auto', color: '#A29C95', fontWeight: 400 }}>설정 ›</span>
                               </div>
                             )}
-                            {lk && lk.type === 'sales' && ((lk.productIds || []).length > 0 || (lk.groupIds || []).length > 0) && (() => { const ins = productInsight(lk); return ins && (
+                            {!hasChild && lk && lk.type === 'sales' && ((lk.productIds || []).length > 0 || (lk.groupIds || []).length > 0) && (() => { const ins = productInsight(lk); return ins && (
                               <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8, padding: '8px 10px', marginBottom: 10 }}>
                                 <div style={{ fontSize: 10, fontWeight: 700, color: '#B45309', marginBottom: 4 }}>📦 선택 상품 분석 (이 기간)</div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px 10px', fontSize: 11, color: '#3A3631' }}>
@@ -2007,9 +2047,9 @@ function TabKpi({ data, setData }) {
                                 <div style={{ fontSize: 9, color: '#A29C95', marginTop: 4 }}>객단가 효과는 판매량 기준 추정치</div>
                               </div>
                             ); })()}
-                            <TargetEditor targets={k.targets} onSet={(key, v) => setPlanKpiMonth(p.id, k.id, key, v)} unit={k.unit} />
-                            {lk && klogs.length > 0 && <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 4 }}>※ 연동 중이므로 아래 성과 기록은 달성값 합산에서 제외됩니다 (참고용)</div>}
-                            {klogs.length > 0 ? (<div><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 6 }}>이 기간 기여 업무 ({klogs.length}건)</div>{klogs.map(l => { const sub = data.subplans.find(s => s.id === l.subplanId); return (<div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '4px 0' }}><span style={{ flex: 1, color: '#3A3631' }}>{sub ? sub.name : '삭제된 업무'}</span><span style={{ fontSize: 11, color: '#A29C95' }}>{l.periodStart.slice(5)}~{l.periodEnd.slice(5)}</span><span style={{ fontWeight: 700, color: G }}>+{l.value.toLocaleString()}</span></div>); })}</div>) : <div style={{ fontSize: 11, color: '#A29C95' }}>이 기간에 기록된 달성 내역이 없습니다</div>}
+                            {!hasChild && <TargetEditor targets={k.targets} onSet={(key, v) => setPlanKpiMonth(p.id, k.id, key, v)} unit={k.unit} />}
+                            {!hasChild && lk && klogs.length > 0 && <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 4 }}>※ 연동 중이므로 아래 성과 기록은 달성값 합산에서 제외됩니다 (참고용)</div>}
+                            {!hasChild && (klogs.length > 0 ? (<div><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 6 }}>이 기간 기여 업무 ({klogs.length}건)</div>{klogs.map(l => { const sub = data.subplans.find(s => s.id === l.subplanId); return (<div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '4px 0' }}><span style={{ flex: 1, color: '#3A3631' }}>{sub ? sub.name : '삭제된 업무'}</span><span style={{ fontSize: 11, color: '#A29C95' }}>{l.periodStart.slice(5)}~{l.periodEnd.slice(5)}</span><span style={{ fontWeight: 700, color: G }}>+{l.value.toLocaleString()}</span></div>); })}</div>) : <div style={{ fontSize: 11, color: '#A29C95' }}>이 기간에 기록된 달성 내역이 없습니다</div>)}
                           </div>
                         )}
                       </Card>
@@ -3101,7 +3141,7 @@ function MeetingActionModal({ action, data, setData, onApplied, onClose }) {
     if (existingSub) {
       setData(d => resolveAll({ ...d, subplans: d.subplans.map(s => s.id === existingSub.id ? { ...s, name: name.trim() || s.name, stage, owner, support, start, due, planId: Number(planId), completedAt: stage === '완료' && !s.completedAt ? TODAY : s.completedAt } : s) }));
     } else {
-      setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: Number(planId), name: name.trim(), stage, start, due, owner, support, dep: null, resolved: false, files: [], perfRecorded: false, completedAt: stage === '완료' ? TODAY : undefined }] }));
+      setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: Number(planId), name: name.trim(), stage, start, due, owner, support, dep: null, resolved: false, files: [], perfRecorded: false, completedAt: stage === '완료' ? TODAY : undefined, kpis: [] }] }));
     }
     onApplied(a.id); onClose();
   };
