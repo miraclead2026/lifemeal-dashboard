@@ -2115,7 +2115,8 @@ function TabKpi({ data, setData }) {
                                 <div style={{ fontSize: 9, color: '#A29C95', marginTop: 4 }}>객단가 효과는 판매량 기준 추정치</div>
                               </div>
                             ); })()}
-                            {!hasChild && <TargetEditor targets={k.targets} onSet={(key, v) => setPlanKpiMonth(p.id, k.id, key, v)} unit={k.unit} />}
+                            {hasChild && <div style={{ fontSize: 10, color: '#6E6863', background: '#F7FAFD', border: '1px solid #D9E7F5', borderRadius: 8, padding: '7px 10px', marginBottom: 8 }}>ℹ️ 달성값은 세부 KPI 합계로 자동 계산돼요. 아래 <b>월별 목표</b>는 {k.name} 자체 목표이며, 전체(기본) 목표는 오른쪽 위 <b>수정</b>에서 설정합니다. 세부 합계와 다르면 위에 ⚠ 표시가 떠요.</div>}
+                            <TargetEditor targets={k.targets} onSet={(key, v) => setPlanKpiMonth(p.id, k.id, key, v)} unit={k.unit} />
                             {!hasChild && lk && klogs.length > 0 && <div style={{ fontSize: 10, color: '#A29C95', marginBottom: 4 }}>※ 연동 중이므로 아래 성과 기록은 달성값 합산에서 제외됩니다 (참고용)</div>}
                             {!hasChild && (klogs.length > 0 ? (<div><div style={{ fontSize: 11, fontWeight: 600, color: '#6E6863', marginBottom: 6 }}>이 기간 기여 업무 ({klogs.length}건)</div>{klogs.map(l => { const sub = data.subplans.find(s => s.id === l.subplanId); return (<div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, padding: '4px 0' }}><span style={{ flex: 1, color: '#3A3631' }}>{sub ? sub.name : '삭제된 업무'}</span><span style={{ fontSize: 11, color: '#A29C95' }}>{l.periodStart.slice(5)}~{l.periodEnd.slice(5)}</span><span style={{ fontWeight: 700, color: G }}>+{l.value.toLocaleString()}</span></div>); })}</div>) : <div style={{ fontSize: 11, color: '#A29C95' }}>이 기간에 기록된 달성 내역이 없습니다</div>)}
                           </div>
