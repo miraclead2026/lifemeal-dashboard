@@ -1500,17 +1500,27 @@ function MainKpiModal({ data, setData, onClose, edit }) {
   const [salesAuto, setSalesAuto] = useState(edit ? !!edit.salesAuto : false);
   const [kakaoAuto, setKakaoAuto] = useState(edit ? !!edit.kakaoAuto : false);
   const [roasAuto, setRoasAuto] = useState(edit ? !!edit.roasAuto : false);
+  const [startMonth, setStartMonth] = useState(edit ? (edit.startMonth || '') : '');
+  const [endMonth, setEndMonth] = useState(edit ? (edit.endMonth || '') : '');
   const save = () => {
     if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
     const u = roasAuto ? '%' : (unit.trim() || '개');
-    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto, kakaoAuto, roasAuto } : mk) }));
-    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto, roasAuto }] }));
+    if (startMonth && endMonth && startMonth > endMonth) { alert('적용 시작월이 종료월보다 늦습니다'); return; }
+    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto, kakaoAuto, roasAuto, startMonth, endMonth } : mk) }));
+    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto, roasAuto, startMonth, endMonth }] }));
     onClose();
   };
   return (
     <ModalShell title={edit ? '메인 KPI 수정' : '메인 KPI 추가'} onClose={onClose}>
       <div><Lbl c="KPI 이름" /><Inp value={name} onChange={setName} placeholder="예: 총매출 / 신규고객 / 전환율" /></div>
       <div><Lbl c="단위" /><Inp value={unit} onChange={setUnit} placeholder="원 / 명 / % / 건" /></div>
+      <div style={{ background: '#F5F4F2', borderRadius: 10, padding: '10px 12px' }}>
+        <Lbl c="📅 적용 기간 (월 단위 · 선택)" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8 }}>
+          {inp(startMonth, setStartMonth, 'month')}<span style={{ color: '#A29C95' }}>~</span>{inp(endMonth, setEndMonth, 'month')}
+        </div>
+        <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6, lineHeight: 1.5 }}>집계 기간이 이 범위와 겹치는 달에만 이 KPI가 표시됩니다. 시작월만 넣으면 그 달부터 계속, 비워두면 모든 기간에 표시돼요.</div>
+      </div>
       <div style={{ background: '#ECFDF5', borderRadius: 10, padding: '10px 12px', fontSize: 11, color: '#1FA463', lineHeight: 1.5 }}>📡 KPI 이름에 "매출"이 들어가면 네이버 매출이 <b>자동 연동</b>됩니다. 집계기간에 해당하는 일별 매출이 달성값에 합산돼요.</div>
       <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: '#FEF9E7', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
         <input type="checkbox" checked={kakaoAuto} onChange={e => setKakaoAuto(e.target.checked)} style={{ marginTop: 2 }} />
@@ -1532,10 +1542,13 @@ function KpiEditModal({ data, setData, planId, kpiId, onClose }) {
   const [unit, setUnit] = useState(k0.unit || '');
   const [target, setTarget] = useState(k0.target != null ? String(k0.target) : '');
   const [toPlan, setToPlan] = useState(planId);
+  const [startMonth, setStartMonth] = useState(k0.startMonth || '');
+  const [endMonth, setEndMonth] = useState(k0.endMonth || '');
   const planOpts = data.plans.map(p => { const o = data.outputs.find(x => x.id === p.outputId); return { v: p.id, l: (o ? o.code + ' ' : '') + p.name }; });
   const save = () => {
     if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
-    const updated = { ...k0, id: kpiId, name: name.trim(), unit: unit.trim(), target: Number(target) || 0 };
+    if (startMonth && endMonth && startMonth > endMonth) { alert('적용 시작월이 종료월보다 늦습니다'); return; }
+    const updated = { ...k0, id: kpiId, name: name.trim(), unit: unit.trim(), target: Number(target) || 0, startMonth, endMonth };
     setData(d => {
       let plans = d.plans.map(p => p.id === planId ? { ...p, kpis: (p.kpis || []).filter(x => x.id !== kpiId) } : p);
       plans = plans.map(p => p.id === toPlan ? { ...p, kpis: [...(p.kpis || []), updated] } : p);
@@ -1558,6 +1571,13 @@ function KpiEditModal({ data, setData, planId, kpiId, onClose }) {
       <div><Lbl c="KPI 이름" /><Inp value={name} onChange={setName} placeholder="예: 신규 고객 수" /></div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="단위" /><Inp value={unit} onChange={setUnit} placeholder="명/원/건" /></div><div><Lbl c="기본 목표" /><Inp type="number" value={target} onChange={setTarget} placeholder="목표 수치" /></div></div>
       <div><Lbl c="연결 실행계획 (프로젝트)" /><Sel value={toPlan} onChange={setToPlan} opts={planOpts} /></div>
+      <div style={{ background: '#F5F4F2', borderRadius: 10, padding: '10px 12px' }}>
+        <Lbl c="📅 적용 기간 (월 단위 · 선택)" />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8 }}>
+          {inp(startMonth, setStartMonth, 'month')}<span style={{ color: '#A29C95' }}>~</span>{inp(endMonth, setEndMonth, 'month')}
+        </div>
+        <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6, lineHeight: 1.5 }}>집계 기간이 이 범위와 겹치는 달에만 표시됩니다. 비워두면 모든 기간에 표시돼요.</div>
+      </div>
       <div style={{ fontSize: 11, color: '#A29C95' }}>월별 목표는 KPI 카드를 펼친 뒤 "월 목표"에서 설정할 수 있어요.</div>
       <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
       <button onClick={del} style={{ width: '100%', marginTop: 4, padding: 10, background: 'white', color: '#E53935', border: '1px solid #E53935', borderRadius: 8, fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>🗑 이 KPI 삭제</button>
@@ -1762,6 +1782,7 @@ function TabKpi({ data, setData }) {
   const mktCostInRange = (data.payments || []).filter(p => p.paidDate && p.paidDate >= pStart && p.paidDate <= pEnd).reduce((a, p) => a + (Number(p.amount) || 0), 0);
   const rangeMonths = monthsInRange(pStart, pEnd);
   const isSingleMonth = rangeMonths.length === 1;
+  const kpiActive = k => { if (!k) return true; if (k.startMonth && (k.startMonth + '-01') > pEnd) return false; if (k.endMonth && (k.endMonth + '-31') < pStart) return false; return true; };
   const sumForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
   const sumForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
   const logsForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart);
@@ -1916,7 +1937,7 @@ function TabKpi({ data, setData }) {
         {mkEdit !== undefined && <MainKpiModal data={data} setData={setData} edit={mkEdit} onClose={() => setMkEdit(undefined)} />}
         {kpiEdit && <KpiEditModal data={data} setData={setData} planId={kpiEdit.planId} kpiId={kpiEdit.kpiId} onClose={() => setKpiEdit(null)} />}
         {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); if (linkCfg.subId != null) { const sub = data.subplans.find(s => s.id === linkCfg.subId); const ck = sub && (sub.kpis || []).find(c => c.id === linkCfg.ckId); return ck ? <KpiLinkPanel kpi={ck} days={naverDays} kakaoCoupons={kakaoCoupons} adsDays={adsDays} data={data} setData={setData} onSave={l => { setSubKpiLink(linkCfg.subId, linkCfg.ckId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; } const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} kakaoCoupons={kakaoCoupons} adsDays={adsDays} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
-        {mainKpis.map(mk => {
+        {mainKpis.filter(kpiActive).map(mk => {
           const linkedIds = mk.linkedKpiIds || [];
           const linked = linkedIds.map(kid => findKpi(kid)).filter(Boolean);
           const linkedSum = linkedIds.reduce((a, kid) => a + sumForKpi(kid), 0);
@@ -1998,6 +2019,7 @@ function TabKpi({ data, setData }) {
             </Card>
           );
         })}
+        {mainKpis.length > 0 && mainKpis.filter(kpiActive).length === 0 && <div style={{ fontSize: 12, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 기간에 적용되는 메인 KPI가 없습니다</div>}
       </div>
 
       <div>
@@ -2007,8 +2029,8 @@ function TabKpi({ data, setData }) {
         </div>
         {kpiOutputs.length === 0 && <div style={{ color: '#A29C95', textAlign: 'center', padding: 40 }}>등록된 프로젝트/실행계획 KPI가 없습니다. 진행상황 탭에서 프로젝트·실행계획 수정으로 KPI를 등록하세요.</div>}
         {kpiOutputs.map(o => {
-          const plansW = data.plans.filter(p => p.outputId === o.id && (p.kpis && p.kpis.length));
-          const kpiCount = plansW.reduce((a, p) => a + p.kpis.length, 0);
+          const plansW = data.plans.filter(p => p.outputId === o.id && (p.kpis || []).some(kpiActive));
+          const kpiCount = plansW.reduce((a, p) => a + p.kpis.filter(kpiActive).length, 0);
           const oAch = sumForOutput(o.id);
           const oTarget = o.kpi ? effTarget(o.kpi) : 0;
           return (
@@ -2028,9 +2050,9 @@ function TabKpi({ data, setData }) {
               )}
 
               <div style={{ marginTop: 4 }}>
-                {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '6px 0' }}>이 프로젝트에 등록된 실행계획 KPI가 없습니다</div> : (
+                {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '6px 0' }}>이 기간에 적용되는 실행계획 KPI가 없습니다</div> : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'stretch' }}>
-                    {plansW.flatMap(p => p.kpis.map(k0 => { const k = { ...k0, _planId: p.id }; const achieved = kpiAchieved(k); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; const lk = k.link; const lkStyle = lk ? (lk.type === 'manual' ? { border: '1px solid #2D5FE0', color: '#2D5FE0' } : { border: '1px solid #1FA463', color: '#1FA463' }) : { border: '1px solid #E3E0DC', color: '#A29C95' }; const childs = childKpisOf(p.id, k.id); const hasChild = childs.length > 0; const cTgtSum = childTargetSum(p.id, k.id); const tgtMismatch = hasChild && Math.round(cTgtSum) !== Math.round(target); return (
+                    {plansW.flatMap(p => p.kpis.filter(kpiActive).map(k0 => { const k = { ...k0, _planId: p.id }; const achieved = kpiAchieved(k); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; const lk = k.link; const lkStyle = lk ? (lk.type === 'manual' ? { border: '1px solid #2D5FE0', color: '#2D5FE0' } : { border: '1px solid #1FA463', color: '#1FA463' }) : { border: '1px solid #E3E0DC', color: '#A29C95' }; const childs = childKpisOf(p.id, k.id); const hasChild = childs.length > 0; const cTgtSum = childTargetSum(p.id, k.id); const tgtMismatch = hasChild && Math.round(cTgtSum) !== Math.round(target); return (
                       <Card key={k.id} style={{ flex: '1 1 auto', minWidth: 210, maxWidth: 480, boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
                           <div onClick={() => setExpanded(open ? null : 'kpi-' + k.id)} style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}>
