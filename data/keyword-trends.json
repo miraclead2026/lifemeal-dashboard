@@ -1,8 +1,58 @@
 [
   {
     "date": "2026-07-07",
-    "generatedAt": "2026-07-08T11:00:00+09:00",
+    "generatedAt": "2026-07-08T11:30:00+09:00",
     "signals": [
+      {
+        "id": "person-parkkyuri-생식",
+        "keyword": "박규리 생식",
+        "vertical": "생식·식사대용",
+        "targets": [
+          "시니어건강",
+          "다이어터"
+        ],
+        "matchType": "person",
+        "source": "news",
+        "summary": "박규리가 '2주 생식 프로젝트'로 2kg 감량 공개(대장암 전단계 계기 건강관리, 건강한집 방송)",
+        "whyNow": "인물+생식 라이브 이슈(2026-07-01), 우리 카테고리 직접 연관 — 인물 안테나로 신규 포착",
+        "heat": 4,
+        "newsVolume": 8,
+        "sources": [
+          {
+            "outlet": "TV리포트",
+            "url": "https://m.entertain.naver.com/article/213/0001392834"
+          },
+          {
+            "outlet": "엑스포츠뉴스",
+            "url": "https://m.entertain.naver.com/article/311/0002028441"
+          }
+        ]
+      },
+      {
+        "id": "person-seoinyoung-생식",
+        "keyword": "서인영 생식",
+        "vertical": "생식·식사대용",
+        "targets": [
+          "다이어터",
+          "이너뷰티"
+        ],
+        "matchType": "person",
+        "source": "news",
+        "summary": "서인영이 생식+구운란+동결건조 야채가루로 15kg 감량(유퀴즈·개과천선 서인영), 관련 뉴스 다수",
+        "whyNow": "인물 안테나 신설로 재포착 — 5월말~6월초 대량 이슈(74건)를 이전 안테나(제품·성분어만)로 놓쳤던 케이스",
+        "heat": 5,
+        "newsVolume": 56,
+        "sources": [
+          {
+            "outlet": "코메디닷컴",
+            "url": "https://n.news.naver.com/mnews/article/296/0000100620?sid=103"
+          },
+          {
+            "outlet": "매일경제",
+            "url": "https://www.mk.co.kr/article/12005781"
+          }
+        ]
+      },
       {
         "id": "cheonyeon-wigobi",
         "keyword": "천연위고비",
@@ -266,18 +316,53 @@
     ],
     "seedCandidates": [
       {
-        "seed": "마시는 샐러드",
-        "tier": "learning",
-        "catchReason": "'마시는 샐러드' 시드로 최근14일 제품영상 1건 포착 — 학습시드 승격 후보",
-        "sampleVideos": [
+        "seed": "서인영",
+        "tier": "person",
+        "catchReason": "'생식'·'동결건조' 앵커 매칭 — 서인영이 생식+구운란+동결건조 야채가루로 15kg 감량(유퀴즈/개과천선). 뉴스 다수",
+        "sampleNews": [
           {
-            "title": "귀찮은 야채손질 없이 1포로 챙기는 '편리한 마시는 샐러드 1750'",
-            "url": "https://www.youtube.com/watch?v=cEycuXwCG5U",
-            "matchType": "ingredient"
+            "title": "서인영, 돼지 이슈 후 극한 다이어트…생식과 계란만",
+            "url": "https://m.entertain.naver.com/article/311/0002014106"
+          },
+          {
+            "title": "'15kg 감량' 서인영, 구운란·야채가루로 뺐다",
+            "url": "https://www.mk.co.kr/article/12005781"
           }
         ],
-        "caughtCount": 1,
+        "caughtCount": 56,
         "status": "pending"
+      },
+      {
+        "seed": "박규리",
+        "tier": "person",
+        "catchReason": "'생식' 앵커 매칭 — 박규리가 '2주 생식 프로젝트'로 2kg 감량 공개(2026-07-01, 라이브)",
+        "sampleNews": [
+          {
+            "title": "박규리 '대장암 전 단계'…2주 생식 프로젝트 2kg 감량",
+            "url": "https://m.entertain.naver.com/article/213/0001392834"
+          }
+        ],
+        "caughtCount": 8,
+        "status": "pending"
+      },
+      {
+        "seed": "조혜련",
+        "tier": "person",
+        "catchReason": "'생식'·'동결건조' 앵커 매칭 — 조혜련이 동결건조 생식 가루를 두유에 타 먹으며 8kg 감량(2026-05)",
+        "sampleNews": [
+          {
+            "title": "'8kg 감량' 조혜련, 동결건조 생식 제품 식사대용",
+            "url": "https://n.news.naver.com/mnews/article/346/0000110481?sid=103"
+          }
+        ],
+        "caughtCount": 6,
+        "status": "pending"
+      }
+    ],
+    "seedApprovalsSeen": [
+      {
+        "seed": "마시는 샐러드",
+        "status": "approved"
       }
     ]
   }
