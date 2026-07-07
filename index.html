@@ -160,6 +160,7 @@ const migrateData = raw => ({
   productGroups: raw.productGroups || [],
   adsLog: raw.adsLog || [],
   keywordApprovals: raw.keywordApprovals || [],
+  seedApprovals: raw.seedApprovals || [],
 });
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
@@ -3780,6 +3781,7 @@ function TabTrends({ data, setData }) {
   const [rej, setRej] = useState(null);
   const [showDigest, setShowDigest] = useState(false);
   const [vPlat, setVPlat] = useState('all');
+  const [rejSeed, setRejSeed] = useState(null);
   useEffect(() => {
     let alive = true;
     fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/keyword-trends.json?t=' + Date.now())
@@ -3804,7 +3806,12 @@ function TabTrends({ data, setData }) {
   const signals = entry ? (entry.signals || []).slice().sort((a, b) => (Number(b.heat) || 0) - (Number(a.heat) || 0)) : [];
   const watchlist = entry ? (entry.watchlist || []).slice().sort((a, b) => (Number(b.priorityScore) || 0) - (Number(a.priorityScore) || 0)) : [];
   const ideas = entry ? (entry.contentIdeas || []) : [];
-  const MATCH = { brand: '브랜드 언급', product: '제품 언급', category: '카테고리' };
+  const matchMeta = t => ({ brand: { l: '브랜드 언급', bg: '#FEF2F2', bd: '#FCA5A5', tx: '#DC2626', strong: true }, product: { l: '제품 언급', bg: '#ECFDF5', bd: '#A7F3D0', tx: '#047857', strong: true }, ingredient: { l: '참고 · 유사효능', bg: '#F5F4F2', bd: '#E3E0DC', tx: '#8A8580', strong: false }, trend: { l: '트렌드', bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB', strong: false }, category: { l: '카테고리', bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863', strong: false } }[t] || { l: t, bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863', strong: false });
+  const seedCands = entry ? (entry.seedCandidates || []) : [];
+  const seedAppr = data.seedApprovals || [];
+  const seedDecision = s => seedAppr.find(a => a.seed === s);
+  const decideSeed = (cand, st, reason) => setData(d => ({ ...d, seedApprovals: [...(d.seedApprovals || []).filter(a => a.seed !== cand.seed), { seed: cand.seed, status: st, reason: reason || '', decidedBy: '', date: TODAY, source: cand.source || 'trend' }] }));
+  const undecideSeed = s => setData(d => ({ ...d, seedApprovals: (d.seedApprovals || []).filter(a => a.seed !== s) }));
   const platMeta = p => p === 'instagram' ? { l: '📷 Instagram', tx: '#C2185B', bg: '#FCE7F3', bd: '#F9A8D4' } : { l: '▶️ YouTube', tx: '#DC2626', bg: '#FEF2F2', bd: '#FCA5A5' };
   const hasViral = !!(entry && Array.isArray(entry.viral));
   const viralAll = hasViral ? entry.viral : [];
@@ -3904,7 +3911,8 @@ function TabTrends({ data, setData }) {
                             {v.likes ? <span>♥ {Number(v.likes).toLocaleString()}</span> : null}
                             {v.comments ? <span>💬 {Number(v.comments).toLocaleString()}</span> : null}
                             {v.publishedAt ? <span>{v.publishedAt}</span> : null}
-                            {(v.matchType || v.relatedProduct) ? <span style={{ ...chip, padding: '1px 6px' }}>{(MATCH[v.matchType] || v.matchType || '')}{v.matchType && v.relatedProduct ? ' · ' : ''}{v.relatedProduct || ''}</span> : null}
+                            {v.matchType ? (() => { const mm = matchMeta(v.matchType); return <span style={{ fontSize: 9.5, fontWeight: mm.strong ? 700 : 600, color: mm.tx, background: mm.bg, border: '1px solid ' + mm.bd, borderRadius: 5, padding: '1px 6px' }}>{mm.l}{v.relatedProduct ? ' · ' + v.relatedProduct : ''}</span>; })() : (v.relatedProduct ? <span style={{ ...chip, padding: '1px 6px' }}>{v.relatedProduct}</span> : null)}
+                            {v.seedMatched ? <span style={{ fontSize: 9.5, color: '#8A8580', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 6px' }}>🌱 {v.seedMatched}</span> : null}
                           </div>
                         </div>
                       </div>
@@ -3914,6 +3922,57 @@ function TabTrends({ data, setData }) {
               )}
             </Card>
           )}
+          <Card>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: G }}>🌱 바이럴 시드 학습</div>
+              <span style={{ fontSize: 11, color: '#A29C95' }}>학습 시드 후보 검토 — 승인하면 추적, 거절하면 다음 런부터 제외</span>
+            </div>
+            {(() => {
+              const pending = seedCands.filter(c => !seedDecision(c.seed));
+              const decided = seedCands.filter(c => seedDecision(c.seed));
+              if (seedCands.length === 0) return <div style={{ fontSize: 12, color: '#A29C95' }}>검토할 신규 시드 없음</div>;
+              return (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {pending.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>검토할 신규 시드 없음</div> : pending.map((c, i) => {
+                    const editing = rejSeed && rejSeed.seed === c.seed;
+                    return (
+                      <div key={c.seed || i} style={{ border: '1px solid #E3E0DC', borderLeft: '3px solid #10B981', borderRadius: 10, padding: 11, background: 'white' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 3 }}>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1614' }}>{c.seed}</span>
+                          {c.tier ? <span style={{ fontSize: 9.5, fontWeight: 700, color: '#047857', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 5, padding: '1px 6px' }}>{c.tier === 'trend' ? '트렌드어' : '학습 시드'}</span> : null}
+                          {c.caughtCount ? <span style={{ fontSize: 10, color: '#6E6863' }}>{Number(c.caughtCount).toLocaleString()}건 포착</span> : null}
+                        </div>
+                        {c.catchReason ? <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.5 }}>{c.catchReason}</div> : null}
+                        {(c.sampleVideos || []).length > 0 ? <div style={{ marginTop: 6, display: 'grid', gap: 3 }}>
+                          {(c.sampleVideos || []).slice(0, 3).map((sv, j) => <a key={j} href={sv.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: '#2D5FE0', textDecoration: 'none', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>▸ {sv.title || sv.url}{sv.matchType ? ' [' + matchMeta(sv.matchType).l + ']' : ''}</a>)}
+                        </div> : null}
+                        {!editing ? (
+                          <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+                            <button onClick={() => setRejSeed({ seed: c.seed, mode: 'approved', text: '' })} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', background: '#1FA463', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>승인</button>
+                            <button onClick={() => setRejSeed({ seed: c.seed, mode: 'rejected', text: '' })} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>거절</button>
+                          </div>
+                        ) : (
+                          <div style={{ marginTop: 8 }}>
+                            <textarea value={rejSeed.text} onChange={ev => { const val = ev.target.value; setRejSeed(r => ({ ...r, text: val })); }} placeholder={rejSeed.mode === 'approved' ? '승인 메모 (선택)' : '거절 사유 (시드 학습에 반영됨)'} rows={2} style={{ width: '100%', boxSizing: 'border-box', padding: '6px 8px', borderRadius: 6, border: '1px solid #E3E0DC', fontSize: 12, fontFamily: 'inherit', resize: 'vertical' }} />
+                            <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                              <button onClick={() => { if (rejSeed.mode === 'rejected' && !rejSeed.text.trim()) { alert('거절 사유를 입력해주세요 — 시드 학습에 사용됩니다'); return; } decideSeed(c, rejSeed.mode, rejSeed.text.trim()); setRejSeed(null); }} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', background: rejSeed.mode === 'approved' ? '#1FA463' : '#6E6863', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{rejSeed.mode === 'approved' ? '승인 확정' : '거절 확정'}</button>
+                              <button onClick={() => setRejSeed(null)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 11 }}>취소</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {decided.length > 0 ? (
+                    <div style={{ borderTop: '1px solid #F0EEEB', paddingTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                      <span style={{ fontSize: 10, color: '#A29C95' }}>처리됨:</span>
+                      {decided.map((c, i) => { const dc = seedDecision(c.seed); const ap = dc.status === 'approved'; return <span key={i} style={{ fontSize: 10, fontWeight: 600, color: ap ? '#047857' : '#B45309', background: ap ? '#ECFDF5' : '#FFF7ED', border: '1px solid ' + (ap ? '#A7F3D0' : '#FDBA74'), borderRadius: 12, padding: '2px 8px', display: 'inline-flex', alignItems: 'center', gap: 5 }}>{ap ? '✓' : '✕'} {c.seed}<button onClick={() => undecideSeed(c.seed)} style={{ border: 'none', background: 'none', color: '#A29C95', cursor: 'pointer', fontSize: 10, padding: 0 }}>↩</button></span>; })}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })()}
+          </Card>
           <Card>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: G }}>🎯 선점 추천 키워드</div>
