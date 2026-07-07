@@ -2728,7 +2728,7 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
             {(() => {
               const pm = prodNames || {};
               const idm = (String(it.id || '') + ' ' + String(it.evidence || '')).match(/\b(1[0-9]{9,})\b/);
-              const pid = idm ? idm[1] : null;
+              const pid = it.productId != null && String(it.productId).trim() ? String(it.productId).trim() : (idm ? idm[1] : null);
               const fullName = pid && pm[pid] ? pm[pid] : null;
               let disp = it.target || '';
               if (fullName && /[…]|\.\.\./.test(disp)) { const pre = disp.split('·')[0]; disp = (pre && pre.trim() && pre.indexOf(fullName) < 0 ? pre.trim() + ' · ' : '') + fullName; }
