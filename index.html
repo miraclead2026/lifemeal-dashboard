@@ -2706,6 +2706,8 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
   const mark = (it, st, reason) => setData(d => ({ ...d, adsLog: [...(d.adsLog || []), { id: String(it.id), target: it.target || '', action: it.action || '', insight: it.insight || '', status: st, reason: reason || '', date: TODAY }] }));
   const unmark = id => setData(d => ({ ...d, adsLog: (d.adsLog || []).filter(l => String(l.id) !== String(id)) }));
   const sevC = { high: { bg: '#FEF2F2', bd: '#FECACA', tx: '#E53935', l: '중요' }, mid: { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309', l: '권장' }, low: { bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863', l: '참고' } };
+  const TRIAL = { powerlink: '파워링크 시드', gfa_website_conversion: 'GFA 웹전환' };
+  const acqChip = { fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 5, background: '#D1FAE5', border: '1px solid #6EE7B7', color: '#047857' };
   const sortedItems = items.slice().sort((a, b) => ({ high: 0, mid: 1, low: 2 }[a.severity] || 1) - ({ high: 0, mid: 1, low: 2 }[b.severity] || 1));
   const doneLog = log.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return (
@@ -2719,9 +2721,10 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
       {status === 'none' && <div style={{ fontSize: 12, color: '#A29C95', background: '#F8F7F5', borderRadius: 8, padding: '10px 12px' }}>아직 전략 데이터가 없습니다 — 광고 에이전트가 <b>data/ads-strategy.json</b>을 push하면 여기에 인사이트와 제안이 표시됩니다.</div>}
       {status === 'ok' && sortedItems.length === 0 && <div style={{ fontSize: 12, color: '#1FA463', background: '#ECFDF5', borderRadius: 8, padding: '10px 12px' }}>✓ 현재 제안된 전략을 모두 처리했습니다</div>}
       {status === 'ok' && sortedItems.map(it => { const sv = sevC[it.severity] || sevC.mid; return (
-        <div key={it.id} style={{ border: '1px solid ' + sv.bd, background: 'white', borderRadius: 10, padding: 12, marginBottom: 8 }}>
+        <div key={it.id} style={{ border: '1px solid ' + sv.bd, borderLeft: it.mode === 'acquisition' ? '3px solid #10B981' : ('1px solid ' + sv.bd), background: 'white', borderRadius: 10, padding: 12, marginBottom: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 5 }}>
             <span style={{ fontSize: 10, fontWeight: 800, color: sv.tx, background: sv.bg, border: '1px solid ' + sv.bd, borderRadius: 5, padding: '2px 7px' }}>{sv.l}</span>
+            {it.mode === 'acquisition' && <span style={{ fontSize: 10, fontWeight: 800, color: '#047857', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 5, padding: '2px 7px' }}>🌱 시범·확보</span>}
             {(() => {
               const pm = prodNames || {};
               const idm = (String(it.id || '') + ' ' + String(it.evidence || '')).match(/\b(1[0-9]{9,})\b/);
@@ -2734,6 +2737,23 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
           </div>
           <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.55 }}>{it.insight}</div>
           <div style={{ marginTop: 7, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 8, padding: '8px 10px', fontSize: 12.5, fontWeight: 700, color: '#166534' }}>▸ {it.action}</div>
+          {it.mode === 'acquisition' && (it.trialProduct || (it.prerequisites || []).length || it.budgetGuide || it.durationGuide || it.successGuide) && (
+            <div style={{ marginTop: 7, background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 8, padding: '8px 10px' }}>
+              {(it.trialProduct || (it.prerequisites || []).length > 0) && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                  {it.trialProduct && <span style={acqChip}>{TRIAL[it.trialProduct] || it.trialProduct}</span>}
+                  {(it.prerequisites || []).map((p, i) => <span key={i} style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#FFFBEB', border: '1px solid #FDE68A', color: '#B45309' }}>✓ {p}</span>)}
+                </div>
+              )}
+              {(it.budgetGuide || it.durationGuide || it.successGuide) && (
+                <div style={{ display: 'grid', gap: 3, fontSize: 11, color: '#065F46', marginTop: (it.trialProduct || (it.prerequisites || []).length > 0) ? 6 : 0 }}>
+                  {it.budgetGuide && <div>💰 예산 · {it.budgetGuide}</div>}
+                  {it.durationGuide && <div>📅 기간 · {it.durationGuide}</div>}
+                  {it.successGuide && <div>🎯 성공기준 · {it.successGuide}</div>}
+                </div>
+              )}
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 7, flexWrap: 'wrap' }}>
             {it.evidence && <span style={{ fontSize: 10, color: '#A29C95' }}>근거: {it.evidence}</span>}
             {it.expectedEffect && <span style={{ fontSize: 10, color: '#B45309' }}>기대: {it.expectedEffect}</span>}
