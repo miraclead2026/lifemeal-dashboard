@@ -159,6 +159,7 @@ const migrateData = raw => ({
   vendors: raw.vendors || [],
   productGroups: raw.productGroups || [],
   adsLog: raw.adsLog || [],
+  keywordApprovals: raw.keywordApprovals || [],
 });
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
@@ -3772,6 +3773,235 @@ function ReorderModal({ title, items, onSave, onClose }) {
   );
 }
 
+function TabTrends({ data, setData }) {
+  const [feed, setFeed] = useState(null);
+  const [status, setStatus] = useState('loading');
+  const [idx, setIdx] = useState(null);
+  const [rej, setRej] = useState(null);
+  const [showDigest, setShowDigest] = useState(false);
+  const [vPlat, setVPlat] = useState('all');
+  useEffect(() => {
+    let alive = true;
+    fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/keyword-trends.json?t=' + Date.now())
+      .then(r => r.ok ? r.json() : null)
+      .then(j => {
+        if (!alive) return;
+        const arr = Array.isArray(j) ? j : (j && Array.isArray(j.entries) ? j.entries : null);
+        const clean = arr ? arr.filter(e => e && e.date).sort((a, b) => a.date < b.date ? -1 : 1) : null;
+        if (clean && clean.length) { setFeed(clean); setIdx(clean.length - 1); setStatus('ok'); } else setStatus('none');
+      })
+      .catch(() => { if (alive) setStatus('none'); });
+    return () => { alive = false; };
+  }, []);
+  const navBtnT = { border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '3px 9px', fontSize: 12 };
+  const thT = { padding: '5px 8px', fontWeight: 600, whiteSpace: 'nowrap' };
+  const tdT = { padding: '6px 8px', verticalAlign: 'top' };
+  const chip = { fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 5, background: '#F5F4F2', border: '1px solid #E3E0DC', color: '#6E6863' };
+  const heatStyle = h => { const n = Number(h) || 0; if (n >= 5) return { bg: '#FEF2F2', bd: '#FCA5A5', tx: '#DC2626' }; if (n >= 4) return { bg: '#FFF7ED', bd: '#FDBA74', tx: '#EA580C' }; if (n >= 3) return { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309' }; if (n >= 2) return { bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB' }; return { bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863' }; };
+  const compC = c => c === '높음' ? '#DC2626' : c === '중간' ? '#B45309' : c === '낮음' ? '#1FA463' : '#6E6863';
+  const stBadge = s => s === 'defend' ? { l: '🛡 브랜드 방어', bg: '#F5F3FF', bd: '#DDD6FE', tx: '#7C3AED' } : s === 'approved' ? { l: '✓ 승인됨', bg: '#ECFDF5', bd: '#A7F3D0', tx: '#047857' } : { l: '선점 후보', bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB' };
+  const entry = feed && idx != null ? feed[idx] : null;
+  const signals = entry ? (entry.signals || []).slice().sort((a, b) => (Number(b.heat) || 0) - (Number(a.heat) || 0)) : [];
+  const watchlist = entry ? (entry.watchlist || []).slice().sort((a, b) => (Number(b.priorityScore) || 0) - (Number(a.priorityScore) || 0)) : [];
+  const ideas = entry ? (entry.contentIdeas || []) : [];
+  const MATCH = { brand: '브랜드 언급', product: '제품 언급', category: '카테고리' };
+  const platMeta = p => p === 'instagram' ? { l: '📷 Instagram', tx: '#C2185B', bg: '#FCE7F3', bd: '#F9A8D4' } : { l: '▶️ YouTube', tx: '#DC2626', bg: '#FEF2F2', bd: '#FCA5A5' };
+  const hasViral = !!(entry && Array.isArray(entry.viral));
+  const viralAll = hasViral ? entry.viral : [];
+  const viral = viralAll.slice().filter(v => vPlat === 'all' || v.platform === vPlat).sort((a, b) => (Number(b.viralScore) || 0) - (Number(a.viralScore) || 0));
+  const appr = data.keywordApprovals || [];
+  const decisionFor = (kw, sd) => appr.find(a => a.keyword === kw && a.sourceDate === sd);
+  const decide = (w, st, reason) => setData(d => { const k = a => a.keyword === w.keyword && a.sourceDate === entry.date; return { ...d, keywordApprovals: [...(d.keywordApprovals || []).filter(a => !k(a)), { keyword: w.keyword, status: st, reason: reason || '', date: TODAY, sourceDate: entry.date, decidedBy: '' }] }; });
+  const undecide = (kw, sd) => setData(d => ({ ...d, keywordApprovals: (d.keywordApprovals || []).filter(a => !(a.keyword === kw && a.sourceDate === sd)) }));
+  const inlineMd = s => { const parts = []; let rest = String(s == null ? '' : s), k = 0; const re = /\*\*([^*]+)\*\*|\[([^\]]+)\]\(([^\s]+?)\)/; let m; while ((m = rest.match(re))) { if (m.index > 0) parts.push(rest.slice(0, m.index)); if (m[1] != null) parts.push(<b key={k++}>{m[1]}</b>); else parts.push(<a key={k++} href={m[3]} target="_blank" rel="noreferrer" style={{ color: '#2D5FE0' }}>{m[2]}</a>); rest = rest.slice(m.index + m[0].length); } if (rest) parts.push(rest); return parts; };
+  const mdLite = src => String(src == null ? '' : src).split('\n').map((ln, i) => { let m; if ((m = ln.match(/^(#{1,6})\s+(.*)/))) { const lv = m[1].length; return <div key={i} style={{ fontWeight: 800, fontSize: lv <= 1 ? 14.5 : lv === 2 ? 13.5 : 12.5, color: '#1A1614', marginTop: i ? 9 : 0, marginBottom: 3 }}>{inlineMd(m[2])}</div>; } if ((m = ln.match(/^\s*[-*]\s+(.*)/))) return <div key={i} style={{ display: 'flex', gap: 6, marginLeft: 4, marginBottom: 2 }}><span style={{ color: '#A29C95' }}>•</span><span>{inlineMd(m[1])}</span></div>; if (ln.trim() === '') return <div key={i} style={{ height: 6 }} />; return <div key={i} style={{ marginBottom: 2, lineHeight: 1.55 }}>{inlineMd(ln)}</div>; });
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: G }}>🔥 키워드 트렌드</div>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>키워드트렌드 에이전트가 매일 09:15 갱신</span>
+        {feed && entry && (
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button disabled={idx <= 0} onClick={() => setIdx(i => Math.max(0, i - 1))} style={{ ...navBtnT, opacity: idx <= 0 ? 0.4 : 1 }}>◀</button>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#3A3631', minWidth: 92, textAlign: 'center' }}>{entry.date}</span>
+            <button disabled={idx >= feed.length - 1} onClick={() => setIdx(i => Math.min(feed.length - 1, i + 1))} style={{ ...navBtnT, opacity: idx >= feed.length - 1 ? 0.4 : 1 }}>▶</button>
+            {idx < feed.length - 1 && <button onClick={() => setIdx(feed.length - 1)} style={{ ...navBtnT, fontSize: 11, color: '#6E6863' }}>최신</button>}
+          </div>
+        )}
+      </div>
+      {status === 'loading' && <Card><div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div></Card>}
+      {status === 'none' && <Card><div style={{ fontSize: 12, color: '#A29C95' }}>아직 키워드 트렌드 데이터가 없습니다 — 에이전트가 <b>data/keyword-trends.json</b>을 push하면 표시됩니다.</div></Card>}
+      {status === 'ok' && entry && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {(entry.digest || entry.digestKakao) && (
+            <Card style={{ borderColor: '#C7D2FE', background: '#FBFCFF' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: G }}>📰 오늘의 다이제스트</div>
+                <span style={{ fontSize: 11, color: '#A29C95' }}>키워드트렌드 데일리 요약</span>
+                {entry.digest && <button onClick={() => setShowDigest(v => !v)} style={{ marginLeft: 'auto', ...navBtnT }}>{showDigest ? '▾ 접기' : '▸ 전문 보기'}</button>}
+              </div>
+              {entry.digestKakao && <div style={{ marginTop: 8, background: 'white', border: '1px dashed #C7D2FE', borderRadius: 8, padding: '8px 10px' }}><span style={{ fontSize: 10, fontWeight: 700, color: '#6366F1' }}>💬 카톡 발송본</span><div style={{ marginTop: 3, fontSize: 11.5, color: '#3A3631', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{entry.digestKakao}</div></div>}
+              {entry.digest && showDigest && <div style={{ marginTop: 10, fontSize: 12, color: '#3A3631', borderTop: '1px solid #EEF1F6', paddingTop: 10 }}>{mdLite(entry.digest)}</div>}
+            </Card>
+          )}
+          <Card>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: G }}>📡 오늘의 신호</div>
+              <span style={{ fontSize: 11, color: '#A29C95' }}>지금 뜨는 이슈 · 강도(heat)순</span>
+            </div>
+            {signals.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>오늘 신호 없음</div> : (
+              <div style={{ display: 'grid', gap: 8 }}>
+                {signals.map((s, i) => { const hc = heatStyle(s.heat); return (
+                  <div key={s.id || i} style={{ border: '1px solid ' + hc.bd, borderLeft: '3px solid ' + hc.tx, borderRadius: 10, padding: 11, background: 'white' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: hc.tx, background: hc.bg, border: '1px solid ' + hc.bd, borderRadius: 5, padding: '2px 7px' }}>heat {s.heat}</span>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1614' }}>{s.keyword}</span>
+                      {s.vertical && <span style={chip}>{s.vertical}</span>}
+                      {(s.targets || []).map((t, j) => <span key={j} style={{ ...chip, background: '#F0F9FF', border: '1px solid #BAE6FD', color: '#0369A1' }}>{t}</span>)}
+                    </div>
+                    {s.summary && <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.55 }}>{s.summary}</div>}
+                    {s.whyNow && <div style={{ fontSize: 11.5, color: '#B45309', marginTop: 4 }}>⏱ 지금 뜨는 이유: {s.whyNow}</div>}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 6, flexWrap: 'wrap', fontSize: 10.5, color: '#6E6863' }}>
+                      {s.monthlySearch ? <span>월 검색량 {Number(s.monthlySearch).toLocaleString()}</span> : null}
+                      {s.competition ? <span>경쟁 <b style={{ color: compC(s.competition) }}>{s.competition}</b></span> : null}
+                      {(s.sources || []).filter(src => src && src.url).map((src, k) => <a key={k} href={src.url} target="_blank" rel="noreferrer" style={{ color: '#2D5FE0', textDecoration: 'none' }}>🔗 {src.outlet || '출처'}</a>)}
+                    </div>
+                  </div>
+                ); })}
+              </div>
+            )}
+          </Card>
+          {!hasViral ? (
+            <Card style={{ borderStyle: 'dashed', background: '#FCFCFB' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: G, marginBottom: 4 }}>🎬 바이럴 모니터</div>
+              <div style={{ fontSize: 11.5, color: '#A29C95', lineHeight: 1.5 }}>아직 수집된 바이럴이 없습니다 — YouTube·Instagram 연동 수집분부터 우리 제품·브랜드 관련 급상승 영상·릴스가 여기에 표시됩니다.</div>
+            </Card>
+          ) : (
+            <Card>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: G }}>🎬 바이럴 모니터</div>
+                <span style={{ fontSize: 11, color: '#A29C95' }}>우리 제품·브랜드 관련 급상승 영상·릴스</span>
+                {viralAll.length > 0 && <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+                  {[['all', '전체'], ['youtube', '▶️'], ['instagram', '📷']].map(pf => <button key={pf[0]} onClick={() => setVPlat(pf[0])} style={{ ...navBtnT, background: vPlat === pf[0] ? G : 'white', color: vPlat === pf[0] ? 'white' : '#6E6863' }}>{pf[1]}</button>)}
+                </div>}
+              </div>
+              {viralAll.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>🎬 오늘 감지된 바이럴 없음</div> : viral.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>해당 플랫폼 바이럴 없음</div> : (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {viral.map((v, i) => { const pm = platMeta(v.platform); return (
+                    <div key={v.id || i} style={{ border: '1px solid ' + pm.bd, borderLeft: '3px solid ' + pm.tx, borderRadius: 10, padding: 10, background: 'white' }}>
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        {v.thumbnail ? <img src={v.thumbnail} onError={ev => { ev.target.style.display = 'none'; }} style={{ width: 92, height: 60, borderRadius: 8, objectFit: 'cover', flexShrink: 0, background: '#F0EEEB' }} /> : null}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 3 }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: pm.tx, background: pm.bg, border: '1px solid ' + pm.bd, borderRadius: 5, padding: '2px 7px' }}>{pm.l}</span>
+                            {v.viralScore != null ? <span style={{ fontSize: 10, fontWeight: 800, color: '#EA580C', background: '#FFF7ED', border: '1px solid #FDBA74', borderRadius: 5, padding: '2px 7px' }}>🔥 {v.viralScore}</span> : null}
+                            {v.sentiment ? <span title={v.sentiment} style={{ width: 8, height: 8, borderRadius: 4, background: v.sentiment === 'positive' ? '#1FA463' : v.sentiment === 'negative' ? '#DC2626' : '#C4BFB9', display: 'inline-block' }} /> : null}
+                          </div>
+                          <a href={v.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 700, color: '#1A1614', textDecoration: 'none', display: 'block', lineHeight: 1.35 }}>{v.title || '(제목 없음)'}</a>
+                          <div style={{ fontSize: 10.5, color: '#6E6863', marginTop: 2 }}>{v.creator || ''}{v.creatorHandle ? ' · ' + v.creatorHandle : ''}{v.followers ? ' · 팔로워 ' + Number(v.followers).toLocaleString() : ''}</div>
+                          <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap', marginTop: 4, fontSize: 10.5, color: '#6E6863' }}>
+                            {v.views ? <span>👁 {Number(v.views).toLocaleString()}</span> : null}
+                            {v.likes ? <span>♥ {Number(v.likes).toLocaleString()}</span> : null}
+                            {v.comments ? <span>💬 {Number(v.comments).toLocaleString()}</span> : null}
+                            {v.publishedAt ? <span>{v.publishedAt}</span> : null}
+                            {(v.matchType || v.relatedProduct) ? <span style={{ ...chip, padding: '1px 6px' }}>{(MATCH[v.matchType] || v.matchType || '')}{v.matchType && v.relatedProduct ? ' · ' : ''}{v.relatedProduct || ''}</span> : null}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ); })}
+                </div>
+              )}
+            </Card>
+          )}
+          <Card>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: G }}>🎯 선점 추천 키워드</div>
+              <span style={{ fontSize: 11, color: '#A29C95' }}>우선순위(priorityScore)순 · 방어 키워드는 상시 감시</span>
+            </div>
+            {watchlist.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>추천 키워드 없음</div> : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                  <thead>
+                    <tr style={{ textAlign: 'left', color: '#A29C95', fontSize: 10.5 }}>
+                      <th style={thT}>키워드</th><th style={thT}>타겟</th><th style={{ ...thT, textAlign: 'right' }}>점수</th><th style={{ ...thT, textAlign: 'right' }}>월 검색(PC/모바일)</th><th style={thT}>경쟁</th><th style={{ ...thT, textAlign: 'right' }}>평균입찰</th><th style={thT}>상태</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {watchlist.map((w, i) => { return (
+                      <tr key={i} style={{ borderTop: '1px solid #F0EEEB', background: w.status === 'defend' ? '#FCFAFF' : 'white' }}>
+                        <td style={{ ...tdT, fontWeight: 700, color: '#1A1614' }}>{w.keyword}{w.relatedSignal ? <div style={{ fontSize: 9.5, color: '#A29C95', fontWeight: 400 }}>← {w.relatedSignal}</div> : null}</td>
+                        <td style={{ ...tdT, color: '#6E6863' }}>{(w.targets || []).join(', ') || '—'}</td>
+                        <td style={{ ...tdT, textAlign: 'right', fontWeight: 800, color: '#1A1614' }}>{w.priorityScore != null ? w.priorityScore : '—'}</td>
+                        <td style={{ ...tdT, textAlign: 'right', color: '#6E6863', whiteSpace: 'nowrap' }}>{Number(w.monthlyPc || 0).toLocaleString()} / {Number(w.monthlyMobile || 0).toLocaleString()}</td>
+                        <td style={{ ...tdT, fontWeight: 600, color: compC(w.competition) }}>{w.competition || '—'}</td>
+                        <td style={{ ...tdT, textAlign: 'right', color: '#6E6863', whiteSpace: 'nowrap' }}>{w.avgBid ? Number(w.avgBid).toLocaleString() + '원' : '—'}</td>
+                        <td style={{ ...tdT, minWidth: 150 }}>{(() => {
+                          if (w.status === 'defend') return <span style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 5, padding: '2px 7px', whiteSpace: 'nowrap' }}>🛡 브랜드 방어</span>;
+                          const dec = decisionFor(w.keyword, entry.date);
+                          if (dec) { const ap = dec.status === 'approved'; return (
+                            <div>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: ap ? '#047857' : '#B45309', background: ap ? '#ECFDF5' : '#FFFBEB', border: '1px solid ' + (ap ? '#A7F3D0' : '#FDE68A'), borderRadius: 5, padding: '2px 7px', whiteSpace: 'nowrap' }}>{ap ? '✓ 승인됨' : '✖ 반려됨'}</span>
+                              {dec.reason ? <div style={{ fontSize: 9.5, color: '#A29C95', marginTop: 3, lineHeight: 1.4 }}>{dec.reason}</div> : null}
+                              {dec.processedAt ? <div style={{ fontSize: 9.5, color: '#1FA463', marginTop: 2 }}>입찰반영 {dec.processedAt}{dec.adRef ? ' · ' + dec.adRef : ''}</div> : null}
+                              <button onClick={() => undecide(w.keyword, entry.date)} style={{ border: 'none', background: 'none', color: '#A29C95', cursor: 'pointer', fontSize: 9.5, padding: '2px 0', marginTop: 1 }}>↩ 되돌리기</button>
+                            </div>
+                          ); }
+                          const editing = rej && rej.keyword === w.keyword;
+                          return (
+                            <div>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 5, padding: '2px 7px', whiteSpace: 'nowrap' }}>선점 후보</span>
+                              {!editing ? (
+                                <div style={{ display: 'flex', gap: 4, marginTop: 5 }}>
+                                  <button onClick={() => setRej({ keyword: w.keyword, mode: 'approved', text: '' })} style={{ padding: '3px 9px', borderRadius: 6, border: 'none', background: '#1FA463', color: 'white', cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>승인</button>
+                                  <button onClick={() => setRej({ keyword: w.keyword, mode: 'dismissed', text: '' })} style={{ padding: '3px 9px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 10, fontWeight: 600 }}>반려</button>
+                                </div>
+                              ) : (
+                                <div style={{ marginTop: 5 }}>
+                                  <textarea value={rej.text} onChange={ev => { const v = ev.target.value; setRej(r => ({ ...r, text: v })); }} placeholder={rej.mode === 'approved' ? '승인 메모 (선택)' : '반려 사유 (에이전트 학습용)'} rows={2} style={{ width: '100%', minWidth: 130, boxSizing: 'border-box', padding: '5px 7px', borderRadius: 6, border: '1px solid #E3E0DC', fontSize: 11, fontFamily: 'inherit', resize: 'vertical' }} />
+                                  <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                                    <button onClick={() => { if (rej.mode === 'dismissed' && !rej.text.trim()) { alert('반려 사유를 입력해주세요 — 에이전트 학습에 사용됩니다'); return; } decide(w, rej.mode, rej.text.trim()); setRej(null); }} style={{ padding: '3px 9px', borderRadius: 6, border: 'none', background: rej.mode === 'approved' ? '#1FA463' : '#6E6863', color: 'white', cursor: 'pointer', fontSize: 10, fontWeight: 700 }}>{rej.mode === 'approved' ? '승인 확정' : '반려 확정'}</button>
+                                    <button onClick={() => setRej(null)} style={{ padding: '3px 9px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 10 }}>취소</button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}</td>
+                      </tr>
+                    ); })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {watchlist.some(w => w.status !== 'defend') && <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>ℹ️ "선점 후보"를 승인하면 광고 에이전트가 <b>keywordApprovals</b>에서 읽어 입찰 세팅으로 넘겨받습니다(반려 사유는 에이전트 학습에 사용). 방어(🛡) 키워드는 상시 감시용이라 승인 대상이 아니에요.</div>}
+          </Card>
+          {ideas.length > 0 && (
+            <Card>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: G }}>✍ 콘텐츠 소재</div>
+                <span style={{ fontSize: 11, color: '#A29C95' }}>뉴스레터·광고 콘텐츠용</span>
+              </div>
+              <div style={{ display: 'grid', gap: 8 }}>
+                {ideas.map((c, i) => (
+                  <div key={i} style={{ border: '1px solid #E3E0DC', borderRadius: 10, padding: 11 }}>
+                    {c.title && <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1614', marginBottom: 3 }}>{c.title}</div>}
+                    {c.body && <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.55 }}>{c.body}</div>}
+                    {c.caution && <div style={{ fontSize: 10.5, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 7, padding: '5px 8px', marginTop: 6 }}>⚠ 건기식 표현 주의: {c.caution}</div>}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+          {entry.generatedAt && <div style={{ fontSize: 10, color: '#A29C95', textAlign: 'right' }}>생성 {entry.generatedAt}</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const TAB_SLUG = { team: '팀 현황', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
+
 function App() {
   const [tab, setTab] = useState(0);
   const [data, setData] = useState(null);
@@ -3826,11 +4056,19 @@ function App() {
     { icon: '💵', label: '매출', C: TabSales },
     { icon: '💬', label: '카카오', C: TabKakao },
     { icon: '📣', label: '광고', C: TabAds },
+    { icon: '🔥', label: '키워드 트렌드', C: TabTrends },
     { icon: '🗓', label: '회의', C: TabMeeting },
     { icon: '⏸', label: '보류', C: TabHold, badge: heldCount },
     { icon: '💰', label: '예산', C: TabBudget },
     { icon: '🗑', label: '휴지통', C: TabTrash, badge: trashCount },
   ];
+
+  useEffect(() => {
+    const applyHash = () => { const raw = decodeURIComponent((window.location.hash || '').replace(/^#/, '')).trim(); if (!raw) return; const label = TAB_SLUG[raw.toLowerCase()] || raw; const i = TABS.findIndex(t => t.label === label); if (i >= 0) setTab(i); };
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+  }, []);
 
   if (!ready || !data) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: BG }}>
