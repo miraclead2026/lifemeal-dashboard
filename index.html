@@ -943,6 +943,7 @@ function NoticeBoard({ data, setData }) {
 function TabProgress({ data, setData, onEdit }) {
   const [filter, setFilter] = useState('전체');
   const [showCatOrder, setShowCatOrder] = useState(false);
+  const [showProjOrder, setShowProjOrder] = useState(false);
   const [orderPlansFor, setOrderPlansFor] = useState(null);
   const [expPlan, setExpPlan] = useState({});
   const toggleHold = id => setData(d => ({ ...d, plans: d.plans.map(p => p.id === id ? { ...p, hold: !p.hold } : p) }));
@@ -953,10 +954,12 @@ function TabProgress({ data, setData, onEdit }) {
     <div style={{ padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>프로젝트 진행 상황</div>
-        <button onClick={() => setShowCatOrder(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>⠿ 분류 순서 변경</button>
+        <button onClick={() => setShowProjOrder(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>⠿ 프로젝트 순서</button>
+        <button onClick={() => setShowCatOrder(true)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>⠿ 분류 순서 변경</button>
       </div>
       <FilterBar value={filter} onChange={setFilter} />
       {showCatOrder && <CategoryOrderModal data={data} setData={setData} onClose={() => setShowCatOrder(false)} />}
+      {showProjOrder && <ProjectOrderModal data={data} setData={setData} onClose={() => setShowProjOrder(false)} />}
       {orderPlansFor != null && (() => { const o = data.outputs.find(x => x.id === orderPlansFor); const ps = data.plans.filter(p => p.outputId === orderPlansFor); return <ReorderModal title={(o ? o.name + ' · ' : '') + '실행계획 순서'} items={ps.map(p => ({ id: p.id, label: p.name }))} onClose={() => setOrderPlansFor(null)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.plans.find(p => p.id === x.id)).filter(Boolean); let k = 0; return { ...d, plans: d.plans.map(p => p.outputId === orderPlansFor ? q[k++] : p) }; })} />; })()}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {sortedOutputs.map(o => {
@@ -3810,6 +3813,56 @@ function ReorderModal({ title, items, onSave, onClose }) {
         ))}
       </div>
       <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+    </ModalShell>
+  );
+}
+
+function ProjectOrderModal({ data, setData, onClose }) {
+  const cats = data.categories || [];
+  const catOrder = t => { const i = cats.findIndex(c => c.name === t); return i < 0 ? 999 : i; };
+  const [rows, setRows] = useState(() => [...data.outputs].map(o => ({ id: o.id, name: o.name, type: o.type })).sort((a, b) => catOrder(a.type) - catOrder(b.type)));
+  const prefixOf = t => { const c = cats.find(x => x.name === t); return c ? c.prefix : 'X'; };
+  const preview = (() => { const cnt = {}, m = {}; rows.forEach(r => { cnt[r.type] = (cnt[r.type] || 0) + 1; m[r.id] = prefixOf(r.type) + '-' + cnt[r.type]; }); return m; })();
+  const move = (id, dir) => setRows(rs => { const idx = rs.findIndex(r => r.id === id); if (idx < 0) return rs; const type = rs[idx].type; const same = rs.map((r, i) => r.type === type ? i : -1).filter(i => i >= 0); const pos = same.indexOf(idx) + dir; if (pos < 0 || pos >= same.length) return rs; const arr = rs.slice(); const a = idx, b = same[pos], t = arr[a]; arr[a] = arr[b]; arr[b] = t; return arr; });
+  const changeCat = (id, newType) => setRows(rs => { const row = rs.find(r => r.id === id); if (!row || !newType || row.type === newType) return rs; const without = rs.filter(r => r.id !== id); let last = -1; without.forEach((r, i) => { if (r.type === newType) last = i; }); const arr = without.slice(); arr.splice(last + 1, 0, { ...row, type: newType }); return arr; });
+  const save = () => { setData(d => { const cnt = {}, ids = rows.map(r => r.id); const rebuilt = rows.map(r => { const orig = d.outputs.find(o => o.id === r.id) || {}; cnt[r.type] = (cnt[r.type] || 0) + 1; return { ...orig, type: r.type, code: prefixOf(r.type) + '-' + cnt[r.type] }; }); const missing = d.outputs.filter(o => ids.indexOf(o.id) < 0); return { ...d, outputs: [...rebuilt, ...missing] }; }); onClose(); };
+  const arrowBtn = { width: 26, height: 22, border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 9, color: '#6E6863' };
+  const groups = cats.map(c => ({ cat: c, list: rows.filter(r => r.type === c.name) })).filter(g => g.list.length);
+  const orphans = rows.filter(r => !cats.some(c => c.name === r.type));
+  const catOpts = cats.map(c => ({ v: c.name, l: c.name }));
+  return (
+    <ModalShell title="프로젝트 순서 · 분류 변경" onClose={onClose}>
+      <div style={{ fontSize: 12, color: '#6E6863', lineHeight: 1.5 }}>▲▼로 분류 안 순서를 바꾸고, 오른쪽 드롭다운으로 분류를 이동하세요. 저장하면 코드(AD-1, AD-2 …)가 이 순서대로 자동 재부여됩니다. <b>회의·예산 등의 연결은 프로젝트 ID로 유지되어 안전합니다.</b></div>
+      {groups.map(g => (
+        <div key={g.cat.name} style={{ marginTop: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '10px 0 6px' }}><Badge label={g.cat.prefix} color={clsC(g.cat.name, cats)} /><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{g.cat.name}</span><span style={{ fontSize: 11, color: '#A29C95' }}>{g.list.length}개</span></div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {g.list.map((r, i) => (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 9 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: clsC(g.cat.name, cats), minWidth: 46 }}>{preview[r.id]}</span>
+                <span style={{ fontWeight: 600, fontSize: 13, flex: 1, minWidth: 0, wordBreak: 'break-word' }}>{r.name}</span>
+                <button onClick={() => move(r.id, -1)} disabled={i === 0} style={{ ...arrowBtn, opacity: i === 0 ? 0.35 : 1 }}>▲</button>
+                <button onClick={() => move(r.id, 1)} disabled={i === g.list.length - 1} style={{ ...arrowBtn, opacity: i === g.list.length - 1 ? 0.35 : 1 }}>▼</button>
+                <div style={{ width: 104 }}><Sel value={r.type} onChange={nv => changeCat(r.id, nv)} opts={catOpts} /></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      {orphans.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#B45309', margin: '4px 0 6px' }}>⚠ 분류 미지정 — 분류를 지정하세요</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {orphans.map(r => (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 9 }}>
+                <span style={{ fontWeight: 600, fontSize: 13, flex: 1 }}>{r.name} <span style={{ fontSize: 10, color: '#A29C95' }}>(현재 "{r.type}")</span></span>
+                <div style={{ width: 104 }}><Sel value="" onChange={nv => changeCat(r.id, nv)} opts={catOpts} ph="분류 선택" /></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}><Btn onClick={save} style={{ flex: 1 }}>저장 · 코드 재부여</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
     </ModalShell>
   );
 }
