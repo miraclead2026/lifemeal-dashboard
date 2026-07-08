@@ -2719,6 +2719,46 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
         <span style={{ fontSize: 11, color: '#A29C95' }}>광고 에이전트가 최신 데이터에서 인사이트를 도출해 자동 갱신</span>
         {strat && <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{strat.basedOn ? strat.basedOn + ' 데이터 기준' : ''}{strat.updatedAt ? ' · 갱신 ' + strat.updatedAt : ''}</span>}
       </div>
+      {strat && Array.isArray(strat.roadmaps) && strat.roadmaps.length > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          {strat.roadmaps.map(rm => { const stages = rm.stages || []; return (
+            <div key={rm.id} style={{ border: '1px solid #D9E7F5', borderRadius: 12, padding: 12, background: '#FBFCFF', marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: G }}>🗺 {rm.title || '실행 로드맵'}</span>
+                {rm.subtitle ? <span style={{ fontSize: 11, color: '#A29C95' }}>{rm.subtitle}</span> : null}
+              </div>
+              <div>
+                {stages.map((s, i) => { const isActive = s.status === 'active' || s.status === '진행중'; const isDone = s.status === 'done' || s.status === '완료'; const dotBg = isDone ? '#1FA463' : isActive ? '#2563EB' : '#D5D2CE'; return (
+                  <div key={s.id || i} style={{ display: 'flex', gap: 10 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div style={{ width: 24, height: 24, borderRadius: 12, background: dotBg, color: 'white', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{isDone ? '✓' : (s.id != null ? s.id : i + 1)}</div>
+                      {i < stages.length - 1 ? <div style={{ width: 2, flex: 1, minHeight: 18, background: isDone ? '#A7F3D0' : '#E3E0DC' }} /> : null}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0, paddingBottom: i < stages.length - 1 ? 12 : 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: isActive ? '#1D4ED8' : '#1A1614' }}>{s.title}</span>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, borderRadius: 5, padding: '1px 7px', color: isActive ? '#1D4ED8' : isDone ? '#047857' : '#8A8580', background: isActive ? '#EFF6FF' : isDone ? '#ECFDF5' : '#F5F4F2', border: '1px solid ' + (isActive ? '#BFDBFE' : isDone ? '#A7F3D0' : '#E3E0DC') }}>{isActive ? '진행중' : isDone ? '완료' : '대기'}</span>
+                      </div>
+                      {s.entryCondition ? <div style={{ fontSize: 11, marginTop: 3, color: s.entryMet ? '#047857' : '#6E6863' }}>{s.entryMet ? '✓' : '○'} 진입조건: {s.entryCondition}</div> : null}
+                      {s.action ? <div style={{ fontSize: 11.5, marginTop: 3, color: '#3A3631', lineHeight: 1.5 }}>▸ {s.action}</div> : null}
+                      {(s.successCriteria || s.stopCriteria) ? <div style={{ fontSize: 10.5, marginTop: 3, color: '#6E6863', display: 'grid', gap: 1 }}>{s.successCriteria ? <span>🎯 성공: {s.successCriteria}</span> : null}{s.stopCriteria ? <span>🛑 중단: {s.stopCriteria}</span> : null}</div> : null}
+                      {s.nextTrigger ? <div style={{ fontSize: 10.5, marginTop: 3, color: '#B45309' }}>⏭ 다음: {s.nextTrigger}</div> : null}
+                      {(s.setup || []).length > 0 ? (
+                        <details style={{ marginTop: 6 }}>
+                          <summary style={{ fontSize: 10.5, fontWeight: 700, color: '#2563EB', cursor: 'pointer' }}>⚙ 네이버 콘솔 세팅 방법 ({(s.setup || []).length})</summary>
+                          <div style={{ marginTop: 5, display: 'grid', gap: 4, background: 'white', border: '1px solid #E3E0DC', borderRadius: 8, padding: '8px 10px' }}>
+                            {(s.setup || []).map((kv, k) => <div key={k} style={{ display: 'flex', gap: 8, fontSize: 11, lineHeight: 1.4 }}><span style={{ color: '#8A8580', minWidth: 92, fontWeight: 600, flexShrink: 0 }}>{kv.label}</span><span style={{ color: '#1A1614' }}>{kv.value}</span></div>)}
+                          </div>
+                        </details>
+                      ) : null}
+                    </div>
+                  </div>
+                ); })}
+              </div>
+            </div>
+          ); })}
+        </div>
+      )}
       {status === 'loading' && <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div>}
       {status === 'none' && <div style={{ fontSize: 12, color: '#A29C95', background: '#F8F7F5', borderRadius: 8, padding: '10px 12px' }}>아직 전략 데이터가 없습니다 — 광고 에이전트가 <b>data/ads-strategy.json</b>을 push하면 여기에 인사이트와 제안이 표시됩니다.</div>}
       {status === 'ok' && sortedItems.length === 0 && <div style={{ fontSize: 12, color: '#1FA463', background: '#ECFDF5', borderRadius: 8, padding: '10px 12px' }}>✓ 현재 제안된 전략을 모두 처리했습니다</div>}
@@ -2961,7 +3001,7 @@ function TabSales({ data, setData }) {
   const curMonth = monthsArr.find(m => (m.key || '').slice(0, 7) === ymNow) || monthsArr[0];
   const monthRev = curMonth && curMonth.summary && curMonth.summary.revenue ? curMonth.summary.revenue.value : 0;
   const autoKpis = (data.mainKpis || []).filter(mk => (mk.name || '').indexOf('매출') >= 0);
-  const subs = (r && r.subscribers) || null;
+  const subs = (() => { const raw = (r && r.subscribers) || null; if (!raw) return null; const dA = (full && full.days) || []; const end = r ? r.periodEnd : null; const fill = f => { const rec = raw[f]; if (!rec) return rec; if (rec.total != null) return rec; const arr = dA.filter(d => d.key && (!end || d.key <= end) && d.subscribers && d.subscribers[f] && d.subscribers[f].total != null).sort((a, b) => a.key < b.key ? -1 : 1); if (arr.length) { const L = arr[arr.length - 1]; return { total: L.subscribers[f].total, added: rec.added || 0, _asOf: L.key }; } return rec; }; return { ...raw, notify: raw.notify ? fill('notify') : raw.notify, interest: raw.interest ? fill('interest') : raw.interest }; })();
   const daysArr = (full && full.days) || [];
   const subDaily = r ? daysArr.filter(d => d.key && d.key >= r.periodStart && d.key <= r.periodEnd).map(d => ({ date: d.key, added: (d.subscribers && d.subscribers.notify ? d.subscribers.notify.added : 0) || 0, total: (d.subscribers && d.subscribers.notify ? d.subscribers.notify.total : 0) || 0 })).sort((a, b) => a.date < b.date ? -1 : 1) : [];
   const subMax = Math.max(1, ...subDaily.map(z => z.added || 0));
@@ -3079,7 +3119,7 @@ function TabSales({ data, setData }) {
             <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', alignItems: 'flex-end' }}>
               <div>
                 <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 2 }}>알림 구독자 누적</div>
-                <div style={{ fontSize: 24, fontWeight: 800, color: G }}>{subs.notify ? (subs.notify.total || 0).toLocaleString() : '-'}<span style={{ fontSize: 13, fontWeight: 600, color: '#6E6863' }}> 명</span></div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: G }}>{subs.notify ? (subs.notify.total || 0).toLocaleString() : '-'}<span style={{ fontSize: 13, fontWeight: 600, color: '#6E6863' }}> 명</span>{subs.notify && subs.notify._asOf ? <span style={{ fontSize: 10, fontWeight: 600, color: '#B45309', marginLeft: 6 }}>({subs.notify._asOf.slice(5)} 기준 · 최신일 수집대기)</span> : null}</div>
               </div>
               <div style={{ paddingBottom: 4 }}>
                 <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 2 }}>이 기간 순증</div>
@@ -3220,7 +3260,7 @@ const MEETING_SAMPLE = {
   attendees: ['이수영 대표', '윤희', '현수', '박성욱'],
   summaryHtml: `<h3>회의 목적</h3><p>7월 광고 예산 사용 승인 근거 정리(상무 보고용), 네이버 광고 성과와 올리브 베러 베러픽 입점·인플루언서 전략, 팀 R&R 및 KPI 대시보드 운영 방식 논의.</p>
 <h3>핵심 논의</h3><ul>
-<li><b>매출·광고 성과</b> — 월간 방문수 1만 최초 돌파(전월비 약 131%). 6월 매출 약 3,500만(KPI m1 목표 일치). 로아스 322%(목표 350%). 일 예산 50만 안착.</li>
+<li><b>매출·광고 성과</b> — 월간 방문수 1만 최초 돌파(전월비 약 131%). 6월 매출 약 3,500만(KPI m1 목표 일치). 로아스 322%(목표 330%). 일 예산 50만 안착.</li>
 <li><b>애드부스트/7월 방향</b> — 부스트업(외부 광역 노출) 전환 0 → 즉시 중단. 7/1~15 예산 유지·효율 세분화, 효율 유지 시 증액.</li>
 <li><b>베러픽 입점</b> — 7/1 판매 시작, 집기 세팅 완료. 광고 집행 매출은 라이프밀 KPI로 카운트.</li>
 <li><b>인플루언서</b> — 자체 친밀 인플루언서·걸그룹 준비생(위드니스 4명) 모델 활용. 원픽엔터 1명 개런티 검토.</li>
@@ -3943,7 +3983,7 @@ function TabTrends({ data, setData }) {
                           {c.tier ? <span style={{ fontSize: 9.5, fontWeight: 700, color: '#047857', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 5, padding: '1px 6px' }}>{c.tier === 'person' ? '인물' : c.tier === 'trend' ? '트렌드어' : c.tier === 'ingredient' ? '성분' : '학습 시드'}</span> : null}
                           {c.caughtCount ? <span style={{ fontSize: 10, color: '#6E6863' }}>{Number(c.caughtCount).toLocaleString()}건 포착</span> : null}
                         </div>
-                        {c.catchReason ? <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.5 }}>{c.catchReason}</div> : null}
+                        {c.catchReason ? <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{c.catchReason}</div> : null}
                         {samples.length > 0 ? <div style={{ marginTop: 6, display: 'grid', gap: 3 }}>
                           {samples.slice(0, 3).map((sv, j) => <a key={j} href={sv.url} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: '#2D5FE0', textDecoration: 'none', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>▸ {sv.title || sv.url}{sv.matchType ? ' [' + matchMeta(sv.matchType).l + ']' : (sv.outlet ? ' · ' + sv.outlet : '')}</a>)}
                         </div> : null}
