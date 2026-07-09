@@ -4096,9 +4096,9 @@ function TabTrends({ data, setData }) {
                         <td style={{ ...tdT, fontWeight: 700, color: '#1A1614' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>{w.keyword}{w.intentType ? (() => { const im = intentMeta(w.intentType); return <span style={{ fontSize: 9, fontWeight: 700, color: im.tx, background: im.bg, border: '1px solid ' + im.bd, borderRadius: 4, padding: '0 5px' }}>{im.l}</span>; })() : null}</div>
                           {w.relatedSignal ? <div style={{ fontSize: 9.5, color: '#A29C95', fontWeight: 400 }}>← {w.relatedSignal}</div> : null}
-                          {Array.isArray(w.related) ? (w.related.length > 0
-                            ? <details style={{ marginTop: 2 }}><summary style={{ fontSize: 9.5, color: '#2563EB', cursor: 'pointer', fontWeight: 600 }}>연관어 {w.related.length}개</summary><div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 3 }}>{w.related.map((rk, k) => <span key={k} style={{ fontSize: 9, fontWeight: 400, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 4, padding: '1px 5px' }}>{typeof rk === 'string' ? rk : (rk && rk.keyword) || ''}</span>)}</div></details>
-                            : <div style={{ fontSize: 9, color: '#C4BFB9', fontWeight: 400, marginTop: 2 }}>연관어 없음</div>) : null}
+                          {(() => { const rel = w.relatedKeywords || w.related; if (!Array.isArray(rel)) return null; return rel.length > 0
+                            ? <details style={{ marginTop: 2 }}><summary style={{ fontSize: 9.5, color: '#2563EB', cursor: 'pointer', fontWeight: 600 }}>연관어 {rel.length}개</summary><div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 3 }}>{rel.map((rk, k) => <span key={k} style={{ fontSize: 9, fontWeight: 400, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 4, padding: '1px 5px' }}>{typeof rk === 'string' ? rk : (rk && (rk.keyword || rk.term || rk.text || rk.word || rk.name)) || ''}</span>)}</div></details>
+                            : <div style={{ fontSize: 9, color: '#C4BFB9', fontWeight: 400, marginTop: 2 }}>연관어 없음</div>; })()}
                         </td>
                         <td style={{ ...tdT, color: '#6E6863' }}>{(w.targets || []).join(', ') || '—'}</td>
                         <td style={{ ...tdT, textAlign: 'right', fontWeight: 800, color: '#1A1614' }}>{w.priorityScore != null ? w.priorityScore : '—'}</td>
