@@ -34,7 +34,7 @@ firebase.initializeApp({
 const db = firebase.database();
 // 쓰기 권한용 익명 로그인 (Firebase 규칙: 읽기 공개, 쓰기 auth 필요)
 firebase.auth().signInAnonymously().catch(e => console.warn('익명 로그인 실패 — 저장이 안 될 수 있습니다:', e.message));
-const DB_PATH = '/dashboard';   // 운영
+const DB_PATH = '/dashboard_test';   // 테스트본. 확인 후 운영 배포 시 '/dashboard' 로 변경
 const { useState, useEffect, useRef } = React;
 
 const G = '#1A1614', GO = '#1A1614', BG = '#FFFFFF';
@@ -162,6 +162,7 @@ const migrateData = raw => ({
   keywordApprovals: raw.keywordApprovals || [],
   seedApprovals: raw.seedApprovals || [],
   roadmapOverrides: raw.roadmapOverrides || {},
+  messageSchedules: raw.messageSchedules || {},
 });
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
@@ -4169,7 +4170,69 @@ function TabTrends({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { team: '팀 현황', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
+function TabSchedule({ data, setData }) {
+  const [copied, setCopied] = useState(null);
+  const scheds = data.messageSchedules || {};
+  const entries = Object.entries(scheds);
+  const isSafeCode = c => typeof c === 'string' && /^LM\d[\w-]*$/i.test(c) && !c.includes('@') && c.length <= 24;
+  const STATUS = ['예약', '발송대기', '발송완료'];
+  const stMeta = s => s === '발송완료' ? { bg: '#ECFDF5', bd: '#A7F3D0', tx: '#047857' } : s === '발송대기' ? { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309' } : { bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB' };
+  const cycleStatus = (segId, sendIdx) => setData(d => { const sc = { ...(d.messageSchedules || {}) }; const seg = sc[segId]; if (!seg) return d; const sends = (seg.sends || []).map((s, i) => { if (i !== sendIdx) return s; const ni = (STATUS.indexOf(s.status || '예약') + 1) % STATUS.length; return { ...s, status: STATUS[ni] }; }); sc[segId] = { ...seg, sends }; return { ...d, messageSchedules: sc }; });
+  const copyCodes = (codes, key) => { const safe = (codes || []).filter(isSafeCode); const text = safe.join('\n'); const done = () => { setCopied(key); setTimeout(() => setCopied(c => c === key ? null : c), 1500); }; try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done).catch(() => done()); } else { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(); } } catch (e) { done(); } };
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: G }}>📨 발송 스케줄</div>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>세그먼트별 메시지 발송 일정 · LM 코드만 표시(실제 ID는 자동 숨김)</span>
+      </div>
+      {entries.length === 0 ? <Card><div style={{ fontSize: 12, color: '#A29C95' }}>등록된 발송 스케줄이 없습니다 — messageSchedules에 데이터가 들어오면 표시됩니다.</div></Card> : entries.map(([segId, seg]) => {
+        const msg = seg.message || {}; const sends = seg.sends || [];
+        return (
+          <Card key={segId}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1614' }}>{seg.segmentName || segId}</span>
+              {seg.rule ? <span style={{ fontSize: 10.5, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 7px' }}>{seg.rule}</span> : null}
+            </div>
+            {(msg.title || msg.body || msg.button || msg.coupon) ? (
+              <div style={{ background: '#FBFAF8', border: '1px solid #EEEBE7', borderRadius: 9, padding: '9px 11px', marginBottom: 10 }}>
+                {msg.title ? <div style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>{msg.title}</div> : null}
+                {msg.body ? <div style={{ fontSize: 11.5, color: '#3A3631', lineHeight: 1.5, marginTop: 3, whiteSpace: 'pre-wrap' }}>{msg.body}</div> : null}
+                {(msg.button || msg.coupon) ? <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>{msg.button ? <span style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 5, padding: '2px 8px' }}>🔘 {msg.button}</span> : null}{msg.coupon ? <span style={{ fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '2px 8px' }}>🎟 {msg.coupon}</span> : null}</div> : null}
+              </div>
+            ) : null}
+            {sends.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>예정된 발송 없음</div> : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {sends.map((sd, i) => { const codes = sd.codes || []; const unsafe = codes.filter(c => !isSafeCode(c)); const safeCount = codes.length - unsafe.length; const sm = stMeta(sd.status || '예약'); const ckey = segId + ':' + i; return (
+                  <div key={i} style={{ border: '1px solid #E3E0DC', borderRadius: 9, padding: '9px 11px', background: 'white' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>📅 {sd.date || '-'}</span>
+                      <span style={{ fontSize: 11, color: '#6E6863' }}>대상 {Number(sd.count != null ? sd.count : codes.length).toLocaleString()}명</span>
+                      <button onClick={() => cycleStatus(segId, i)} style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 800, color: sm.tx, background: sm.bg, border: '1px solid ' + sm.bd, borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}>{sd.status || '예약'} ⇄</button>
+                    </div>
+                    {unsafe.length > 0 ? <div style={{ fontSize: 10.5, color: '#DC2626', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 7, padding: '5px 8px', marginTop: 6 }}>⚠ 코드 형식이 아닌 값 {unsafe.length}건 감지 — 실제 ID일 수 있어 숨겼습니다. 유니 확인 필요.</div> : null}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7, flexWrap: 'wrap' }}>
+                      <button onClick={() => copyCodes(codes, ckey)} disabled={safeCount === 0} style={{ fontSize: 11, fontWeight: 700, color: copied === ckey ? '#047857' : 'white', background: copied === ckey ? '#ECFDF5' : (safeCount === 0 ? '#C4BFB9' : G), border: copied === ckey ? '1px solid #A7F3D0' : 'none', borderRadius: 6, padding: '4px 12px', cursor: safeCount === 0 ? 'default' : 'pointer' }}>{copied === ckey ? '✓ 복사됨' : '📋 코드 복사'}</button>
+                      <span style={{ fontSize: 10.5, color: '#A29C95' }}>{safeCount.toLocaleString()}개 코드</span>
+                      {codes.length > 0 ? (
+                        <details style={{ marginLeft: 'auto' }}>
+                          <summary style={{ fontSize: 10.5, color: '#2563EB', cursor: 'pointer', fontWeight: 600 }}>코드 보기</summary>
+                          <div style={{ marginTop: 5, maxHeight: 140, overflowY: 'auto', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 7, padding: '7px 9px', fontSize: 10.5, color: '#3A3631', fontFamily: 'monospace', lineHeight: 1.7, wordBreak: 'break-all' }}>{codes.map((c, k) => isSafeCode(c) ? <span key={k} style={{ marginRight: 8 }}>{c}</span> : <span key={k} style={{ marginRight: 8, color: '#DC2626', fontWeight: 700 }}>🔒숨김</span>)}</div>
+                        </details>
+                      ) : null}
+                    </div>
+                  </div>
+                ); })}
+              </div>
+            )}
+            {seg.updatedAt ? <div style={{ fontSize: 9.5, color: '#A29C95', textAlign: 'right', marginTop: 6 }}>갱신 {seg.updatedAt}</div> : null}
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+const TAB_SLUG = { team: '팀 현황', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
 
 function App() {
   const [tab, setTab] = useState(0);
@@ -4226,6 +4289,7 @@ function App() {
     { icon: '💬', label: '카카오', C: TabKakao },
     { icon: '📣', label: '광고', C: TabAds },
     { icon: '🔥', label: '키워드 트렌드', C: TabTrends },
+    { icon: '📨', label: '발송 스케줄', C: TabSchedule },
     { icon: '🗓', label: '회의', C: TabMeeting },
     { icon: '⏸', label: '보류', C: TabHold, badge: heldCount },
     { icon: '💰', label: '예산', C: TabBudget },
