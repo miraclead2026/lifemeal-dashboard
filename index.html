@@ -161,6 +161,7 @@ const migrateData = raw => ({
   adsLog: raw.adsLog || [],
   keywordApprovals: raw.keywordApprovals || [],
   seedApprovals: raw.seedApprovals || [],
+  roadmapOverrides: raw.roadmapOverrides || {},
 });
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
@@ -2731,18 +2732,26 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
                 {rm.subtitle ? <span style={{ fontSize: 11, color: '#A29C95' }}>{rm.subtitle}</span> : null}
               </div>
               <div>
-                {stages.map((s, i) => { const isActive = s.status === 'active' || s.status === '진행중'; const isDone = s.status === 'done' || s.status === '완료'; const dotBg = isDone ? '#1FA463' : isActive ? '#2563EB' : '#D5D2CE'; return (
+                {stages.map((s, i) => { const isActive = s.status === 'active' || s.status === '진행중'; const isDone = s.status === 'done' || s.status === '완료'; const dotBg = isDone ? '#1FA463' : isActive ? '#2563EB' : '#D5D2CE'; const effMet = s.entryMet || !!(data.roadmapOverrides || {})[rm.id + ':' + (s.id != null ? s.id : i)]; const isReady = !isActive && !isDone && effMet; return (
                   <div key={s.id || i} style={{ display: 'flex', gap: 10 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ width: 24, height: 24, borderRadius: 12, background: dotBg, color: 'white', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{isDone ? '✓' : (s.id != null ? s.id : i + 1)}</div>
+                      <div style={{ width: 24, height: 24, borderRadius: 12, background: dotBg, color: 'white', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{isDone ? '✓' : i + 1}</div>
                       {i < stages.length - 1 ? <div style={{ width: 2, flex: 1, minHeight: 18, background: isDone ? '#A7F3D0' : '#E3E0DC' }} /> : null}
                     </div>
                     <div style={{ flex: 1, minWidth: 0, paddingBottom: i < stages.length - 1 ? 12 : 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: 13, fontWeight: 700, color: isActive ? '#1D4ED8' : '#1A1614' }}>{s.title}</span>
-                        <span style={{ fontSize: 9.5, fontWeight: 700, borderRadius: 5, padding: '1px 7px', color: isActive ? '#1D4ED8' : isDone ? '#047857' : '#8A8580', background: isActive ? '#EFF6FF' : isDone ? '#ECFDF5' : '#F5F4F2', border: '1px solid ' + (isActive ? '#BFDBFE' : isDone ? '#A7F3D0' : '#E3E0DC') }}>{isActive ? '진행중' : isDone ? '완료' : '대기'}</span>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, borderRadius: 5, padding: '1px 7px', color: isActive ? '#1D4ED8' : isDone ? '#047857' : isReady ? '#047857' : '#8A8580', background: isActive ? '#EFF6FF' : isDone ? '#ECFDF5' : isReady ? '#ECFDF5' : '#F5F4F2', border: '1px solid ' + (isActive ? '#BFDBFE' : isDone ? '#A7F3D0' : isReady ? '#6EE7B7' : '#E3E0DC') }}>{isActive ? '진행중' : isDone ? '완료' : isReady ? '🟢 진입 가능' : '대기'}</span>
                       </div>
-                      {s.entryCondition ? <div style={{ fontSize: 11, marginTop: 3, color: s.entryMet ? '#047857' : '#6E6863' }}>{s.entryMet ? '✓' : '○'} 진입조건: {s.entryCondition}</div> : null}
+                      {s.entryCondition ? (() => { const ovKey = rm.id + ':' + (s.id != null ? s.id : i); const ov = (data.roadmapOverrides || {})[ovKey]; const effMet = s.entryMet || !!ov; return (
+                        <div style={{ marginTop: 3 }}>
+                          <div style={{ fontSize: 11, color: effMet ? '#047857' : '#6E6863' }}>{effMet ? '✓' : '○'} 진입조건: {s.entryCondition}{effMet && !s.entryMet ? ' · 수동 확인됨' : ''}</div>
+                          {!s.entryMet && s.manualEntry !== false && !isActive && !isDone ? (ov
+                            ? <button onClick={() => setData(d => { const o = { ...(d.roadmapOverrides || {}) }; delete o[ovKey]; return { ...d, roadmapOverrides: o }; })} style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '3px 9px', cursor: 'pointer' }}>✓ 준비완료 · 해제</button>
+                            : <button onClick={() => setData(d => { const o = { ...(d.roadmapOverrides || {}) }; o[ovKey] = { entryMet: true, at: TODAY }; return { ...d, roadmapOverrides: o }; })} style={{ marginTop: 4, fontSize: 10, fontWeight: 600, color: '#2563EB', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 6, padding: '3px 9px', cursor: 'pointer' }}>👁 진입조건 준비완료로 표시</button>
+                          ) : null}
+                        </div>
+                      ); })() : null}
                       {s.action ? <div style={{ fontSize: 11.5, marginTop: 3, color: '#3A3631', lineHeight: 1.5 }}>▸ {s.action}</div> : null}
                       {(s.successCriteria || s.stopCriteria) ? <div style={{ fontSize: 10.5, marginTop: 3, color: '#6E6863', display: 'grid', gap: 1 }}>{s.successCriteria ? <span>🎯 성공: {s.successCriteria}</span> : null}{s.stopCriteria ? <span>🛑 중단: {s.stopCriteria}</span> : null}</div> : null}
                       {s.nextTrigger ? <div style={{ fontSize: 10.5, marginTop: 3, color: '#B45309' }}>⏭ 다음: {s.nextTrigger}</div> : null}
@@ -3895,6 +3904,7 @@ function TabTrends({ data, setData }) {
   const heatStyle = h => { const n = Number(h) || 0; if (n >= 5) return { bg: '#FEF2F2', bd: '#FCA5A5', tx: '#DC2626' }; if (n >= 4) return { bg: '#FFF7ED', bd: '#FDBA74', tx: '#EA580C' }; if (n >= 3) return { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309' }; if (n >= 2) return { bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB' }; return { bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863' }; };
   const compC = c => c === '높음' ? '#DC2626' : c === '중간' ? '#B45309' : c === '낮음' ? '#1FA463' : '#6E6863';
   const stBadge = s => s === 'defend' ? { l: '🛡 브랜드 방어', bg: '#F5F3FF', bd: '#DDD6FE', tx: '#7C3AED' } : s === 'approved' ? { l: '✓ 승인됨', bg: '#ECFDF5', bd: '#A7F3D0', tx: '#047857' } : { l: '선점 후보', bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB' };
+  const intentMeta = t => { const k = String(t || '').toLowerCase(); if (k === 'shopping' || k.indexOf('쇼핑') >= 0) return { l: '🛒 쇼핑성', tx: '#047857', bg: '#ECFDF5', bd: '#A7F3D0' }; if (k === 'info' || k === 'information' || k.indexOf('정보') >= 0) return { l: '📄 정보성', tx: '#2563EB', bg: '#EFF6FF', bd: '#BFDBFE' }; if (k === 'mixed' || k.indexOf('혼합') >= 0) return { l: '🔀 혼합', tx: '#B45309', bg: '#FFFBEB', bd: '#FDE68A' }; return { l: t, tx: '#6E6863', bg: '#F5F4F2', bd: '#E3E0DC' }; };
   const entry = feed && idx != null ? feed[idx] : null;
   const signals = entry ? (entry.signals || []).slice().sort((a, b) => (Number(b.heat) || 0) - (Number(a.heat) || 0)) : [];
   const watchlist = entry ? (entry.watchlist || []).slice().sort((a, b) => (Number(b.priorityScore) || 0) - (Number(a.priorityScore) || 0)) : [];
@@ -4083,11 +4093,17 @@ function TabTrends({ data, setData }) {
                   <tbody>
                     {watchlist.map((w, i) => { return (
                       <tr key={i} style={{ borderTop: '1px solid #F0EEEB', background: w.status === 'defend' ? '#FCFAFF' : 'white' }}>
-                        <td style={{ ...tdT, fontWeight: 700, color: '#1A1614' }}>{w.keyword}{w.relatedSignal ? <div style={{ fontSize: 9.5, color: '#A29C95', fontWeight: 400 }}>← {w.relatedSignal}</div> : null}</td>
+                        <td style={{ ...tdT, fontWeight: 700, color: '#1A1614' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>{w.keyword}{w.intentType ? (() => { const im = intentMeta(w.intentType); return <span style={{ fontSize: 9, fontWeight: 700, color: im.tx, background: im.bg, border: '1px solid ' + im.bd, borderRadius: 4, padding: '0 5px' }}>{im.l}</span>; })() : null}</div>
+                          {w.relatedSignal ? <div style={{ fontSize: 9.5, color: '#A29C95', fontWeight: 400 }}>← {w.relatedSignal}</div> : null}
+                          {Array.isArray(w.related) ? (w.related.length > 0
+                            ? <details style={{ marginTop: 2 }}><summary style={{ fontSize: 9.5, color: '#2563EB', cursor: 'pointer', fontWeight: 600 }}>연관어 {w.related.length}개</summary><div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 3 }}>{w.related.map((rk, k) => <span key={k} style={{ fontSize: 9, fontWeight: 400, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 4, padding: '1px 5px' }}>{typeof rk === 'string' ? rk : (rk && rk.keyword) || ''}</span>)}</div></details>
+                            : <div style={{ fontSize: 9, color: '#C4BFB9', fontWeight: 400, marginTop: 2 }}>연관어 없음</div>) : null}
+                        </td>
                         <td style={{ ...tdT, color: '#6E6863' }}>{(w.targets || []).join(', ') || '—'}</td>
                         <td style={{ ...tdT, textAlign: 'right', fontWeight: 800, color: '#1A1614' }}>{w.priorityScore != null ? w.priorityScore : '—'}</td>
-                        <td style={{ ...tdT, textAlign: 'right', color: '#6E6863', whiteSpace: 'nowrap' }}>{Number(w.monthlyPc || 0).toLocaleString()} / {Number(w.monthlyMobile || 0).toLocaleString()}</td>
-                        <td style={{ ...tdT, fontWeight: 600, color: compC(w.competition) }}>{w.competition || '—'}</td>
+                        <td style={{ ...tdT, textAlign: 'right', color: '#6E6863', whiteSpace: 'nowrap' }}>{(!w.monthlyPc && !w.monthlyMobile) ? <span style={{ color: '#A29C95' }}>미집계</span> : (Number(w.monthlyPc || 0).toLocaleString() + ' / ' + Number(w.monthlyMobile || 0).toLocaleString())}</td>
+                        <td style={{ ...tdT, fontWeight: 600, color: compC(w.competition) }}>{w.competition || '—'}{w.adDepth != null ? <span style={{ fontSize: 9, color: '#A29C95', fontWeight: 400 }}> · 밀도 {w.adDepth}</span> : null}</td>
                         <td style={{ ...tdT, textAlign: 'right', color: '#6E6863', whiteSpace: 'nowrap' }}>{w.avgBid ? Number(w.avgBid).toLocaleString() + '원' : '—'}</td>
                         <td style={{ ...tdT, minWidth: 150 }}>{(() => {
                           if (w.status === 'defend') return <span style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', background: '#F5F3FF', border: '1px solid #DDD6FE', borderRadius: 5, padding: '2px 7px', whiteSpace: 'nowrap' }}>🛡 브랜드 방어</span>;
