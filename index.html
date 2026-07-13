@@ -2196,7 +2196,9 @@ function TabBudget({ data, setData, goTab }) {
   const unpaid = Math.max(0, draftSum - payMonthSum);
   const paidBudgetIds = new Set(); payments.forEach(p => (p.coveredBudgetIds || []).forEach(id => paidBudgetIds.add(id)));
   const togglePlanStatus = id => setData(d => ({ ...d, budgets: d.budgets.map(b => b.id === id ? { ...b, status: b.status === '기안완료' ? '기안전' : '기안완료' } : b) }));
+  const vendorLedger = (() => { const m = {}; monthBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료').forEach(b => { const v = b.vendor || '(미지정)'; if (!m[v]) m[v] = { appr: 0, paid: 0 }; m[v].appr += itemTotal(b); }); payments.filter(p => inMonth(p.paidDate)).forEach(p => { const v = p.vendor || '(미지정)'; if (!m[v]) m[v] = { appr: 0, paid: 0 }; m[v].paid += Number(p.amount) || 0; }); return Object.entries(m).map(([v, x]) => ({ vendor: v, appr: x.appr, paid: x.paid, left: x.appr - x.paid })).sort((a, b) => b.appr - a.appr || b.paid - a.paid); })();
   const del = id => setData(d => moveToTrash(d, 'budget', id));
+  const [showVendorMgr, setShowVendorMgr] = useState(false);
   const delPay = id => { if (!confirm('이 실결제 기록을 삭제할까요? (드라이브 영수증 파일은 유지됩니다)')) return; setData(d => ({ ...d, payments: (d.payments || []).filter(p => p.id !== id) })); };
   const groups = {}; tableBudgets.forEach(b => { const k = view === 'week' ? weekKeyOf(b.date) : b.date; (groups[k] = groups[k] || []).push(b); });
   const keys = Object.keys(groups).sort().reverse();
@@ -2217,6 +2219,7 @@ function TabBudget({ data, setData, goTab }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>예산 관리</div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <button onClick={() => setShowVendorMgr(true)} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid ' + G, cursor: 'pointer', fontSize: 12, fontWeight: 600, background: 'white', color: G }}>🏢 업체 관리</button>
           {subTab === 'plan' ? (<>
             <button onClick={() => setShowDraft(true)} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid ' + G, cursor: 'pointer', fontSize: 12, fontWeight: 600, background: 'white', color: G }}>📄 기안서 만들기</button>
             <button onClick={() => setShowAdd(true)} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: GO, color: 'white' }}>+ 예산 추가</button>
@@ -2279,6 +2282,33 @@ function TabBudget({ data, setData, goTab }) {
           </div>
           <div style={{ fontSize: 11, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>실결제 = 결제일이 해당 월인 실결제 기록 합계 · 영수증은 드라이브 라이프밀/영수증/(프로젝트) 폴더에 저장됩니다</div>
         </Card>
+        {vendorLedger.length > 0 && (
+          <Card style={{ marginBottom: 16, padding: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: G }}>🏢 업체별 예산 현황</div>
+              <span style={{ fontSize: 11, color: '#A29C95' }}>기안완료 기준 사용가능 · 실결제 반영 실시간</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {vendorLedger.map(v => { const pct = v.appr > 0 ? Math.min(100, Math.round(v.paid / v.appr * 100)) : (v.paid > 0 ? 100 : 0); const over = v.left < 0; const noAppr = v.appr === 0 && v.paid > 0; const barC = over ? '#E53935' : pct >= 90 ? '#E08700' : '#1FA463'; return (
+                <div key={v.vendor} style={{ border: '1px solid ' + (over ? '#FCA5A5' : '#EDEBE7'), background: over ? '#FEF2F2' : 'white', borderRadius: 10, padding: '10px 12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>{v.vendor}</span>
+                    {over ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#E53935', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 5, padding: '1px 6px' }}>예산 초과</span> : null}
+                    {noAppr ? <span style={{ fontSize: 9.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '1px 6px' }}>기안 없음</span> : null}
+                    <span style={{ marginLeft: 'auto', fontSize: 11, color: '#6E6863' }}>사용가능 <b style={{ color: '#2D5FE0' }}>{won(v.appr)}</b></span>
+                  </div>
+                  <div style={{ height: 7, background: '#F0EEEB', borderRadius: 4, overflow: 'hidden' }}><div style={{ width: pct + '%', height: '100%', background: barC, borderRadius: 4 }} /></div>
+                  <div style={{ display: 'flex', gap: 12, marginTop: 6, flexWrap: 'wrap', fontSize: 11 }}>
+                    <span style={{ color: '#6E6863' }}>사용 <b style={{ color: '#1FA463' }}>{won(v.paid)}</b></span>
+                    <span style={{ color: '#6E6863' }}>잔여 <b style={{ color: over ? '#E53935' : '#E08700' }}>{won(v.left)}</b></span>
+                    <span style={{ marginLeft: 'auto', color: '#A29C95', fontWeight: 700 }}>{pct}%</span>
+                  </div>
+                </div>
+              ); })}
+            </div>
+            <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>사용가능 = 이번 달 기안완료·결제완료 기안 금액 합 · 사용 = 이번 달 실결제 합 · 잔여 = 사용가능 − 사용 (음수면 예산 초과)</div>
+          </Card>
+        )}
         {!payments.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>🧾</div><div>등록된 실결제 기록이 없습니다</div><div style={{ fontSize: 12, marginTop: 6 }}>업체를 선택하고 결제 금액을 입력해 기록하세요</div></Card>) :
           payKeys.map(k => { const list = payGroups[k]; const sub = list.reduce((a, p) => a + (Number(p.amount) || 0), 0); return (
             <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
@@ -2303,6 +2333,7 @@ function TabBudget({ data, setData, goTab }) {
       </>)}
 
       {showAdd && <BudgetFormModal data={data} setData={setData} onClose={() => setShowAdd(false)} />}
+      {showVendorMgr && <VendorManagerModal data={data} setData={setData} onClose={() => setShowVendorMgr(false)} />}
       {showDraft && <DraftModal data={data} setData={setData} onClose={() => setShowDraft(false)} />}
       {editB && <BudgetFormModal data={data} setData={setData} edit={editB} onClose={() => setEditB(null)} />}
       {showPay && <PaymentModal data={data} setData={setData} onClose={() => setShowPay(false)} />}
@@ -4167,6 +4198,92 @@ function TabTrends({ data, setData }) {
         </div>
       )}
     </div>
+  );
+}
+
+function VendorManagerModal({ data, setData, onClose }) {
+  const [sel, setSel] = useState(null);
+  const [newVendor, setNewVendor] = useState('');
+  const payments = data.payments || [];
+  const budgets = data.budgets || [];
+  const reg = data.vendors || [];
+  const itemTot = b => (b.items || []).reduce((a, i) => a + (Number(i.amount) || 0), 0) || Number(b.amount) || 0;
+  const vendors = (() => {
+    const m = {};
+    const ensure = v => { if (!m[v]) m[v] = { vendor: v, paid: 0, cnt: 0, appr: 0, bcnt: 0, last: '', registered: false }; return m[v]; };
+    reg.forEach(v => { ensure(v).registered = true; });
+    payments.forEach(p => { const x = ensure(p.vendor || '(미지정)'); x.paid += Number(p.amount) || 0; x.cnt++; if ((p.paidDate || '') > x.last) x.last = p.paidDate || ''; });
+    budgets.forEach(b => { const x = ensure(b.vendor || '(미지정)'); x.bcnt++; if (b.status === '기안완료' || b.status === '결제완료') x.appr += itemTot(b); });
+    return Object.values(m).sort((a, b) => (b.cnt + b.bcnt) - (a.cnt + a.bcnt) || b.paid - a.paid || (a.vendor < b.vendor ? -1 : 1));
+  })();
+  const addVendor = () => { const v = newVendor.trim(); if (!v) return; if (vendors.some(x => x.vendor === v)) { alert('이미 있는 업체입니다'); return; } setData(d => ({ ...d, vendors: [...(d.vendors || []), v] })); setNewVendor(''); };
+  const removeVendor = v => { if (!confirm('"' + v.vendor + '" 업체를 목록에서 삭제할까요?\n(실결제 선택 목록에서 사라집니다)')) return; setData(d => ({ ...d, vendors: (d.vendors || []).filter(x => x !== v.vendor) })); };
+  const hist = sel ? payments.filter(p => (p.vendor || '(미지정)') === sel).slice().sort((a, b) => (b.paidDate || '') < (a.paidDate || '') ? -1 : 1) : [];
+  const histTotal = hist.reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  const delPayment = p => { if (!confirm('[' + (p.paidDate || '-') + '] ' + won(Number(p.amount) || 0) + ' 결제 기록을 삭제할까요?\n(드라이브 영수증 파일은 유지됩니다)')) return; setData(d => ({ ...d, payments: (d.payments || []).filter(x => x.id !== p.id) })); };
+  return (
+    <ModalShell title={sel ? '🏢 ' + sel : '🏢 업체 관리'} onClose={onClose}>
+      {!sel ? (
+        <div>
+          <div style={{ fontSize: 12, color: '#6E6863', marginBottom: 10, lineHeight: 1.5 }}>실결제 선택 목록에 뜨는 <b>전체 업체 {vendors.length}개</b>입니다. 업체를 클릭하면 결제 이력(전체 기간)을 보고 개별 삭제할 수 있어요. <b>사용 기록이 없는 업체</b>는 목록에서 삭제할 수 있습니다.</div>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+            <input value={newVendor} onChange={ev => setNewVendor(ev.target.value)} onKeyDown={ev => { if (ev.key === 'Enter') addVendor(); }} placeholder="새 업체명 입력" style={{ flex: 1, padding: '8px 11px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 13, boxSizing: 'border-box' }} />
+            <button onClick={addVendor} style={{ padding: '0 14px', borderRadius: 8, border: 'none', background: GO, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>+ 추가</button>
+          </div>
+          {vendors.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '16px 0', textAlign: 'center' }}>등록된 업체가 없습니다</div> : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 400, overflowY: 'auto' }}>
+              {vendors.map(v => { const used = v.cnt > 0 || v.bcnt > 0; return (
+                <div key={v.vendor} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 11px', background: used ? '#F8F7F5' : 'white', border: '1px solid ' + (used ? '#E3E0DC' : '#EDEBE7'), borderRadius: 9 }}>
+                  <div onClick={() => used && setSel(v.vendor)} style={{ flex: 1, minWidth: 0, cursor: used ? 'pointer' : 'default' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>{v.vendor}</span>
+                      {!used ? <span style={{ fontSize: 9, fontWeight: 700, color: '#8A8580', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 6px' }}>사용 안 함</span> : null}
+                    </div>
+                    <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 2 }}>{used ? ('결제 ' + v.cnt + '건' + (v.bcnt ? ' · 기안 ' + v.bcnt + '건' : '') + (v.last ? ' · 최근 ' + v.last : '')) : '결제·기안 기록 없음'}</div>
+                  </div>
+                  {used ? (<>
+                    <div style={{ textAlign: 'right' }}><div style={{ fontSize: 13, fontWeight: 800, color: '#1FA463' }}>{won(v.paid)}</div><div style={{ fontSize: 9, color: '#A29C95' }}>총 결제</div></div>
+                    <button onClick={() => setSel(v.vendor)} style={{ border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', borderRadius: 6, cursor: 'pointer', fontSize: 10.5, fontWeight: 700, padding: '4px 9px', whiteSpace: 'nowrap' }}>이력 ›</button>
+                  </>) : (
+                    <button onClick={() => removeVendor(v)} style={{ border: '1px solid #FCA5A5', background: 'white', color: '#E53935', borderRadius: 6, cursor: 'pointer', fontSize: 10.5, fontWeight: 700, padding: '4px 9px', whiteSpace: 'nowrap' }}>🗑 삭제</button>
+                  )}
+                </div>
+              ); })}
+            </div>
+          )}
+          <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>ℹ️ 결제·기안 기록이 있는 업체는 목록에서 지울 수 없습니다(기록이 깨짐). 먼저 이력에서 결제를 삭제하면 "사용 안 함"이 되어 삭제할 수 있어요.</div>
+        </div>
+      ) : (
+        <div>
+          <button onClick={() => setSel(null)} style={{ border: 'none', background: 'none', color: '#2D5FE0', cursor: 'pointer', fontSize: 12, fontWeight: 700, padding: 0, marginBottom: 8 }}>‹ 업체 목록</button>
+          <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+            <div style={{ flex: 1, background: '#ECFDF5', borderRadius: 9, padding: 10, textAlign: 'center' }}><div style={{ fontSize: 10.5, color: '#1FA463' }}>총 결제 ({hist.length}건)</div><div style={{ fontSize: 15, fontWeight: 800, color: '#1FA463' }}>{won(histTotal)}</div></div>
+          </div>
+          {hist.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '16px 0', textAlign: 'center' }}>결제 기록이 없습니다</div> : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 380, overflowY: 'auto' }}>
+              {hist.map(p => { const items = (p.coveredBudgetIds || []).map(id => budgets.find(b => b.id === id)).filter(Boolean); return (
+                <div key={p.id} style={{ border: '1px solid #EDEBE7', borderRadius: 9, padding: '9px 11px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1614' }}>{p.paidDate || '-'}</span>
+                    {p.payMethod ? <span style={{ fontSize: 10.5, color: '#6E6863' }}>{p.payMethod}</span> : null}
+                    {p.project ? <span style={{ fontSize: 9.5, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 6px' }}>{p.project}</span> : null}
+                    <span style={{ marginLeft: 'auto', fontSize: 14, fontWeight: 800, color: '#1FA463' }}>{won(Number(p.amount) || 0)}</span>
+                  </div>
+                  {items.length > 0 ? <div style={{ fontSize: 10.5, color: '#6E6863', marginTop: 4 }}>기안 연결: {items.map(b => budgetNames(data, b).detail).join(', ')}</div> : null}
+                  {p.memo ? <div style={{ fontSize: 10.5, color: '#6E6863', marginTop: 4 }}>💬 {p.memo}</div> : null}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 7, alignItems: 'center' }}>
+                    {p.receiptUrl ? <a href={p.receiptUrl} target="_blank" rel="noreferrer" style={{ fontSize: 10.5, color: '#2D5FE0', fontWeight: 700, textDecoration: 'none' }}>🧾 영수증</a> : <span style={{ fontSize: 10.5, color: '#C4BFB9' }}>영수증 없음</span>}
+                    <button onClick={() => delPayment(p)} style={{ marginLeft: 'auto', border: '1px solid #FCA5A5', background: 'white', color: '#E53935', borderRadius: 6, cursor: 'pointer', fontSize: 10.5, fontWeight: 700, padding: '3px 10px' }}>🗑 삭제</button>
+                  </div>
+                </div>
+              ); })}
+            </div>
+          )}
+          <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>⚠ 실결제 삭제는 되돌릴 수 없습니다(휴지통 미적용). 드라이브 영수증 파일은 유지됩니다.</div>
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 8, marginTop: 12 }}><Btn v="secondary" onClick={onClose} style={{ flex: 1 }}>닫기</Btn></div>
+    </ModalShell>
   );
 }
 
