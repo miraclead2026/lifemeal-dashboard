@@ -38,9 +38,11 @@ const DB_PATH = '/dashboard';   // 운영
 const { useState, useEffect, useRef } = React;
 
 const G = '#1A1614', GO = '#1A1614', BG = '#FFFFFF';
-const MEMBERS = ['윤희', '현수'];
-const ROLES = { 윤희: '마케팅 팀장', 현수: 'MD' };
-const AV = { 윤희: '🌿', 현수: '📦' };
+const DEFAULT_MEMBERS = [{ name: '윤희', role: '마케팅 팀장', av: '🌿' }, { name: '현수', role: 'MD', av: '📦' }];
+let MEMBERS = DEFAULT_MEMBERS.map(m => m.name);
+let ROLES = DEFAULT_MEMBERS.reduce((a, m) => { a[m.name] = m.role; return a; }, {});
+let AV = DEFAULT_MEMBERS.reduce((a, m) => { a[m.name] = m.av; return a; }, {});
+const syncMembers = list => { const arr = (list && list.length) ? list : DEFAULT_MEMBERS; MEMBERS = arr.map(m => m.name); ROLES = {}; AV = {}; arr.forEach(m => { ROLES[m.name] = m.role || ''; AV[m.name] = m.av || '👤'; }); };
 const STAGES = ['예정', '진행중', '검토중', '완료', '보류'];
 const MAIN_STAGES = ['예정', '진행중', '검토중', '완료'];
 const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
@@ -143,7 +145,7 @@ const DEFAULT_MAIN_KPIS = [
   { id: 'm2', name: '신규고객', unit: '명', linkedPlanIds: [], targets: {}, manuals: [] },
   { id: 'm3', name: '전환율', unit: '%', linkedPlanIds: [], targets: {}, manuals: [] },
 ];
-const migrateData = raw => ({
+const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? raw.members : DEFAULT_MEMBERS; syncMembers(_mem); return ({
   ...raw,
   categories: raw.categories || [{ name: 'MD출력', prefix: 'MD' }, { name: '기타추가', prefix: 'P' }, { name: '반복지원', prefix: 'R' }],
   mainKpis: (raw.mainKpis || []).map(mk => ({ ...mk, linkedKpiIds: mk.linkedKpiIds || (mk.linkedPlanIds || []).map(pid => 'k' + pid) })),
@@ -163,7 +165,8 @@ const migrateData = raw => ({
   seedApprovals: raw.seedApprovals || [],
   roadmapOverrides: raw.roadmapOverrides || {},
   messageSchedules: raw.messageSchedules || {},
-});
+  members: (raw.members && raw.members.length) ? raw.members : DEFAULT_MEMBERS,
+}); };
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
 const itemTotal = b => b.vat === '별도' ? Math.round(b.amount * 1.1) : b.amount;
@@ -857,12 +860,62 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   );
 }
 
+function MemberModal({ data, setData, onClose }) {
+  const list = data.members && data.members.length ? data.members : DEFAULT_MEMBERS;
+  const [nm, setNm] = useState('');
+  const [rl, setRl] = useState('');
+  const [av, setAv] = useState('👤');
+  const AVS = ['🌿', '📦', '👤', '🍀', '⭐', '🔥', '💡', '🎯', '🚀', '🌸', '☕', '🦊'];
+  const workCount = m => data.plans.filter(p => ownersOf(p).includes(m)).length + data.subplans.filter(s => ownersOf(s).includes(m)).length + data.plans.filter(p => (p.support || []).some(s => s.m === m)).length + data.subplans.filter(s => (s.support || []).some(x => x.m === m)).length;
+  const add = () => { const n = nm.trim(); if (!n) { alert('이름을 입력하세요'); return; } if (list.some(m => m.name === n)) { alert('이미 있는 팀원입니다'); return; } setData(d => ({ ...d, members: [...(d.members && d.members.length ? d.members : DEFAULT_MEMBERS), { name: n, role: rl.trim(), av }] })); setNm(''); setRl(''); setAv('👤'); };
+  const upd = (name, key, val) => setData(d => ({ ...d, members: (d.members && d.members.length ? d.members : DEFAULT_MEMBERS).map(m => m.name === name ? { ...m, [key]: val } : m) }));
+  const del = m => { const c = workCount(m.name); if (c > 0) { alert('"' + m.name + '"님은 담당/서포트 중인 업무가 ' + c + '건 있어 삭제할 수 없습니다.\n먼저 담당자를 변경한 뒤 삭제해주세요.'); return; } if (list.length <= 1) { alert('팀원이 최소 1명은 있어야 합니다'); return; } if (!confirm('"' + m.name + '"님을 팀원 목록에서 삭제할까요?')) return; setData(d => ({ ...d, members: (d.members && d.members.length ? d.members : DEFAULT_MEMBERS).filter(x => x.name !== m.name) })); };
+  return (
+    <ModalShell title="👥 팀원 관리" onClose={onClose}>
+      <div style={{ fontSize: 12, color: '#6E6863', lineHeight: 1.5 }}>팀원을 추가하면 담당자 선택·필터·회의 액션 등 <b>모든 화면에 자동 반영</b>됩니다.</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+        {list.map(m => { const c = workCount(m.name); return (
+          <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 11px', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 9 }}>
+            <span style={{ fontSize: 20 }}>{m.av || '👤'}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>{m.name}</div>
+              <input value={m.role || ''} onChange={e => upd(m.name, 'role', e.target.value)} placeholder="역할 (예: 마케팅 팀장)" style={{ width: '100%', marginTop: 2, padding: '3px 6px', borderRadius: 5, border: '1px solid #E3E0DC', fontSize: 11, boxSizing: 'border-box' }} />
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 10.5, color: c > 0 ? '#6E6863' : '#A29C95' }}>업무 {c}건</div>
+              <button onClick={() => del(m)} style={{ marginTop: 3, border: '1px solid ' + (c > 0 ? '#E3E0DC' : '#FCA5A5'), background: 'white', color: c > 0 ? '#C4BFB9' : '#E53935', borderRadius: 6, cursor: c > 0 ? 'not-allowed' : 'pointer', fontSize: 10, fontWeight: 700, padding: '3px 8px' }}>🗑 삭제</button>
+            </div>
+          </div>
+        ); })}
+      </div>
+      <div style={{ borderTop: '1px solid #EDEBE7', paddingTop: 10, marginTop: 4 }}>
+        <Lbl c="+ 새 팀원 추가" />
+        <div style={{ display: 'flex', gap: 6 }}>
+          <Inp value={nm} onChange={setNm} placeholder="이름" />
+          <Inp value={rl} onChange={setRl} placeholder="역할 (선택)" />
+        </div>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 7 }}>
+          {AVS.map(a => <button key={a} onClick={() => setAv(a)} style={{ fontSize: 16, width: 32, height: 32, borderRadius: 8, cursor: 'pointer', border: '1px solid ' + (av === a ? G : '#E3E0DC'), background: av === a ? '#F0EEEB' : 'white' }}>{a}</button>)}
+        </div>
+        <Btn onClick={add} style={{ width: '100%', marginTop: 8 }}>{av} 팀원 추가</Btn>
+      </div>
+      <div style={{ fontSize: 10, color: '#A29C95', marginTop: 4, lineHeight: 1.5 }}>ℹ️ 담당·서포트 업무가 있는 팀원은 삭제할 수 없습니다(기록이 깨짐). 먼저 담당자를 변경하세요.</div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}><Btn v="secondary" onClick={onClose} style={{ flex: 1 }}>닫기</Btn></div>
+    </ModalShell>
+  );
+}
+
 function TabTeam({ data, setData, goTab }) {
   const all = data.plans.map(p => ({ ...p })).concat(data.subplans.map(s => ({ ...s })));
   const heldTotal = data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length;
+  const [showMem, setShowMem] = useState(false);
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ fontSize: 17, fontWeight: 700, color: G, marginBottom: 4 }}>팀 현황</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: G }}>팀 현황</div>
+        <button onClick={() => setShowMem(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>👥 팀원 관리</button>
+      </div>
+      {showMem && <MemberModal data={data} setData={setData} onClose={() => setShowMem(false)} />}
       <div style={{ fontSize: 12, color: '#6E6863', marginBottom: 16 }}>{TODAY} 기준</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 12 }}>
         {MEMBERS.map(m => {
