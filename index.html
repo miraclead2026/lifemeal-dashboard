@@ -4400,8 +4400,10 @@ function VendorManagerModal({ data, setData, onClose }) {
 
 function TabSchedule({ data, setData }) {
   const [copied, setCopied] = useState(null);
-  const [sel, setSel] = useState(null);
+  const [selRule, setSelRule] = useState(null);
+  const [selProd, setSelProd] = useState(null);
   const [byDate, setByDate] = useState(false);
+  const [edit, setEdit] = useState(null);
   const scheds = data.messageSchedules || {};
   const entries = Object.entries(scheds);
   const isSafeCode = c => typeof c === 'string' && /^LM\d[\w-]*$/i.test(c) && !c.includes('@') && c.length <= 24;
@@ -4409,50 +4411,19 @@ function TabSchedule({ data, setData }) {
   const STATUS = ['예약', '발송대기', '발송완료'];
   const isPending = st => (st || '예약') !== '발송완료';
   const stMeta = s => s === '발송완료' ? { bg: '#ECFDF5', bd: '#A7F3D0', tx: '#047857' } : s === '발송대기' ? { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309' } : { bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB' };
+  const pname = it => it.displayName || it.productName || '(상품명 없음)';
   const flagged = entries.flatMap(([segId, seg]) => (seg.sends || []).filter(sd => sendCodes(sd).some(c => !isSafeCode(c))).map(sd => ({ segName: seg.segmentName || segId, date: sd.date })));
   const cycleStatus = (segId, sendIdx) => setData(d => { const sc = { ...(d.messageSchedules || {}) }; const seg = sc[segId]; if (!seg) return d; const sends = (seg.sends || []).map((s, i) => { if (i !== sendIdx) return s; const ni = (STATUS.indexOf(s.status || '예약') + 1) % STATUS.length; return { ...s, status: STATUS[ni] }; }); sc[segId] = { ...seg, sends }; return { ...d, messageSchedules: sc }; });
-  const copyCodes = (codes, key) => { const safe = (codes || []).filter(isSafeCode); const text = safe.join('\n'); const done = () => { setCopied(key); setTimeout(() => setCopied(c => c === key ? null : c), 1500); }; try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done).catch(() => done()); } else { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(); } } catch (e) { done(); } };
+  const copyText = (text, key) => { const done = () => { setCopied(key); setTimeout(() => setCopied(c => c === key ? null : c), 1500); }; try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done).catch(() => done()); } else { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(); } } catch (e) { done(); } };
+  const copyCodes = (codes, key) => copyText((codes || []).filter(isSafeCode).join('\n'), key);
   const rules = entries.map(([segId, seg]) => { const sends = seg.sends || []; const pend = sends.filter(s => isPending(s.status)); const today = sends.filter(s => s.date === TODAY && isPending(s.status)); const over = sends.filter(s => s.date && s.date < TODAY && isPending(s.status)); const total = sends.reduce((a, s) => a + Number(s.count != null ? s.count : sendCodes(s).length), 0); return { segId, seg, sends, pendCnt: pend.length, todayCnt: today.length, overCnt: over.length, total, active: pend.length > 0 }; }).sort((a, b) => (b.overCnt > 0) - (a.overCnt > 0) || (b.todayCnt > 0) - (a.todayCnt > 0) || b.active - a.active || (Number(b.seg.priority) || 0) - (Number(a.seg.priority) || 0) || b.pendCnt - a.pendCnt);
-  const curId = sel && scheds[sel] ? sel : (rules.length ? rules[0].segId : null);
+  const curId = selRule && scheds[selRule] ? selRule : (rules.length ? rules[0].segId : null);
   const cur = curId ? scheds[curId] : null;
+  const prods = (() => { if (!cur) return []; const m = {}; (cur.sends || []).forEach((sd, si) => { const its = sd.items || []; if (its.length) { its.forEach(it => { const nm = pname(it); const codes = (it.codes || []); if (!m[nm]) m[nm] = { name: nm, servings: it.servings, count: 0, dates: [], over: 0, today: 0 }; const t = m[nm]; t.count += Number(it.count != null ? it.count : codes.length); if (it.servings != null) t.servings = it.servings; t.dates.push({ sd, si, codes, count: Number(it.count != null ? it.count : codes.length), catchup: !!it.catchup }); if (sd.date && sd.date < TODAY && isPending(sd.status)) t.over++; if (sd.date === TODAY && isPending(sd.status)) t.today++; }); } else { const nm = '(상품 미지정)'; const codes = sendCodes(sd); if (!m[nm]) m[nm] = { name: nm, servings: null, count: 0, dates: [], over: 0, today: 0 }; const t = m[nm]; t.count += Number(sd.count != null ? sd.count : codes.length); t.dates.push({ sd, si, codes, count: Number(sd.count != null ? sd.count : codes.length), catchup: false }); if (sd.date && sd.date < TODAY && isPending(sd.status)) t.over++; if (sd.date === TODAY && isPending(sd.status)) t.today++; } }); return Object.values(m).map(p => ({ ...p, dates: p.dates.sort((a, b) => (a.sd.date || '') < (b.sd.date || '') ? -1 : 1) })).sort((a, b) => b.count - a.count); })();
+  const curProd = (() => { if (!prods.length) return null; const f = prods.find(p => p.name === selProd); return f || prods[0]; })();
+  const msgFor = p => { const m = (cur && cur.message) || {}; const rep = s => String(s == null ? '' : s).replace(/\{productName\}/g, p ? p.name : '').replace(/\{displayName\}/g, p ? p.name : ''); return { title: rep(m.title), body: rep(m.body), button: rep(m.button), coupon: rep(m.coupon) }; };
+  const saveMsg = () => { if (!edit || !curId) return; if (!/\{productName\}/.test(edit.body || '') && !/\{displayName\}/.test(edit.body || '')) { if (!confirm('⚠ 본문에 {productName} 변수가 없습니다.\n상품명이 자동으로 들어가지 않습니다.\n\n이대로 저장할까요?')) return; } const now = new Date().toISOString().slice(0, 19).replace('T', ' '); setData(d => { const sc = { ...(d.messageSchedules || {}) }; const seg = sc[curId]; if (!seg) return d; sc[curId] = { ...seg, message: { ...(seg.message || {}), title: edit.title, body: edit.body, button: edit.button, coupon: edit.coupon, messageEditedAt: now } }; return { ...d, messageSchedules: sc }; }); setEdit(null); };
   const dateMap = (() => { const m = {}; entries.forEach(([segId, seg]) => (seg.sends || []).forEach(sd => { if (!sd.date) return; const row = m[sd.date] = m[sd.date] || { codes: [], rows: [] }; sendCodes(sd).forEach(c => row.codes.push({ code: c, segName: seg.segmentName || segId })); row.rows.push({ segId, segName: seg.segmentName || segId, sd }); })); return Object.entries(m).map(([date, v]) => { const cnt = {}; v.codes.forEach(x => { cnt[x.code] = (cnt[x.code] || 0) + 1; }); const dups = Object.keys(cnt).filter(c => cnt[c] > 1); return { date, ...v, dups, uniq: Object.keys(cnt).length }; }).sort((a, b) => a.date < b.date ? -1 : 1); })();
-  const renderSend = (segId, sd, i) => { const items = sd.items || []; const codes = sendCodes(sd); const unsafe = codes.filter(c => !isSafeCode(c)); const safeCount = codes.length - unsafe.length; const sm = stMeta(sd.status || '예약'); const ckey = segId + ':' + i; const isToday = sd.date === TODAY; const overdue = !!sd.date && sd.date < TODAY && isPending(sd.status);
-    return (
-      <div key={i} style={{ border: '1px solid ' + (overdue ? '#FDBA74' : (isToday && isPending(sd.status) ? '#6EE7B7' : '#E3E0DC')), borderLeft: '3px solid ' + (overdue ? '#EA580C' : (isToday && isPending(sd.status) ? '#1FA463' : '#E3E0DC')), borderRadius: 9, padding: '9px 11px', background: overdue ? '#FFFBF5' : 'white' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>📅 {sd.date || '-'}</span>
-          {overdue ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#C2410C', background: '#FFF7ED', border: '1px solid #FDBA74', borderRadius: 5, padding: '1px 6px' }}>⚠ 경과 · 미발송</span> : null}
-          {isToday && isPending(sd.status) ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#047857', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 5, padding: '1px 6px' }}>🔔 오늘</span> : null}
-          <span style={{ fontSize: 11, color: '#6E6863' }}>대상 {Number(sd.count != null ? sd.count : codes.length).toLocaleString()}명</span>
-          <button onClick={() => cycleStatus(segId, i)} style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 800, color: sm.tx, background: sm.bg, border: '1px solid ' + sm.bd, borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}>{sd.status || '예약'} ⇄</button>
-        </div>
-        {unsafe.length > 0 ? <div style={{ fontSize: 10.5, color: '#DC2626', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 7, padding: '5px 8px', marginTop: 6 }}>⚠ 코드 형식이 아닌 값 {unsafe.length}건 감지 — 실제 ID일 수 있어 숨겼습니다. 유니 확인 필요.</div> : null}
-        {items.length > 0 ? (
-          <div style={{ display: 'grid', gap: 5, marginTop: 7 }}>
-            {items.map((it, j) => { const icodes = it.codes || []; const iunsafe = icodes.filter(c => !isSafeCode(c)); const isafe = icodes.length - iunsafe.length; const ikey = segId + ':' + i + ':' + j; return (
-              <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', background: '#FBFAF8', border: '1px solid #EEEBE7', borderRadius: 8, padding: '7px 9px' }}>
-                <div style={{ flex: 1, minWidth: 130 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1614' }}>📦 {it.displayName || it.productName || '(상품명 없음)'}{it.catchup ? <span style={{ fontSize: 9, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 4, padding: '0 5px', marginLeft: 5 }}>캐치업</span> : null}</div>
-                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 1 }}>{it.servings != null ? it.servings + '포 · ' : ''}{Number(it.count != null ? it.count : icodes.length).toLocaleString()}명{iunsafe.length > 0 ? ' · ⚠ 비정상 ' + iunsafe.length + '건' : ''}</div>
-                </div>
-                <button onClick={() => copyCodes(icodes, ikey)} disabled={isafe === 0} style={{ fontSize: 10, fontWeight: 700, color: copied === ikey ? '#047857' : (isafe === 0 ? '#8A8580' : '#2563EB'), background: copied === ikey ? '#ECFDF5' : 'white', border: '1px solid ' + (copied === ikey ? '#A7F3D0' : '#D9E7F5'), borderRadius: 6, padding: '3px 9px', cursor: isafe === 0 ? 'default' : 'pointer', whiteSpace: 'nowrap' }}>{copied === ikey ? '✓ 복사됨' : '📋 ' + isafe + '개'}</button>
-              </div>
-            ); })}
-          </div>
-        ) : null}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7, flexWrap: 'wrap' }}>
-          <button onClick={() => copyCodes(codes, ckey)} disabled={safeCount === 0} style={{ fontSize: 11, fontWeight: 700, color: copied === ckey ? '#047857' : 'white', background: copied === ckey ? '#ECFDF5' : (safeCount === 0 ? '#C4BFB9' : G), border: copied === ckey ? '1px solid #A7F3D0' : 'none', borderRadius: 6, padding: '4px 12px', cursor: safeCount === 0 ? 'default' : 'pointer' }}>{copied === ckey ? '✓ 복사됨' : (items.length > 0 ? '📋 전체 코드 복사' : '📋 코드 복사')}</button>
-          <span style={{ fontSize: 10.5, color: '#A29C95' }}>{safeCount.toLocaleString()}개 코드</span>
-          {codes.length > 0 ? (
-            <details style={{ marginLeft: 'auto' }}>
-              <summary style={{ fontSize: 10.5, color: '#2563EB', cursor: 'pointer', fontWeight: 600 }}>코드 보기</summary>
-              <div style={{ marginTop: 5, maxHeight: 140, overflowY: 'auto', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 7, padding: '7px 9px', fontSize: 10.5, color: '#3A3631', fontFamily: 'monospace', lineHeight: 1.7, wordBreak: 'break-all' }}>{codes.map((c, k) => isSafeCode(c) ? <span key={k} style={{ marginRight: 8 }}>{c}</span> : <span key={k} style={{ marginRight: 8, color: '#DC2626', fontWeight: 700 }}>🔒숨김</span>)}</div>
-            </details>
-          ) : null}
-        </div>
-      </div>
-    );
-  };
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -4491,9 +4462,9 @@ function TabSchedule({ data, setData }) {
                 {d.rows.map((r, k) => { const sm = stMeta(r.sd.status || '예약'); return (
                   <div key={k} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', border: '1px solid #EEEBE7', borderRadius: 8, padding: '7px 9px' }}>
                     <span style={{ fontSize: 12, fontWeight: 700, color: '#1A1614' }}>{r.segName}</span>
-                    <span style={{ fontSize: 10.5, color: '#6E6863' }}>{(r.sd.items || []).map(it => (it.displayName || it.productName || '') + (it.servings != null ? '(' + it.servings + '포)' : '')).filter(Boolean).join(', ') || (Number(r.sd.count) || sendCodes(r.sd).length) + '명'}</span>
+                    <span style={{ fontSize: 10.5, color: '#6E6863' }}>{(r.sd.items || []).map(it => pname(it) + (it.servings != null ? '(' + it.servings + '포)' : '')).join(', ') || (Number(r.sd.count) || sendCodes(r.sd).length) + '명'}</span>
                     <span style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 800, color: sm.tx, background: sm.bg, border: '1px solid ' + sm.bd, borderRadius: 5, padding: '1px 7px' }}>{r.sd.status || '예약'}</span>
-                    <button onClick={() => { setByDate(false); setSel(r.segId); }} style={{ fontSize: 10, color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>규칙 보기 ›</button>
+                    <button onClick={() => { setByDate(false); setSelRule(r.segId); setSelProd(null); }} style={{ fontSize: 10, color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>규칙 보기 ›</button>
                   </div>
                 ); })}
               </div>
@@ -4503,45 +4474,119 @@ function TabSchedule({ data, setData }) {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Card>
-            <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>📋 발송 규칙 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>· {rules.length}개 · 클릭해서 예약현황 확인</span></div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>1️⃣ 발송 규칙 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>· {rules.length}개 · 클릭해서 상품 확인</span></div>
             <div style={{ display: 'grid', gap: 6 }}>
               {rules.map(r => { const on = r.segId === curId; return (
-                <div key={r.segId} onClick={() => setSel(r.segId)} style={{ cursor: 'pointer', border: '1px solid ' + (on ? '#1FA463' : (r.active ? '#A7F3D0' : '#EDEBE7')), borderLeft: '3px solid ' + (r.active ? '#1FA463' : '#D5D2CE'), background: on ? '#ECFDF5' : (r.active ? 'white' : '#FAFAF9'), borderRadius: 9, padding: '9px 11px', opacity: r.active ? 1 : 0.72 }}>
+                <div key={r.segId} onClick={() => { setSelRule(r.segId); setSelProd(null); }} style={{ cursor: 'pointer', border: '1px solid ' + (on ? '#1FA463' : (r.active ? '#A7F3D0' : '#EDEBE7')), borderLeft: '3px solid ' + (r.active ? '#1FA463' : '#D5D2CE'), background: on ? '#ECFDF5' : (r.active ? 'white' : '#FAFAF9'), borderRadius: 9, padding: '9px 11px', opacity: r.active ? 1 : 0.72 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: r.active ? '#1A1614' : '#8A8580' }}>{r.seg.segmentName || r.segId}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: r.active ? '#1A1614' : '#8A8580' }}>📋 {r.seg.segmentName || r.segId}</span>
                     {r.overCnt > 0 ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#C2410C', background: '#FFF7ED', border: '1px solid #FDBA74', borderRadius: 5, padding: '1px 6px' }}>⚠ 경과 {r.overCnt}건</span> : null}
                     {r.todayCnt > 0 ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#047857', background: '#ECFDF5', border: '1px solid #6EE7B7', borderRadius: 5, padding: '1px 6px' }}>🔔 오늘 {r.todayCnt}건</span> : null}
                     {r.pendCnt > 0 ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#1FA463', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 5, padding: '1px 6px' }}>예약 {r.pendCnt}건</span> : <span style={{ fontSize: 9.5, fontWeight: 700, color: '#A29C95', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 6px' }}>대기 없음</span>}
                     {r.seg.priority != null ? <span style={{ fontSize: 9.5, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 6px' }}>P{r.seg.priority}</span> : null}
                     {on ? <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 800, color: '#047857' }}>선택됨</span> : null}
                   </div>
-                  <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 3 }}>{r.seg.rule ? r.seg.rule + ' · ' : ''}총 대상 {r.total.toLocaleString()}명 · 발송 {r.sends.length}건</div>
+                  <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 3 }}>{r.seg.rule ? r.seg.rule + ' · ' : ''}총 {r.total.toLocaleString()}명 · 발송 {r.sends.length}건</div>
                 </div>
               ); })}
             </div>
           </Card>
           {cur ? (
             <Card>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-                <span style={{ fontSize: 14, fontWeight: 800, color: '#1A1614' }}>{cur.segmentName || curId}</span>
-                {cur.rule ? <span style={{ fontSize: 10.5, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 7px' }}>{cur.rule}</span> : null}
-                <span style={{ fontSize: 11, color: '#A29C95' }}>예약현황</span>
-              </div>
-              {(() => { const msg = cur.message || {}; return (msg.title || msg.body || msg.button || msg.coupon) ? (
-                <div style={{ background: '#FBFAF8', border: '1px solid #EEEBE7', borderRadius: 9, padding: '9px 11px', marginBottom: 10 }}>
-                  {msg.title ? <div style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>{msg.title}</div> : null}
-                  {msg.body ? <div style={{ fontSize: 11.5, color: '#3A3631', lineHeight: 1.5, marginTop: 3, whiteSpace: 'pre-wrap' }}>{msg.body}</div> : null}
-                  {(msg.button || msg.coupon) ? <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>{msg.button ? <span style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 5, padding: '2px 8px' }}>🔘 {msg.button}</span> : null}{msg.coupon ? <span style={{ fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '2px 8px' }}>🎟 {msg.coupon}</span> : null}</div> : null}
-                </div>
-              ) : null; })()}
-              {(cur.sends || []).length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>예정된 발송 없음</div> : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                  {(cur.sends || []).map((sd, i) => ({ sd, i })).sort((a, b) => (a.sd.date || '') < (b.sd.date || '') ? -1 : 1).map(x => renderSend(curId, x.sd, x.i))}
+              <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>2️⃣ 상품 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>· {cur.segmentName || curId} · 쿠폰은 상품 단위로 발행</span></div>
+              {prods.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>예정된 발송 없음</div> : (
+                <div style={{ display: 'grid', gap: 6 }}>
+                  {prods.map(p => { const on = curProd && p.name === curProd.name; return (
+                    <div key={p.name} onClick={() => setSelProd(p.name)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', border: '1px solid ' + (on ? '#1FA463' : '#EDEBE7'), background: on ? '#ECFDF5' : 'white', borderRadius: 9, padding: '9px 11px' }}>
+                      <div style={{ flex: 1, minWidth: 140 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>📦 {p.name}</span>
+                          {p.over > 0 ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#C2410C', background: '#FFF7ED', border: '1px solid #FDBA74', borderRadius: 5, padding: '1px 6px' }}>⚠ 경과 {p.over}건</span> : null}
+                          {p.today > 0 ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#047857', background: '#ECFDF5', border: '1px solid #6EE7B7', borderRadius: 5, padding: '1px 6px' }}>🔔 오늘</span> : null}
+                        </div>
+                        <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 2 }}>{p.servings != null ? p.servings + '포 · ' : ''}발송일 {p.dates.length}일에 분산</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: on ? '#047857' : '#1A1614' }}>{p.count.toLocaleString()}명</div>
+                        {on ? <div style={{ fontSize: 9.5, color: '#047857', fontWeight: 700 }}>선택됨</div> : <div style={{ fontSize: 9.5, color: '#C4BFB9' }}>클릭 ›</div>}
+                      </div>
+                    </div>
+                  ); })}
                 </div>
               )}
+            </Card>
+          ) : null}
+          {cur && curProd ? (() => { const m = msgFor(curProd); const full = [m.title, m.body].filter(Boolean).join('\n\n'); const mkey = 'msg:' + curId + ':' + curProd.name; return (
+            <Card>
+              <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>3️⃣ 메시지 · 날짜별 발송 <span style={{ fontSize: 11, fontWeight: 400, color: '#A29C95' }}>· 📦 {curProd.name}</span></div>
+              {edit ? (
+                <div style={{ background: '#FBFCFF', border: '1px solid #C7D2FE', borderRadius: 9, padding: '11px 12px', marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#4F46E5', marginBottom: 7 }}>✏️ 문구 수정 <span style={{ fontWeight: 400, color: '#6E6863' }}>· 이 규칙의 모든 상품에 공통 적용</span></div>
+                  <Lbl c="제목" /><Inp value={edit.title} onChange={v => setEdit(e => ({ ...e, title: v }))} placeholder="예: {productName} 다 드셨나요?" />
+                  <div style={{ marginTop: 7 }}><Lbl c="본문" />
+                    <textarea value={edit.body} onChange={ev => { const v = ev.target.value; setEdit(e => ({ ...e, body: v })); }} rows={5} placeholder="예: {productName} 재구매 시점이에요." style={{ width: '100%', boxSizing: 'border-box', padding: '8px 10px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 13, fontFamily: 'inherit', lineHeight: 1.6, resize: 'vertical' }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 7, marginTop: 7 }}>
+                    <div style={{ flex: 1 }}><Lbl c="버튼명" /><Inp value={edit.button} onChange={v => setEdit(e => ({ ...e, button: v }))} placeholder="재구매하기" /></div>
+                    <div style={{ flex: 1 }}><Lbl c="쿠폰" /><Inp value={edit.coupon} onChange={v => setEdit(e => ({ ...e, coupon: v }))} placeholder="10%" /></div>
+                  </div>
+                  <div style={{ fontSize: 10.5, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 7, padding: '6px 9px', marginTop: 8, lineHeight: 1.5 }}>※ <b>{'{productName}'}</b> 은 상품명으로 자동 치환됩니다. <b>지우지 마세요.</b> (예: {'{productName}'} 다 드셨나요? → 라이프밀 데일리 생식 다 드셨나요?)</div>
+                  {!/\{productName\}|\{displayName\}/.test(edit.body || '') ? <div style={{ fontSize: 10.5, color: '#DC2626', marginTop: 5 }}>⚠ 본문에 {'{productName}'} 변수가 없습니다 — 상품명이 자동으로 들어가지 않습니다.</div> : null}
+                  <div style={{ display: 'flex', gap: 7, marginTop: 10 }}>
+                    <Btn onClick={saveMsg} style={{ flex: 1 }}>저장</Btn>
+                    <Btn v="secondary" onClick={() => setEdit(null)}>취소</Btn>
+                  </div>
+                </div>
+              ) : (m.title || m.body || m.button || m.coupon) ? (
+                <div style={{ background: '#FBFAF8', border: '1px solid #EEEBE7', borderRadius: 9, padding: '10px 12px', marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863' }}>💬 톡톡 발송 메시지</span>
+                    {(cur.message || {}).messageEditedAt ? <span style={{ fontSize: 9, fontWeight: 700, color: '#4F46E5', background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: 4, padding: '1px 5px' }}>✏️ 수정됨 {(cur.message || {}).messageEditedAt}</span> : null}
+                    <div style={{ marginLeft: 'auto', display: 'flex', gap: 5 }}>
+                      <button onClick={() => { const mm = cur.message || {}; setEdit({ title: mm.title || '', body: mm.body || '', button: mm.button || '', coupon: mm.coupon || '' }); }} style={{ fontSize: 10, fontWeight: 700, color: '#4F46E5', background: 'white', border: '1px solid #C7D2FE', borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}>✏️ 문구 수정</button>
+                      {full ? <button onClick={() => copyText(full, mkey)} style={{ fontSize: 10, fontWeight: 700, color: copied === mkey ? '#047857' : 'white', background: copied === mkey ? '#ECFDF5' : G, border: copied === mkey ? '1px solid #A7F3D0' : 'none', borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}>{copied === mkey ? '✓ 복사됨' : '📋 메시지 복사'}</button> : null}
+                    </div>
+                  </div>
+                  {m.title ? <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>{m.title}</div> : null}
+                  {m.body ? <div style={{ fontSize: 12, color: '#3A3631', lineHeight: 1.6, marginTop: 4, whiteSpace: 'pre-wrap' }}>{m.body}</div> : null}
+                  {(m.button || m.coupon) ? <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>{m.button ? <span style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 5, padding: '2px 8px' }}>🔘 {m.button}</span> : null}{m.coupon ? <span style={{ fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '2px 8px' }}>🎟 {m.coupon}</span> : null}</div> : null}
+                </div>
+              ) : (
+                <div style={{ background: '#FBFAF8', border: '1px dashed #E3E0DC', borderRadius: 9, padding: '10px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11.5, color: '#A29C95' }}>등록된 메시지 문구가 없습니다</span>
+                  <button onClick={() => setEdit({ title: '', body: '', button: '', coupon: '' })} style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#4F46E5', background: 'white', border: '1px solid #C7D2FE', borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}>✏️ 문구 작성</button>
+                </div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                {curProd.dates.map((dt, k) => { const sd = dt.sd; const unsafe = dt.codes.filter(c => !isSafeCode(c)); const safeCount = dt.codes.length - unsafe.length; const sm = stMeta(sd.status || '예약'); const ckey = curId + ':' + curProd.name + ':' + k; const isToday = sd.date === TODAY; const overdue = !!sd.date && sd.date < TODAY && isPending(sd.status);
+                  return (
+                    <div key={k} style={{ border: '1px solid ' + (overdue ? '#FDBA74' : (isToday && isPending(sd.status) ? '#6EE7B7' : '#E3E0DC')), borderLeft: '3px solid ' + (overdue ? '#EA580C' : (isToday && isPending(sd.status) ? '#1FA463' : '#E3E0DC')), borderRadius: 9, padding: '9px 11px', background: overdue ? '#FFFBF5' : 'white' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>📅 {sd.date || '-'}</span>
+                        {overdue ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#C2410C', background: '#FFF7ED', border: '1px solid #FDBA74', borderRadius: 5, padding: '1px 6px' }}>⚠ 경과 · 미발송</span> : null}
+                        {isToday && isPending(sd.status) ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#047857', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 5, padding: '1px 6px' }}>🔔 오늘</span> : null}
+                        {dt.catchup ? <span style={{ fontSize: 9, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 4, padding: '0 5px' }}>캐치업</span> : null}
+                        <span style={{ fontSize: 11, color: '#6E6863' }}>{dt.count.toLocaleString()}명</span>
+                        <button onClick={() => cycleStatus(curId, dt.si)} style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 800, color: sm.tx, background: sm.bg, border: '1px solid ' + sm.bd, borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}>{sd.status || '예약'} ⇄</button>
+                      </div>
+                      {unsafe.length > 0 ? <div style={{ fontSize: 10.5, color: '#DC2626', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 7, padding: '5px 8px', marginTop: 6 }}>⚠ 코드 형식이 아닌 값 {unsafe.length}건 감지 — 실제 ID일 수 있어 숨겼습니다. 유니 확인 필요.</div> : null}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7, flexWrap: 'wrap' }}>
+                        <button onClick={() => copyCodes(dt.codes, ckey)} disabled={safeCount === 0} style={{ fontSize: 11, fontWeight: 700, color: copied === ckey ? '#047857' : 'white', background: copied === ckey ? '#ECFDF5' : (safeCount === 0 ? '#C4BFB9' : G), border: copied === ckey ? '1px solid #A7F3D0' : 'none', borderRadius: 6, padding: '4px 12px', cursor: safeCount === 0 ? 'default' : 'pointer' }}>{copied === ckey ? '✓ 복사됨' : '📋 코드 복사'}</button>
+                        <span style={{ fontSize: 10.5, color: '#A29C95' }}>{safeCount.toLocaleString()}개 코드</span>
+                        {dt.codes.length > 0 ? (
+                          <details style={{ marginLeft: 'auto' }}>
+                            <summary style={{ fontSize: 10.5, color: '#2563EB', cursor: 'pointer', fontWeight: 600 }}>코드 보기</summary>
+                            <div style={{ marginTop: 5, maxHeight: 140, overflowY: 'auto', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 7, padding: '7px 9px', fontSize: 10.5, color: '#3A3631', fontFamily: 'monospace', lineHeight: 1.7, wordBreak: 'break-all' }}>{dt.codes.map((c, x) => isSafeCode(c) ? <span key={x} style={{ marginRight: 8 }}>{c}</span> : <span key={x} style={{ marginRight: 8, color: '#DC2626', fontWeight: 700 }}>🔒숨김</span>)}</div>
+                          </details>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
               {cur.updatedAt ? <div style={{ fontSize: 9.5, color: '#A29C95', textAlign: 'right', marginTop: 6 }}>갱신 {cur.updatedAt}</div> : null}
             </Card>
-          ) : <Card><div style={{ fontSize: 12, color: '#A29C95' }}>규칙을 선택하세요</div></Card>}
+          ); })() : null}
         </div>
       )}
     </div>
