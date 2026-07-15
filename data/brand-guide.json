@@ -1,287 +1,1361 @@
 {
   "meta": {
-    "version": "1.0",
-    "generatedAt": "2026-07-15T11:00:00+09:00",
+    "version": "1.1",
+    "generatedAt": "2026-07-15T13:00:00+09:00",
     "generatedBy": "brand-info-agent",
     "schemaVersion": 1,
-    "canonicalUrl": "https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/brand-guide.json"
+    "canonicalUrl": "https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/brand-guide.json",
+    "approvalSync": "2026-07-15 기준 /dashboard/brandApprovals 읽기전용 조회 결과 null(승인 항목 없음) → verified:true 반영 대상 없음. brandOverrides는 미참조(대시보드 렌더 전용)."
   },
   "brand": {
     "nameKo": "라이프밀",
     "nameEn": "LIFEMEAL",
     "company": "해밀리그룹",
-    "positioning": "삶(Life)에 한 끼(Meal)의 균형을 더하는 프리미엄 웰니스 푸드 브랜드. 생식·프로틴·이너뷰티까지 바쁜 일상에 몸에 좋은 선택을 가장 간편하게 제안한다. (verified:false — 라이프밀_브랜드소개서_카피_요약.md, 0521_라이프밀 카페로쥬.pdf)",
-    "story": "황성주 박사와 연구진이 1997년부터 자연 그대로의 영양을 담는 동결건조 기술과 생식 노하우를 연구해 왔고, 그 기술이 라이프밀로 이어진다. (verified:false — 라이프밀_브랜드소개서_카피_요약.md Ch.1)",
-    "mission": "고객의 삶을 더욱 건강하고 풍요롭게 한다. 무너진 하루의 균형을 한 포, 한 잔으로 되돌리는 '라이프 리밸런싱'. (verified:false — 해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx, 라이프밀_브랜드소개서_카피_요약.md)",
+    "positioning": "삶(Life)에 한 끼(Meal)의 균형을 더하는 프리미엄 웰니스 푸드 브랜드. 생식·프로틴·이너뷰티까지 바쁜 일상에 몸에 좋은 선택을 가장 간편하게 제안한다. 성분·효과 중심의 20~40대 여성 실속 소비층을 메인 타깃으로, 40~60대 충성 선물 재구매층을 서브로 두며 프리미엄/가성비 라인을 구분한다. (verified:false — 라이프밀_브랜드소개서_카피_요약.md, 0521_라이프밀 카페로쥬.pdf, 1216_라이프밀.pdf p2)",
+    "story": "황성주 박사와 연구진이 1997년부터 자연 그대로의 영양을 담는 동결건조 기술과 생식 노하우를 연구해 왔고, 그 기술이 라이프밀로 이어진다. '평범한 자연에서 인간에게 유익한 힘을 발견하고, 과학의 힘으로 자연을 담아 건강에 대한 새로운 해답을 제공한다'는 철학을 잇는다. (verified:false — 라이프밀_브랜드소개서_카피_요약.md Ch.1, 1216_라이프밀.pdf p13)",
+    "mission": "고객의 삶을 더욱 건강하고 풍요롭게 한다. 무너진 하루의 균형을 한 포, 한 잔으로 되돌리는 '라이프 리밸런싱'. 과학의 힘으로 자연을 담아 건강에 대한 새로운 해답을 제공한다. (verified:false — 해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx, 1216_라이프밀.pdf p13)",
     "toneOfVoice": {
-      "keywords": ["일상에 더 가까이", "건강하고 풍요롭게", "정성스럽게", "담백하고 맛있게", "가볍고 간편하게", "든든하게", "프리미엄", "데일리 솔루션", "저당", "식물성"],
-      "avoid": ["질병 예방·치료 효능 표방", "출처 없는 최상급 표현", "이롬·뉴밀·매각·사명변경 등 구 브랜드 이력의 대외 언급"]
+      "keywords": [
+        "일상에 더 가까이",
+        "건강하고 풍요롭게",
+        "정성스럽게",
+        "담백하고 맛있게",
+        "가볍고 간편하게",
+        "든든하게",
+        "프리미엄",
+        "데일리 솔루션",
+        "저당",
+        "식물성",
+        "이웃·사랑·과학(브랜드 철학)",
+        "성분·효과 중심",
+        "트렌디한 젊은 무드"
+      ],
+      "avoid": [
+        "질병 예방·치료 효능 표방",
+        "출처 없는 최상급 표현",
+        "이롬·뉴밀·매각·사명변경 등 구 브랜드 이력의 대외 언급"
+      ]
     },
     "visualIdentity": {
       "colors": [
-        { "name": "Deep Green", "hex": "#0D4B42", "usage": "primary" },
-        { "name": "Lime", "hex": "#8FC326", "usage": "accent" },
-        { "name": "Warm Brown", "hex": "#A36B38", "usage": "sub" }
+        {
+          "name": "Deep Green",
+          "hex": "#0D4B42",
+          "usage": "primary"
+        },
+        {
+          "name": "Lime",
+          "hex": "#8FC326",
+          "usage": "accent"
+        },
+        {
+          "name": "Warm Brown",
+          "hex": "#A36B38",
+          "usage": "sub"
+        }
       ],
-      "fonts": { "ko": "Pretendard", "en": "Montserrat" }
+      "fonts": {
+        "ko": "Pretendard",
+        "en": "Montserrat"
+      }
     },
     "channels": [
-      { "type": "smartstore", "name": "라이프밀 브랜드 스토어", "url": "https://smartstore.naver.com/life_meal", "talkTalk": "wsnk2jp", "status": "active" },
-      { "type": "instagram", "url": "https://instagram.com/lifemeal_wellness", "status": "active" },
-      { "type": "ownmall", "url": "", "status": "building" }
+      {
+        "type": "smartstore",
+        "name": "라이프밀 브랜드 스토어",
+        "url": "https://smartstore.naver.com/life_meal",
+        "talkTalk": "wsnk2jp",
+        "status": "active"
+      },
+      {
+        "type": "instagram",
+        "url": "https://instagram.com/lifemeal_wellness",
+        "status": "active"
+      },
+      {
+        "type": "ownmall",
+        "url": "",
+        "status": "building"
+      }
     ]
   },
   "products": [
     {
-      "id": "P001", "name": "황성주 박사의 1일 1생식 라이프밀 (동결건조 420g)", "category": "식품>가루/분말류>기타분말가루", "status": "active",
-      "manufacturer": "황성주", "summary": "국산 동결건조 원료 포함 80여 가지 원물을 한 포에 담은 프리미엄 생식 데일리 솔루션. 30g×14포(420g).",
-      "targetPersona": ["부모님 건강 챙기는 중장년", "아침 거르는 직장인"],
-      "sellingPoints": [
-        { "id": "P001-sp1", "point": "80여 가지 자연 유래 원료, 생식원료 함유 비율 51.1%", "evidence": "라벨 원재료명 표기 '동결건조 생식원료 함유 비율 51.1%'", "source": "라이프밀 데일리.png(상품정보제공고시)", "verified": false },
-        { "id": "P001-sp2", "point": "-30℃ 진공동결건조공법으로 비가열 처리", "evidence": "브랜드 소개서 핵심기술 카피", "source": "라이프밀_브랜드소개서_카피_요약.md Ch.1-5", "verified": false }
+      "id": "P001",
+      "name": "황성주 박사의 1일 1생식 라이프밀 (동결건조 420g)",
+      "category": "식품>가루/분말류>기타분말가루",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)해밀리",
+      "summary": "국산 동결건조 원료 포함 80여 가지 원물을 한 포에 담은 프리미엄 생식 데일리 솔루션. 30g×14포(420g).",
+      "targetPersona": [
+        "부모님 건강 챙기는 중장년",
+        "아침 거르는 직장인"
       ],
-      "nutrition": { "servingSize": "30g(1포)", "table": { "kcal": 105, "carb_g": 22, "protein_g": 5, "fat_g": 0.9, "sodium_mg": 85, "sugar_g": 1.2, "fiber_g": 6, "zinc_pctDV": 100 }, "source": "라이프밀 데일리.png(상품정보제공고시)" },
-      "ingredients": { "list": ["동결건조현미분말(국산)", "분리대두단백(미국산)", "동결건조보리분말(국산)", "난소화성말토덱스트린", "팔라티노스", "닥터샐러드분말", "유산균추출분말(이롬101)", "동결건조 채소·과일·곡물 다수(생식원료 51.1%)"], "allergens": ["대두", "토마토", "우유", "밀"], "source": "라이프밀 데일리.png — 제조/판매원 (주)해밀리(춘천 퇴계공로111). 전체 원재료 표는 라벨 원문 참조. ⚠️'이롬101' 등 구 브랜드 명칭 라벨 잔존" },
+      "sellingPoints": [
+        {
+          "id": "P001-sp1",
+          "point": "80여 가지 자연 유래 원료, 생식원료 함유 비율 51.1%",
+          "evidence": "라벨 원재료명 표기 '동결건조 생식원료 함유 비율 51.1%'",
+          "source": "라이프밀 데일리.png(상품정보제공고시)",
+          "verified": false
+        },
+        {
+          "id": "P001-sp2",
+          "point": "-30℃ 진공동결건조공법으로 비가열 처리",
+          "evidence": "브랜드 소개서 핵심기술 카피",
+          "source": "라이프밀_브랜드소개서_카피_요약.md Ch.1-5",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "30g(1포)",
+        "table": {
+          "kcal": 105,
+          "carb_g": 22,
+          "protein_g": 5,
+          "fat_g": 0.9,
+          "sodium_mg": 85,
+          "sugar_g": 1.2,
+          "fiber_g": 6,
+          "zinc_pctDV": 100
+        },
+        "source": "라이프밀 데일리.png(상품정보제공고시)"
+      },
+      "ingredients": {
+        "list": [
+          "동결건조현미분말(국산)",
+          "분리대두단백(미국산)",
+          "동결건조보리분말(국산)",
+          "난소화성말토덱스트린",
+          "팔라티노스",
+          "닥터샐러드분말",
+          "유산균추출분말(이롬101)",
+          "동결건조 채소·과일·곡물 다수(생식원료 51.1%)"
+        ],
+        "allergens": [
+          "대두",
+          "토마토",
+          "우유",
+          "밀"
+        ],
+        "source": "라이프밀 데일리.png — 제조/판매원 (주)해밀리(춘천 퇴계공로111). 전체 원재료 표는 라벨 원문 참조. ⚠️'이롬101' 등 구 브랜드 명칭 라벨 잔존"
+      },
       "certifications": [],
-      "price": { "list": 53000, "sale": null, "optionCount": 6, "options": [ { "name": "420g 1개", "price": 53000 }, { "name": "420g 3개", "price": 127350 } ] },
-      "usageGuide": "1일 1~3회, 1회 1포(30g)를 150~160mL의 물·두유·우유 등에 넣고 잘 흔들어 섭취.", "storage": "직사광선·고온다습을 피해 보관. 개봉 후 바로 섭취.",
+      "price": {
+        "list": 53000,
+        "sale": 47700,
+        "optionCount": 6,
+        "options": [
+          {
+            "name": "420g 1개",
+            "price": 53000
+          },
+          {
+            "name": "420g 3개",
+            "price": 127350
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "1일 1~3회, 1회 1포(30g)를 150~160mL의 물·두유·우유 등에 넣고 잘 흔들어 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관. 개봉 후 바로 섭취.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/라이프밀 데일리.png", "브랜드소개/product_images/01_1일1생식_라이프밀.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/라이프밀 데일리.png",
+          "브랜드소개/product_images/01_1일1생식_라이프밀.jpg"
+        ]
+      }
     },
     {
-      "id": "P002", "name": "라이프밀 데일리 동결건조 생식 쉐이크 (30g×14포)", "category": "식품>가루/분말류>기타분말가루", "status": "active",
-      "manufacturer": "", "summary": "아침 대용 동결건조 생식 쉐이크. ⚠️ P001(1일1생식 420g)과 동일 레시피 가능성 — 사내 확인 필요.",
-      "targetPersona": ["아침 거르는 직장인", "출산 후 육아맘", "다이어트 관심 여성"],
-      "sellingPoints": [
-        { "id": "P002-sp1", "point": "우유·두유·물에 타 마시는 아침 1분 대용 한 끼", "evidence": "블로그 후기 반복 관찰(아침대용·쉐이커 섭취 루틴)", "source": "https://blog.naver.com/crystalcha13/224312854961", "verified": false }
+      "id": "P002",
+      "name": "라이프밀 데일리 동결건조 생식 쉐이크 (30g×14포)",
+      "category": "식품>가루/분말류>기타분말가루",
+      "status": "active",
+      "manufacturer": "",
+      "producer": "(주)해밀리",
+      "summary": "아침 대용 동결건조 생식 쉐이크. ⚠️ P001(1일1생식 420g)과 동일 레시피 가능성 — 사내 확인 필요.",
+      "targetPersona": [
+        "아침 거르는 직장인",
+        "출산 후 육아맘",
+        "다이어트 관심 여성"
       ],
-      "nutrition": { "servingSize": "30g(1포)", "table": { "kcal": 105, "carb_g": null, "protein_g": 5, "fat_g": null, "sodium_mg": 70, "sugar_g": null, "fiber_g": 6, "zinc_mg": 8.5 }, "source": "라이프밀 데일리.png(P001과 동일 라벨로 추정) / [후기] blog.naver.com/crystalcha13/224312854961 — ⚠️P001 동일제품 여부 사내 확인 필요" },
-      "ingredients": { "list": ["원물 41종(동결건조 생식원료)"], "allergens": ["대두", "토마토", "우유", "밀"], "source": "라이프밀 데일리.png / [후기]. ⚠️P001과 동일 라벨 가능성" },
+      "sellingPoints": [
+        {
+          "id": "P002-sp1",
+          "point": "우유·두유·물에 타 마시는 아침 1분 대용 한 끼",
+          "evidence": "블로그 후기 반복 관찰(아침대용·쉐이커 섭취 루틴)",
+          "source": "https://blog.naver.com/crystalcha13/224312854961",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "30g(1포)",
+        "table": {
+          "kcal": 105,
+          "carb_g": null,
+          "protein_g": 5,
+          "fat_g": null,
+          "sodium_mg": 70,
+          "sugar_g": null,
+          "fiber_g": 6,
+          "zinc_mg": 8.5
+        },
+        "source": "라이프밀 데일리.png(P001과 동일 라벨로 추정) / [후기] blog.naver.com/crystalcha13/224312854961 — ⚠️P001 동일제품 여부 사내 확인 필요"
+      },
+      "ingredients": {
+        "list": [
+          "원물 41종(동결건조 생식원료)"
+        ],
+        "allergens": [
+          "대두",
+          "토마토",
+          "우유",
+          "밀"
+        ],
+        "source": "라이프밀 데일리.png / [후기]. ⚠️P001과 동일 라벨 가능성 | producer 출처: 라이프밀 데일리.png(P001 동일 추정)"
+      },
       "certifications": [],
-      "price": { "list": 45000, "sale": null, "optionCount": 5, "options": [ { "name": "14포 1개", "price": 45000 } ] },
-      "usageGuide": "저지방우유·두유·물에 1포를 타서 흔들어 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 45000,
+        "sale": 34000,
+        "optionCount": 5,
+        "options": [
+          {
+            "name": "14포 1개",
+            "price": 45000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "저지방우유·두유·물에 1포를 타서 흔들어 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/product_images/02_데일리_동결건조생식쉐이크.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/product_images/02_데일리_동결건조생식쉐이크.jpg"
+        ]
+      }
     },
     {
-      "id": "P003", "name": "황성주 박사의 영양식 (황성주생식 식사대용)", "category": "식품>건강식품>환자식/영양보충식", "status": "active",
-      "manufacturer": "황성주", "summary": "3대 영양소와 12종 비타민·미네랄, 식물유래원료 60여 종을 담은 식사대용 생식. 30g(105kcal).",
-      "targetPersona": ["부모님 건강 챙기는 중장년", "간편 건강식 수요층"],
-      "sellingPoints": [
-        { "id": "P003-sp1", "point": "1포 고단백 5.5g & 고식이섬유 5.4g", "evidence": "라벨 마케팅 표기 및 영양성분표", "source": "영양식1.png / 라이프밀_브랜드소개서_카피_요약.md #3a", "verified": false },
-        { "id": "P003-sp2", "point": "라피노스 1g/포 함유 — '일반식품의 기능성표시제' 적용(장내 유익균 증식·유해균 억제, 배변활동 도움)", "evidence": "라벨상 기능성표시제 문구", "source": "영양식1.png(⚠️'이롬의 「일반식품의 기능성표시제」 적용 제품' 문구) — 법적 표시기준 허브 검증 필요", "verified": false }
+      "id": "P003",
+      "name": "황성주 박사의 영양식 (황성주생식 식사대용)",
+      "category": "식품>건강식품>환자식/영양보충식",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)해밀리",
+      "summary": "3대 영양소와 12종 비타민·미네랄, 식물유래원료 60여 종을 담은 식사대용 생식. 30g(105kcal).",
+      "targetPersona": [
+        "부모님 건강 챙기는 중장년",
+        "간편 건강식 수요층"
       ],
-      "nutrition": { "servingSize": "30g(1포)", "table": { "kcal": 105, "carb_g": null, "protein_g": 5.5, "fat_g": null, "sodium_mg": 90, "sugar_g": 2.7, "fiber_g": 5.4, "vitC_mg": 39, "zinc_mg": 3.4 }, "source": "영양식1.png / 라이프밀_브랜드소개서_카피_요약.md #3a(라벨)" },
-      "ingredients": { "list": ["라피노스", "동결건조 채소·곡물 30여 종(29.8%+)", "식물유래원료 60여 종"], "allergens": ["대두", "밀", "토마토"], "source": "영양식1.png(마케팅 이미지) + md #3a. 전체 원재료 표(상품정보제공고시)는 미판독 → 캡처 추가 판독 권장" },
+      "sellingPoints": [
+        {
+          "id": "P003-sp1",
+          "point": "1포 고단백 5.5g & 고식이섬유 5.4g",
+          "evidence": "라벨 마케팅 표기 및 영양성분표",
+          "source": "영양식1.png / 라이프밀_브랜드소개서_카피_요약.md #3a",
+          "verified": false
+        },
+        {
+          "id": "P003-sp2",
+          "point": "라피노스 1g/포 함유 — '일반식품의 기능성표시제' 적용(장내 유익균 증식·유해균 억제, 배변활동 도움)",
+          "evidence": "라벨상 기능성표시제 문구 [식약처 조사: 식품안전나라/식품 DB상 '황성주 박사의 영양식'은 라피노스(고시형)·프락토올리고당 등 기능성 원료 함유 기타가공품(제조 (주)해밀리, 판매원 (주)이롬홀딩스, 허가 2021-04-01)으로 등록. 라피노스 '장내 유익균 증식·유해균 억제·배변활동' 기능성 문구는 일반식품 기능성표시 등록례 확인(kpanews 223428). 단 라이프밀/이롬 제품명으로 특정된 공식 기능성표시 등록번호·문구 원문은 미확인]",
+          "source": "영양식1.png(⚠️'이롬의 「일반식품의 기능성표시제」 적용 제품' 문구) — 법적 표시기준 허브 검증 필요 + 식품안전나라/poolixhub(1562832) + kpanews.co.kr/news 223428",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "30g(1포)",
+        "table": {
+          "kcal": 105,
+          "carb_g": null,
+          "protein_g": 5.5,
+          "fat_g": null,
+          "sodium_mg": 90,
+          "sugar_g": 2.7,
+          "fiber_g": 5.4,
+          "vitC_mg": 39,
+          "zinc_mg": 3.4
+        },
+        "source": "영양식1.png / 라이프밀_브랜드소개서_카피_요약.md #3a(라벨)"
+      },
+      "ingredients": {
+        "list": [
+          "라피노스",
+          "동결건조 채소·곡물 30여 종(29.8%+)",
+          "식물유래원료 60여 종"
+        ],
+        "allergens": [
+          "대두",
+          "밀",
+          "토마토"
+        ],
+        "source": "영양식1.png(마케팅 이미지) + md #3a. 전체 원재료 표(상품정보제공고시)는 미판독 → 캡처 추가 판독 권장 | producer 출처: 식품안전나라/식품 DB(poolixhub 1562832): 제조 (주)해밀리, 판매원 (주)이롬홀딩스"
+      },
       "certifications": [],
-      "price": { "list": 45000, "sale": null, "optionCount": 5, "options": [ { "name": "30포 1개", "price": 45000 } ] },
-      "usageGuide": "물·두유·우유에 1포를 타서 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 45000,
+        "sale": 40500,
+        "optionCount": 5,
+        "options": [
+          {
+            "name": "30포 1개",
+            "price": 45000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "물·두유·우유에 1포를 타서 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/영양식1.png", "브랜드소개/product_images/03_영양식_황성주생식.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/영양식1.png",
+          "브랜드소개/product_images/03_영양식_황성주생식.jpg"
+        ]
+      }
     },
     {
-      "id": "P004", "name": "황성주 박사의 발효건강식 (황성주생식 식사대용)", "category": "식품>건강식품>환자식/영양보충식", "status": "active",
-      "manufacturer": "황성주", "summary": "홍삼·프락토올리고당 2중 기능성원료 함유 발효 생식. 동결건조 35종(40.5%+). 30g(110kcal).",
-      "targetPersona": ["중장년 건강관리층", "부모님 선물 구매자"],
-      "sellingPoints": [
-        { "id": "P004-sp1", "point": "홍삼(진세노사이드 Rb1·Rg1·Rg3 합계 1mg/포) + 프락토올리고당 2g/포 2중 기능성원료", "evidence": "라벨 마케팅 표기", "source": "발효건강식1.png(⚠️'이롬의 「일반식품의 기능성표시제」 적용' 문구) — 법적 검증 필요", "verified": false },
-        { "id": "P004-sp2", "point": "1포 고단백 6g & 고식이섬유 4.5g, 아연 8.5mg(100%)", "evidence": "라벨 영양 표기", "source": "발효건강식1.png / md #3b", "verified": false }
+      "id": "P004",
+      "name": "황성주 박사의 발효건강식 (황성주생식 식사대용)",
+      "category": "식품>건강식품>환자식/영양보충식",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)해밀리",
+      "summary": "홍삼·프락토올리고당 2중 기능성원료 함유 발효 생식. 동결건조 35종(40.5%+). 30g(110kcal).",
+      "targetPersona": [
+        "중장년 건강관리층",
+        "부모님 선물 구매자"
       ],
-      "nutrition": { "servingSize": "30g(1포)", "table": { "kcal": 110, "carb_g": null, "protein_g": 6, "fat_g": null, "sodium_mg": 115, "sugar_g": null, "fiber_g": 4.5, "zinc_mg": 8.5 }, "source": "발효건강식1.png / md #3b(라벨)" },
-      "ingredients": { "list": ["홍삼", "프락토올리고당", "동결건조 원료 35종(40.5%+)", "식물유래원료 60여 종"], "allergens": ["대두", "밀", "토마토", "우유"], "source": "발효건강식1.png(마케팅) + md #3b. 전체 원재료 표 미판독 → 캡처 추가 권장" },
+      "sellingPoints": [
+        {
+          "id": "P004-sp1",
+          "point": "홍삼(진세노사이드 Rb1·Rg1·Rg3 합계 1mg/포) + 프락토올리고당 2g/포 2중 기능성원료",
+          "evidence": "라벨 마케팅 표기 [식약처 조사: '발효건강식'도 제조 (주)해밀리로 식품 DB 확인. 다만 공개 DB에 기능성 원료·기능성표시 문구는 미표시. 프락토올리고당은 기능성 인정 원료이나, 홍삼(진세노사이드)은 건강기능식품 기능성 원료로 일반식품 기능성표시 적용 가능성은 별도 확인 필요]",
+          "source": "발효건강식1.png(⚠️'이롬의 「일반식품의 기능성표시제」 적용' 문구) — 법적 검증 필요 + 식품안전나라/poolixhub(1562832)",
+          "verified": false
+        },
+        {
+          "id": "P004-sp2",
+          "point": "1포 고단백 6g & 고식이섬유 4.5g, 아연 8.5mg(100%)",
+          "evidence": "라벨 영양 표기",
+          "source": "발효건강식1.png / md #3b",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "30g(1포)",
+        "table": {
+          "kcal": 110,
+          "carb_g": null,
+          "protein_g": 6,
+          "fat_g": null,
+          "sodium_mg": 115,
+          "sugar_g": null,
+          "fiber_g": 4.5,
+          "zinc_mg": 8.5
+        },
+        "source": "발효건강식1.png / md #3b(라벨)"
+      },
+      "ingredients": {
+        "list": [
+          "홍삼",
+          "프락토올리고당",
+          "동결건조 원료 35종(40.5%+)",
+          "식물유래원료 60여 종"
+        ],
+        "allergens": [
+          "대두",
+          "밀",
+          "토마토",
+          "우유"
+        ],
+        "source": "발효건강식1.png(마케팅) + md #3b. 전체 원재료 표 미판독 → 캡처 추가 권장 | producer 출처: 식품안전나라/식품 DB: 제조 (주)해밀리"
+      },
       "certifications": [],
-      "price": { "list": 49000, "sale": null, "optionCount": 5, "options": [ { "name": "30포 1개", "price": 49000 }, { "name": "30포 3개", "price": 147000 } ] },
-      "usageGuide": "물·두유·우유에 1포를 타서 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 49000,
+        "sale": 44100,
+        "optionCount": 5,
+        "options": [
+          {
+            "name": "30포 1개",
+            "price": 49000
+          },
+          {
+            "name": "30포 3개",
+            "price": 147000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "물·두유·우유에 1포를 타서 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/발효건강식1.png", "브랜드소개/product_images/03b_발효건강식_황성주생식.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/발효건강식1.png",
+          "브랜드소개/product_images/03b_발효건강식_황성주생식.jpg"
+        ]
+      }
     },
     {
-      "id": "P005", "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 (3g×14포)", "category": "식품>건강식품>건강분말>기타건강분말", "status": "active",
-      "manufacturer": "라이프밀", "summary": "씻고 썰 필요 없이 마시는 샐러드 한 잔. 48가지 재료, 생식원료 54%. 3g(10kcal) 초저열량.",
-      "targetPersona": ["다이어트 관심 여성", "채소 섭취 부족 직장인"],
-      "sellingPoints": [
-        { "id": "P005-sp1", "point": "3g 1포 10kcal 초저열량, 생식원료 함유 54%", "evidence": "라벨 영양·원재료 표기", "source": "닥터샐러드1.png(상품정보제공고시)", "verified": false },
-        { "id": "P005-sp2", "point": "동결건조 채소·곡물 등 48가지 재료를 물에 타 마시는 간편 섭취", "evidence": "라벨 원재료 및 섭취방법", "source": "닥터샐러드1.png", "verified": false }
+      "id": "P005",
+      "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 (3g×14포)",
+      "category": "식품>건강식품>건강분말>기타건강분말",
+      "status": "active",
+      "manufacturer": "라이프밀",
+      "producer": "(주)에프엔디",
+      "summary": "씻고 썰 필요 없이 마시는 샐러드 한 잔. 48가지 재료, 생식원료 54%. 3g(10kcal) 초저열량.",
+      "targetPersona": [
+        "다이어트 관심 여성",
+        "채소 섭취 부족 직장인"
       ],
-      "nutrition": { "servingSize": "3g(1포)", "table": { "kcal": 10, "carb_g": 2.4, "protein_g": 0.2, "fat_g": 0, "sodium_mg": 2.6, "sugar_g": 0.5, "cholesterol_mg": 0 }, "source": "닥터샐러드1.png(상품정보제공고시)" },
-      "ingredients": { "list": ["프락토올리고당", "동결건조 케일·시금치·보리·현미·귀리·연근·레몬 등", "닥터샐러드블랙", "동결건조 생식원료 함유 54%"], "allergens": ["토마토"], "source": "닥터샐러드1.png — 제조 (주)에프엔디(전남 무안), 유통 (주)이롬홀딩스. 전체 원재료 표 라벨 원문 참조" },
+      "sellingPoints": [
+        {
+          "id": "P005-sp1",
+          "point": "3g 1포 10kcal 초저열량, 생식원료 함유 54%",
+          "evidence": "라벨 영양·원재료 표기",
+          "source": "닥터샐러드1.png(상품정보제공고시)",
+          "verified": false
+        },
+        {
+          "id": "P005-sp2",
+          "point": "동결건조 채소·곡물 등 48가지 재료를 물에 타 마시는 간편 섭취",
+          "evidence": "라벨 원재료 및 섭취방법",
+          "source": "닥터샐러드1.png",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "3g(1포)",
+        "table": {
+          "kcal": 10,
+          "carb_g": 2.4,
+          "protein_g": 0.2,
+          "fat_g": 0,
+          "sodium_mg": 2.6,
+          "sugar_g": 0.5,
+          "cholesterol_mg": 0
+        },
+        "source": "닥터샐러드1.png(상품정보제공고시)"
+      },
+      "ingredients": {
+        "list": [
+          "프락토올리고당",
+          "동결건조 케일·시금치·보리·현미·귀리·연근·레몬 등",
+          "닥터샐러드블랙",
+          "동결건조 생식원료 함유 54%"
+        ],
+        "allergens": [
+          "토마토"
+        ],
+        "source": "닥터샐러드1.png — 제조 (주)에프엔디(전남 무안), 유통 (주)이롬홀딩스. 전체 원재료 표 라벨 원문 참조"
+      },
       "certifications": [],
-      "price": { "list": 40000, "sale": null, "optionCount": 5, "options": [ { "name": "14포 1개", "price": 40000 }, { "name": "14포 6개", "price": 240000 } ] },
-      "usageGuide": "1일 1~3회, 1회 1포(3g)를 물에 타서 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 40000,
+        "sale": 36000,
+        "optionCount": 5,
+        "options": [
+          {
+            "name": "14포 1개",
+            "price": 40000
+          },
+          {
+            "name": "14포 6개",
+            "price": 240000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "1일 1~3회, 1회 1포(3g)를 물에 타서 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/닥터샐러드1.png", "브랜드소개/product_images/04_닥터샐러드_마시는샐러드.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/닥터샐러드1.png",
+          "브랜드소개/product_images/04_닥터샐러드_마시는샐러드.jpg"
+        ]
+      }
     },
     {
-      "id": "P006", "name": "황성주 박사의 프로틴 골드 HIGH5 식물성 단백질", "category": "식품>다이어트식품>단백질보충제>단백질파우더", "status": "active",
-      "manufacturer": "황성주", "summary": "식물성 단백질 15g + 아연·셀렌·칼슘·마그네슘 5가지 고영양 설계. 칼슘:마그네슘 2:1. 30g(105kcal).",
-      "targetPersona": ["운동·근성장 관심 직장인", "중장년 근력 관리층"],
-      "sellingPoints": [
-        { "id": "P006-sp1", "point": "1포 식물성 단백질 15g(27%), 아연 2.55mg·셀렌 16.5μg·칼슘 210mg·마그네슘 105mg", "evidence": "라벨 영양성분표", "source": "프로틴골드1.png / md #5(라벨)", "verified": false },
-        { "id": "P006-sp2", "point": "운동 후 단백질 보충 루틴(식물성 단백질 선호층)", "evidence": "블로그 후기 반복 관찰(오운완·근성장)", "source": "https://blog.naver.com/like_a_recipe/224278208745", "verified": false }
+      "id": "P006",
+      "name": "황성주 박사의 프로틴 골드 HIGH5 식물성 단백질",
+      "category": "식품>다이어트식품>단백질보충제>단백질파우더",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "미확인(라벨 상품정보제공고시 미판독)",
+      "summary": "식물성 단백질 15g + 아연·셀렌·칼슘·마그네슘 5가지 고영양 설계. 칼슘:마그네슘 2:1. 30g(105kcal).",
+      "targetPersona": [
+        "운동·근성장 관심 직장인",
+        "중장년 근력 관리층"
       ],
-      "nutrition": { "servingSize": "30g(1포)", "table": { "kcal": 105, "carb_g": null, "protein_g": 15, "fat_g": null, "sodium_mg": 200, "sugar_g": 2, "fiber_g": 2, "zinc_mg": 2.55, "selenium_ug": 16.5, "calcium_mg": 210, "magnesium_mg": 105 }, "source": "프로틴골드1.png / md #5(라벨)" },
-      "ingredients": { "list": ["식물성 단백질(대두)", "아연·셀렌·칼슘·마그네슘 강화"], "allergens": ["대두"], "source": "프로틴골드1.png(마케팅) + md #5. 전체 원재료 표 미판독 → 캡처 추가 권장" },
+      "sellingPoints": [
+        {
+          "id": "P006-sp1",
+          "point": "1포 식물성 단백질 15g(27%), 아연 2.55mg·셀렌 16.5μg·칼슘 210mg·마그네슘 105mg",
+          "evidence": "라벨 영양성분표",
+          "source": "프로틴골드1.png / md #5(라벨)",
+          "verified": false
+        },
+        {
+          "id": "P006-sp2",
+          "point": "운동 후 단백질 보충 루틴(식물성 단백질 선호층)",
+          "evidence": "블로그 후기 반복 관찰(오운완·근성장)",
+          "source": "https://blog.naver.com/like_a_recipe/224278208745",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "30g(1포)",
+        "table": {
+          "kcal": 105,
+          "carb_g": null,
+          "protein_g": 15,
+          "fat_g": null,
+          "sodium_mg": 200,
+          "sugar_g": 2,
+          "fiber_g": 2,
+          "zinc_mg": 2.55,
+          "selenium_ug": 16.5,
+          "calcium_mg": 210,
+          "magnesium_mg": 105
+        },
+        "source": "프로틴골드1.png / md #5(라벨)"
+      },
+      "ingredients": {
+        "list": [
+          "식물성 단백질(대두)",
+          "아연·셀렌·칼슘·마그네슘 강화"
+        ],
+        "allergens": [
+          "대두"
+        ],
+        "source": "프로틴골드1.png(마케팅) + md #5. 전체 원재료 표 미판독 → 캡처 추가 권장 | producer 출처: 라벨 상품정보제공고시 미판독 — 캡처/DB 추가 확인 필요"
+      },
       "certifications": [],
-      "price": { "list": 30000, "sale": null, "optionCount": 4, "options": [ { "name": "21포 1개", "price": 30000 }, { "name": "63포 3개", "price": 90000 } ] },
-      "usageGuide": "물·우유 등에 1포를 타서 쉐이크로 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 30000,
+        "sale": 27000,
+        "optionCount": 4,
+        "options": [
+          {
+            "name": "21포 1개",
+            "price": 30000
+          },
+          {
+            "name": "63포 3개",
+            "price": 90000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "물·우유 등에 1포를 타서 쉐이크로 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/프로틴골드1.png", "브랜드소개/product_images/05_프로틴골드_HIGH5.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/프로틴골드1.png",
+          "브랜드소개/product_images/05_프로틴골드_HIGH5.jpg"
+        ]
+      }
     },
     {
-      "id": "P007", "name": "황성주 박사의 데이 업 프로틴 쉐이크 (4맛: 오리지널/초코/바나나/단호박앤고구마, 45g)", "category": "식품>다이어트식품>단백질보충제>단백질파우더", "status": "active",
-      "manufacturer": "황성주", "summary": "맛있게 즐기는 식물성 단백질 20g 쉐이크. 저당·최대 170kcal. 우유 200mL에 희석 섭취.",
-      "targetPersona": ["운동·근성장 관심 직장인", "다이어트 관심 여성"],
-      "sellingPoints": [
-        { "id": "P007-sp1", "point": "1포(45g) 식물성 단백질 20g(36%), 당류 2g 저당", "evidence": "오리지널 라벨 영양성분표", "source": "데이 업 프로틴 쉐이크1.png(상품정보제공고시)", "verified": false },
-        { "id": "P007-sp2", "point": "맛있어서 지속하는 단백질 루틴(4가지 맛)", "evidence": "0521 카페로쥬 제품 카피 및 블로그 후기", "source": "0521_라이프밀 카페로쥬.pdf / https://blog.naver.com/bong_jja/224280741330", "verified": false }
+      "id": "P007",
+      "name": "황성주 박사의 데이 업 프로틴 쉐이크 (4맛: 오리지널/초코/바나나/단호박앤고구마, 45g)",
+      "category": "식품>다이어트식품>단백질보충제>단백질파우더",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)엄마사랑",
+      "summary": "맛있게 즐기는 식물성 단백질 20g 쉐이크. 저당·최대 170kcal. 우유 200mL에 희석 섭취.",
+      "targetPersona": [
+        "운동·근성장 관심 직장인",
+        "다이어트 관심 여성"
       ],
-      "nutrition": { "servingSize": "45g(1포, 오리지널 기준)", "table": { "kcal": 170, "carb_g": 20, "protein_g": 20, "fat_g": 1.2, "sodium_mg": 260, "sugar_g": 2, "transfat_g": 0 }, "source": "데이 업 프로틴 쉐이크1.png(오리지널 라벨). 초코·바나나·단호박앤고구마 3맛 라벨 영양 미확보" },
-      "ingredients": { "list": ["분리대두단백(싱가폴산)", "농축대두단백(미국산)", "라이프밀 블렌드10(국산, 동결건조현미 등)", "수크랄로스(감미료)", "판토텐산칼슘", "비타민 강화"], "allergens": ["우유", "메밀", "대두", "밀"], "source": "데이 업 프로틴 쉐이크1.png — 제조 (주)엄마사랑(충북 청주), 유통 (주)해밀리. 오리지널 기준" },
+      "sellingPoints": [
+        {
+          "id": "P007-sp1",
+          "point": "1포(45g) 식물성 단백질 20g(36%), 당류 2g 저당",
+          "evidence": "오리지널 라벨 영양성분표",
+          "source": "데이 업 프로틴 쉐이크1.png(상품정보제공고시)",
+          "verified": false
+        },
+        {
+          "id": "P007-sp2",
+          "point": "맛있어서 지속하는 단백질 루틴(4가지 맛)",
+          "evidence": "0521 카페로쥬 제품 카피 및 블로그 후기",
+          "source": "0521_라이프밀 카페로쥬.pdf / https://blog.naver.com/bong_jja/224280741330",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "45g(1포, 오리지널 기준)",
+        "table": {
+          "kcal": 170,
+          "carb_g": 20,
+          "protein_g": 20,
+          "fat_g": 1.2,
+          "sodium_mg": 260,
+          "sugar_g": 2,
+          "transfat_g": 0
+        },
+        "source": "데이 업 프로틴 쉐이크1.png(오리지널 라벨). 초코·바나나·단호박앤고구마 3맛 라벨 영양 미확보"
+      },
+      "ingredients": {
+        "list": [
+          "분리대두단백(싱가폴산)",
+          "농축대두단백(미국산)",
+          "라이프밀 블렌드10(국산, 동결건조현미 등)",
+          "수크랄로스(감미료)",
+          "판토텐산칼슘",
+          "비타민 강화"
+        ],
+        "allergens": [
+          "우유",
+          "메밀",
+          "대두",
+          "밀"
+        ],
+        "source": "데이 업 프로틴 쉐이크1.png — 제조 (주)엄마사랑(충북 청주), 유통 (주)해밀리. 오리지널 기준"
+      },
       "certifications": [],
-      "price": { "list": 31500, "sale": null, "optionCount": 16, "options": [ { "name": "45g 7개", "price": 31500 }, { "name": "45g 28개", "price": 119000 } ] },
-      "usageGuide": "1일 1회, 1포(45g)를 물 또는 두유·우유 200mL에 희석하여 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 31500,
+        "sale": 31500,
+        "optionCount": 16,
+        "options": [
+          {
+            "name": "45g 7개",
+            "price": 31500
+          },
+          {
+            "name": "45g 28개",
+            "price": 119000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "1일 1회, 1포(45g)를 물 또는 두유·우유 200mL에 희석하여 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/데이 업 프로틴 쉐이크1.png", "브랜드소개/product_images/06_데이업_프로틴쉐이크.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/데이 업 프로틴 쉐이크1.png",
+          "브랜드소개/product_images/06_데이업_프로틴쉐이크.jpg"
+        ]
+      }
     },
     {
-      "id": "P008", "name": "황성주 박사의 데이크런치 프로틴바 초코 (35g×10)", "category": "식품>스낵/과자>시리얼>단백질바", "status": "active",
-      "manufacturer": "황성주", "summary": "한 손으로 끝내는 든든한 단백질 한 끼. 초코맛 프로틴바. 35g(155kcal), 단백질 10g.",
-      "targetPersona": ["휴대 간식 수요 다이어터", "대학생·직장인 간식층"],
-      "sellingPoints": [
-        { "id": "P008-sp1", "point": "1개(35g) 단백질 10g(18%), 식이섬유 5g(20%)", "evidence": "라벨 영양성분표", "source": "데이 크런치 프로틴바1.png / _crop_ingredients.png", "verified": false }
+      "id": "P008",
+      "name": "황성주 박사의 데이크런치 프로틴바 초코 (35g×10)",
+      "category": "식품>스낵/과자>시리얼>단백질바",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)엄마사랑",
+      "summary": "한 손으로 끝내는 든든한 단백질 한 끼. 초코맛 프로틴바. 35g(155kcal), 단백질 10g.",
+      "targetPersona": [
+        "휴대 간식 수요 다이어터",
+        "대학생·직장인 간식층"
       ],
-      "nutrition": { "servingSize": "35g(1개)", "table": { "kcal": 155, "carb_g": 13, "protein_g": 10, "fat_g": 6, "sodium_mg": 100, "sugar_g": 2, "fiber_g": 5 }, "source": "데이 크런치 프로틴바1.png / _crop_ingredients2.png(상품정보제공고시)" },
-      "ingredients": { "list": ["소이프로틴너겟(미국산)", "볶음땅콩반태(아르헨티나산)", "폴리글리시톨액(감미료)", "볶음아몬드(미국산)", "블랙칩비스킷(밀가루·설탕·쇼트닝·코코아분말)", "이소말토올리고당", "해바라기씨", "알룰로오스", "카카오닙스", "압출시리얼", "몽크후르츠농축과즙", "대두레시틴"], "allergens": ["땅콩", "대두", "우유", "밀", "아황산류"], "source": "_crop_ingredients.png/_crop_ingredients2.png — 제조 (주)엄마사랑, 유통 (주)이롬홀딩스" },
+      "sellingPoints": [
+        {
+          "id": "P008-sp1",
+          "point": "1개(35g) 단백질 10g(18%), 식이섬유 5g(20%)",
+          "evidence": "라벨 영양성분표",
+          "source": "데이 크런치 프로틴바1.png / _crop_ingredients.png",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "35g(1개)",
+        "table": {
+          "kcal": 155,
+          "carb_g": 13,
+          "protein_g": 10,
+          "fat_g": 6,
+          "sodium_mg": 100,
+          "sugar_g": 2,
+          "fiber_g": 5
+        },
+        "source": "데이 크런치 프로틴바1.png / _crop_ingredients2.png(상품정보제공고시)"
+      },
+      "ingredients": {
+        "list": [
+          "소이프로틴너겟(미국산)",
+          "볶음땅콩반태(아르헨티나산)",
+          "폴리글리시톨액(감미료)",
+          "볶음아몬드(미국산)",
+          "블랙칩비스킷(밀가루·설탕·쇼트닝·코코아분말)",
+          "이소말토올리고당",
+          "해바라기씨",
+          "알룰로오스",
+          "카카오닙스",
+          "압출시리얼",
+          "몽크후르츠농축과즙",
+          "대두레시틴"
+        ],
+        "allergens": [
+          "땅콩",
+          "대두",
+          "우유",
+          "밀",
+          "아황산류"
+        ],
+        "source": "_crop_ingredients.png/_crop_ingredients2.png — 제조 (주)엄마사랑, 유통 (주)이롬홀딩스"
+      },
       "certifications": [],
-      "price": { "list": 28000, "sale": null, "optionCount": 1, "options": [ { "name": "35g×10개", "price": 28000 } ] },
-      "usageGuide": "간식·식사대용으로 섭취. 개봉 후 바로 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 28000,
+        "sale": 25200,
+        "optionCount": 1,
+        "options": [
+          {
+            "name": "35g×10개",
+            "price": 28000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "간식·식사대용으로 섭취. 개봉 후 바로 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/데이 크런치 프로틴바1.png", "브랜드소개/product_images/07_데이크런치_프로틴바.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/데이 크런치 프로틴바1.png",
+          "브랜드소개/product_images/07_데이크런치_프로틴바.jpg"
+        ]
+      }
     },
     {
-      "id": "P009", "name": "황성주 박사의 데이크런치 프로틴바 그레인 (30g×10)", "category": "식품>스낵/과자>시리얼>단백질바", "status": "active",
-      "manufacturer": "황성주", "summary": "곡물 식감의 든든한 단백질바 그레인. 30g×10개. ⚠️ 공식 라벨 캡처 미확보.",
-      "targetPersona": ["휴대 간식 수요 다이어터"],
-      "sellingPoints": [
-        { "id": "P009-sp1", "point": "1개(30g) 단백질 10g, 식이섬유 5g, 당류 1.2g (후기 기준)", "evidence": "구매자 블로그 후기", "source": "[후기] blog.naver.com/seoul_soul_food/224249036794 — 라벨 미확보, 실측 검증 필요", "verified": false }
+      "id": "P009",
+      "name": "황성주 박사의 데이크런치 프로틴바 그레인 (30g×10)",
+      "category": "식품>스낵/과자>시리얼>단백질바",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)엄마사랑",
+      "summary": "곡물 식감의 든든한 단백질바 그레인. 30g×10개. ⚠️ 공식 라벨 캡처 미확보.",
+      "targetPersona": [
+        "휴대 간식 수요 다이어터"
       ],
-      "nutrition": { "servingSize": "30g(1개)", "table": { "kcal": 125, "carb_g": null, "protein_g": 10, "fat_g": null, "sodium_mg": null, "sugar_g": 1.2, "fiber_g": 5 }, "source": "[후기] blog.naver.com/seoul_soul_food/224249036794 — ⚠️미확보(라벨 캡처 필요). origin-detail API: 곡류가공품, 제조 (주)엄마사랑(품목보고 2002041502)" },
-      "ingredients": { "list": [], "allergens": [], "source": "미확보 — 라벨 캡처 필요. origin-detail API상 원재료='상품상세참조'" },
+      "sellingPoints": [
+        {
+          "id": "P009-sp1",
+          "point": "1개(30g) 단백질 10g, 식이섬유 5g, 당류 1.2g (후기 기준)",
+          "evidence": "구매자 블로그 후기",
+          "source": "[후기] blog.naver.com/seoul_soul_food/224249036794 — 라벨 미확보, 실측 검증 필요",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "30g(1개)",
+        "table": {
+          "kcal": 125,
+          "carb_g": null,
+          "protein_g": 10,
+          "fat_g": null,
+          "sodium_mg": null,
+          "sugar_g": 1.2,
+          "fiber_g": 5
+        },
+        "source": "[후기] blog.naver.com/seoul_soul_food/224249036794 — ⚠️미확보(라벨 캡처 필요). origin-detail API: 곡류가공품, 제조 (주)엄마사랑(품목보고 2002041502)"
+      },
+      "ingredients": {
+        "list": [],
+        "allergens": [],
+        "source": "미확보 — 라벨 캡처 필요. origin-detail API상 원재료='상품상세참조' | producer 출처: 커머스 origin-detail API"
+      },
       "certifications": [],
-      "price": { "list": 28000, "sale": null, "optionCount": 1, "options": [ { "name": "30g×10개", "price": 28000 } ] },
-      "usageGuide": "간식·식사대용으로 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 28000,
+        "sale": 25200,
+        "optionCount": 1,
+        "options": [
+          {
+            "name": "30g×10개",
+            "price": 28000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "간식·식사대용으로 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": [] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": []
+      }
     },
     {
-      "id": "P010", "name": "홀그레인 저당 그래놀라 (20g×7봉)", "category": "식품>스낵/과자>시리얼>그래놀라", "status": "active",
-      "manufacturer": "황성주", "summary": "당은 줄이고 곡물의 든든함은 그대로. 5가지 통곡물 100% 국산. ⚠️ 공식 라벨 캡처 미확보.",
-      "targetPersona": ["저당 간식 수요층", "다이어트 관심 여성"],
-      "sellingPoints": [
-        { "id": "P010-sp1", "point": "5가지 통곡물(약콩·수수·현미·율무·귀리) 100% 국산, 당류 0.4g (후기 기준)", "evidence": "구매자 블로그 후기", "source": "[후기] blog.naver.com/s1996129s/223810149236 — 라벨 미확보, 실측 검증 필요", "verified": false }
+      "id": "P010",
+      "name": "홀그레인 저당 그래놀라 (20g×7봉)",
+      "category": "식품>스낵/과자>시리얼>그래놀라",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)엄마사랑",
+      "summary": "당은 줄이고 곡물의 든든함은 그대로. 5가지 통곡물 100% 국산. ⚠️ 공식 라벨 캡처 미확보.",
+      "targetPersona": [
+        "저당 간식 수요층",
+        "다이어트 관심 여성"
       ],
-      "nutrition": { "servingSize": "20g(1봉)", "table": { "kcal": null, "carb_g": null, "protein_g": null, "fat_g": null, "sodium_mg": null, "sugar_g": 0.4 }, "source": "[후기] blog.naver.com/s1996129s/223810149236 — ⚠️미확보(라벨 캡처 필요). origin-detail API: 곡류가공품, 제조 (주)엄마사랑" },
-      "ingredients": { "list": ["약콩·수수·현미·율무·귀리 5가지 통곡물(100% 국산, 후기 기준)"], "allergens": [], "source": "미확보 — 라벨 캡처 필요. ⚠️origin-detail API 고시상 productName='이롬 홀그레인 저당 그래놀라'(구 브랜드 명칭 잔존)" },
+      "sellingPoints": [
+        {
+          "id": "P010-sp1",
+          "point": "5가지 통곡물(약콩·수수·현미·율무·귀리) 100% 국산, 당류 0.4g (후기 기준)",
+          "evidence": "구매자 블로그 후기",
+          "source": "[후기] blog.naver.com/s1996129s/223810149236 — 라벨 미확보, 실측 검증 필요",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "20g(1봉)",
+        "table": {
+          "kcal": null,
+          "carb_g": null,
+          "protein_g": null,
+          "fat_g": null,
+          "sodium_mg": null,
+          "sugar_g": 0.4
+        },
+        "source": "[후기] blog.naver.com/s1996129s/223810149236 — ⚠️미확보(라벨 캡처 필요). origin-detail API: 곡류가공품, 제조 (주)엄마사랑"
+      },
+      "ingredients": {
+        "list": [
+          "약콩·수수·현미·율무·귀리 5가지 통곡물(100% 국산, 후기 기준)"
+        ],
+        "allergens": [],
+        "source": "미확보 — 라벨 캡처 필요. ⚠️origin-detail API 고시상 productName='이롬 홀그레인 저당 그래놀라'(구 브랜드 명칭 잔존) | producer 출처: 커머스 origin-detail API"
+      },
       "certifications": [],
-      "price": { "list": 24000, "sale": null, "optionCount": 1, "options": [ { "name": "20g×7봉", "price": 24000 } ] },
-      "usageGuide": "간식·아침 대용으로 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 24000,
+        "sale": 21600,
+        "optionCount": 1,
+        "options": [
+          {
+            "name": "20g×7봉",
+            "price": 24000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도."
+      },
+      "usageGuide": "간식·아침 대용으로 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/product_images/10_홀그레인저당그래놀라.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/product_images/10_홀그레인저당그래놀라.jpg"
+        ]
+      }
     },
     {
-      "id": "P011", "name": "갓 구운 하루견과 (20g×30봉)", "category": "식품>농산물>견과류>혼합견과/견과류세트", "status": "active",
-      "manufacturer": "황성주", "summary": "심심할 때 손이 가는 건강 간식. 구운 견과 5종 배합. 20g(130kcal). HACCP 인증 제품.",
-      "targetPersona": ["사무실 간식 수요층", "대학생·직장인 간식층"],
-      "sellingPoints": [
-        { "id": "P011-sp1", "point": "구운 견과 5종 배합(아몬드30%·캐슈넛25%·피칸20%·헤이즐넛15%·피스타치오10%)", "evidence": "라벨 원재료명 배합비", "source": "갓구운하루견과.png(상품정보제공고시)", "verified": false },
-        { "id": "P011-sp2", "point": "식품안전관리인증 HACCP 획득", "evidence": "라벨 HACCP 인증 마크", "source": "갓구운하루견과.png(HACCP 로고)", "verified": false }
+      "id": "P011",
+      "name": "갓 구운 하루견과 (20g×30봉)",
+      "category": "식품>농산물>견과류>혼합견과/견과류세트",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "(주)조하",
+      "summary": "심심할 때 손이 가는 건강 간식. 구운 견과 5종 배합. 20g(130kcal). HACCP 인증 제품.",
+      "targetPersona": [
+        "사무실 간식 수요층",
+        "대학생·직장인 간식층"
       ],
-      "nutrition": { "servingSize": "20g(1봉)", "table": { "kcal": 130, "carb_g": 4.2, "protein_g": 4.4, "fat_g": 10.6, "sodium_mg": 0, "sugar_g": 0.8, "saturatedfat_g": 1.2, "transfat_g": 0 }, "source": "갓구운하루견과.png(상품정보제공고시)" },
-      "ingredients": { "list": ["구운아몬드 30%(미국산)", "구운캐슈넛 25%(베트남산)", "구운피칸 20%(미국산)", "구운헤이즐넛 15%(터키예산)", "구운피스타치오 10%(미국산)"], "allergens": ["땅콩", "호두", "잣", "난류", "우유", "메밀", "대두", "밀", "기타 견과류(동일 제조시설)"], "source": "갓구운하루견과.png — 제조 (주)조하(경기 고양), 유통 (주)이롬홀딩스" },
-      "certifications": [ { "name": "HACCP(식품안전관리인증)", "source": "갓구운하루견과.png(라벨 인증 마크)", "verified": false } ],
-      "price": { "list": 40000, "sale": null, "optionCount": 3, "options": [ { "name": "20g×30봉", "price": 40000 }, { "name": "30개입 3개(대용량)", "price": 120000 } ] },
-      "usageGuide": "간식으로 섭취. 씹지 않고 삼키면 질식 위험 주의.", "storage": "직사광선을 피해 서늘한 곳 보관, 개봉 후 냉장 보관 권장.",
+      "sellingPoints": [
+        {
+          "id": "P011-sp1",
+          "point": "구운 견과 5종 배합(아몬드30%·캐슈넛25%·피칸20%·헤이즐넛15%·피스타치오10%)",
+          "evidence": "라벨 원재료명 배합비",
+          "source": "갓구운하루견과.png(상품정보제공고시)",
+          "verified": false
+        },
+        {
+          "id": "P011-sp2",
+          "point": "식품안전관리인증 HACCP 획득",
+          "evidence": "라벨 HACCP 인증 마크",
+          "source": "갓구운하루견과.png(HACCP 로고)",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "20g(1봉)",
+        "table": {
+          "kcal": 130,
+          "carb_g": 4.2,
+          "protein_g": 4.4,
+          "fat_g": 10.6,
+          "sodium_mg": 0,
+          "sugar_g": 0.8,
+          "saturatedfat_g": 1.2,
+          "transfat_g": 0
+        },
+        "source": "갓구운하루견과.png(상품정보제공고시)"
+      },
+      "ingredients": {
+        "list": [
+          "구운아몬드 30%(미국산)",
+          "구운캐슈넛 25%(베트남산)",
+          "구운피칸 20%(미국산)",
+          "구운헤이즐넛 15%(터키예산)",
+          "구운피스타치오 10%(미국산)"
+        ],
+        "allergens": [
+          "땅콩",
+          "호두",
+          "잣",
+          "난류",
+          "우유",
+          "메밀",
+          "대두",
+          "밀",
+          "기타 견과류(동일 제조시설)"
+        ],
+        "source": "갓구운하루견과.png — 제조 (주)조하(경기 고양), 유통 (주)이롬홀딩스"
+      },
+      "certifications": [
+        {
+          "name": "HACCP(식품안전관리인증)",
+          "source": "갓구운하루견과.png(라벨 인증 마크)",
+          "verified": false
+        }
+      ],
+      "price": {
+        "list": 40000,
+        "sale": null,
+        "optionCount": 3,
+        "options": [
+          {
+            "name": "20g×30봉",
+            "price": 40000
+          },
+          {
+            "name": "30개입 3개(대용량)",
+            "price": 120000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도. 단품 즉시할인가 미수집; 30개입 2개 기준 정상80,000/즉시할인59,200(커머스 API)"
+      },
+      "usageGuide": "간식으로 섭취. 씹지 않고 삼키면 질식 위험 주의.",
+      "storage": "직사광선을 피해 서늘한 곳 보관, 개봉 후 냉장 보관 권장.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/갓구운하루견과.png", "브랜드소개/product_images/09_갓구운하루견과.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/갓구운하루견과.png",
+          "브랜드소개/product_images/09_갓구운하루견과.jpg"
+        ]
+      }
     },
     {
-      "id": "P012", "name": "라이프밀 이너뷰티 알로에 비타 프룻 젤리 스틱 (20g×15포)", "category": "식품>젤리/사탕/초콜릿>젤리", "status": "active",
-      "manufacturer": "(주)라이프밀", "summary": "씹어먹는 이너뷰티 젤리 스틱. 비오틴 함유. 20g(35kcal).",
-      "targetPersona": ["이너뷰티 관심 여성", "휴대 간식 수요층"],
-      "sellingPoints": [
-        { "id": "P012-sp1", "point": "1포(20g) 35kcal, 비오틴 영양성분 기준치 100% 함유", "evidence": "라벨 영양성분표", "source": "프룻젤리스틱-알로에비타1~2.png / md #8c", "verified": false }
+      "id": "P012",
+      "name": "라이프밀 이너뷰티 알로에 비타 프룻 젤리 스틱 (20g×15포)",
+      "category": "식품>젤리/사탕/초콜릿>젤리",
+      "status": "active",
+      "manufacturer": "(주)라이프밀",
+      "producer": "미확인(프룻젤리 계열, (주)연두 추정)",
+      "summary": "씹어먹는 이너뷰티 젤리 스틱. 비오틴 함유. 20g(35kcal).",
+      "targetPersona": [
+        "이너뷰티 관심 여성",
+        "휴대 간식 수요층"
       ],
-      "nutrition": { "servingSize": "20g(1포)", "table": { "kcal": 35, "carb_g": null, "protein_g": 0, "fat_g": null, "sodium_mg": 10, "sugar_g": 2, "biotin_pctDV": 100 }, "source": "프룻젤리스틱-알로에비타1~2.png / md #8c(라벨)" },
-      "ingredients": { "list": ["알로에 농축액", "비타민·비오틴 강화"], "allergens": [], "source": "프룻젤리스틱-알로에비타1~2.png. 전체 원재료 표 라벨 원문 참조" },
+      "sellingPoints": [
+        {
+          "id": "P012-sp1",
+          "point": "1포(20g) 35kcal, 비오틴 영양성분 기준치 100% 함유",
+          "evidence": "라벨 영양성분표",
+          "source": "프룻젤리스틱-알로에비타1~2.png / md #8c",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "20g(1포)",
+        "table": {
+          "kcal": 35,
+          "carb_g": null,
+          "protein_g": 0,
+          "fat_g": null,
+          "sodium_mg": 10,
+          "sugar_g": 2,
+          "biotin_pctDV": 100
+        },
+        "source": "프룻젤리스틱-알로에비타1~2.png / md #8c(라벨)"
+      },
+      "ingredients": {
+        "list": [
+          "알로에 농축액",
+          "비타민·비오틴 강화"
+        ],
+        "allergens": [],
+        "source": "프룻젤리스틱-알로에비타1~2.png. 전체 원재료 표 라벨 원문 참조 | producer 출처: 미확인"
+      },
       "certifications": [],
-      "price": { "list": 28000, "sale": null, "optionCount": 1, "options": [ { "name": "20g×15포", "price": 28000 } ] },
-      "usageGuide": "1일 1스틱, 짜서 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 28000,
+        "sale": 28000,
+        "optionCount": 1,
+        "options": [
+          {
+            "name": "20g×15포",
+            "price": 28000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도. 즉시할인 없음(정상가=할인가)"
+      },
+      "usageGuide": "1일 1스틱, 짜서 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/프룻젤리스틱-알로에비타1.png", "브랜드소개/product_images/08c_이너뷰티알로에비타_프룻젤리.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/프룻젤리스틱-알로에비타1.png",
+          "브랜드소개/product_images/08c_이너뷰티알로에비타_프룻젤리.jpg"
+        ]
+      }
     },
     {
-      "id": "P013", "name": "라이프밀 유산균 푸룬 식이섬유 프룻 젤리 스틱 (20g×15포)", "category": "식품>다이어트식품>식이섬유", "status": "active",
-      "manufacturer": "라이프밀", "summary": "푸룬·식이섬유·유산균을 담은 젤리 스틱. 20g(40kcal).",
-      "targetPersona": ["장 건강·식이섬유 관심층", "이너뷰티 관심 여성"],
-      "sellingPoints": [
-        { "id": "P013-sp1", "point": "푸룬농축액 50%(칠레산 푸룬 100%) + 유산균·식이섬유", "evidence": "라벨 원재료명 배합비", "source": "프룻젤리스틱-푸룬식이섬유2.png(상품정보제공고시)", "verified": false }
+      "id": "P013",
+      "name": "라이프밀 유산균 푸룬 식이섬유 프룻 젤리 스틱 (20g×15포)",
+      "category": "식품>다이어트식품>식이섬유",
+      "status": "active",
+      "manufacturer": "라이프밀",
+      "producer": "(주)연두",
+      "summary": "푸룬·식이섬유·유산균을 담은 젤리 스틱. 20g(40kcal).",
+      "targetPersona": [
+        "장 건강·식이섬유 관심층",
+        "이너뷰티 관심 여성"
       ],
-      "nutrition": { "servingSize": "20g(1포)", "table": { "kcal": 40, "carb_g": 11, "protein_g": 0, "fat_g": 0, "sodium_mg": 5, "sugar_g": 6, "fiber_g": 1.2 }, "source": "프룻젤리스틱-푸룬식이섬유2.png(상품정보제공고시) — ⚠️md #8a는 식이섬유 3.2g(13%)로 기재, 라벨 재판독값은 1.2g(5%). 사내 재확인 필요" },
-      "ingredients": { "list": ["푸룬농축액(칠레산 푸룬 100%) 50%", "히비스커스추출액", "프락토올리고당", "사과농축액(국산) 6.4%", "자두농축액(칠레산) 3.6%", "난소화성말토덱스트린", "잔탄검", "한천", "타마린드검", "카라기난", "유산균사균체분말", "염화칼륨"], "allergens": ["대두", "우유"], "source": "프룻젤리스틱-푸룬식이섬유2.png — 제조 (주)연두(전북 익산), 유통 (주)해밀리" },
+      "sellingPoints": [
+        {
+          "id": "P013-sp1",
+          "point": "푸룬농축액 50%(칠레산 푸룬 100%) + 유산균·식이섬유",
+          "evidence": "라벨 원재료명 배합비",
+          "source": "프룻젤리스틱-푸룬식이섬유2.png(상품정보제공고시)",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "20g(1포)",
+        "table": {
+          "kcal": 40,
+          "carb_g": 11,
+          "protein_g": 0,
+          "fat_g": 0,
+          "sodium_mg": 5,
+          "sugar_g": 6,
+          "fiber_g": 1.2
+        },
+        "source": "프룻젤리스틱-푸룬식이섬유2.png(상품정보제공고시) — ⚠️md #8a는 식이섬유 3.2g(13%)로 기재, 라벨 재판독값은 1.2g(5%). 사내 재확인 필요"
+      },
+      "ingredients": {
+        "list": [
+          "푸룬농축액(칠레산 푸룬 100%) 50%",
+          "히비스커스추출액",
+          "프락토올리고당",
+          "사과농축액(국산) 6.4%",
+          "자두농축액(칠레산) 3.6%",
+          "난소화성말토덱스트린",
+          "잔탄검",
+          "한천",
+          "타마린드검",
+          "카라기난",
+          "유산균사균체분말",
+          "염화칼륨"
+        ],
+        "allergens": [
+          "대두",
+          "우유"
+        ],
+        "source": "프룻젤리스틱-푸룬식이섬유2.png — 제조 (주)연두(전북 익산), 유통 (주)해밀리"
+      },
       "certifications": [],
-      "price": { "list": 28000, "sale": null, "optionCount": 1, "options": [ { "name": "20g×15포", "price": 28000 } ] },
-      "usageGuide": "1포(20g)를 조금씩 씹어 섭취. 개봉 후 아래부터 밀어 올려 섭취.", "storage": "직사광선·고온다습을 피해 서늘한 곳 보관.",
+      "price": {
+        "list": 28000,
+        "sale": 28000,
+        "optionCount": 1,
+        "options": [
+          {
+            "name": "20g×15포",
+            "price": 28000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도. 즉시할인 없음"
+      },
+      "usageGuide": "1포(20g)를 조금씩 씹어 섭취. 개봉 후 아래부터 밀어 올려 섭취.",
+      "storage": "직사광선·고온다습을 피해 서늘한 곳 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/프룻젤리스틱-푸룬식이섬유2.png", "브랜드소개/product_images/08a_유산균푸룬_프룻젤리.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/프룻젤리스틱-푸룬식이섬유2.png",
+          "브랜드소개/product_images/08a_유산균푸룬_프룻젤리.jpg"
+        ]
+      }
     },
     {
-      "id": "P014", "name": "라이프밀 저분자 콜라겐 ABC 프룻 젤리 스틱 (20g×15포)", "category": "식품>다이어트식품>콜라겐", "status": "active",
-      "manufacturer": "라이프밀", "summary": "번거로운 ABC주스(사과·비트·당근)를 저분자 콜라겐과 함께 젤리 스틱으로. 20g(50kcal).",
-      "targetPersona": ["이너뷰티 관심 여성", "ABC주스·콜라겐 수요층"],
-      "sellingPoints": [
-        { "id": "P014-sp1", "point": "ABC(사과·비트·당근) + 저분자 콜라겐 이너뷰티 편의 섭취", "evidence": "블로그 후기 반복 관찰 + 라벨", "source": "프룻젤리스틱-abc콜라겐1~2.png / https://blog.naver.com/freshday9656/224343726148", "verified": false }
+      "id": "P014",
+      "name": "라이프밀 저분자 콜라겐 ABC 프룻 젤리 스틱 (20g×15포)",
+      "category": "식품>다이어트식품>콜라겐",
+      "status": "active",
+      "manufacturer": "라이프밀",
+      "producer": "미확인(프룻젤리 계열, (주)연두 추정)",
+      "summary": "번거로운 ABC주스(사과·비트·당근)를 저분자 콜라겐과 함께 젤리 스틱으로. 20g(50kcal).",
+      "targetPersona": [
+        "이너뷰티 관심 여성",
+        "ABC주스·콜라겐 수요층"
       ],
-      "nutrition": { "servingSize": "20g(1포)", "table": { "kcal": 50, "carb_g": null, "protein_g": 1, "fat_g": null, "sodium_mg": 25, "sugar_g": 8 }, "source": "프룻젤리스틱-abc콜라겐1~2.png / md #8b(라벨)" },
-      "ingredients": { "list": ["ABC 농축액(사과·비트·당근)", "저분자 콜라겐"], "allergens": [], "source": "프룻젤리스틱-abc콜라겐1~2.png. 전체 원재료 표 라벨 원문 참조" },
+      "sellingPoints": [
+        {
+          "id": "P014-sp1",
+          "point": "ABC(사과·비트·당근) + 저분자 콜라겐 이너뷰티 편의 섭취",
+          "evidence": "블로그 후기 반복 관찰 + 라벨",
+          "source": "프룻젤리스틱-abc콜라겐1~2.png / https://blog.naver.com/freshday9656/224343726148",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "20g(1포)",
+        "table": {
+          "kcal": 50,
+          "carb_g": null,
+          "protein_g": 1,
+          "fat_g": null,
+          "sodium_mg": 25,
+          "sugar_g": 8
+        },
+        "source": "프룻젤리스틱-abc콜라겐1~2.png / md #8b(라벨)"
+      },
+      "ingredients": {
+        "list": [
+          "ABC 농축액(사과·비트·당근)",
+          "저분자 콜라겐"
+        ],
+        "allergens": [],
+        "source": "프룻젤리스틱-abc콜라겐1~2.png. 전체 원재료 표 라벨 원문 참조 | producer 출처: 미확인"
+      },
       "certifications": [],
-      "price": { "list": 28000, "sale": null, "optionCount": 1, "options": [ { "name": "20g×15포", "price": 28000 } ] },
-      "usageGuide": "1일 1스틱, 짜서 섭취.", "storage": "직사광선·고온다습을 피해 보관.",
+      "price": {
+        "list": 28000,
+        "sale": 28000,
+        "optionCount": 1,
+        "options": [
+          {
+            "name": "20g×15포",
+            "price": 28000
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도. 즉시할인 없음"
+      },
+      "usageGuide": "1일 1스틱, 짜서 섭취.",
+      "storage": "직사광선·고온다습을 피해 보관.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/상품영양정보&소구점/프룻젤리스틱-abc콜라겐1.png", "브랜드소개/product_images/08b_저분자콜라겐ABC_프룻젤리.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/상품영양정보&소구점/프룻젤리스틱-abc콜라겐1.png",
+          "브랜드소개/product_images/08b_저분자콜라겐ABC_프룻젤리.jpg"
+        ]
+      }
     },
     {
-      "id": "P015", "name": "라이프밀 웰니스 선물세트 (5종)", "category": "식품>건강식품>환자식/영양보충식", "status": "active",
-      "manufacturer": "황성주", "summary": "받는 사람의 하루 루틴까지 생각한 웰니스 선물세트 5종(가정의달·뷰티 기획 구성).",
-      "targetPersona": ["명절·기념일 선물 구매자", "부모님 건강 챙기는 자녀"],
-      "sellingPoints": [
-        { "id": "P015-sp1", "point": "생식·프로틴·이너뷰티를 조합한 프리미엄 웰니스 선물 구성", "evidence": "0416 변경 안내카드 선물세트 카피 + 스마트스토어 구성", "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx / 커머스 API", "verified": false }
+      "id": "P015",
+      "name": "라이프밀 웰니스 선물세트 (5종)",
+      "category": "식품>건강식품>환자식/영양보충식",
+      "status": "active",
+      "manufacturer": "황성주",
+      "producer": "복합구성 — 개별 제품 참조",
+      "summary": "받는 사람의 하루 루틴까지 생각한 웰니스 선물세트 5종(가정의달·뷰티 기획 구성).",
+      "targetPersona": [
+        "명절·기념일 선물 구매자",
+        "부모님 건강 챙기는 자녀"
       ],
-      "nutrition": { "servingSize": "구성품별 상이", "table": { "kcal": null, "carb_g": null, "protein_g": null, "fat_g": null, "sodium_mg": null, "sugar_g": null }, "source": "복합 구성 — 개별 제품(P001~P014) 참조" },
-      "ingredients": { "list": [], "allergens": [], "source": "복합 구성 — 개별 제품 참조" },
+      "sellingPoints": [
+        {
+          "id": "P015-sp1",
+          "point": "생식·프로틴·이너뷰티를 조합한 프리미엄 웰니스 선물 구성",
+          "evidence": "0416 변경 안내카드 선물세트 카피 + 스마트스토어 구성",
+          "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx / 커머스 API",
+          "verified": false
+        }
+      ],
+      "nutrition": {
+        "servingSize": "구성품별 상이",
+        "table": {
+          "kcal": null,
+          "carb_g": null,
+          "protein_g": null,
+          "fat_g": null,
+          "sodium_mg": null,
+          "sugar_g": null
+        },
+        "source": "복합 구성 — 개별 제품(P001~P014) 참조"
+      },
+      "ingredients": {
+        "list": [],
+        "allergens": [],
+        "source": "복합 구성 — 개별 제품 참조 | producer 출처: 복합구성"
+      },
       "certifications": [],
-      "price": { "list": null, "sale": null, "optionCount": 5, "options": [ { "name": "데일리 루틴 웰니스 선물세트", "price": 158000 }, { "name": "온가족 루틴 웰니스 선물세트", "price": 124000 }, { "name": "뷰티 기획 세트(프룻젤리 3박스+라이프밀 2박스)", "price": 171000 }, { "name": "가정의달 선물세트 B(하루견과·그래놀라 2박스)", "price": null }, { "name": "가정의달 선물세트 C(하루견과·그래놀라·프로틴바 그레인·초코)", "price": null } ] },
-      "usageGuide": "구성품별 섭취방법 참조.", "storage": "구성품별 보관방법 참조.",
+      "price": {
+        "list": null,
+        "sale": null,
+        "optionCount": 5,
+        "options": [
+          {
+            "name": "데일리 루틴 웰니스 선물세트",
+            "price": 158000
+          },
+          {
+            "name": "온가족 루틴 웰니스 선물세트",
+            "price": 124000
+          },
+          {
+            "name": "뷰티 기획 세트(프룻젤리 3박스+라이프밀 2박스)",
+            "price": 171000
+          },
+          {
+            "name": "가정의달 선물세트 B(하루견과·그래놀라 2박스)",
+            "price": null
+          },
+          {
+            "name": "가정의달 선물세트 C(하루견과·그래놀라·프로틴바 그레인·초코)",
+            "price": null
+          }
+        ],
+        "notes": "sale=커머스 즉시할인가(discountedPrice) 기준, 쿠폰가 별도. 구성별 상이 — 개별 옵션 참조"
+      },
+      "usageGuide": "구성품별 섭취방법 참조.",
+      "storage": "구성품별 보관방법 참조.",
       "faq": [],
-      "links": { "smartstore": "https://smartstore.naver.com/life_meal", "detailAssets": ["브랜드소개/product_images/11_데일리루틴_웰니스선물세트.jpg", "브랜드소개/product_images/12_온가족루틴_웰니스선물세트.jpg", "브랜드소개/product_images/13_뷰티기획세트.jpg"] }
+      "links": {
+        "smartstore": "https://smartstore.naver.com/life_meal",
+        "detailAssets": [
+          "브랜드소개/product_images/11_데일리루틴_웰니스선물세트.jpg",
+          "브랜드소개/product_images/12_온가족루틴_웰니스선물세트.jpg",
+          "브랜드소개/product_images/13_뷰티기획세트.jpg"
+        ]
+      }
     }
   ],
   "audience": {
     "personas": [
-      { "name": "바쁜 직장인(아침 거르는 1인 루틴형)", "age": "20대 후반~40대", "needs": ["아침 결식 대체", "출근 전 1분 간편 섭취", "속 편한 한 끼"], "source": "https://blog.naver.com/alahtk92/224248888196", "verified": false },
-      { "name": "다이어트 관심 여성(방송·셀럽 자극 유입)", "age": "20~30대", "needs": ["건강한 체중감량", "저당·저칼로리 식사대용", "굶지 않는 다이어트", "간식 대체"], "source": "https://blog.naver.com/rkarbfl/224270070611", "verified": false },
-      { "name": "출산 후 육아맘", "age": "30대", "needs": ["아침 챙길 여유 부족", "속 편한 영양 보충", "산후 컨디션 관리"], "source": "https://blog.naver.com/ccamzz/224248319025", "verified": false },
-      { "name": "운동·근성장 관심 직장인(남성 비중)", "age": "20~40대", "needs": ["운동 후 단백질 보충", "식물성 단백질 선호", "간편 프로틴 쉐이크"], "source": "https://blog.naver.com/bong_jja/224280741330", "verified": false },
-      { "name": "부모님 건강 챙기는 자녀/중장년 건강관리층(선물 수요)", "age": "50~60대(수혜자)/30~40대(구매자)", "needs": ["부모 영양 보충", "명절 건강 선물(리커버리 콘셉트)", "꾸준한 건강 루틴"], "source": "https://blog.naver.com/orion7yj/224310108959", "verified": false },
-      { "name": "대학생·간식 대체 수요층", "age": "10대 후반~20대", "needs": ["휴대 간편 간식", "가성비 단백질 보충"], "source": "https://blog.naver.com/gua10256/224242425851", "verified": false },
-      { "name": "혈당 관리 관심층(질병 아님, 니즈만)", "age": "40~60대", "needs": ["저당 식사대용", "탄수화물 대체"], "source": "https://blog.naver.com/doyoss1/224221990351 — ⚠️질병(당뇨) 효능 표방 금지, 니즈 후보로만", "verified": false }
+      {
+        "name": "바쁜 직장인(아침 거르는 1인 루틴형)",
+        "age": "20대 후반~40대",
+        "needs": [
+          "아침 결식 대체",
+          "출근 전 1분 간편 섭취",
+          "속 편한 한 끼"
+        ],
+        "source": "https://blog.naver.com/alahtk92/224248888196",
+        "verified": false
+      },
+      {
+        "name": "다이어트 관심 여성(방송·셀럽 자극 유입)",
+        "age": "20~30대",
+        "needs": [
+          "건강한 체중감량",
+          "저당·저칼로리 식사대용",
+          "굶지 않는 다이어트",
+          "간식 대체"
+        ],
+        "source": "https://blog.naver.com/rkarbfl/224270070611",
+        "verified": false
+      },
+      {
+        "name": "출산 후 육아맘",
+        "age": "30대",
+        "needs": [
+          "아침 챙길 여유 부족",
+          "속 편한 영양 보충",
+          "산후 컨디션 관리"
+        ],
+        "source": "https://blog.naver.com/ccamzz/224248319025",
+        "verified": false
+      },
+      {
+        "name": "운동·근성장 관심 직장인(남성 비중)",
+        "age": "20~40대",
+        "needs": [
+          "운동 후 단백질 보충",
+          "식물성 단백질 선호",
+          "간편 프로틴 쉐이크"
+        ],
+        "source": "https://blog.naver.com/bong_jja/224280741330",
+        "verified": false
+      },
+      {
+        "name": "부모님 건강 챙기는 자녀/중장년 건강관리층(선물 수요)",
+        "age": "50~60대(수혜자)/30~40대(구매자)",
+        "needs": [
+          "부모 영양 보충",
+          "명절 건강 선물(리커버리 콘셉트)",
+          "꾸준한 건강 루틴"
+        ],
+        "source": "https://blog.naver.com/orion7yj/224310108959",
+        "verified": false
+      },
+      {
+        "name": "대학생·간식 대체 수요층",
+        "age": "10대 후반~20대",
+        "needs": [
+          "휴대 간편 간식",
+          "가성비 단백질 보충"
+        ],
+        "source": "https://blog.naver.com/gua10256/224242425851",
+        "verified": false
+      },
+      {
+        "name": "혈당 관리 관심층(질병 아님, 니즈만)",
+        "age": "40~60대",
+        "needs": [
+          "저당 식사대용",
+          "탄수화물 대체"
+        ],
+        "source": "https://blog.naver.com/doyoss1/224221990351 — ⚠️질병(당뇨) 효능 표방 금지, 니즈 후보로만",
+        "verified": false
+      }
     ]
   },
   "messaging": {
     "coreMessages": [
-      { "id": "msg1", "message": "균형 잡힌 하루, 라이프밀로 다시 시작합니다", "context": "브랜드 표지·대표 카피", "source": "라이프밀_브랜드소개서_카피_요약.md Ch.0", "verified": false },
-      { "id": "msg2", "message": "건강은 거창한 결심이 아니라, 매일의 한 끼에서 시작됩니다 — 라이프 리밸런싱", "context": "브랜드 철학", "source": "라이프밀_브랜드소개서_카피_요약.md Ch.1-3", "verified": false },
-      { "id": "msg3", "message": "국산 동결건조 원료를 포함한 80여 가지 농산물을 한 포에 담은 프리미엄 생식 데일리 솔루션", "context": "제품(생식) 대표 카피", "source": "0521_라이프밀 카페로쥬.pdf", "verified": false },
-      { "id": "msg4", "message": "믿고 드시던 기존 제품의 깐깐한 품질과 철학은 변경 없이 동일하게 유지됩니다", "context": "리브랜딩 안심 메시지(구 브랜드명 비노출 버전으로만 사용)", "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx", "verified": false }
+      {
+        "id": "msg1",
+        "message": "균형 잡힌 하루, 라이프밀로 다시 시작합니다",
+        "context": "브랜드 표지·대표 카피",
+        "source": "라이프밀_브랜드소개서_카피_요약.md Ch.0",
+        "verified": false
+      },
+      {
+        "id": "msg2",
+        "message": "건강은 거창한 결심이 아니라, 매일의 한 끼에서 시작됩니다 — 라이프 리밸런싱",
+        "context": "브랜드 철학",
+        "source": "라이프밀_브랜드소개서_카피_요약.md Ch.1-3",
+        "verified": false
+      },
+      {
+        "id": "msg3",
+        "message": "국산 동결건조 원료를 포함한 80여 가지 농산물을 한 포에 담은 프리미엄 생식 데일리 솔루션",
+        "context": "제품(생식) 대표 카피",
+        "source": "0521_라이프밀 카페로쥬.pdf",
+        "verified": false
+      },
+      {
+        "id": "msg4",
+        "message": "믿고 드시던 기존 제품의 깐깐한 품질과 철학은 변경 없이 동일하게 유지됩니다",
+        "context": "리브랜딩 안심 메시지(구 브랜드명 비노출 버전으로만 사용)",
+        "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx",
+        "verified": false
+      }
     ],
     "prohibitedExpressions": [
       "질병 예방·치료 효능 표방(식품표시광고법 제8조)",
@@ -290,7 +1364,25 @@
       "당뇨·암 등 질병 관련 효능 암시(audience 니즈로만 활용)",
       "라벨 미확보 제품(그레인·그래놀라 등)의 영양·성분 수치 확정 표기"
     ],
-    "keywordPool": ["황성주생식", "동결건조", "생식", "식사대용", "저당", "고단백", "식물성단백질", "프로틴쉐이크", "단백질바", "다이어트간식", "이너뷰티", "식이섬유", "마시는샐러드", "파이토케미컬", "웰니스루틴", "아침대용", "선물세트"]
+    "keywordPool": [
+      "황성주생식",
+      "동결건조",
+      "생식",
+      "식사대용",
+      "저당",
+      "고단백",
+      "식물성단백질",
+      "프로틴쉐이크",
+      "단백질바",
+      "다이어트간식",
+      "이너뷰티",
+      "식이섬유",
+      "마시는샐러드",
+      "파이토케미컬",
+      "웰니스루틴",
+      "아침대용",
+      "선물세트"
+    ]
   },
   "cs": {
     "policies": {
@@ -301,33 +1393,109 @@
       "source": "커머스 origin-detail API afterServiceInfo + 라벨 상품정보제공고시. ⚠️배송비·반품비·반품기한 구체 수치는 스토어 공지에서 별도 수집 필요"
     },
     "topInquiries": [
-      { "q": "물·우유·두유 중 무엇에 타 먹나요?", "a": "제품별 상이 — 생식/데일리는 물·두유·우유 150~160mL, 데이업 프로틴쉐이크는 우유 200mL 희석 권장.", "source": "각 제품 라벨 섭취방법" },
-      { "q": "임산부·수유부·질병 치료 중에도 먹어도 되나요?", "a": "섭취 전 고객센터·구입처 또는 전문가와 상담을 권장(라벨 섭취 시 주의사항 기준).", "source": "닥터샐러드1.png / 데이 업 프로틴 쉐이크1.png 주의사항" }
+      {
+        "q": "물·우유·두유 중 무엇에 타 먹나요?",
+        "a": "제품별 상이 — 생식/데일리는 물·두유·우유 150~160mL, 데이업 프로틴쉐이크는 우유 200mL 희석 권장.",
+        "source": "각 제품 라벨 섭취방법"
+      },
+      {
+        "q": "임산부·수유부·질병 치료 중에도 먹어도 되나요?",
+        "a": "섭취 전 고객센터·구입처 또는 전문가와 상담을 권장(라벨 섭취 시 주의사항 기준).",
+        "source": "닥터샐러드1.png / 데이 업 프로틴 쉐이크1.png 주의사항"
+      }
     ]
   },
   "internal": {
     "visibility": "internal",
     "usageNote": "대외 카피 사용 금지. CS 응대 맥락 파악·내부 판단용으로만 참조.",
     "history": [
-      { "fact": "사명 변경: '이롬(erom)' → '주식회사 해밀리(Hemily)'. 안내문 서명부 '주식회사 해밀리(구 이롬) 임직원 일동'.", "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx" },
-      { "fact": "브랜드명 개편: 대표 브랜드 '이롬(erom)' → '라이프밀(Lifemeal)'. 제품 품질·성분·철학은 변경 없이 유지한다고 안내.", "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx" },
-      { "fact": "'이롬몰과 이롬 스마트스토어는 매각 완료 상태' 문구 존재.", "source": "1216_라이프밀.pdf(fileId 1sOZBgX04WCzs3ZAg_R_znlWYx_HFwLUl) — 서브에이전트 발견, 지정 대상 외 파일. 허브 확인 요망" },
-      { "fact": "라이브 스마트스토어 라벨/고시에 구 브랜드 흔적 잔존: 유통전문판매원 '(주)이롬홀딩스'(닥터샐러드·데이크런치·하루견과), origin-detail productName '이롬 홀그레인 저당 그래놀라', 원재료 '유산균추출분말(이롬101)', 영양식/발효건강식/프로틴골드 라벨 'erom' 로고 및 '이롬의 「일반식품의 기능성표시제」 적용 제품' 문구.", "source": "브랜드소개/상품영양정보&소구점 라벨 캡처 + 커머스 origin-detail API" }
+      {
+        "fact": "사명 변경: '이롬(erom)' → '주식회사 해밀리(Hemily)'. 안내문 서명부 '주식회사 해밀리(구 이롬) 임직원 일동'.",
+        "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx"
+      },
+      {
+        "fact": "브랜드명 개편: 대표 브랜드 '이롬(erom)' → '라이프밀(Lifemeal)'. 제품 품질·성분·철학은 변경 없이 유지한다고 안내.",
+        "source": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx"
+      },
+      {
+        "fact": "'현재 이롬몰과 이롬 스마트스토어는 매각 완료 상태입니다. (자사몰 운영 채널은 네이버 스마트스토어와 카카오 쇼핑하기몰 2가지)' 문구 확인.",
+        "source": "1216_라이프밀.pdf p12(Goal-퍼포먼스 마케팅)"
+      },
+      {
+        "fact": "브랜드 철학문 '이웃·사랑·과학' 및 '과학의 힘으로 자연을 담아 건강에 대한 새로운 해답을 제공' 미션이 '이롬그룹/㈜이롬홀딩스' 명의로 기재 — 라이프밀은 구 이롬 브랜드 자산을 승계. (철학·미션 자체는 대외 사용 가능하되 '이롬' 명의는 비노출)",
+        "source": "1216_라이프밀.pdf p13"
+      },
+      {
+        "fact": "제품 판매원이 대체로 '(주)이롬홀딩스'(일부 (주)이롬)로 기재, 운영 인스타그램 계정명이 'erom.lifemeal(이롬라이프밀)' — 라이브 자산에 구 브랜드명 '이롬' 잔존.",
+        "source": "1216_라이프밀.pdf p12·14~24 + 커머스 origin-detail API"
+      },
+      {
+        "fact": "라이브 스마트스토어 라벨/고시에 구 브랜드 흔적 잔존: 유통전문판매원 '(주)이롬홀딩스'(닥터샐러드·데이크런치·하루견과), origin-detail productName '이롬 홀그레인 저당 그래놀라', 원재료 '유산균추출분말(이롬101)', 영양식/발효/프로틴골드 라벨 'erom' 로고 및 '이롬의 「일반식품의 기능성표시제」 적용 제품' 문구.",
+        "source": "브랜드소개/상품영양정보&소구점 라벨 캡처 + 커머스 origin-detail API"
+      }
     ],
     "csGuidelines": [
-      { "scenario": "구 브랜드(뉴밀/이롬 등) 비교 문의", "guidance": "'라이프밀'은 기존 제품의 품질·철학을 그대로 이어받은 브랜드임을 안내하되, 매각·사명변경 등 기업 이력은 대외적으로 언급하지 않는다. 성분·품질 동일성 위주로 답변." },
-      { "scenario": "타몰(이롬/뉴밀 명의)에서 더 싸게 파는 제품 문의", "guidance": "공식 채널은 스마트스토어 '라이프밀 브랜드 스토어'임을 안내. 타몰 재판매 상품의 브랜드 이력은 대외 언급하지 않음." }
+      {
+        "scenario": "구 브랜드(뉴밀/이롬 등) 비교 문의",
+        "guidance": "'라이프밀'은 기존 제품의 품질·철학을 그대로 이어받은 브랜드임을 안내하되, 매각·사명변경 등 기업 이력은 대외적으로 언급하지 않는다. 성분·품질 동일성 위주로 답변."
+      },
+      {
+        "scenario": "타몰(이롬/뉴밀 명의)에서 더 싸게 파는 제품 문의",
+        "guidance": "공식 채널은 스마트스토어 '라이프밀 브랜드 스토어'임을 안내. 타몰 재판매 상품의 브랜드 이력은 대외 언급하지 않음."
+      }
     ]
   },
   "assets": {
     "driveIndex": [
-      { "name": "0521_라이프밀 카페로쥬.pdf", "driveId": "1UEI2XUGJMKi6y0t_q1qSayeOQGvfcByZ", "type": "pdf", "summary": "제품 카피·포지셔닝·메뉴 문구(데이업 20g/저당/170kcal 등)", "quality": "usable" },
-      { "name": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx", "driveId": "12Miqa5YDlPCpMnLjrWOHvTtjT8bdvGEe", "type": "pptx", "summary": "리브랜딩 안내문(미션·톤·구 브랜드 이력) — internal 근거", "quality": "usable" },
-      { "name": "1229_라이프밀 발표용.pdf", "driveId": "1KitJpkXvXzddsEe2yCMlKoe2w1w4LYF6", "type": "pdf", "summary": "약 178MB 이미지형 PDF — 텍스트 추출 실패", "quality": "outdated" },
-      { "name": "0302_라이프밀 마케팅.pdf", "driveId": "1qyc_5PS3PTlL0nRljgB6MH4A_iWL69aC", "type": "pdf", "summary": "약 64MB 이미지형 PDF — 텍스트 추출 실패", "quality": "outdated" },
-      { "name": "1216_라이프밀.pdf", "driveId": "1sOZBgX04WCzs3ZAg_R_znlWYx_HFwLUl", "type": "pdf", "summary": "포지셔닝·타깃·브랜드 철학(이웃·사랑·과학) 및 매각 관련 문구 포함 — 대상 외 발견, 허브 확인 요망", "quality": "draft" },
-      { "name": "라이프밀_브랜드소개서_카피_요약.md(로컬)", "driveId": "", "type": "md", "summary": "브랜드 카피·영양성분 전수 요약(라벨/후기 2단계 출처)", "quality": "usable" },
-      { "name": "상품영양정보&소구점(로컬 라벨 캡처 폴더)", "driveId": "", "type": "images", "summary": "공식 상품정보제공고시 라벨 캡처 — 영양·원재료·알레르기·인증 1차 원천", "quality": "usable" }
+      {
+        "name": "0521_라이프밀 카페로쥬.pdf",
+        "driveId": "1UEI2XUGJMKi6y0t_q1qSayeOQGvfcByZ",
+        "type": "pdf",
+        "summary": "제품 카피·포지셔닝·메뉴 문구(데이업 20g/저당/170kcal 등)",
+        "quality": "usable"
+      },
+      {
+        "name": "해밀리&라이프밀 변경 안내카드문구(초안)_0416.pptx",
+        "driveId": "12Miqa5YDlPCpMnLjrWOHvTtjT8bdvGEe",
+        "type": "pptx",
+        "summary": "리브랜딩 안내문(미션·톤·구 브랜드 이력) — internal 근거",
+        "quality": "usable"
+      },
+      {
+        "name": "1229_라이프밀 발표용.pdf",
+        "driveId": "1KitJpkXvXzddsEe2yCMlKoe2w1w4LYF6",
+        "type": "pdf",
+        "summary": "약 178MB 이미지형 PDF — 텍스트 추출 실패",
+        "quality": "outdated"
+      },
+      {
+        "name": "0302_라이프밀 마케팅.pdf",
+        "driveId": "1qyc_5PS3PTlL0nRljgB6MH4A_iWL69aC",
+        "type": "pdf",
+        "summary": "약 64MB 이미지형 PDF — 텍스트 추출 실패",
+        "quality": "outdated"
+      },
+      {
+        "name": "1216_라이프밀.pdf",
+        "driveId": "1sOZBgX04WCzs3ZAg_R_znlWYx_HFwLUl",
+        "type": "pdf",
+        "summary": "브랜드 철학(이웃·사랑·과학)·미션·포지셔닝·타깃 정의 + 이롬 매각/판매원 이력 — brand/internal 보강 원천(25p)",
+        "quality": "usable"
+      },
+      {
+        "name": "라이프밀_브랜드소개서_카피_요약.md(로컬)",
+        "driveId": "",
+        "type": "md",
+        "summary": "브랜드 카피·영양성분 전수 요약(라벨/후기 2단계 출처)",
+        "quality": "usable"
+      },
+      {
+        "name": "상품영양정보&소구점(로컬 라벨 캡처 폴더)",
+        "driveId": "",
+        "type": "images",
+        "summary": "공식 상품정보제공고시 라벨 캡처 — 영양·원재료·알레르기·인증 1차 원천",
+        "quality": "usable"
+      }
     ]
   }
 }
