@@ -333,6 +333,7 @@ const Sel = ({ value, onChange, opts, ph }) => (
   </select>
 );
 const Inp = ({ value, onChange, type = 'text', placeholder = '' }) => <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={{ width: '100%', padding: '8px 9px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 13, boxSizing: 'border-box' }} />;
+const MoneyInput = ({ value, onChange, placeholder = '' }) => { const fmt = n => (n === '' || n === null || n === undefined || isNaN(Number(n))) ? '' : Number(n).toLocaleString(); return <input type="text" inputMode="numeric" value={fmt(value)} onChange={e => { const d = e.target.value.replace(/[^\d]/g, ''); onChange(d === '' ? '' : Number(d)); }} placeholder={placeholder} style={{ width: '100%', padding: '8px 9px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 13, boxSizing: 'border-box' }} />; };
 const inp = (val, set, type = 'text', ph = '') => <input type={type} value={val} onChange={e => set(e.target.value)} placeholder={ph} style={{ width: '100%', padding: '8px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 13, boxSizing: 'border-box' }} />;
 const Btn = ({ children, onClick, disabled, v = 'primary', style = {} }) => {
   let bg = G, color = 'white';
@@ -2477,7 +2478,7 @@ function PaymentModal({ data, setData, edit, onClose }) {
         )}
         {allVendors.length === 0 && !addingVendor && <div style={{ fontSize: 11, color: '#A29C95', marginTop: 5 }}>등록된 업체가 없습니다. [+ 새 업체]로 추가하세요.</div>}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="실결제 금액 (원)" /><Inp type="number" value={amount} onChange={setAmount} placeholder="실제 결제 금액" /></div><div><Lbl c="결제일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="실결제 금액 (원)" /><MoneyInput value={amount} onChange={setAmount} placeholder="실제 결제 금액" /></div><div><Lbl c="결제일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div></div>
       <div><Lbl c="결제방법" />{seg(payMethod, setPayMethod, PAY_OPTS)}</div>
       <div>
         <Lbl c="영수증" />
@@ -2587,9 +2588,14 @@ function DraftModal({ data, setData, onClose }) {
 
 function BudgetFormModal({ data, setData, onClose, edit }) {
   const e = edit || {};
+  const budgetVendors = [...new Set((data.budgets || []).map(b => b.vendor).filter(Boolean))];
+  const regVendors = data.vendors || [];
+  const allVendors = [...new Set([...regVendors, ...budgetVendors])].sort();
   const [outId, setOutId] = useState(e.outputId ? String(e.outputId) : '');
   const [planId, setPlanId] = useState(e.planId ? String(e.planId) : '');
-  const [vendor, setVendor] = useState(e.vendor || '');
+  const [vendor, setVendor] = useState(e.vendor || allVendors[0] || '');
+  const [newVendor, setNewVendor] = useState('');
+  const [addingVendor, setAddingVendor] = useState(false);
   const [amount, setAmount] = useState(e.amount != null ? String(e.amount) : '');
   const [vat, setVat] = useState(e.vat || '별도');
   const [pay, setPay] = useState(e.payMethod || '세금계산서');
@@ -2599,6 +2605,7 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
   const [kind, setKind] = useState(e.kind || '일반');
   const [paidDate, setPaidDate] = useState(e.paidDate || TODAY);
   const [paidAmount, setPaidAmount] = useState(e.paidAmount != null && e.paidAmount !== '' ? String(e.paidAmount) : '');
+  const confirmAddVendor = () => { const v = newVendor.trim(); if (!v) return; if (allVendors.indexOf(v) < 0) setData(d => ({ ...d, vendors: [...(d.vendors || []), v] })); setVendor(v); setNewVendor(''); setAddingVendor(false); };
   const plans = data.plans.filter(p => p.outputId === Number(outId));
   const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E3E0DC', color: val === o ? 'white' : '#3A3631' }}>{o}</button>)}</div>;
   const submit = () => {
@@ -2613,12 +2620,28 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
       <div><Lbl c="출력 프로젝트" /><Sel value={outId} onChange={v => { setOutId(v); setPlanId(''); }} ph="선택..." opts={data.outputs.map(o => ({ v: o.id, l: o.code + ' · ' + o.name }))} /></div>
       <div><Lbl c="실행계획 (선택)" /><Sel value={planId} onChange={setPlanId} ph="선택..." opts={plans.map(p => ({ v: p.id, l: p.name }))} /></div>
       <div><Lbl c="구분" />{seg(kind, setKind, ['일반', '정기'])}</div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 업체" /><Inp value={vendor} onChange={setVendor} placeholder="업체명" /></div><div><Lbl c="예상 금액 (원)" /><Inp type="number" value={amount} onChange={setAmount} placeholder="공급가" /></div></div>
+      <div>
+        <Lbl c="결제 업체" />
+        {addingVendor ? (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <input value={newVendor} onChange={ev => setNewVendor(ev.target.value)} onKeyDown={ev => { if (ev.key === 'Enter') confirmAddVendor(); }} placeholder="새 업체명 입력" autoFocus style={{ flex: 1, padding: '9px 11px', borderRadius: 9, border: '1px solid #E3E0DC', fontSize: 13, boxSizing: 'border-box' }} />
+            <button onClick={confirmAddVendor} style={{ padding: '0 14px', borderRadius: 9, border: 'none', background: G, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>추가</button>
+            <button onClick={() => { setAddingVendor(false); setNewVendor(''); }} style={{ padding: '0 12px', borderRadius: 9, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 12 }}>취소</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ flex: 1 }}><Sel value={vendor} onChange={setVendor} ph="업체 선택..." opts={allVendors.map(v => ({ v, l: v }))} /></div>
+            <button onClick={() => setAddingVendor(true)} style={{ padding: '0 14px', borderRadius: 9, border: '1px dashed ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>+ 새 업체</button>
+          </div>
+        )}
+        {allVendors.length === 0 && !addingVendor && <div style={{ fontSize: 11, color: '#A29C95', marginTop: 5 }}>등록된 업체가 없습니다. [+ 새 업체]로 추가하세요.</div>}
+      </div>
+      <div><Lbl c="예상 금액 (원)" /><MoneyInput value={amount} onChange={setAmount} placeholder="공급가" /></div>
       <div><Lbl c="VAT" />{seg(vat, setVat, VAT_OPTS)}</div>
       <div><Lbl c="결제방법" />{seg(pay, setPay, PAY_OPTS)}</div>
       {pay === '세금계산서' && <div><Lbl c="입금 계좌 (선택)" /><Inp value={account} onChange={setAccount} placeholder="은행 / 계좌번호 / 예금주" /></div>}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="상태" /><Sel value={status} onChange={setStatus} opts={BSTATUS} /></div><div><Lbl c="기안/등록 일자" /><Inp type="date" value={date} onChange={setDate} /></div></div>
-      {status === '결제완료' && <div style={{ background: '#ECFDF5', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0' }}><div style={{ fontSize: 12, fontWeight: 700, color: '#1FA463', marginBottom: 8 }}>✓ 결제 완료 정보</div><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 완료일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div><div><Lbl c="실결제 금액 (선택)" /><Inp type="number" value={paidAmount} onChange={setPaidAmount} placeholder="비우면 예상금액 사용" /></div></div><div style={{ fontSize: 11, color: '#6E6863', marginTop: 6 }}>※ 결제완료일 기준으로 월 집계 및 날짜별 표시가 반영됩니다.</div></div>}
+      {status === '결제완료' && <div style={{ background: '#ECFDF5', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0' }}><div style={{ fontSize: 12, fontWeight: 700, color: '#1FA463', marginBottom: 8 }}>✓ 결제 완료 정보</div><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 완료일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div><div><Lbl c="실결제 금액 (선택)" /><MoneyInput value={paidAmount} onChange={setPaidAmount} placeholder="비우면 예상금액 사용" /></div></div><div style={{ fontSize: 11, color: '#6E6863', marginTop: 6 }}>※ 결제완료일 기준으로 월 집계 및 날짜별 표시가 반영됩니다.</div></div>}
       <div style={{ display: 'flex', gap: 8 }}><Btn onClick={submit} style={{ flex: 1 }}>{edit ? '저장' : '추가'}</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
     </ModalShell>
   );
