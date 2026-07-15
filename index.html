@@ -912,10 +912,72 @@ function MemberModal({ data, setData, onClose }) {
   );
 }
 
+function ProfileModal({ name, data, onClose }) {
+  const mm = (data.members || []).find(x => x.name === name) || {};
+  const photo = mm.photo || '';
+  const av = mm.av || AV[name] || '👤';
+  const role = mm.role || ROLES[name] || '';
+  const plansOwned = data.plans.filter(p => ownersOf(p).includes(name));
+  const subOwned = data.subplans.filter(s => ownersOf(s).includes(name));
+  const supported = data.plans.filter(p => (p.support || []).some(s => s.m === name)).concat(data.subplans.filter(s => (s.support || []).some(x => x.m === name)));
+  const subCnt = subOwned.length; const done = subOwned.filter(s => s.stage === '완료').length;
+  const ownedCnt = plansOwned.length + subOwned.length;
+  const stat = (label, value, color) => <div style={{ flex: 1, textAlign: 'center', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 10, padding: '10px 4px' }}><div style={{ fontSize: 20, fontWeight: 800, color: color }}>{value}</div><div style={{ fontSize: 10.5, color: '#6E6863', marginTop: 1 }}>{label}</div></div>;
+  return (
+    <ModalShell title="팀원 프로필" onClose={onClose}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '2px 0 6px' }}>
+        <div style={{ width: 96, height: 96, borderRadius: '50%', background: photo ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 46, border: '1px solid #E3E0DC', flexShrink: 0 }}>{photo ? <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : av}</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: '#1A1614' }}>{name}</div>
+        {role ? <div style={{ fontSize: 13, color: '#6E6863' }}>{role}</div> : null}
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+        {stat('담당', ownedCnt, G)}
+        {stat('서포트', supported.length, GO)}
+        {stat('완료율', (subCnt ? pct(done, subCnt) : 0) + '%', '#2D5FE0')}
+      </div>
+      {subCnt ? <div style={{ marginTop: 8 }}><Bar v={done} m={subCnt} h={6} /><div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 3, textAlign: 'right' }}>세부계획 {done}/{subCnt} 완료</div></div> : null}
+      <div style={{ marginTop: 12 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: G, marginBottom: 6 }}>담당 업무 <span style={{ color: '#A29C95', fontWeight: 600 }}>{ownedCnt}건</span></div>
+        {ownedCnt === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>담당 중인 업무가 없습니다.</div> : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {plansOwned.map(p => { const subs = data.subplans.filter(s => s.planId === p.id); const pd = subs.filter(s => s.stage === '완료').length; return (
+              <div key={'p' + p.id} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 8, padding: '7px 10px' }}>
+                <span style={{ fontSize: 9, fontWeight: 700, color: '#2D5FE0', background: '#EAF0FE', borderRadius: 5, padding: '1px 6px', flexShrink: 0 }}>실행계획</span>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: '#1A1614', flex: 1, minWidth: 0 }}>{p.name}</span>
+                {p.hold ? <Badge label="⏸ 보류" color="#989088" /> : <span style={{ fontSize: 10.5, color: '#6E6863', flexShrink: 0 }}>{pd}/{subs.length}</span>}
+              </div>
+            ); })}
+            {subOwned.map(s => (
+              <div key={'s' + s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 8, padding: '7px 10px' }}>
+                <span style={{ fontSize: 9, fontWeight: 700, color: '#E08700', background: '#FBF1E0', borderRadius: 5, padding: '1px 6px', flexShrink: 0 }}>세부</span>
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: s.stage === '완료' ? '#A29C95' : '#1A1614', flex: 1, minWidth: 0, textDecoration: s.stage === '완료' ? 'line-through' : 'none' }}>{s.name}</span>
+                <Badge label={s.stage} color={stC(s.stage)} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {supported.length ? <div style={{ marginTop: 12 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: GO, marginBottom: 6 }}>서포트 <span style={{ color: '#A29C95', fontWeight: 600 }}>{supported.length}건</span></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          {supported.map((x, i) => (
+            <div key={'sup' + i} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FAF6EE', border: '1px solid #F0E6D2', borderRadius: 8, padding: '7px 10px' }}>
+              <span style={{ fontSize: 12.5, color: '#3A3631', flex: 1, minWidth: 0 }}>{x.name}</span>
+              {x.stage ? <Badge label={x.stage} color={stC(x.stage)} /> : null}
+            </div>
+          ))}
+        </div>
+      </div> : null}
+      <div style={{ display: 'flex', gap: 8, marginTop: 14 }}><Btn v="secondary" onClick={onClose} style={{ flex: 1 }}>닫기</Btn></div>
+    </ModalShell>
+  );
+}
+
 function TabTeam({ data, setData, goTab }) {
   const all = data.plans.map(p => ({ ...p })).concat(data.subplans.map(s => ({ ...s })));
   const heldTotal = data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length;
   const [showMem, setShowMem] = useState(false);
+  const [profileMem, setProfileMem] = useState(null);
   const photoOf = n => { const mm = (data.members || []).find(x => x.name === n); return (mm && mm.photo) || ''; };
   return (
     <div style={{ padding: 20 }}>
@@ -924,12 +986,13 @@ function TabTeam({ data, setData, goTab }) {
         <button onClick={() => setShowMem(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>👥 팀원 관리</button>
       </div>
       {showMem && <MemberModal data={data} setData={setData} onClose={() => setShowMem(false)} />}
-      <div style={{ fontSize: 12, color: '#6E6863', marginBottom: 16 }}>{TODAY} 기준</div>
+      {profileMem && <ProfileModal name={profileMem} data={data} onClose={() => setProfileMem(null)} />}
+      <div style={{ fontSize: 12, color: '#6E6863', marginBottom: 16 }}>{TODAY} 기준 <span style={{ color: '#A29C95' }}>· 팀원 카드를 누르면 프로필이 열립니다</span></div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 12 }}>
         {MEMBERS.map(m => {
           const owned = all.filter(x => ownersOf(x).includes(m)); const supp = all.filter(x => x.support && x.support.some(s => s.m === m));
           const subCnt = data.subplans.filter(s => ownersOf(s).includes(m)).length; const done = data.subplans.filter(s => ownersOf(s).includes(m) && s.stage === '완료').length;
-          return (<Card key={m}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 15 }}>{m}</div><div style={{ fontSize: 11, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 11, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 16, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>서포트</div></div></div></Card>);
+          return (<Card key={m} onClick={() => setProfileMem(m)} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 15 }}>{m}</div><div style={{ fontSize: 11, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 11, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 16, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>서포트</div></div></div></Card>);
         })}
       </div>
       <div style={{ marginTop: 18 }}><SCards items={[{ label: '출력 프로젝트', value: data.outputs.length + '개', color: G, onClick: () => goTab && goTab('프로젝트 진행 상황') }, { label: '실행계획', value: data.plans.length + '개', color: '#2D5FE0', onClick: () => goTab && goTab('칸반') }, { label: '세부 실행계획', value: data.subplans.length + '개', color: '#E08700', onClick: () => goTab && goTab('데일리/주간') }, { label: '등록 KPI', value: (data.plans.reduce((a, p) => a + (p.kpis ? p.kpis.length : 0), 0) + data.outputs.filter(o => o.kpi).length) + '개', color: GO, onClick: () => goTab && goTab('KPI') }, { label: '보류 항목', value: heldTotal + '건', color: '#989088', onClick: () => goTab && goTab('보류') }]} /></div>
