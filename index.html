@@ -3233,20 +3233,32 @@ function TabSales({ data, setData }) {
             const cEst = !sum.conversion && !!cData;
             const dayCnt = daily.filter(d => (d.revenue || 0) > 0).length || daily.length;
             const avgDay = (mode !== 'day' && sum.revenue && dayCnt > 0) ? Math.round((sum.revenue.value || 0) / dayCnt) : null;
+            const rb = sum.refund && sum.refund.breakdown;
+            const refOrig = (sum.refund && sum.refund.value != null) ? sum.refund.value : null;
+            const netOrig = (sum.revenue && refOrig != null) ? ((sum.revenue.value || 0) - refOrig) : null;
             const cards = [
               { k: 'revenue', l: modeLabel[mode] + ' 매출', d: sum.revenue, fmt: v => won2(v), note: avgDay != null ? '일평균 ' + won2(avgDay) + ' · ' + dayCnt + '일' : null },
               { k: 'orders', l: '결제 건수', d: sum.orders, fmt: v => (v || 0).toLocaleString() + '건' },
               { k: 'aov', l: '건당 매출', d: sum.aov, fmt: v => won2(v) },
               { k: 'visitors', l: '방문자', d: vData, fmt: v => (v || 0).toLocaleString() + '명', est: vEst },
               { k: 'conversion', l: '전환율', d: cData, fmt: v => (v == null ? '-' : v + '%'), sfx: '%p', est: cEst },
-              { k: 'refund', l: '환불', d: sum.refund, fmt: v => won2(v), inv: true, red: true, note: (sum.revenue && sum.refund && (sum.refund.value || 0) > 0) ? '실매출 ' + won2((sum.revenue.value || 0) - (sum.refund.value || 0)) + ' (매출−환불)' : null },
+              { k: 'refund', l: '환불', d: rb ? { value: (rb.total && rb.total.amount) || 0, deltaValue: rb.deltaValue, deltaPct: rb.deltaPct } : sum.refund, fmt: v => won2(v), inv: true, red: true, bd: rb, refOrig: rb ? refOrig : null, netOrig: rb ? netOrig : null, note: (!rb && sum.revenue && sum.refund && (sum.refund.value || 0) > 0) ? '실매출 ' + won2((sum.revenue.value || 0) - (sum.refund.value || 0)) + ' (매출−환불)' : null },
             ];
             return cards.map(c => (
               <div key={c.k} style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 12, padding: 14 }}>
-                <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 4 }}>{c.l}{c.est && <span style={{ fontSize: 9, color: '#A29C95', fontWeight: 400 }}> · 채널 합산 추정</span>}</div>
+                <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 4 }}>{c.l}{c.est && <span style={{ fontSize: 9, color: '#A29C95', fontWeight: 400 }}> · 채널 합산 추정</span>}{c.bd ? <span style={{ fontSize: 9, color: '#B45309', fontWeight: 400 }}> · 처리일 기준</span> : null}</div>
                 <div style={{ fontSize: 19, fontWeight: 800, color: c.red ? '#E53935' : G }}>{c.d ? c.fmt(c.d.value) : '-'}</div>
                 {c.note ? <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>{c.note}</div> : null}
                 <div style={{ marginTop: 4, minHeight: 14 }}>{deltaChip(c.d, c.inv, c.sfx)}</div>
+                {c.bd ? (() => { const b = c.bd; const row = (lb, o, tx) => { const x = o || {}; return <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 6, padding: '2px 0' }}><span style={{ fontSize: 10.5, color: '#6E6863' }}>{lb}</span><span style={{ fontSize: 11, fontWeight: 700, color: (x.amount || 0) > 0 ? tx : '#BDB7AF' }}>{won2(x.amount)} <span style={{ fontSize: 9.5, color: '#A29C95', fontWeight: 400 }}>· {(x.count || 0).toLocaleString()}건</span></span></div>; }; return (
+                  <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #EDEBE7' }}>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: '#6E6863', marginBottom: 3 }}>취소 · 반품 · 교환 <span style={{ color: '#A29C95', fontWeight: 400 }}>· 합계 = 위 환불</span></div>
+                    {row('취소', b.cancel, '#E53935')}
+                    {row('반품', b.return, '#C2410C')}
+                    {row('교환', b.exchange, '#B45309')}
+                    {c.refOrig != null ? <div style={{ fontSize: 9, color: '#A29C95', marginTop: 6, lineHeight: 1.5, borderTop: '1px dotted #EDEBE7', paddingTop: 5 }}>원주문일 기준 환불 {won2(c.refOrig)}{c.netOrig != null ? ' · 실매출 ' + won2(c.netOrig) : ''} <span style={{ color: '#BDB7AF' }}>(참고)</span></div> : null}
+                  </div>
+                ); })() : null}
               </div>
             ));
           })()}
