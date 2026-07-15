@@ -43,6 +43,7 @@ let MEMBERS = DEFAULT_MEMBERS.map(m => m.name);
 let ROLES = DEFAULT_MEMBERS.reduce((a, m) => { a[m.name] = m.role; return a; }, {});
 let AV = DEFAULT_MEMBERS.reduce((a, m) => { a[m.name] = m.av; return a; }, {});
 const syncMembers = list => { const arr = (list && list.length) ? list : DEFAULT_MEMBERS; MEMBERS = arr.map(m => m.name); ROLES = {}; AV = {}; arr.forEach(m => { ROLES[m.name] = m.role || ''; AV[m.name] = m.av || '👤'; }); };
+const resizeToThumb = (file, cb) => { if (!file || !/^image\//.test(file.type)) { cb(null); return; } const SIZE = 160; const reader = new FileReader(); reader.onload = e => { const img = new Image(); img.onload = () => { try { const side = Math.min(img.width, img.height) || 1; const sx = (img.width - side) / 2, sy = (img.height - side) / 2; const canvas = document.createElement('canvas'); canvas.width = SIZE; canvas.height = SIZE; const ctx = canvas.getContext('2d'); ctx.drawImage(img, sx, sy, side, side, 0, 0, SIZE, SIZE); cb(canvas.toDataURL('image/jpeg', 0.72)); } catch (err) { cb(null); } }; img.onerror = () => cb(null); img.src = e.target.result; }; reader.onerror = () => cb(null); reader.readAsDataURL(file); };
 const STAGES = ['예정', '진행중', '검토중', '완료', '보류'];
 const MAIN_STAGES = ['예정', '진행중', '검토중', '완료'];
 const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
@@ -873,14 +874,19 @@ function MemberModal({ data, setData, onClose }) {
   const del = m => { const c = workCount(m.name); if (c > 0) { alert('"' + m.name + '"님은 담당/서포트 중인 업무가 ' + c + '건 있어 삭제할 수 없습니다.\n먼저 담당자를 변경한 뒤 삭제해주세요.'); return; } if (list.length <= 1) { alert('팀원이 최소 1명은 있어야 합니다'); return; } if (!confirm('"' + m.name + '"님을 팀원 목록에서 삭제할까요?')) return; setData(d => ({ ...d, members: (d.members && d.members.length ? d.members : DEFAULT_MEMBERS).filter(x => x.name !== m.name) })); };
   return (
     <ModalShell title="👥 팀원 관리" onClose={onClose}>
-      <div style={{ fontSize: 12, color: '#6E6863', lineHeight: 1.5 }}>팀원을 추가하면 담당자 선택·필터·회의 액션 등 <b>모든 화면에 자동 반영</b>됩니다.</div>
+      <div style={{ fontSize: 12, color: '#6E6863', lineHeight: 1.5 }}>팀원을 추가하면 담당자 선택·필터·회의 액션 등 <b>모든 화면에 자동 반영</b>됩니다. <span style={{ color: '#A29C95' }}>· 아바타(📷)를 클릭하면 프로필 사진을 등록할 수 있어요.</span></div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
         {list.map(m => { const c = workCount(m.name); return (
           <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 11px', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 9 }}>
-            <span style={{ fontSize: 20 }}>{m.av || '👤'}</span>
+            <label title="클릭해서 사진 등록/변경" style={{ position: 'relative', cursor: 'pointer', flexShrink: 0, lineHeight: 0 }}>
+              {m.photo ? <img src={m.photo} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', display: 'block', border: '1px solid #E3E0DC' }} /> : <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', background: '#EFEDEA', fontSize: 20 }}>{m.av || '👤'}</span>}
+              <span style={{ position: 'absolute', right: -1, bottom: -1, width: 16, height: 16, borderRadius: '50%', background: G, color: 'white', fontSize: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid white' }}>📷</span>
+              <input type="file" accept="image/*" onChange={e => { const f = e.target.files && e.target.files[0]; if (f) resizeToThumb(f, url => { if (url) upd(m.name, 'photo', url); else alert('이미지를 불러오지 못했습니다. 다른 파일로 시도해주세요.'); }); e.target.value = ''; }} style={{ display: 'none' }} />
+            </label>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>{m.name}</div>
               <input value={m.role || ''} onChange={e => upd(m.name, 'role', e.target.value)} placeholder="역할 (예: 마케팅 팀장)" style={{ width: '100%', marginTop: 2, padding: '3px 6px', borderRadius: 5, border: '1px solid #E3E0DC', fontSize: 11, boxSizing: 'border-box' }} />
+              {m.photo ? <button onClick={() => upd(m.name, 'photo', '')} style={{ marginTop: 3, fontSize: 9.5, color: '#A29C95', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline' }}>사진 제거</button> : null}
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 10.5, color: c > 0 ? '#6E6863' : '#A29C95' }}>업무 {c}건</div>
@@ -910,6 +916,7 @@ function TabTeam({ data, setData, goTab }) {
   const all = data.plans.map(p => ({ ...p })).concat(data.subplans.map(s => ({ ...s })));
   const heldTotal = data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length;
   const [showMem, setShowMem] = useState(false);
+  const photoOf = n => { const mm = (data.members || []).find(x => x.name === n); return (mm && mm.photo) || ''; };
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -922,7 +929,7 @@ function TabTeam({ data, setData, goTab }) {
         {MEMBERS.map(m => {
           const owned = all.filter(x => ownersOf(x).includes(m)); const supp = all.filter(x => x.support && x.support.some(s => s.m === m));
           const subCnt = data.subplans.filter(s => ownersOf(s).includes(m)).length; const done = data.subplans.filter(s => ownersOf(s).includes(m) && s.stage === '완료').length;
-          return (<Card key={m}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: G, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 15 }}>{m}</div><div style={{ fontSize: 11, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 11, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 16, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>서포트</div></div></div></Card>);
+          return (<Card key={m}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 15 }}>{m}</div><div style={{ fontSize: 11, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 11, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 16, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>서포트</div></div></div></Card>);
         })}
       </div>
       <div style={{ marginTop: 18 }}><SCards items={[{ label: '출력 프로젝트', value: data.outputs.length + '개', color: G, onClick: () => goTab && goTab('프로젝트 진행 상황') }, { label: '실행계획', value: data.plans.length + '개', color: '#2D5FE0', onClick: () => goTab && goTab('칸반') }, { label: '세부 실행계획', value: data.subplans.length + '개', color: '#E08700', onClick: () => goTab && goTab('데일리/주간') }, { label: '등록 KPI', value: (data.plans.reduce((a, p) => a + (p.kpis ? p.kpis.length : 0), 0) + data.outputs.filter(o => o.kpi).length) + '개', color: GO, onClick: () => goTab && goTab('KPI') }, { label: '보류 항목', value: heldTotal + '건', color: '#989088', onClick: () => goTab && goTab('보류') }]} /></div>
