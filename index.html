@@ -130,6 +130,15 @@ const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + (Numb
 const addDay = (str, n) => addDays(str, n);
 const outLabel = o => o ? o.code + ' ' + o.name : '';
 const ownersOf = it => Array.isArray(it.owner) ? it.owner.filter(Boolean) : (it.owner ? [it.owner] : []);
+const applyChklDate = (d, chkId, date) => {
+  const checklists = d.checklists.map(c => c.id === chkId ? { ...c, date } : c);
+  const chk = checklists.find(c => c.id === chkId);
+  if (!chk) return { ...d, checklists };
+  const dates = checklists.filter(c => c.subplanId === chk.subplanId && c.date).map(c => c.date).sort();
+  const newStart = dates.length ? dates[0] : '';
+  const subplans = d.subplans.map(s => s.id === chk.subplanId ? { ...s, start: newStart } : s);
+  return { ...d, checklists, subplans };
+};
 const ownerAv = it => ownersOf(it).map(m => AV[m] || '').join(' ');
 const ownerNm = it => ownersOf(it).join(', ');
 const matchOwner = (it, f) => f === '전체' || ownersOf(it).includes(f) || (it.support && it.support.some(s => s.m === f));
@@ -470,6 +479,7 @@ function FileModal({ subId, data, setData, onClose }) {
 
 function DateBlock({ title, d, set, depOpts }) {
   const up = (k, val) => set({ ...d, [k]: val });
+  const hideStart = title === '세부실행계획';
   return (
     <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, marginTop: 8, border: '1px solid #EDEBE7' }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: G, marginBottom: 8 }}>{title} 일정</div>
@@ -479,6 +489,8 @@ function DateBlock({ title, d, set, depOpts }) {
           <div><Lbl c="선행 업무" /><Sel value={d.depId} onChange={v => up('depId', v)} opts={depOpts} ph="선택..." /></div>
           <div><Lbl c="완료 후 +일수" /><Inp type="number" value={d.depDays} onChange={v => up('depDays', v)} placeholder="7" /></div>
         </div>
+      ) : hideStart ? (
+        <div><Lbl c="마감일 (데드라인)" /><Inp type="date" value={d.due} onChange={v => up('due', v)} /></div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           <div><Lbl c="시작일" /><Inp type="date" value={d.start} onChange={v => up('start', v)} /></div>
@@ -598,7 +610,7 @@ function AddModal({ data, setData, onClose }) {
     let subId = null;
     if (sMode === 'new') { if (!sName.trim()) { alert('세부실행계획명 입력'); return; } subId = next(); const dep = parseDep(sDate); nd.subplans.push({ id: subId, planId, name: sName.trim(), stage: '예정', start: dep ? '' : sDate.start, due: dep ? addDays(TODAY, dep.days) : sDate.due, owner, support: support.slice(), dep, resolved: false, files: [], perfRecorded: false }); }
     else if (sMode === 'exist') { subId = Number(sSel); }
-    if (subId) checks.filter(c => c.trim()).forEach(c => nd.checklists.push({ id: next(), subplanId: subId, text: c.trim(), done: false }));
+    if (subId) checks.filter(c => c.trim()).forEach(c => nd.checklists.push({ id: next(), subplanId: subId, text: c.trim(), done: false, date: '', owner: '' }));
     nd.nid = id; setData(resolveAll(nd)); onClose();
   };
   const Toggle = ({ mode, setMode, opts }) => (
@@ -717,7 +729,9 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const movePlanChild = (id, dir) => setData(d => ({ ...d, plans: reorderSiblings(d.plans, id, 'outputId', dir) }));
   const toggleSubChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
   const delSubChk = id => setData(d => ({ ...d, checklists: d.checklists.filter(c => c.id !== id) }));
-  const addSubChk = () => { if (!newSubChk.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: item.id, text: newSubChk.trim(), done: false }] })); setNewSubChk(''); };
+  const setSubChkDate = (id, date) => setData(d => applyChklDate(d, id, date));
+  const setSubChkOwner = (id, owner) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, owner } : c) }));
+  const addSubChk = () => { if (!newSubChk.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: item.id, text: newSubChk.trim(), done: false, date: '', owner: '' }] })); setNewSubChk(''); };
   const moveSubChild = (id, dir) => setData(d => ({ ...d, subplans: reorderSiblings(d.subplans, id, 'planId', dir) }));
 
   const titleMap = { output: '출력 프로젝트 수정', plan: '실행계획 수정', subplan: '세부실행계획 수정' };
@@ -775,9 +789,11 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
           <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>☑ 체크리스트 ({subChks.length})</div>
           {subChks.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', marginBottom: 8 }}>등록된 체크리스트가 없습니다</div> :
             subChks.map(c => (
-              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 8, padding: '7px 10px', marginBottom: 5, border: '1px solid #E3E0DC' }}>
+              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'white', borderRadius: 8, padding: '7px 10px', marginBottom: 5, border: '1px solid #E3E0DC', flexWrap: 'wrap' }}>
                 <span onClick={() => toggleSubChk(c.id)} style={{ cursor: 'pointer', display: 'flex' }}><Chk on={c.done} /></span>
-                <div style={{ flex: 1, fontSize: 12, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</div>
+                <div style={{ flex: 1, minWidth: 90, fontSize: 12, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</div>
+                <select value={c.owner || ''} onChange={e => setSubChkOwner(c.id, e.target.value)} title="담당자" style={{ fontSize: 10.5, padding: '3px 4px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.owner ? '#3A3631' : '#A29C95', background: 'white', maxWidth: 88 }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
+                <input type="date" value={c.date || ''} onChange={e => setSubChkDate(c.id, e.target.value)} title="실행일" style={{ fontSize: 11, padding: '3px 5px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.date ? '#3A3631' : '#A29C95', flexShrink: 0, maxWidth: 130 }} />
                 <button onClick={() => delSubChk(c.id)} style={{ border: 'none', background: 'none', color: '#E53935', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
               </div>
             ))}
@@ -973,6 +989,166 @@ function ProfileModal({ name, data, onClose }) {
   );
 }
 
+function ChecklistModal({ chkId, data, setData, onClose }) {
+  const c = (data.checklists || []).find(x => x.id === chkId);
+  if (!c) return null;
+  const sub = data.subplans.find(s => s.id === c.subplanId);
+  const plan = sub ? data.plans.find(p => p.id === sub.planId) : null;
+  const out = plan ? data.outputs.find(o => o.id === plan.outputId) : null;
+  const over = !!(c.date && sub && sub.due && c.date > sub.due);
+  const toggleDone = () => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, done: !x.done } : x) }));
+  const setOwner = nm => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, owner: x.owner === nm ? '' : nm } : x) }));
+  const setDate = date => setData(d => applyChklDate(d, c.id, date));
+  return (
+    <ModalShell title="체크리스트" onClose={onClose}>
+      <div style={{ fontSize: 17, fontWeight: 800, color: c.done ? '#A29C95' : '#1A1614', textDecoration: c.done ? 'line-through' : 'none', lineHeight: 1.4 }}>{c.text}</div>
+      <button onClick={toggleDone} style={{ width: '100%', marginTop: 10, padding: '11px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, background: c.done ? '#E3E0DC' : '#1FA463', color: c.done ? '#3A3631' : 'white' }}>{c.done ? '✓ 완료됨 — 완료 취소' : '완료로 표시'}</button>
+      <div style={{ marginTop: 14, background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #EDEBE7' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: G, marginBottom: 6 }}>소속 세부실행계획</div>
+        {sub ? (
+          <div>
+            <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 4 }}>{out ? outLabel(out) : ''}{plan ? ' ▸ ' + plan.name : ''}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+              <Badge label={sub.stage} color={stC(sub.stage)} />
+              <span style={{ fontSize: 14, fontWeight: 700 }}>{sub.name}</span>
+            </div>
+            <div style={{ fontSize: 12, color: '#6E6863', marginTop: 6 }}>마감일: {sub.due || '미정'}{over && <span style={{ color: '#DC2626', fontWeight: 700 }}> · ⚠ 실행일이 마감일을 초과했습니다</span>}</div>
+          </div>
+        ) : <div style={{ fontSize: 12.5, color: '#A29C95' }}>연결된 세부실행계획이 없습니다</div>}
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <Lbl c="담당자" />
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {MEMBERS.map(m => { const on = c.owner === m; return (
+            <button key={m} onClick={() => setOwner(m)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 20, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, border: '1.5px solid ' + (on ? G : '#E3E0DC'), background: on ? G : 'white', color: on ? 'white' : '#3A3631' }}>
+              <span style={{ fontSize: 13 }}>{AV[m]}</span>{m}
+            </button>
+          ); })}
+        </div>
+        {c.owner ? <div style={{ fontSize: 11, color: '#A29C95', marginTop: 5 }}>선택된 담당자를 다시 누르면 해제됩니다</div> : null}
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <Lbl c="실행일" />
+        <Inp type="date" value={c.date || ''} onChange={setDate} />
+      </div>
+      <Btn v="secondary" onClick={onClose} style={{ width: '100%', marginTop: 14 }}>닫기</Btn>
+    </ModalShell>
+  );
+}
+
+function TeamCalendar({ data, setData }) {
+  const [ym, setYm] = useState(TODAY.slice(0, 7));
+  const [dragOver, setDragOver] = useState(null);
+  const [openChk, setOpenChk] = useState(null);
+  const [ownerFilter, setOwnerFilter] = useState('');
+  const setDate = (id, date) => setData(d => applyChklDate(d, id, date));
+  const navBtnSmall = { width: 28, height: 28, borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 14, color: '#3A3631', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' };
+  const filterBtn = active => ({ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 15, fontSize: 11, fontWeight: 600, cursor: 'pointer', border: '1px solid ' + (active ? G : '#E3E0DC'), background: active ? G : 'white', color: active ? 'white' : '#6E6863' });
+  const [yy, mm] = ym.split('-').map(Number);
+  const firstDow = new Date(yy, mm - 1, 1).getDay();
+  const dim = new Date(yy, mm, 0).getDate();
+  const cells = [];
+  for (let i = 0; i < firstDow; i++) cells.push(null);
+  for (let dd = 1; dd <= dim; dd++) cells.push(ym + '-' + String(dd).padStart(2, '0'));
+  while (cells.length % 7 !== 0) cells.push(null);
+  const visible = c => !ownerFilter || c.owner === ownerFilter;
+  const chksByDate = {};
+  (data.checklists || []).forEach(c => { if (c.date && visible(c)) (chksByDate[c.date] = chksByDate[c.date] || []).push(c); });
+  const subOf = id => data.subplans.find(s => s.id === id);
+  const undated = (data.checklists || []).filter(c => !c.date && visible(c));
+  const shift = delta => { const nd = new Date(yy, mm - 1 + delta, 1); setYm(nd.getFullYear() + '-' + String(nd.getMonth() + 1).padStart(2, '0')); };
+  const WD = ['일', '월', '화', '수', '목', '금', '토'];
+  const isOver = c => { const s = subOf(c.subplanId); return !!(c.date && s && s.due && c.date > s.due); };
+  const warnCnt = (data.checklists || []).filter(c => visible(c) && isOver(c)).length;
+  const chip = (c, hideSub) => {
+    const s = subOf(c.subplanId); const over = isOver(c); const av = c.owner ? AV[c.owner] : '';
+    return (
+      <div key={c.id} draggable onDragStart={e => { e.stopPropagation(); e.dataTransfer.setData('chk-id', String(c.id)); }} onClick={e => { e.stopPropagation(); setOpenChk(c.id); }}
+        title={(s ? s.name : '') + (c.owner ? ' · ' + c.owner : '') + (over && s ? ' · 마감일(' + s.due + ') 초과' : '')}
+        style={{ padding: '3px 6px', marginBottom: 3, borderRadius: 6, cursor: 'pointer', lineHeight: 1.3, background: over ? '#FEF2F2' : (c.done ? '#F1F0ED' : '#EEF4EC'), border: '1px solid ' + (over ? '#FCA5A5' : (c.done ? '#E3E0DC' : '#CDE3C6')) }}>
+        {s && !hideSub && <div style={{ fontSize: 9, color: '#A29C95', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</div>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5 }}>
+          {over && <span style={{ color: '#DC2626', fontWeight: 800, flexShrink: 0 }}>⚠</span>}
+          <span style={{ flexShrink: 0, width: 9, height: 9, borderRadius: '50%', border: '1.5px solid ' + (c.done ? '#1FA463' : '#B8B2AA'), background: c.done ? '#1FA463' : 'transparent' }} />
+          {av && <span style={{ flexShrink: 0, fontSize: 12.5 }}>{av}</span>}
+          <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span>
+        </div>
+      </div>
+    );
+  };
+  const groupChks = list => { const g = {}; list.forEach(c => { const sub = data.subplans.find(s => s.id === c.subplanId); const plan = sub ? data.plans.find(p => p.id === sub.planId) : null; const o = plan ? data.outputs.find(x => x.id === plan.outputId) : null; const oK = o ? outLabel(o) : '기타'; const pK = plan ? plan.name : '기타'; const sK = sub ? sub.name : '기타'; (((g[oK] = g[oK] || {})[pK] = g[oK][pK] || {})[sK] = g[oK][pK][sK] || []).push(c); }); return g; };
+  const renderGrouped = list => {
+    if (list.length === 0) return <div style={{ fontSize: 10, color: '#C4BEB6', padding: '2px 0' }}>없음</div>;
+    const g = groupChks(list);
+    return Object.keys(g).map(oK => (
+      <div key={oK} style={{ marginBottom: 7 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, color: G, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📁 {oK}</div>
+        {Object.keys(g[oK]).map(pK => (
+          <div key={pK} style={{ marginLeft: 5, marginTop: 3 }}>
+            <div style={{ fontSize: 9.5, fontWeight: 700, color: '#6E6863', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>▸ {pK}</div>
+            {Object.keys(g[oK][pK]).map(sK => (
+              <div key={sK} style={{ marginLeft: 7, marginTop: 2 }}>
+                <div style={{ fontSize: 9, color: '#A29C95', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 1 }}>· {sK}</div>
+                {g[oK][pK][sK].map(c => chip(c, true))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    ));
+  };
+  return (
+    <Card style={{ marginTop: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: G }}>📅 캘린더</div>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>끌어서 날짜 지정 · 클릭하면 상세·완료</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
+          <button onClick={() => shift(-1)} style={navBtnSmall}>‹</button>
+          <span style={{ fontSize: 13.5, fontWeight: 700, minWidth: 84, textAlign: 'center' }}>{yy}년 {mm}월</span>
+          <button onClick={() => shift(1)} style={navBtnSmall}>›</button>
+          <button onClick={() => setYm(TODAY.slice(0, 7))} style={{ ...navBtnSmall, width: 'auto', padding: '0 9px', fontSize: 11, fontWeight: 700 }}>오늘</button>
+        </div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 9 }}>
+        <span style={{ fontSize: 11, color: '#6E6863', fontWeight: 600, marginRight: 2 }}>담당자</span>
+        <button onClick={() => setOwnerFilter('')} style={filterBtn(!ownerFilter)}>전체</button>
+        {MEMBERS.map(m => <button key={m} onClick={() => setOwnerFilter(ownerFilter === m ? '' : m)} style={filterBtn(ownerFilter === m)}><span style={{ fontSize: 12 }}>{AV[m]}</span> {m}</button>)}
+      </div>
+      {warnCnt > 0 && <div style={{ fontSize: 11, color: '#B91C1C', marginBottom: 8, background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 7, padding: '6px 10px' }}>⚠ 마감일을 넘긴 체크리스트 {warnCnt}건 — 빨간 항목의 날짜나 세부계획 마감일을 조정하세요.</div>}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4 }}>
+        {WD.map((w, i) => <div key={w} style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: i === 0 ? '#DC2626' : (i === 6 ? '#2563EB' : '#6E6863'), padding: '3px 0' }}>{w}</div>)}
+        {cells.map((date, i) => {
+          if (!date) return <div key={'e' + i} style={{ minHeight: 74, background: '#FAFAF9', borderRadius: 6 }} />;
+          const dd = Number(date.slice(8)); const isToday = date === TODAY; const chks = chksByDate[date] || []; const dow = i % 7;
+          return (
+            <div key={date} onDragOver={e => { e.preventDefault(); setDragOver(date); }} onDragLeave={() => setDragOver(o => o === date ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, date); setDragOver(null); }}
+              style={{ minHeight: 74, background: dragOver === date ? '#EAF0FE' : 'white', border: '1px solid ' + (isToday ? G : (dragOver === date ? '#93C5FD' : '#EDEBE7')), borderRadius: 6, padding: 3, overflow: 'hidden' }}>
+              <div style={{ fontSize: 12, fontWeight: isToday ? 800 : 600, color: isToday ? G : (dow === 0 ? '#DC2626' : (dow === 6 ? '#2563EB' : '#6E6863')), marginBottom: 3, textAlign: 'right', paddingRight: 3 }}>{dd}</div>
+              {chks.map(c => chip(c))}
+            </div>
+          );
+        })}
+      </div>
+      <div onDragOver={e => { e.preventDefault(); setDragOver('un'); }} onDragLeave={() => setDragOver(o => o === 'un' ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, ''); setDragOver(null); }}
+        style={{ marginTop: 10, border: '1px dashed ' + (dragOver === 'un' ? '#93C5FD' : '#D5D2CE'), background: dragOver === 'un' ? '#EAF0FE' : '#FAFAF9', borderRadius: 8, padding: 8 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>📥 미배정 체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({undated.length}) — 날짜 칸으로 끌어 놓으세요</span></div>
+        {undated.length === 0 ? <div style={{ fontSize: 10.5, color: '#A29C95' }}>모든 체크리스트에 실행일이 지정되었습니다.</div> :
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#3A3631', marginBottom: 5, paddingBottom: 3, borderBottom: '1.5px solid #E3E0DC' }}>미완료 {undated.filter(c => !c.done).length}</div>
+              {renderGrouped(undated.filter(c => !c.done))}
+            </div>
+            <div style={{ borderLeft: '1px solid #E3E0DC', paddingLeft: 10 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#A29C95', marginBottom: 5, paddingBottom: 3, borderBottom: '1.5px solid #E3E0DC' }}>완료 {undated.filter(c => c.done).length}</div>
+              {renderGrouped(undated.filter(c => c.done))}
+            </div>
+          </div>}
+      </div>
+      {openChk && <ChecklistModal chkId={openChk} data={data} setData={setData} onClose={() => setOpenChk(null)} />}
+    </Card>
+  );
+}
+
 function TabTeam({ data, setData, goTab }) {
   const all = data.plans.map(p => ({ ...p })).concat(data.subplans.map(s => ({ ...s })));
   const heldTotal = data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length;
@@ -988,15 +1164,22 @@ function TabTeam({ data, setData, goTab }) {
       {showMem && <MemberModal data={data} setData={setData} onClose={() => setShowMem(false)} />}
       {profileMem && <ProfileModal name={profileMem} data={data} onClose={() => setProfileMem(null)} />}
       <div style={{ fontSize: 12, color: '#6E6863', marginBottom: 16 }}>{TODAY} 기준 <span style={{ color: '#A29C95' }}>· 팀원 카드를 누르면 프로필이 열립니다</span></div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 12 }}>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 440px', minWidth: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 12 }}>
         {MEMBERS.map(m => {
           const owned = all.filter(x => ownersOf(x).includes(m)); const supp = all.filter(x => x.support && x.support.some(s => s.m === m));
           const subCnt = data.subplans.filter(s => ownersOf(s).includes(m)).length; const done = data.subplans.filter(s => ownersOf(s).includes(m) && s.stage === '완료').length;
           return (<Card key={m} onClick={() => setProfileMem(m)} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 15 }}>{m}</div><div style={{ fontSize: 11, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 11, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 16, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>서포트</div></div></div></Card>);
         })}
+          </div>
+          <TeamCalendar data={data} setData={setData} />
+          <div style={{ marginTop: 18 }}><SCards items={[{ label: '출력 프로젝트', value: data.outputs.length + '개', color: G, onClick: () => goTab && goTab('프로젝트 진행 상황') }, { label: '실행계획', value: data.plans.length + '개', color: '#2D5FE0', onClick: () => goTab && goTab('칸반') }, { label: '세부 실행계획', value: data.subplans.length + '개', color: '#E08700', onClick: () => goTab && goTab('데일리/주간') }, { label: '등록 KPI', value: (data.plans.reduce((a, p) => a + (p.kpis ? p.kpis.length : 0), 0) + data.outputs.filter(o => o.kpi).length) + '개', color: GO, onClick: () => goTab && goTab('KPI') }, { label: '보류 항목', value: heldTotal + '건', color: '#989088', onClick: () => goTab && goTab('보류') }]} /></div>
+        </div>
+        <div style={{ flex: '0 1 330px', minWidth: 280 }}>
+          <NoticeBoard data={data} setData={setData} />
+        </div>
       </div>
-      <div style={{ marginTop: 18 }}><SCards items={[{ label: '출력 프로젝트', value: data.outputs.length + '개', color: G, onClick: () => goTab && goTab('프로젝트 진행 상황') }, { label: '실행계획', value: data.plans.length + '개', color: '#2D5FE0', onClick: () => goTab && goTab('칸반') }, { label: '세부 실행계획', value: data.subplans.length + '개', color: '#E08700', onClick: () => goTab && goTab('데일리/주간') }, { label: '등록 KPI', value: (data.plans.reduce((a, p) => a + (p.kpis ? p.kpis.length : 0), 0) + data.outputs.filter(o => o.kpi).length) + '개', color: GO, onClick: () => goTab && goTab('KPI') }, { label: '보류 항목', value: heldTotal + '건', color: '#989088', onClick: () => goTab && goTab('보류') }]} /></div>
-      <NoticeBoard data={data} setData={setData} />
     </div>
   );
 }
@@ -1030,6 +1213,7 @@ function NoticeModal({ data, setData, edit, onClose }) {
 
 function NoticeBoard({ data, setData }) {
   const [modal, setModal] = useState(false);
+  const [openId, setOpenId] = useState(null);
   const notices = data.notices || [];
   const pinned = notices.find(n => n.pinned);
   const rest = notices.filter(n => !n.pinned);
@@ -1037,30 +1221,42 @@ function NoticeBoard({ data, setData }) {
   const togglePin = id => setData(d => ({ ...d, notices: (d.notices || []).map(n => n.id === id ? { ...n, pinned: !n.pinned } : (n.pinned ? { ...n, pinned: false } : n)) }));
   const actBtn = { padding: '4px 10px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: '#6E6863' };
   return (
-    <div style={{ marginTop: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: G }}>📢 공지사항</div>
-        <button onClick={() => setModal(true)} style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: G, color: 'white' }}>+ 공지 작성</button>
+        <button onClick={() => setModal(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: G, color: 'white' }}>+ 작성</button>
       </div>
       {pinned && (
-        <Card style={{ marginBottom: 14, padding: 0, overflow: 'hidden', border: '1px solid #F0E2C0' }}>
-          <div style={{ borderLeft: '4px solid ' + GO, background: '#FBF6EC', padding: '14px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}><span style={{ fontSize: 11, fontWeight: 700, color: GO }}>📌 고정된 공지</span><span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{AV[pinned.author]} {pinned.author} · {pinned.createdAt}</span></div>
-            {pinned.title && <div style={{ fontSize: 15, fontWeight: 800, marginBottom: 8, color: '#1A1614' }}>{pinned.title}</div>}
-            <div style={{ fontSize: 15, lineHeight: 1.65, whiteSpace: 'pre-wrap', color: '#3A3631' }}>{pinned.content}</div>
-            <div style={{ display: 'flex', gap: 6, marginTop: 12 }}><button onClick={() => togglePin(pinned.id)} style={{ ...actBtn, borderColor: GO, color: GO }}>📌 고정 해제</button><button onClick={() => setModal(pinned)} style={actBtn}>수정</button><button onClick={() => del(pinned.id)} style={{ ...actBtn, color: '#E53935' }}>삭제</button></div>
+        <Card style={{ marginBottom: 12, padding: 0, overflow: 'hidden', border: '1px solid #F0E2C0' }}>
+          <div style={{ borderLeft: '4px solid ' + GO, background: '#FBF6EC', padding: '13px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7, flexWrap: 'wrap' }}><span style={{ fontSize: 11, fontWeight: 700, color: GO }}>📌 고정된 공지</span><span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#A29C95' }}>{AV[pinned.author]} {pinned.author} · {pinned.createdAt}</span></div>
+            {pinned.title && <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 6, color: '#1A1614' }}>{pinned.title}</div>}
+            <div style={{ fontSize: 13.5, lineHeight: 1.6, whiteSpace: 'pre-wrap', color: '#3A3631' }}>{pinned.content}</div>
+            <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}><button onClick={() => togglePin(pinned.id)} style={{ ...actBtn, borderColor: GO, color: GO }}>📌 고정 해제</button><button onClick={() => setModal(pinned)} style={actBtn}>수정</button><button onClick={() => del(pinned.id)} style={{ ...actBtn, color: '#E53935' }}>삭제</button></div>
           </div>
         </Card>
       )}
-      {notices.length === 0 ? (
-        <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 32, marginBottom: 8 }}>📢</div><div>등록된 공지가 없습니다</div></Card>
-      ) : rest.map(n => (
-        <Card key={n.id} style={{ marginBottom: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>{n.title && <span style={{ fontSize: 14, fontWeight: 700 }}>{n.title}</span>}<span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{AV[n.author]} {n.author} · {n.createdAt}</span></div>
-          {n.content && <div style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap', color: '#3A3631' }}>{n.content}</div>}
-          <div style={{ display: 'flex', gap: 6, marginTop: 10 }}><button onClick={() => togglePin(n.id)} style={actBtn}>📌 상단 고정</button><button onClick={() => setModal(n)} style={actBtn}>수정</button><button onClick={() => del(n.id)} style={{ ...actBtn, color: '#E53935' }}>삭제</button></div>
-        </Card>
-      ))}
+      {(rest.length === 0 && !pinned) ? (
+        <Card style={{ textAlign: 'center', padding: 28, color: '#A29C95' }}><div style={{ fontSize: 28, marginBottom: 6 }}>📢</div><div style={{ fontSize: 12.5 }}>등록된 공지가 없습니다</div></Card>
+      ) : rest.map(n => {
+        const open = openId === n.id;
+        return (
+          <Card key={n.id} style={{ marginBottom: 6, padding: 0, overflow: 'hidden' }}>
+            <div onClick={() => setOpenId(open ? null : n.id)} style={{ cursor: 'pointer', padding: '9px 12px', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <span style={{ fontSize: 10, color: '#A29C95', flexShrink: 0 }}>{open ? '▾' : '▸'}</span>
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 700, color: '#1A1614', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title || '(제목 없음)'}</span>
+              <span style={{ fontSize: 10.5, color: '#A29C95', flexShrink: 0 }}>{n.createdAt}</span>
+            </div>
+            {open && (
+              <div style={{ padding: '0 12px 12px', borderTop: '1px solid #F0EEEB' }}>
+                <div style={{ fontSize: 10.5, color: '#A29C95', margin: '8px 0 6px' }}>{AV[n.author]} {n.author}</div>
+                {n.content && <div style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap', color: '#3A3631' }}>{n.content}</div>}
+                <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}><button onClick={() => togglePin(n.id)} style={actBtn}>📌 상단 고정</button><button onClick={() => setModal(n)} style={actBtn}>수정</button><button onClick={() => del(n.id)} style={{ ...actBtn, color: '#E53935' }}>삭제</button></div>
+              </div>
+            )}
+          </Card>
+        );
+      })}
       {modal && <NoticeModal data={data} setData={setData} edit={modal === true ? null : modal} onClose={() => setModal(false)} />}
     </div>
   );
@@ -1171,7 +1367,7 @@ function TabWeekly({ data, setData, onEdit }) {
   const weekDates = DAYS.map((_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); return x.toISOString().slice(0, 10); });
   const diffDays = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
   const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
-  const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false }] })); setNewChk(n => ({ ...n, [id]: '' })); };
+  const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false, date: '', owner: '' }] })); setNewChk(n => ({ ...n, [id]: '' })); };
   const planName = id => { const p = data.plans.find(x => x.id === id); return p ? p.name : ''; };
   const onDragStart = (e, s, isSpan) => {
     e.stopPropagation();
@@ -1201,7 +1397,7 @@ function TabWeekly({ data, setData, onEdit }) {
     setData(d => ({ ...d, subplans: d.subplans.map(s => s.id === id ? { ...s, start: '', due: '' } : s) }));
   };
   const subs = data.subplans.filter(s => s.stage !== '보류' && matchOwner(s, filter));
-  const spanning = subs.filter(s => s.start && s.due && s.start !== s.due && s.start <= weekDates[6] && s.due >= weekDates[0]);
+  const spanning = [];
   const SPAN_GAP = 8;
   const spanMeta = spanning.map(s => {
     const sc = s.start <= weekDates[0] ? 0 : weekDates.indexOf(s.start);
@@ -1228,7 +1424,7 @@ function TabWeekly({ data, setData, onEdit }) {
   const laneTop = [];
   lanes.forEach((_, k) => { laneTop[k] = k === 0 ? 0 : laneTop[k - 1] + (laneH[k - 1] || 46) + SPAN_GAP; });
   const colReserve = i => { let h = 0; spanMeta.forEach((m, idx) => { if (m.sc >= 0 && m.ec >= 0 && m.sc <= i && i <= m.ec) h = Math.max(h, laneTop[laneOf[idx]] + (laneH[laneOf[idx]] || 46) + SPAN_GAP); }); return h; };
-  const getDayItems = date => subs.filter(s => { if (s.start && s.due && s.start !== s.due) return false; return s.due === date; });
+  const getDayItems = date => subs.filter(s => s.due === date);
   const unassigned = subs.filter(s => !s.due);
   const grouped = {};
   unassigned.forEach(s => {
@@ -1242,7 +1438,7 @@ function TabWeekly({ data, setData, onEdit }) {
   });
   const renderMini = (s, hideParent = false) => {
     const chks = data.checklists.filter(c => c.subplanId === s.id); const cd = chks.filter(c => c.done).length;
-    const isSpan = !!(s.start && s.due && s.start !== s.due); const files = s.files || [];
+    const isSpan = false; const files = s.files || [];
     return (
       <Card key={s.id} draggable onDragStart={e => onDragStart(e, s, isSpan)} style={{ marginBottom: 6, padding: 8, cursor: 'grab' }}>
         {!hideParent && <div style={{ fontSize: 9, color: '#A29C95', marginBottom: 3 }}>{planName(s.planId)}</div>}
@@ -1273,7 +1469,7 @@ function TabWeekly({ data, setData, onEdit }) {
   while (monthCells.length % 7 !== 0) monthCells.push(null);
   const monthWeeks = []; for (let i = 0; i < monthCells.length; i += 7) monthWeeks.push(monthCells.slice(i, i + 7));
   const monthEnd = mDates[mDates.length - 1];
-  const monthItemsOf = date => subs.filter(s => { if (!s.due) return false; if (s.start && s.due && s.start !== s.due) return s.start <= date && date <= s.due; return s.due === date; });
+  const monthItemsOf = date => subs.filter(s => s.due === date);
   const navBtn = { border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '4px 10px' };
   return (
     <div style={{ padding: 20 }}>
