@@ -1115,7 +1115,7 @@ function TeamCalendar({ data, setData }) {
         {MEMBERS.map(m => <button key={m} onClick={() => setOwnerFilter(ownerFilter === m ? '' : m)} style={filterBtn(ownerFilter === m)}><span style={{ fontSize: 12 }}>{AV[m]}</span> {m}</button>)}
       </div>
       {warnCnt > 0 && <div style={{ fontSize: 11, color: '#B91C1C', marginBottom: 8, background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 7, padding: '6px 10px' }}>⚠ 마감일을 넘긴 체크리스트 {warnCnt}건 — 빨간 항목의 날짜나 세부계획 마감일을 조정하세요.</div>}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: 4 }}>
         {WD.map((w, i) => <div key={w} style={{ textAlign: 'center', fontSize: 12, fontWeight: 700, color: i === 0 ? '#DC2626' : (i === 6 ? '#2563EB' : '#6E6863'), padding: '3px 0' }}>{w}</div>)}
         {cells.map((date, i) => {
           if (!date) return <div key={'e' + i} style={{ minHeight: 74, background: '#FAFAF9', borderRadius: 6 }} />;
@@ -1493,11 +1493,11 @@ function TabWeekly({ data, setData, onEdit }) {
       <FilterBar value={filter} onChange={setFilter} />
       {monthView && (
         <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6, marginBottom: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: 6, marginBottom: 6 }}>
             {DAYS.map(day => <div key={day} style={{ textAlign: 'center', fontWeight: 700, fontSize: 12, color: G, padding: '4px 0' }}>{day}</div>)}
           </div>
           {monthWeeks.map((wk, wi) => (
-            <div key={wi} style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 6, marginBottom: 6 }}>
+            <div key={wi} style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: 6, marginBottom: 6 }}>
               {wk.map((date, di) => {
                 if (!date) return <div key={di} style={{ minHeight: 92, background: '#FAFAFA', borderRadius: 8 }} />;
                 const items = monthItemsOf(date);
@@ -1521,16 +1521,16 @@ function TabWeekly({ data, setData, onEdit }) {
       )}
       <div style={{ overflowX: 'auto', marginBottom: 16, display: monthView ? 'none' : 'block' }}>
         <div style={{ minWidth: 1000 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 8, marginBottom: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: 8, marginBottom: 8 }}>
             {DAYS.map((day, i) => (
               <div key={day} style={{ background: weekDates[i] === TODAY ? GO : G, color: 'white', borderRadius: 8, padding: '7px 0', textAlign: 'center', fontWeight: 700, fontSize: 12 }}>
                 {day} <span style={{ opacity: 0.7, fontSize: 10 }}>{weekDates[i].slice(5)}</span>
               </div>
             ))}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: 8 }}>
             {weekDates.map((date, i) => (
-              <div key={'dc' + i} style={{ gridColumn: i + 1, gridRow: 1 }}
+              <div key={'dc' + i} style={{ gridColumn: i + 1, gridRow: 1, minWidth: 0 }}
                 onDragOver={e => { e.preventDefault(); setDragOver('c' + i); }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null); }}
                 onDrop={e => handleDrop(e, date)}>
