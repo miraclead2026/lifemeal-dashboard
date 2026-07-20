@@ -7907,7 +7907,18 @@
         "intentReason": "브랜드명 직접 검색이며 쇼핑 결과가 자사·유통 상품으로 채워짐 — 구매 의도 명확.",
         "priorityScore": 9.6,
         "status": "defend",
-        "relatedKeywords": []
+        "relatedKeywords": [],
+        "productHints": [
+          {
+            "group": "balhyo-hwangseongju",
+            "confidence": "medium"
+          },
+          {
+            "group": "yeongyang-hwangseongju",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "브랜드 '황성주생식' — 발효건강식/영양식 두 SKU 모두 해당, 하나로 단정 불가"
       },
       {
         "keyword": "단백질쉐이크",
@@ -7991,7 +8002,18 @@
             "adDepth": 8,
             "intentType": "shopping"
           }
-        ]
+        ],
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "medium"
+          },
+          {
+            "group": "proteingold-high5",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "단백질쉐이크 카테고리어 → 데이업 쉐이크·프로틴골드 후보"
       },
       {
         "keyword": "마시는샐러드",
@@ -8019,7 +8041,14 @@
             "adDepth": 6,
             "intentType": "shopping"
           }
-        ]
+        ],
+        "productHints": [
+          {
+            "group": "doctorsalad-14po",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "마시는샐러드 카테고리어 → 닥터샐러드 14포"
       },
       {
         "keyword": "하루견과",
@@ -8038,7 +8067,14 @@
         "intentReason": "제품 카테고리명이며 adDepth 10으로 광고 경쟁이 포화.",
         "priorityScore": 8.1,
         "status": "proposed",
-        "relatedKeywords": []
+        "relatedKeywords": [],
+        "productHints": [
+          {
+            "group": "harugwana",
+            "confidence": "high"
+          }
+        ],
+        "productHintBasis": "제품명 '하루견과' 직접 매칭(갓 구운 하루견과)"
       },
       {
         "keyword": "그래놀라",
@@ -8057,7 +8093,14 @@
         "intentReason": "제품 카테고리 직접 검색, 쇼핑 결과 밀집.",
         "priorityScore": 7.8,
         "status": "proposed",
-        "relatedKeywords": []
+        "relatedKeywords": [],
+        "productHints": [
+          {
+            "group": "granola",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "그래놀라 카테고리어 → 홀그레인 저당 그래놀라"
       },
       {
         "keyword": "프로틴쉐이크",
@@ -8101,7 +8144,18 @@
             "adDepth": 10,
             "intentType": "info"
           }
-        ]
+        ],
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "medium"
+          },
+          {
+            "group": "proteingold-high5",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "프로틴쉐이크 카테고리어 → 데이업 쉐이크·프로틴골드 후보"
       },
       {
         "keyword": "생식",
@@ -8137,7 +8191,18 @@
             "adDepth": 8,
             "intentType": "shopping"
           }
-        ]
+        ],
+        "productHints": [
+          {
+            "group": "ilsaeng-lifemeal-420g",
+            "confidence": "medium"
+          },
+          {
+            "group": "lifemeal-daily-30g",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "생식 카테고리어 → 라이프밀 생식 2종(브랜드 '황성주생식'은 별도 defend)"
       },
       {
         "keyword": "식사대용",
@@ -8189,7 +8254,22 @@
             "adDepth": 10,
             "intentType": "info"
           }
-        ]
+        ],
+        "productHints": [
+          {
+            "group": "ilsaeng-lifemeal-420g",
+            "confidence": "low"
+          },
+          {
+            "group": "lifemeal-daily-30g",
+            "confidence": "low"
+          },
+          {
+            "group": "dayup-shake",
+            "confidence": "low"
+          }
+        ],
+        "productHintBasis": "식사대용=광범위 식사대용 카테고리, 생식·쉐이크 다수 해당 → 저신뢰 후보 나열"
       },
       {
         "keyword": "저속노화",
@@ -8257,7 +8337,9 @@
             "adDepth": 8,
             "intentType": "shopping"
           }
-        ]
+        ],
+        "productHints": [],
+        "productHintBasis": "트렌드어 — 다이어트·시니어건강 전반, 특정 제품군 매핑 곤란(억지 매핑 금지)"
       },
       {
         "keyword": "역노화",
@@ -8276,7 +8358,9 @@
         "intentReason": "search_shop 실검증 결과 288건 대부분이 NMN·줄기세포 영양제로 우리 카테고리와 불일치. 우리 관점에서는 정보성 유입 키워드로 취급하는 것이 타당.",
         "priorityScore": 5.4,
         "status": "proposed",
-        "relatedKeywords": []
+        "relatedKeywords": [],
+        "productHints": [],
+        "productHintBasis": "신조어(트렌드) — 특정 제품군 매핑 곤란(억지 매핑 금지)"
       }
     ],
     "contentIdeas": [
