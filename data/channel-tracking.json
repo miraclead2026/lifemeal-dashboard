@@ -3,7 +3,7 @@
     "extracted_at": "2026-07-21",
     "provisional_days": 14,
     "source": "네이버 마케팅분석>전체채널 (기간합계, 차원=상세, 지표=전체)",
-    "note": "full_channel=전체채널 3기간(기간합계, 일단위 미제공). a14=+14일기여도추정(잠정). ad_spend 0→null. channel_class=허브 확정표(채널명). baseline is_provisional=false. custom_channel=nt 미배포로 빈배열. product_channel=상품별 확보 후 채움."
+    "note": "full_channel=전체채널 3기간(기간합계, 일단위 미제공). a14=+14일기여도추정(잠정). ad_spend 0→null. channel_class=허브 확정표(채널명). baseline is_provisional=false. custom_channel=nt 미배포로 빈배열. product_channel=상품별 확보 후 채움. product_channel=판매분석 상품별(판매금액 확정매출, buyer_count=고객수모드). period_role=product_mtd(기본30일 fallback)."
   },
   "reports": {
     "full_channel": [
@@ -4017,6 +4017,228 @@
       }
     ],
     "custom_channel": [],
-    "product_channel": []
+    "product_channel": [
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13616691087",
+        "product_name_raw": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 쉐이크 30g, 14포, 3개",
+        "product_group": "생식",
+        "product_line": "라이프밀데일리생식",
+        "order_count": 169,
+        "revenue": 17494520,
+        "buyer_count": 160
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13616691089",
+        "product_name_raw": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 쉐이크 30g, 14포, 4개",
+        "product_group": "생식",
+        "product_line": "라이프밀데일리생식",
+        "order_count": 103,
+        "revenue": 13437030,
+        "buyer_count": 100
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "12763789807",
+        "product_name_raw": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
+        "product_group": "생식",
+        "product_line": "1일1생식",
+        "order_count": 83,
+        "revenue": 13182420,
+        "buyer_count": 81
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13447249282",
+        "product_name_raw": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 쉐이크",
+        "product_group": "생식",
+        "product_line": "라이프밀데일리생식",
+        "order_count": 291,
+        "revenue": 11266470,
+        "buyer_count": 270
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13635278957",
+        "product_name_raw": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
+        "product_group": "생식",
+        "product_line": "황성주생식",
+        "order_count": 108,
+        "revenue": 11086650,
+        "buyer_count": 104
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13616691086",
+        "product_name_raw": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 쉐이크 30g, 14포, 2개",
+        "product_group": "생식",
+        "product_line": "라이프밀데일리생식",
+        "order_count": 79,
+        "revenue": 4828000,
+        "buyer_count": 79
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "12894742052",
+        "product_name_raw": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
+        "product_group": "생식",
+        "product_line": "1일1생식",
+        "order_count": 39,
+        "revenue": 4598790,
+        "buyer_count": 36
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13635293181",
+        "product_name_raw": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+        "product_group": "생식",
+        "product_line": "황성주생식_발효",
+        "order_count": 31,
+        "revenue": 3681240,
+        "buyer_count": 30
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "12763906780",
+        "product_name_raw": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
+        "product_group": "생식",
+        "product_line": "황성주생식",
+        "order_count": 74,
+        "revenue": 2904510,
+        "buyer_count": 74
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "12808019284",
+        "product_name_raw": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
+        "product_group": "생식",
+        "product_line": "1일1생식",
+        "order_count": 19,
+        "revenue": 1585920,
+        "buyer_count": 18
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "12764871210",
+        "product_name_raw": "황성주 박사의 프로틴 골드 HIGH5 식물성 단백질 21포, 1개",
+        "product_group": "프로틴",
+        "product_line": "프로틴골드HIGH5",
+        "order_count": 42,
+        "revenue": 1241530,
+        "buyer_count": 39
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "12747389906",
+        "product_name_raw": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
+        "product_group": "생식",
+        "product_line": "1일1생식",
+        "order_count": 25,
+        "revenue": 1163750,
+        "buyer_count": 21
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "12763859709",
+        "product_name_raw": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+        "product_group": "생식",
+        "product_line": "황성주생식_발효",
+        "order_count": 26,
+        "revenue": 1160710,
+        "buyer_count": 26
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13392548244",
+        "product_name_raw": "황성주 박사의 프로틴 골드 HIGH5 식물성 단백질 63포, 3개",
+        "product_group": "프로틴",
+        "product_line": "프로틴골드HIGH5",
+        "order_count": 15,
+        "revenue": 1088370,
+        "buyer_count": 15
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13392543208",
+        "product_name_raw": "황성주 박사의 프로틴 골드 HIGH5 식물성 단백질 42포, 2개",
+        "product_group": "프로틴",
+        "product_line": "프로틴골드HIGH5",
+        "order_count": 15,
+        "revenue": 727470,
+        "buyer_count": 15
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13637171566",
+        "product_name_raw": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 6개",
+        "product_group": "닥터샐러드",
+        "product_line": "닥터샐러드",
+        "order_count": 5,
+        "revenue": 609500,
+        "buyer_count": 5
+      },
+      {
+        "period_start": "2026-06-21",
+        "period_end": "2026-07-20",
+        "period_label": "2026-06-21~2026-07-20",
+        "period_role": "product_mtd",
+        "product_id": "13635278956",
+        "product_name_raw": "황성주박사의 영양식 황성주생식 식사대용 30포, 2개",
+        "product_group": "생식",
+        "product_line": "황성주생식",
+        "order_count": 8,
+        "revenue": 599400,
+        "buyer_count": 8
+      }
+    ]
   }
 }
