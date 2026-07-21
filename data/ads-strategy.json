@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-21 10:32",
+  "updatedAt": "2026-07-21 11:58",
   "basedOn": "2026-07-19",
   "items": [
     {
@@ -162,93 +162,12 @@
   "roadmaps": [
     {
       "id": "gfa-ab-webconv",
-      "title": "GFA 웹전환 A/B 테스트 → 확장 로드맵",
-      "subtitle": "자동(A) vs 수동(B) · 브랜드 소구 · 판정=스토어 총매출 통합ROAS(목표 330%) · 객단가 89,237원·목표CPA 27,042원",
+      "title": "GFA 애드부스트 → 리타겟·유사 확장 로드맵",
+      "subtitle": "GFA=애드부스트(자동) 운영·상품별 소재 · 판정=스토어 총매출 통합ROAS(목표 330%) · 객단가 89,237원·목표CPA 27,042원 · A/B 미집행(전량 애드부스트, 2026-07 유니 결정)",
       "stages": [
         {
-          "id": "step1_ab_run",
-          "title": "1) A/B 집행",
-          "status": "active",
-          "entryCondition": "캠페인 A·B 세팅 완료 + 스토어 대표URL(메인) 전환추적 연결 확인",
-          "entryMet": false,
-          "action": "A/B 각 일 10만원 2~4주 집행. CPC 초기 한도없음+예산통제 → 첫 3~5일 실제 CPC·CPA 관찰 후 조정",
-          "successCriteria": "표본 30클릭+ · D-2 확정치 · 스토어 총매출 통합ROAS 330% 목표",
-          "nextTrigger": "2~4주 경과 & A·B 각 30클릭+ 표본 확보",
-          "setup": [
-            {
-              "label": "A 목적",
-              "value": "웹사이트전환 · ADVoost 오디언스 ON(자동) · 브랜드"
-            },
-            {
-              "label": "A 타겟",
-              "value": "연령·성별 전체(넓게 — 20·30 반응 탐색 포함)"
-            },
-            {
-              "label": "A 게재위치/소재",
-              "value": "전체 / ADVoost 소재"
-            },
-            {
-              "label": "B 목적",
-              "value": "웹사이트전환 · ADVoost OFF(수동 프로스펙팅) · 브랜드"
-            },
-            {
-              "label": "B 관심사/구매의도",
-              "value": "건강기능식품·다이어트·식사대용·건강관리"
-            },
-            {
-              "label": "B 데모(확정)",
-              "value": "여성 40~60대 주축 + 남성 40~50대 보조"
-            },
-            {
-              "label": "공통 예산",
-              "value": "각 일 10만원(하루예산 고정)"
-            },
-            {
-              "label": "공통 소재",
-              "value": "동일 브랜드 소재(황성주 박사 라이프밀 · 식사대용·간편)"
-            },
-            {
-              "label": "CPC 상한",
-              "value": "초기 한도없음 → CPA 27,042원 초과 시 600~900원대로 조이기"
-            }
-          ]
-        },
-        {
-          "id": "step2_judge",
-          "title": "2) 판정(자동 vs 수동 · 브랜드 vs 제품)",
-          "status": "pending",
-          "entryCondition": "A·B 각 30클릭+ & 집행 2주+ 경과",
-          "entryMet": false,
-          "action": "스토어 총매출 기준 통합ROAS로 A(자동) vs B(수동) + 기준선(애드부스트 쇼핑=제품·자동) 대비 판정",
-          "successCriteria": "ROAS 330% 이상 = 승자",
-          "stopCriteria": "ROAS 330% 미달 = 패자",
-          "nextTrigger": "승자 판정 완료",
-          "setup": [
-            {
-              "label": "판정 지표",
-              "value": "스토어 총매출 ÷ (A+B 광고비) · 채널 리포트 ROAS 합산 금지"
-            }
-          ]
-        },
-        {
-          "id": "step3_scale",
-          "title": "3) 승자 확장 / 패자 정리",
-          "status": "pending",
-          "entryCondition": "승자 판정 완료",
-          "entryMet": false,
-          "action": "승자 방식 예산 집중(증액 30% 이내, 학습 보호). 패자 중단 또는 원인 수정 후 재테스트",
-          "successCriteria": "승자 ROAS 330% 유지하며 지출 볼륨 확대",
-          "nextTrigger": "스토어타겟 준비완료 시 step4 병행",
-          "setup": [
-            {
-              "label": "증액 상한",
-              "value": "직전 대비 30% 이내"
-            }
-          ]
-        },
-        {
           "id": "step4_retarget",
-          "title": "4) 리타겟(카탈로그 판매)",
+          "title": "1) 리타겟(카탈로그 판매)",
           "status": "pending",
           "entryCondition": "스토어타겟 준비완료 & 모수 ≥ 1,000",
           "entryMet": false,
@@ -269,7 +188,7 @@
         },
         {
           "id": "step5_lookalike",
-          "title": "5) 유사타겟 확장",
+          "title": "2) 유사타겟 확장",
           "status": "pending",
           "entryCondition": "구매완료 모수 ≥ 1,000 (유사 시드)",
           "entryMet": false,
