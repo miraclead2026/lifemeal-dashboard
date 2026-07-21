@@ -174,6 +174,9 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   keywordApprovals: raw.keywordApprovals || [],
   seedApprovals: raw.seedApprovals || [],
   roadmapOverrides: raw.roadmapOverrides || {},
+  adOpsLog: raw.adOpsLog || [],
+  powerlinkApprovals: raw.powerlinkApprovals || {},
+  adKeywordRegistry: raw.adKeywordRegistry || {},
   messageSchedules: raw.messageSchedules || {},
   members: (raw.members && raw.members.length) ? raw.members : DEFAULT_MEMBERS,
 }); };
@@ -3130,7 +3133,96 @@ function TabAds({ data, setData }) {
         <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>{hasGroups ? '그룹 ROAS는 합산 기준(전환매출 합 ÷ 광고비 합) · 그룹 행을 클릭하면 수량·맛별 개별 상품이 펼쳐집니다 · ' : ''}전환매출·ROAS·전환수는 모두 구매완료 기준 · 전환매출은 광고 기여 기준으로 정산 매출과 다를 수 있습니다</div>
       </Card>
       <AdsStrategyPanel data={data} setData={setData} prodNames={(() => { const m = {}; daysAll.forEach(x => (x.products || []).forEach(p => { if (p.productId && p.name) m[String(p.productId)] = p.name; })); return m; })()} />
+      <AdOpsLog data={data} setData={setData} />
     </div>
+  );
+}
+
+function PowerlinkPlans({ strat, data, setData }) {
+  const plans = (strat && Array.isArray(strat.powerlinkPlans)) ? strat.powerlinkPlans : [];
+  const proposals = (strat && Array.isArray(strat.powerlinkGroupProposals)) ? strat.powerlinkGroupProposals : [];
+  if (plans.length === 0 && proposals.length === 0) return null;
+  const appr = data.powerlinkApprovals || {};
+  const stOf = id => (appr[id] || {}).status;
+  const setAppr = (id, status) => setData(d => { const a = { ...(d.powerlinkApprovals || {}) }; if (status === null) delete a[id]; else a[id] = { status, at: TODAY }; return { ...d, powerlinkApprovals: a }; });
+  const okBtn = { fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 7, cursor: 'pointer', border: 'none', background: '#1FA463', color: 'white' };
+  const noBtn = { fontSize: 11, fontWeight: 600, padding: '5px 12px', borderRadius: 7, cursor: 'pointer', border: '1px solid #E3E0DC', background: 'white', color: '#6E6863' };
+  return (
+    <div style={{ marginBottom: 14, border: '1px solid #E3E0DC', borderRadius: 12, padding: 12, background: '#FCFBF8' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
+        <span style={{ fontSize: 13, fontWeight: 800, color: G }}>🔎 파워링크 실행계획</span>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>승인한 조합은 세팅 체크리스트로 표시 · 등록은 네이버에서 직접</span>
+      </div>
+      {plans.map(p => {
+        const s = stOf(p.id); const approved = s === 'approved', rejected = s === 'rejected';
+        return (
+          <div key={p.id} style={{ border: '1px solid ' + (approved ? '#A7F3D0' : '#E3E0DC'), background: approved ? '#F6FEFB' : 'white', borderRadius: 10, padding: 11, marginBottom: 8, opacity: rejected ? 0.55 : 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}><span style={{ color: '#1D4ED8' }}>{p.keyword}</span> → <span>{p.adGroup}</span>에 추가{p.campaign ? <span style={{ fontSize: 10.5, color: '#A29C95', fontWeight: 400 }}> · {p.campaign}</span> : null}</div>
+            {p.evidence ? <div style={{ fontSize: 11, color: '#6E6863', marginTop: 4, lineHeight: 1.5 }}>📊 {p.evidence}</div> : null}
+            {!s ? <div style={{ display: 'flex', gap: 6, marginTop: 9 }}><button onClick={() => setAppr(p.id, 'approved')} style={okBtn}>승인</button><button onClick={() => setAppr(p.id, 'rejected')} style={noBtn}>반려</button></div> : null}
+            {approved ? (
+              <div style={{ marginTop: 9 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 6 }}><span style={{ fontSize: 11, fontWeight: 700, color: '#047857' }}>✓ 승인 — 세팅 체크리스트 (네이버에서 이대로 등록)</span>{(data.adKeywordRegistry || {})[p.id] && (data.adKeywordRegistry || {})[p.id].registered ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#047857', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 5, padding: '2px 7px' }}>🟢 등록됨{(data.adKeywordRegistry || {})[p.id].at ? ' · ' + (data.adKeywordRegistry || {})[p.id].at : ''}</span> : <span style={{ fontSize: 9.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '2px 7px' }}>⏳ 등록 대기</span>}</div>
+                <div style={{ display: 'grid', gap: 4, background: 'white', border: '1px solid #D1FAE5', borderRadius: 8, padding: '8px 10px' }}>
+                  {(p.setup && p.setup.length ? p.setup : [{ label: '광고그룹', value: p.adGroup }, { label: '키워드', value: p.keyword }].concat(p.campaign ? [{ label: '캠페인', value: p.campaign }] : []).concat(p.bidGuide ? [{ label: '입찰방식', value: p.bidGuide }] : [])).map((kv, k) => <div key={k} style={{ display: 'flex', gap: 8, fontSize: 11, lineHeight: 1.4 }}><span style={{ color: '#8A8580', minWidth: 78, fontWeight: 600, flexShrink: 0 }}>{kv.label}</span><span style={{ color: '#1A1614' }}>{kv.value}</span></div>)}
+                </div>
+                <button onClick={() => setAppr(p.id, null)} style={{ marginTop: 7, fontSize: 10, color: '#8A8580', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>승인 취소</button>
+              </div>
+            ) : null}
+            {rejected ? <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ fontSize: 11, color: '#8A8580' }}>반려됨</span><button onClick={() => setAppr(p.id, null)} style={{ fontSize: 10, color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>되돌리기</button></div> : null}
+          </div>
+        );
+      })}
+      {proposals.map(pr => {
+        const s = stOf(pr.id); const approved = s === 'approved', rejected = s === 'rejected';
+        return (
+          <div key={pr.id} style={{ border: '1px dashed ' + (approved ? '#6EE7B7' : '#C9B896'), background: approved ? '#F6FEFB' : '#FFFDF6', borderRadius: 10, padding: 11, marginBottom: 8, opacity: rejected ? 0.55 : 1 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#92400E' }}>💡 {pr.lineName} 라인 광고그룹 생성 제안</div>
+            {pr.keywords && pr.keywords.length ? <div style={{ fontSize: 11, color: '#6E6863', marginTop: 4 }}>키워드: {pr.keywords.join(', ')}</div> : null}
+            {pr.evidence ? <div style={{ fontSize: 11, color: '#6E6863', marginTop: 3, lineHeight: 1.5 }}>📊 {pr.evidence}</div> : null}
+            {!s ? <div style={{ display: 'flex', gap: 6, marginTop: 9 }}><button onClick={() => setAppr(pr.id, 'approved')} style={okBtn}>승인(생성 예정)</button><button onClick={() => setAppr(pr.id, 'rejected')} style={noBtn}>반려</button></div> :
+              <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ fontSize: 11, fontWeight: 700, color: approved ? '#047857' : '#8A8580' }}>{approved ? '✓ 승인 — 광고그룹 생성 대상' : '반려됨'}</span><button onClick={() => setAppr(pr.id, null)} style={{ fontSize: 10, color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>{approved ? '취소' : '되돌리기'}</button></div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function AdOpsLog({ data, setData }) {
+  const CATS = ['GFA', '파워링크', '애드부스트', '쇼핑검색', '기타'];
+  const CAT_C = { 'GFA': { bg: '#EFF6FF', tx: '#1D4ED8', bd: '#BFDBFE' }, '파워링크': { bg: '#ECFDF5', tx: '#047857', bd: '#A7F3D0' }, '애드부스트': { bg: '#FEF3C7', tx: '#92400E', bd: '#FDE68A' }, '쇼핑검색': { bg: '#F3E8FF', tx: '#7E22CE', bd: '#E9D5FF' }, '기타': { bg: '#F5F4F2', tx: '#6E6863', bd: '#E3E0DC' } };
+  const [date, setDate] = useState(TODAY);
+  const [cat, setCat] = useState('GFA');
+  const [note, setNote] = useState('');
+  const log = (data.adOpsLog || []).slice().sort((a, b) => (b.date + (b.enteredAt || '')).localeCompare(a.date + (a.enteredAt || '')));
+  const add = () => { if (!note.trim()) return; setData(d => ({ ...d, adOpsLog: [...(d.adOpsLog || []), { date, category: cat, note: note.trim(), enteredAt: new Date().toISOString() }] })); setNote(''); };
+  const del = ea => { if (!confirm('이 기록을 삭제할까요?')) return; setData(d => ({ ...d, adOpsLog: (d.adOpsLog || []).filter(r => r.enteredAt !== ea) })); };
+  return (
+    <Card style={{ marginTop: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📝 작업 수행기록</div>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>광고 에이전트가 다음날 참고합니다</span>
+      </div>
+      <div style={{ fontSize: 10.5, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 7, padding: '6px 9px', marginBottom: 10, lineHeight: 1.5 }}>💡 모든 업무가 아니라 <b>다음 실행계획에 영향을 주는 조치</b>만 기록하세요 (예: "GFA 닥터샐러드 소재 등록", "파워링크에 프로틴쉐이크 캠페인 추가").</div>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
+        <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ fontSize: 12, padding: '7px 8px', border: '1px solid #E3E0DC', borderRadius: 8 }} />
+        <select value={cat} onChange={e => setCat(e.target.value)} style={{ fontSize: 12, padding: '7px 8px', border: '1px solid #E3E0DC', borderRadius: 8, background: 'white' }}>{CATS.map(c => <option key={c} value={c}>{c}</option>)}</select>
+        <input value={note} onChange={e => setNote(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') add(); }} placeholder="수행한 조치를 입력 (예: GFA 닥터샐러드 소재 등록함)" style={{ flex: 1, minWidth: 180, fontSize: 13, padding: '8px 10px', border: '1px solid #E3E0DC', borderRadius: 8, outline: 'none' }} />
+        <button onClick={add} style={{ fontSize: 12, fontWeight: 700, padding: '8px 16px', border: 'none', background: G, color: 'white', borderRadius: 8, cursor: 'pointer' }}>기록</button>
+      </div>
+      {log.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95' }}>아직 기록이 없습니다.</div> :
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          {log.map(r => { const cc = CAT_C[r.category] || CAT_C['기타']; return (
+            <div key={r.enteredAt} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #EDEBE7', borderRadius: 8, padding: '8px 10px' }}>
+              <span style={{ fontSize: 10.5, color: '#8A8580', fontWeight: 600, flexShrink: 0, width: 62 }}>{(r.date || '').slice(5)}</span>
+              <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 7px', borderRadius: 5, background: cc.bg, color: cc.tx, border: '1px solid ' + cc.bd, flexShrink: 0 }}>{r.category}</span>
+              <span style={{ flex: 1, minWidth: 0, fontSize: 12.5, color: '#3A3631', lineHeight: 1.4 }}>{r.note}</span>
+              <button onClick={() => del(r.enteredAt)} style={{ border: 'none', background: 'none', color: '#C4BEB6', cursor: 'pointer', fontSize: 14, lineHeight: 1, flexShrink: 0 }}>×</button>
+            </div>
+          ); })}
+        </div>}
+    </Card>
   );
 }
 
@@ -3212,6 +3304,7 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
           ); })}
         </div>
       )}
+      <PowerlinkPlans strat={strat} data={data} setData={setData} />
       {status === 'loading' && <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div>}
       {status === 'none' && <div style={{ fontSize: 12, color: '#A29C95', background: '#F8F7F5', borderRadius: 8, padding: '10px 12px' }}>아직 전략 데이터가 없습니다 — 광고 에이전트가 <b>data/ads-strategy.json</b>을 push하면 여기에 인사이트와 제안이 표시됩니다.</div>}
       {status === 'ok' && sortedItems.length === 0 && <div style={{ fontSize: 12, color: '#1FA463', background: '#ECFDF5', borderRadius: 8, padding: '10px 12px' }}>✓ 현재 제안된 전략을 모두 처리했습니다</div>}
