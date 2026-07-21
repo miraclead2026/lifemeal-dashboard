@@ -610,7 +610,7 @@ function AddModal({ data, setData, onClose }) {
     let subId = null;
     if (sMode === 'new') { if (!sName.trim()) { alert('세부실행계획명 입력'); return; } subId = next(); const dep = parseDep(sDate); nd.subplans.push({ id: subId, planId, name: sName.trim(), stage: '예정', start: dep ? '' : sDate.start, due: dep ? addDays(TODAY, dep.days) : sDate.due, owner, support: support.slice(), dep, resolved: false, files: [], perfRecorded: false }); }
     else if (sMode === 'exist') { subId = Number(sSel); }
-    if (subId) checks.filter(c => c.trim()).forEach(c => nd.checklists.push({ id: next(), subplanId: subId, text: c.trim(), done: false, date: '', owner: '' }));
+    if (subId) checks.filter(c => c.trim()).forEach(c => nd.checklists.push({ id: next(), subplanId: subId, text: c.trim(), done: false, date: '', owner: '', memo: '' }));
     nd.nid = id; setData(resolveAll(nd)); onClose();
   };
   const Toggle = ({ mode, setMode, opts }) => (
@@ -681,6 +681,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const [newChild, setNewChild] = useState('');
   const [desc, setDesc] = useState(item.desc || '');
   const [newSubChk, setNewSubChk] = useState('');
+  const [memoOpen, setMemoOpen] = useState(null);
   const [showReorder, setShowReorder] = useState(false);
   const [planKpis, setPlanKpis] = useState(() => kind === 'plan' ? ((item.kpis || []).map(k => ({ id: k.id || genKpiId(), name: k.name, unit: k.unit, target: String(k.target != null ? k.target : ''), targets: k.targets || {} }))) : []);
 
@@ -731,7 +732,8 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const delSubChk = id => setData(d => ({ ...d, checklists: d.checklists.filter(c => c.id !== id) }));
   const setSubChkDate = (id, date) => setData(d => applyChklDate(d, id, date));
   const setSubChkOwner = (id, owner) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, owner } : c) }));
-  const addSubChk = () => { if (!newSubChk.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: item.id, text: newSubChk.trim(), done: false, date: '', owner: '' }] })); setNewSubChk(''); };
+  const setSubChkMemo = (id, memo) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, memo } : c) }));
+  const addSubChk = () => { if (!newSubChk.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: item.id, text: newSubChk.trim(), done: false, date: '', owner: '', memo: '' }] })); setNewSubChk(''); };
   const moveSubChild = (id, dir) => setData(d => ({ ...d, subplans: reorderSiblings(d.subplans, id, 'planId', dir) }));
 
   const titleMap = { output: '출력 프로젝트 수정', plan: '실행계획 수정', subplan: '세부실행계획 수정' };
@@ -789,12 +791,16 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
           <div style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 8 }}>☑ 체크리스트 ({subChks.length})</div>
           {subChks.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', marginBottom: 8 }}>등록된 체크리스트가 없습니다</div> :
             subChks.map(c => (
-              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'white', borderRadius: 8, padding: '7px 10px', marginBottom: 5, border: '1px solid #E3E0DC', flexWrap: 'wrap' }}>
-                <span onClick={() => toggleSubChk(c.id)} style={{ cursor: 'pointer', display: 'flex' }}><Chk on={c.done} /></span>
-                <div style={{ flex: 1, minWidth: 90, fontSize: 12, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</div>
-                <select value={c.owner || ''} onChange={e => setSubChkOwner(c.id, e.target.value)} title="담당자" style={{ fontSize: 10.5, padding: '3px 4px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.owner ? '#3A3631' : '#A29C95', background: 'white', maxWidth: 88 }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
-                <input type="date" value={c.date || ''} onChange={e => setSubChkDate(c.id, e.target.value)} title="실행일" style={{ fontSize: 11, padding: '3px 5px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.date ? '#3A3631' : '#A29C95', flexShrink: 0, maxWidth: 130 }} />
-                <button onClick={() => delSubChk(c.id)} style={{ border: 'none', background: 'none', color: '#E53935', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
+              <div key={c.id} style={{ marginBottom: 5 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'white', borderRadius: 8, padding: '7px 10px', border: '1px solid #E3E0DC', flexWrap: 'wrap' }}>
+                  <span onClick={() => toggleSubChk(c.id)} style={{ cursor: 'pointer', display: 'flex' }}><Chk on={c.done} /></span>
+                  <div style={{ flex: 1, minWidth: 90, fontSize: 12, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</div>
+                  <button onClick={() => setMemoOpen(o => o === c.id ? null : c.id)} title="메모" style={{ border: 'none', background: (c.memo || memoOpen === c.id) ? '#EEF4EC' : 'transparent', borderRadius: 6, cursor: 'pointer', fontSize: 13, padding: '2px 5px', lineHeight: 1, color: c.memo ? '#1FA463' : '#A29C95', flexShrink: 0 }}>📝</button>
+                  <select value={c.owner || ''} onChange={e => setSubChkOwner(c.id, e.target.value)} title="담당자" style={{ fontSize: 10.5, padding: '3px 4px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.owner ? '#3A3631' : '#A29C95', background: 'white', maxWidth: 88 }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
+                  <input type="date" value={c.date || ''} onChange={e => setSubChkDate(c.id, e.target.value)} title="실행일" style={{ fontSize: 11, padding: '3px 5px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.date ? '#3A3631' : '#A29C95', flexShrink: 0, maxWidth: 130 }} />
+                  <button onClick={() => delSubChk(c.id)} style={{ border: 'none', background: 'none', color: '#E53935', cursor: 'pointer', fontSize: 16, lineHeight: 1 }}>×</button>
+                </div>
+                {memoOpen === c.id && <textarea value={c.memo || ''} onChange={e => setSubChkMemo(c.id, e.target.value)} placeholder="메모 입력" autoFocus style={{ width: '100%', minHeight: 52, marginTop: 4, padding: '7px 9px', border: '1px solid #CDE3C6', borderRadius: 7, fontSize: 12, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5, color: '#3A3631' }} />}
               </div>
             ))}
           <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
@@ -999,6 +1005,7 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
   const toggleDone = () => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, done: !x.done } : x) }));
   const setOwner = nm => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, owner: x.owner === nm ? '' : nm } : x) }));
   const setDate = date => setData(d => applyChklDate(d, c.id, date));
+  const setMemo = txt => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, memo: txt } : x) }));
   return (
     <ModalShell title="체크리스트" onClose={onClose}>
       <div style={{ fontSize: 17, fontWeight: 800, color: c.done ? '#A29C95' : '#1A1614', textDecoration: c.done ? 'line-through' : 'none', lineHeight: 1.4 }}>{c.text}</div>
@@ -1030,6 +1037,10 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
       <div style={{ marginTop: 12 }}>
         <Lbl c="실행일" />
         <Inp type="date" value={c.date || ''} onChange={setDate} />
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <Lbl c="메모" />
+        <textarea value={c.memo || ''} onChange={e => setMemo(e.target.value)} placeholder="이 체크리스트에 대한 메모를 입력하세요" style={{ width: '100%', minHeight: 72, padding: '9px 11px', border: '1px solid #E3E0DC', borderRadius: 8, fontSize: 13, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.55, color: '#3A3631' }} />
       </div>
       <Btn v="secondary" onClick={onClose} style={{ width: '100%', marginTop: 14 }}>닫기</Btn>
     </ModalShell>
@@ -1072,6 +1083,7 @@ function TeamCalendar({ data, setData }) {
           <span style={{ flexShrink: 0, width: 9, height: 9, borderRadius: '50%', border: '1.5px solid ' + (c.done ? '#1FA463' : '#B8B2AA'), background: c.done ? '#1FA463' : 'transparent' }} />
           {av && <span style={{ flexShrink: 0, fontSize: 12.5 }}>{av}</span>}
           <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span>
+          {c.memo && <span style={{ flexShrink: 0, fontSize: 10 }} title="메모 있음">📝</span>}
         </div>
       </div>
     );
@@ -1367,7 +1379,7 @@ function TabWeekly({ data, setData, onEdit }) {
   const weekDates = DAYS.map((_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); return x.toISOString().slice(0, 10); });
   const diffDays = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
   const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
-  const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false, date: '', owner: '' }] })); setNewChk(n => ({ ...n, [id]: '' })); };
+  const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false, date: '', owner: '', memo: '' }] })); setNewChk(n => ({ ...n, [id]: '' })); };
   const planName = id => { const p = data.plans.find(x => x.id === id); return p ? p.name : ''; };
   const onDragStart = (e, s, isSpan) => {
     e.stopPropagation();
