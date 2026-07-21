@@ -999,58 +999,65 @@ function ProfileModal({ name, data, onClose }) {
 }
 
 function ChecklistModal({ chkId, data, setData, onClose }) {
+  const [memoOpen, setMemoOpen] = useState(null);
   const c = (data.checklists || []).find(x => x.id === chkId);
   if (!c) return null;
   const sub = data.subplans.find(s => s.id === c.subplanId);
   const plan = sub ? data.plans.find(p => p.id === sub.planId) : null;
   const out = plan ? data.outputs.find(o => o.id === plan.outputId) : null;
-  const over = !!(c.date && sub && sub.due && c.date > sub.due);
-  const toggleDone = () => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, done: !x.done } : x) }));
-  const setOwner = nm => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, owner: x.owner === nm ? '' : nm } : x) }));
-  const setDate = date => setData(d => applyChklDate(d, c.id, date));
-  const setMemo = txt => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === c.id ? { ...x, memo: txt } : x) }));
+  const chks = (data.checklists || []).filter(x => x.subplanId === c.subplanId);
+  const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done } : x) }));
+  const setText = (id, text) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, text } : x) }));
+  const setOwner = (id, owner) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, owner } : x) }));
+  const setDate = (id, date) => setData(d => applyChklDate(d, id, date));
+  const setMemo = (id, memo) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, memo } : x) }));
+  const del = id => { if (!confirm('이 체크리스트를 삭제할까요?')) return; setData(d => ({ ...d, checklists: d.checklists.filter(x => x.id !== id) })); if (id === chkId) onClose && onClose(); };
+  const addChk = () => setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: c.subplanId, text: '', done: false, date: c.date || '', owner: '', memo: '' }] }));
   return (
     <ModalShell title="체크리스트" onClose={onClose}>
-      <div style={{ fontSize: 17, fontWeight: 800, color: c.done ? '#A29C95' : '#1A1614', textDecoration: c.done ? 'line-through' : 'none', lineHeight: 1.4 }}>{c.text}</div>
-      <button onClick={toggleDone} style={{ width: '100%', marginTop: 10, padding: '11px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, background: c.done ? '#E3E0DC' : '#1FA463', color: c.done ? '#3A3631' : 'white' }}>{c.done ? '✓ 완료됨 — 완료 취소' : '완료로 표시'}</button>
-      <div style={{ marginTop: 14, background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #EDEBE7' }}>
+      <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #EDEBE7' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: G, marginBottom: 6 }}>소속 세부실행계획</div>
         {sub ? (
           <div>
-            <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 4 }}>{out ? outLabel(out) : ''}{plan ? ' ▸ ' + plan.name : ''}</div>
+            <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 6 }}>{out ? outLabel(out) : ''}{plan ? ' ▸ ' + plan.name : ''}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <Badge label={sub.stage} color={stC(sub.stage)} />
               <span style={{ fontSize: 14, fontWeight: 700 }}>{sub.name}</span>
             </div>
-            <div style={{ fontSize: 12, color: '#6E6863', marginTop: 6 }}>마감일: {sub.due || '미정'}{over && <span style={{ color: '#DC2626', fontWeight: 700 }}> · ⚠ 실행일이 마감일을 초과했습니다</span>}</div>
+            <div style={{ fontSize: 12, color: '#6E6863', marginTop: 6 }}>마감일: {sub.due || '미정'}</div>
           </div>
         ) : <div style={{ fontSize: 12.5, color: '#A29C95' }}>연결된 세부실행계획이 없습니다</div>}
       </div>
-      <div style={{ marginTop: 12 }}>
-        <Lbl c="담당자" />
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {MEMBERS.map(m => { const on = c.owner === m; return (
-            <button key={m} onClick={() => setOwner(m)} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 11px', borderRadius: 20, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, border: '1.5px solid ' + (on ? G : '#E3E0DC'), background: on ? G : 'white', color: on ? 'white' : '#3A3631' }}>
-              <span style={{ fontSize: 13 }}>{AV[m]}</span>{m}
-            </button>
-          ); })}
-        </div>
-        {c.owner ? <div style={{ fontSize: 11, color: '#A29C95', marginTop: 5 }}>선택된 담당자를 다시 누르면 해제됩니다</div> : null}
-      </div>
-      <div style={{ marginTop: 12 }}>
-        <Lbl c="실행일" />
-        <Inp type="date" value={c.date || ''} onChange={setDate} />
-      </div>
-      <div style={{ marginTop: 12 }}>
-        <Lbl c="메모" />
-        <textarea value={c.memo || ''} onChange={e => setMemo(e.target.value)} placeholder="이 체크리스트에 대한 메모를 입력하세요" style={{ width: '100%', minHeight: 72, padding: '9px 11px', border: '1px solid #E3E0DC', borderRadius: 8, fontSize: 13, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.55, color: '#3A3631' }} />
+      <div style={{ marginTop: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: G, marginBottom: 7 }}>체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({chks.filter(x => x.done).length}/{chks.length})</span></div>
+        {chks.map(x => {
+          const over = !!(x.date && sub && sub.due && x.date > sub.due);
+          const isCur = x.id === chkId;
+          return (
+            <div key={x.id} style={{ marginBottom: 6, border: '1px solid ' + (isCur ? G : '#E3E0DC'), borderRadius: 9, padding: 9, background: isCur ? '#FBFDFB' : 'white' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+                <span onClick={() => toggleDone(x.id)} style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={x.done} /></span>
+                <input value={x.text} onChange={e => setText(x.id, e.target.value)} placeholder="체크리스트 명" style={{ flex: 1, minWidth: 110, fontSize: 13, fontWeight: 600, padding: '6px 8px', border: '1px solid #E3E0DC', borderRadius: 7, outline: 'none', color: x.done ? '#A29C95' : '#1A1614', textDecoration: x.done ? 'line-through' : 'none', fontFamily: 'inherit' }} />
+                <button onClick={() => setMemoOpen(o => o === x.id ? null : x.id)} title="메모" style={{ border: 'none', background: (x.memo || memoOpen === x.id) ? '#EEF4EC' : 'transparent', borderRadius: 6, cursor: 'pointer', fontSize: 13, padding: '3px 5px', lineHeight: 1, color: x.memo ? '#1FA463' : '#A29C95', flexShrink: 0 }}>📝</button>
+                <button onClick={() => del(x.id)} style={{ border: 'none', background: 'none', color: '#E53935', cursor: 'pointer', fontSize: 15, lineHeight: 1, flexShrink: 0 }}>×</button>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                <select value={x.owner || ''} onChange={e => setOwner(x.id, e.target.value)} title="담당자" style={{ fontSize: 11, padding: '4px 6px', border: '1px solid #E3E0DC', borderRadius: 6, color: x.owner ? '#3A3631' : '#A29C95', background: 'white' }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
+                <input type="date" value={x.date || ''} onChange={e => setDate(x.id, e.target.value)} title="실행일" style={{ fontSize: 11, padding: '4px 6px', border: '1px solid ' + (over ? '#FCA5A5' : '#E3E0DC'), borderRadius: 6, color: x.date ? '#3A3631' : '#A29C95' }} />
+                {over ? <span style={{ fontSize: 10, color: '#DC2626', fontWeight: 700 }}>⚠ 마감초과</span> : null}
+              </div>
+              {memoOpen === x.id && <textarea value={x.memo || ''} onChange={e => setMemo(x.id, e.target.value)} placeholder="메모 입력" style={{ width: '100%', minHeight: 52, marginTop: 6, padding: '7px 9px', border: '1px solid #CDE3C6', borderRadius: 7, fontSize: 12, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5, color: '#3A3631' }} />}
+            </div>
+          );
+        })}
+        <button onClick={addChk} style={{ width: '100%', marginTop: 4, padding: '9px', borderRadius: 8, border: '1.5px dashed ' + G, cursor: 'pointer', fontSize: 12.5, fontWeight: 700, background: 'white', color: G }}>+ 체크리스트 추가</button>
       </div>
       <Btn v="secondary" onClick={onClose} style={{ width: '100%', marginTop: 14 }}>닫기</Btn>
     </ModalShell>
   );
 }
 
-function TeamCalendar({ data, setData }) {
+function TeamCalendar({ data, setData, onEdit }) {
   const [ym, setYm] = useState(TODAY.slice(0, 7));
   const [dragOver, setDragOver] = useState(null);
   const [openChk, setOpenChk] = useState(null);
@@ -1164,7 +1171,7 @@ function TeamCalendar({ data, setData }) {
   );
 }
 
-function TabTeam({ data, setData, goTab }) {
+function TabTeam({ data, setData, goTab, onEdit }) {
   const all = data.plans.map(p => ({ ...p })).concat(data.subplans.map(s => ({ ...s })));
   const heldTotal = data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length;
   const [showMem, setShowMem] = useState(false);
@@ -1188,7 +1195,7 @@ function TabTeam({ data, setData, goTab }) {
           return (<Card key={m} onClick={() => setProfileMem(m)} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 15 }}>{m}</div><div style={{ fontSize: 11, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 11, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 16, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 18, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 10, color: '#6E6863' }}>서포트</div></div></div></Card>);
         })}
           </div>
-          <TeamCalendar data={data} setData={setData} />
+          <TeamCalendar data={data} setData={setData} onEdit={onEdit} />
           <div style={{ marginTop: 18 }}><SCards items={[{ label: '출력 프로젝트', value: data.outputs.length + '개', color: G, onClick: () => goTab && goTab('프로젝트 진행 상황') }, { label: '실행계획', value: data.plans.length + '개', color: '#2D5FE0', onClick: () => goTab && goTab('칸반') }, { label: '세부 실행계획', value: data.subplans.length + '개', color: '#E08700', onClick: () => goTab && goTab('데일리/주간') }, { label: '등록 KPI', value: (data.plans.reduce((a, p) => a + (p.kpis ? p.kpis.length : 0), 0) + data.outputs.filter(o => o.kpi).length) + '개', color: GO, onClick: () => goTab && goTab('KPI') }, { label: '보류 항목', value: heldTotal + '건', color: '#989088', onClick: () => goTab && goTab('보류') }]} /></div>
         </div>
         <div style={{ flex: '0 1 330px', minWidth: 280 }}>
