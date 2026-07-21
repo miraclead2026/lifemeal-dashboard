@@ -3503,6 +3503,128 @@ function TabKakao() {
   );
 }
 
+function TabChannel({ data, setData }) {
+  const [raw, setRaw] = useState(null);
+  const [status, setStatus] = useState('loading');
+  const [metric, setMetric] = useState('a14');
+  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/channel-tracking.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && (Array.isArray(j.rows) || (j.reports && typeof j.reports === 'object') || Array.isArray(j.channel_daily) || Array.isArray(j.custom_channel_daily) || Array.isArray(j.product_channel_daily))) { setRaw(j); setStatus('ok'); } else setStatus('none'); }).catch(() => { if (alive) setStatus('none'); }); return () => { alive = false; }; }, []);
+  const _rows = (raw && Array.isArray(raw.rows)) ? raw.rows : [];
+  const _byType = t => ((raw && raw.report_type === t) ? _rows : []);
+  const _rep = (raw && raw.reports) || {};
+  const chD = (raw && raw.channel_daily) || (Array.isArray(_rep.full_channel) ? _rep.full_channel : null) || _byType('full_channel') || [], cuD = (raw && raw.custom_channel_daily) || (Array.isArray(_rep.custom_channel) ? _rep.custom_channel : null) || _byType('custom_channel') || [], prD = (raw && raw.product_channel_daily) || (Array.isArray(_rep.product_channel) ? _rep.product_channel : null) || _byType('product_channel') || [];
+  const meta = (raw && raw.meta) || {};
+  const extractedAt = meta.extracted_at || (raw && (raw.data_loaded_at || raw.extracted_at)) || '';
+  const OC = metric === 'a14' ? 'a14_order_count' : 'lc_order_count', REV = metric === 'a14' ? 'a14_revenue' : 'lc_revenue';
+  const won = n => (Math.round(Number(n) || 0)).toLocaleString() + '원', num = n => (Math.round(Number(n) || 0)).toLocaleString(), pctS = n => (Math.round((Number(n) || 0) * 1000) / 10) + '%';
+  const UNID = ['기타', '(알수없음)', '알수없음', '웹사이트', '(direct)', '(not set)'];
+  const sf = (arr, f) => arr.reduce((s, r) => s + (Number(r[f]) || 0), 0);
+  const delta = (cur, prev) => (!prev ? null : (cur - prev) / prev);
+  const isUnid = r => UNID.includes((r.channel_name_raw || '').trim()) || UNID.includes((r.channel_class_l1 || '').trim()) || UNID.includes((r.channel_group_raw || '').trim());
+  const groupBy = (arr, keyFn) => { const m = {}; arr.forEach(r => { const k = keyFn(r); (m[k] = m[k] || []).push(r); }); return m; };
+  const pk = r => r.period_label || r.period_end || r.date || '?';
+  const spanDays = p => (p.start && p.end) ? (new Date(p.end) - new Date(p.start)) / 86400000 : 0;
+  const isBaseP = p => (p.role === 'baseline') || /기준|baseline|추세|평균/i.test(p.label || '') || spanDays(p) > 21;
+  const pMap = {}; chD.forEach(r => { const k = pk(r); if (!pMap[k]) pMap[k] = { label: k, start: r.period_start, end: r.period_end || r.date, prov: !!r.is_provisional, role: r.period_role }; });
+  const periods = Object.values(pMap);
+  const baseP = periods.find(isBaseP);
+  const nonBase = periods.filter(p => !isBaseP(p)).sort((a, b) => (b.end || '').localeCompare(a.end || ''));
+  const curP = periods.find(p => p.role === 'current') || nonBase[0];
+  const priP = periods.find(p => p.role === 'prior') || nonBase.filter(p => p !== curP)[0];
+  const rowsIn = (arr, p) => p ? arr.filter(r => pk(r) === p.label) : [];
+  const ch1 = rowsIn(chD, curP), ch0 = rowsIn(chD, priP);
+  const totVisit = sf(ch1, 'visit_count'), unidVisit = sf(ch1.filter(isUnid), 'visit_count');
+  const idRate = totVisit ? (totVisit - unidVisit) / totVisit : 0;
+  const cuVisit1 = sf(rowsIn(cuD, curP), 'visit_count');
+  const captureRate = totVisit ? cuVisit1 / totVisit : 0;
+  const kpi = arr => ({ visit: sf(arr, 'visit_count'), rev: sf(arr, REV), ord: sf(arr, OC), spend: sf(arr, 'ad_spend') });
+  const k1 = kpi(ch1), k0 = kpi(ch0);
+  const chanKey = r => (r.channel_name_raw || r.channel_group_raw || '(미지정)');
+  const g1 = groupBy(ch1, chanKey), g0 = groupBy(ch0, chanKey);
+  const chanRows = Object.keys(g1).map(k => { const cur = g1[k], prev = g0[k] || []; const visit = sf(cur, 'visit_count'), rv = sf(cur, REV), ord = sf(cur, OC); const pv = sf(prev, 'visit_count'), prv = sf(prev, REV); return { k, visit, rv, ord, dvisit: delta(visit, pv), drev: delta(rv, prv), cvr: visit ? ord / visit : 0, rpv: visit ? rv / visit : 0, l1: (cur[0] || {}).channel_class_l1 }; }).sort((a, b) => b.rv - a.rv);
+  const cuKey = r => [r.nt_source, r.nt_medium, r.nt_detail, r.nt_keyword].filter(Boolean).join(' / ') || '(미지정)';
+  const cuG = groupBy(rowsIn(cuD, curP), cuKey);
+  const cuRows = Object.keys(cuG).map(k => { const cur = cuG[k], r0 = cur[0] || {}; return { k, campaign: r0.campaign_name, placement: r0.placement_name, creative: r0.creative_name, owner: r0.owner, visit: sf(cur, 'visit_count'), ord: sf(cur, OC), rv: sf(cur, REV) }; }).sort((a, b) => b.rv - a.rv);
+  const prG = groupBy(rowsIn(prD, curP), r => (r.product_name_raw || r.product_id) + '||' + (r.channel_name_raw || r.channel_group_raw || '(미지정)'));
+  const prRows = Object.keys(prG).map(k => { const cur = prG[k], r0 = cur[0] || {}; return { product: r0.product_name_raw || r0.product_id, group: r0.product_group, channel: r0.channel_name_raw || r0.channel_group_raw, ord: sf(cur, 'order_count'), rv: sf(cur, 'revenue') }; }).sort((a, b) => b.rv - a.rv).slice(0, 40);
+  const movers = chanRows.filter(r => r.drev != null);
+  const up3 = movers.slice().sort((a, b) => b.drev - a.drev).filter(m => m.drev > 0).slice(0, 3);
+  const down3 = movers.slice().sort((a, b) => a.drev - b.drev).filter(m => m.drev < 0).slice(0, 3);
+  const DChip = ({ v }) => v == null ? <span style={{ fontSize: 10, color: '#C4BEB6' }}>—</span> : <span style={{ fontSize: 10.5, fontWeight: 700, color: v >= 0 ? '#1FA463' : '#DC2626' }}>{v >= 0 ? '▲' : '▼'} {pctS(Math.abs(v))}</span>;
+  const Sec = ({ title, desc, children }) => (<Card style={{ marginBottom: 14 }}><div style={{ marginBottom: 10 }}><div style={{ fontSize: 14, fontWeight: 800, color: G }}>{title}</div>{desc ? <div style={{ fontSize: 11, color: '#A29C95', marginTop: 2, lineHeight: 1.5 }}>{desc}</div> : null}</div>{children}</Card>);
+  const Empty = ({ what }) => <div style={{ fontSize: 12, color: '#A29C95', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 8, padding: '12px 14px' }}>{what || '데이터가 아직 없습니다'} — 매출·분석 허브가 <b>data/channel-tracking.json</b>을 push하면 채워집니다.</div>;
+  const th = { textAlign: 'left', fontSize: 10.5, fontWeight: 700, color: '#8A8580', padding: '6px 8px', borderBottom: '1.5px solid #E3E0DC', whiteSpace: 'nowrap' };
+  const td = { fontSize: 11.5, color: '#3A3631', padding: '6px 8px', borderBottom: '1px solid #F0EEEB', whiteSpace: 'nowrap' };
+  const tdR = { ...td, textAlign: 'right' };
+  const diagBox = (label, val, warn) => (<div style={{ flex: 1, minWidth: 150, background: warn ? '#FEF2F2' : '#F8F7F5', border: '1px solid ' + (warn ? '#FCA5A5' : '#EDEBE7'), borderRadius: 10, padding: '11px 12px' }}><div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>{label}</div><div style={{ fontSize: 20, fontWeight: 800, color: warn ? '#DC2626' : G }}>{val}</div></div>);
+  const kpiBox = c => (<div style={{ background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 10, padding: '11px 12px' }}><div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>{c.l}</div><div style={{ fontSize: 18, fontWeight: 800, color: c.muted ? '#B8B2AA' : G }}>{c.v}</div><div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}><DChip v={c.d} />{c.sub ? <span style={{ fontSize: 9.5, color: '#A29C95' }}>{c.sub}</span> : null}</div></div>);
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+        <div style={{ fontSize: 20, fontWeight: 800, color: '#1A1614' }}>🔎 네이버 채널 추적</div>
+        <div style={{ display: 'flex', gap: 2, background: '#EFEDEA', borderRadius: 9, padding: 3 }}>
+          {[['a14', '+14일 기여'], ['lc', '마지막클릭']].map(([v, l]) => <button key={v} onClick={() => setMetric(v)} style={{ fontSize: 11.5, fontWeight: 700, padding: '5px 11px', borderRadius: 7, border: 'none', cursor: 'pointer', background: metric === v ? 'white' : 'transparent', color: metric === v ? G : '#8A8580', boxShadow: metric === v ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>{l}</button>)}
+        </div>
+        {extractedAt ? <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#A29C95' }}>추출일 {extractedAt}</span> : null}
+      </div>
+      <div style={{ fontSize: 11.5, color: '#6E6863', marginBottom: 10, lineHeight: 1.5 }}>어느 채널·경로로 유입되어 매출로 이어지는지 추적. 주 지표는 <b>+14일 기여도(a14)</b>, 마지막클릭(lc)은 토글로 분리. <span style={{ color: '#B45309' }}>기간이 최근 14일과 겹치면 <b>잠정</b>.</span></div>
+      {status === 'ok' && curP ? <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 11.5, background: '#F5F4F2', border: '1px solid #EDEBE7', borderRadius: 9, padding: '9px 12px', marginBottom: 14 }}>
+        <span style={{ fontWeight: 700, color: G }}>비교 기간</span>
+        <span style={{ fontWeight: 700 }}>{curP.label}</span>{curP.start ? <span style={{ color: '#8A8580' }}>({curP.start}~{curP.end})</span> : null}{curP.prov ? <span style={{ fontSize: 9.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 4, padding: '1px 5px' }}>잠정</span> : null}
+        <span style={{ color: '#A29C95' }}>vs</span>
+        {priP ? <React.Fragment><span style={{ fontWeight: 700 }}>{priP.label}</span>{priP.start ? <span style={{ color: '#8A8580' }}>({priP.start}~{priP.end})</span> : null}{priP.prov ? <span style={{ fontSize: 9.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 4, padding: '1px 5px' }}>일부 잠정</span> : null}</React.Fragment> : <span style={{ color: '#A29C95' }}>직전 기간 없음</span>}
+        {baseP ? <span style={{ marginLeft: 'auto', color: '#8A8580' }}>기준선 {baseP.label}{baseP.start ? ' (' + baseP.start + '~' + baseP.end + ')' : ''}</span> : null}
+      </div> : null}
+      {status === 'loading' && <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div>}
+      {status === 'none' && <div style={{ fontSize: 12.5, color: '#A29C95', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 10, padding: '14px 16px', marginBottom: 14 }}>아직 채널 추적 데이터가 없습니다 — 매출·분석 허브가 <b>data/channel-tracking.json</b>(channel_daily · custom_channel_daily · product_channel_daily)을 push하면 아래 섹션이 자동으로 채워집니다. <b>현재는 골격(빈 상태)</b>입니다.</div>}
+
+      <Sec title="0. 추적 정확도 (진단)" desc="유입이 어느 채널인지 얼마나 식별되는지 — 추적이 새는지 한눈에.">
+        {chD.length === 0 ? <Empty what="채널 유입 데이터 없음" /> : (
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {diagBox('채널 식별률', pctS(idRate), idRate < 0.7)}
+            {diagBox('미식별 비중 (기타·알수없음·웹사이트)', pctS(1 - idRate), (1 - idRate) > 0.3)}
+            {diagBox('사용자정의 유입 캡처', pctS(captureRate))}
+          </div>
+        )}
+      </Sec>
+
+      <Sec title="1. 주간 요약 KPI" desc="기간 스냅샷 비교 (위 비교 기간 기준) · 광고비·ROAS는 이후 단계">
+        {chD.length === 0 ? <Empty what="유입 데이터 없음" /> : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10 }}>
+            {[{ l: '전체 유입수', v: num(k1.visit), d: delta(k1.visit, k0.visit) }, { l: '기여 결제금액', v: won(k1.rev), d: delta(k1.rev, k0.rev), sub: metric === 'a14' ? '+14일' : 'lc' }, { l: '유입당 결제율', v: k1.visit ? pctS(k1.ord / k1.visit) : '—', d: delta(k1.visit ? k1.ord / k1.visit : 0, k0.visit ? k0.ord / k0.visit : 0) }, { l: '유입당 결제금액', v: k1.visit ? won(k1.rev / k1.visit) : '—', d: delta(k1.visit ? k1.rev / k1.visit : 0, k0.visit ? k0.rev / k0.visit : 0) }, { l: '광고비', v: k1.spend ? won(k1.spend) : '준비중', d: null, muted: !k1.spend }, { l: 'ROAS', v: k1.spend ? pctS(k1.rev / k1.spend) : '준비중', d: null, muted: !k1.spend }].map((c, i) => <div key={i}>{kpiBox(c)}</div>)}
+          </div>
+        )}
+      </Sec>
+
+      <Sec title="2. 채널별 성과표" desc="네이버 기본 채널 + 사용자정의 · 원본 채널명 보존">
+        {chanRows.length === 0 ? <Empty what="채널 데이터 없음" /> : (
+          <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 620 }}><thead><tr><th style={th}>채널</th><th style={{ ...th, textAlign: 'right' }}>유입수</th><th style={{ ...th, textAlign: 'right' }}>증감</th><th style={{ ...th, textAlign: 'right' }}>결제금액</th><th style={{ ...th, textAlign: 'right' }}>증감</th><th style={{ ...th, textAlign: 'right' }}>전환율</th><th style={{ ...th, textAlign: 'right' }}>유입당매출</th></tr></thead><tbody>{chanRows.map((r, i) => <tr key={i}><td style={td}>{r.k}{r.l1 ? <span style={{ fontSize: 9, color: '#A29C95', marginLeft: 4 }}>{r.l1}</span> : null}</td><td style={tdR}>{num(r.visit)}</td><td style={tdR}><DChip v={r.dvisit} /></td><td style={tdR}>{won(r.rv)}</td><td style={tdR}><DChip v={r.drev} /></td><td style={tdR}>{pctS(r.cvr)}</td><td style={tdR}>{won(r.rpv)}</td></tr>)}</tbody></table></div>
+        )}
+      </Sec>
+
+      <Sec title="3. 사용자정의(외부) 채널 상세" desc="nt_source·nt_medium·nt_detail·nt_keyword → 캠페인/게재위치/소재 매핑">
+        {cuRows.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 8, padding: '12px 14px' }}><b>nt 추적 링크 미배포</b> — 배포 시 자동 표시됩니다.</div> : (
+          <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 680 }}><thead><tr><th style={th}>nt (source/medium/detail/keyword)</th><th style={th}>캠페인</th><th style={th}>게재위치</th><th style={th}>소재</th><th style={{ ...th, textAlign: 'right' }}>유입</th><th style={{ ...th, textAlign: 'right' }}>결제</th><th style={{ ...th, textAlign: 'right' }}>결제금액</th></tr></thead><tbody>{cuRows.map((r, i) => <tr key={i}><td style={td}>{r.k}</td><td style={td}>{r.campaign || '—'}</td><td style={td}>{r.placement || '—'}</td><td style={td}>{r.creative || '—'}</td><td style={tdR}>{num(r.visit)}</td><td style={tdR}>{num(r.ord)}</td><td style={tdR}>{won(r.rv)}</td></tr>)}</tbody></table></div>
+        )}
+      </Sec>
+
+      <Sec title="4. 상품별 성과" desc="상품군·상품별 결제수·결제금액·구매자수 (판매분석 기준 — 마케팅분석 결제금액과 다를 수 있음)">
+        {prRows.length === 0 ? <Empty what="상품×채널 데이터 없음" /> : (
+          <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 520 }}><thead><tr><th style={th}>상품</th><th style={th}>상품군</th><th style={th}>채널</th><th style={{ ...th, textAlign: 'right' }}>결제수</th><th style={{ ...th, textAlign: 'right' }}>결제금액</th></tr></thead><tbody>{prRows.map((r, i) => <tr key={i}><td style={td}>{r.product}</td><td style={td}>{r.group || '—'}</td><td style={td}>{r.channel}</td><td style={tdR}>{num(r.ord)}</td><td style={tdR}>{won(r.rv)}</td></tr>)}</tbody></table></div>
+        )}
+      </Sec>
+
+      <Sec title="5. 매출 증감 기여" desc="비교 기간 · 채널 결제금액 증감 기준">
+        {movers.length === 0 ? <Empty what="증감 비교 데이터 없음" /> : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }}>
+            <div><div style={{ fontSize: 12, fontWeight: 800, color: '#1FA463', marginBottom: 6 }}>▲ 상승 Top 3</div>{up3.length === 0 ? <div style={{ fontSize: 11, color: '#A29C95' }}>없음</div> : up3.map((m, i) => <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, padding: '6px 9px', background: '#F4FBF7', border: '1px solid #D1FAE5', borderRadius: 7, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>{m.k}</span><span><DChip v={m.drev} /> <span style={{ color: '#8A8580', fontSize: 10.5 }}>{won(m.rv)}</span></span></div>)}</div>
+            <div><div style={{ fontSize: 12, fontWeight: 800, color: '#DC2626', marginBottom: 6 }}>▼ 하락 Top 3</div>{down3.length === 0 ? <div style={{ fontSize: 11, color: '#A29C95' }}>없음</div> : down3.map((m, i) => <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, padding: '6px 9px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 7, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>{m.k}</span><span><DChip v={m.drev} /> <span style={{ color: '#8A8580', fontSize: 10.5 }}>{won(m.rv)}</span></span></div>)}</div>
+          </div>
+        )}
+      </Sec>
+    </div>
+  );
+}
+
 function TabSales({ data, setData }) {
   const [mode, setMode] = useState('month');
   const [full, setFull] = useState(null);
@@ -5153,6 +5275,7 @@ function App() {
     { icon: '🏆', label: '업무 성과', C: TabPerformance },
     { icon: '📊', label: 'KPI', C: TabKpi },
     { icon: '💵', label: '매출', C: TabSales },
+    { icon: '🔎', label: '네이버 채널 추적', C: TabChannel },
     { icon: '💬', label: '카카오', C: TabKakao },
     { icon: '📣', label: '광고', C: TabAds },
     { icon: '🔥', label: '키워드 트렌드', C: TabTrends },
