@@ -2,13 +2,14 @@
   "report_type": "full_channel",
   "data_loaded_at": "2026-07-21",
   "source": "네이버 마케팅분석>전체채널 (기간합계, 차원=상세, 지표=전체)",
-  "note": "일단위 미제공(리포트가 기간합계만 다운로드). a14=+14일기여도추정(잠정). ad_spend 전채널 0→null.",
+  "note": "일단위 미제공(리포트가 기간합계만 다운로드). a14=+14일기여도추정(잠정). ad_spend 전채널 0→null. channel_class=허브 확정표(채널명 기준). baseline은 is_provisional=false(참고선).",
   "row_count": 167,
   "rows": [
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "광고",
@@ -26,12 +27,13 @@
       "a14_revenue": 5020167,
       "a14_revenue_per_visit": 3266.2112882238125,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -48,13 +50,14 @@
       "a14_conversion_rate": 0.09327312166414936,
       "a14_revenue": 3577509,
       "a14_revenue_per_visit": 6178.77150798791,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "소셜",
@@ -72,12 +75,13 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l2": "social_instagram"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색광고",
@@ -95,12 +99,13 @@
       "a14_revenue": 1719390,
       "a14_revenue_per_visit": 6742.704427083333,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "brand_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색광고",
@@ -118,12 +123,13 @@
       "a14_revenue": 1130147,
       "a14_revenue_per_visit": 5137.033522727273,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "검색광고",
@@ -141,12 +147,13 @@
       "a14_revenue": 1649620,
       "a14_revenue_per_visit": 7567.065725344037,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "brand_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "소셜",
@@ -164,12 +171,13 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l2": "social_facebook"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -186,13 +194,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "광고",
@@ -210,12 +219,13 @@
       "a14_revenue": 525655,
       "a14_revenue_per_visit": 5419.12163740335,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -232,13 +242,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "웹사이트",
@@ -256,12 +267,13 @@
       "a14_revenue": 129600,
       "a14_revenue_per_visit": 1524.7058823529412,
       "channel_class_l1": "external_untracked",
-      "channel_class_l2": "referral"
+      "channel_class_l2": "referral_website"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색",
@@ -279,12 +291,13 @@
       "a14_revenue": 530971,
       "a14_revenue_per_visit": 6895.731204342533,
       "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l2": "naver_web_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -301,13 +314,14 @@
       "a14_conversion_rate": 0.014926118637198832,
       "a14_revenue": 30602,
       "a14_revenue_per_visit": 456.74361590485074,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "광고",
@@ -325,12 +339,13 @@
       "a14_revenue": 669573,
       "a14_revenue_per_visit": 11159.543880208334,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -347,13 +362,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -370,13 +386,14 @@
       "a14_conversion_rate": 0.1840283636535917,
       "a14_revenue": 691897,
       "a14_revenue_per_visit": 14120.337691326531,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -393,13 +410,14 @@
       "a14_conversion_rate": 0.022723125914732616,
       "a14_revenue": 70497,
       "a14_revenue_per_visit": 1468.6859944661458,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -416,13 +434,14 @@
       "a14_conversion_rate": 0.15653000151117644,
       "a14_revenue": 513888,
       "a14_revenue_per_visit": 10706.007283528646,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -439,13 +458,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -462,13 +482,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -485,13 +506,14 @@
       "a14_conversion_rate": 0.05263157894736842,
       "a14_revenue": 180180,
       "a14_revenue_per_visit": 4741.578947368421,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -508,13 +530,14 @@
       "a14_conversion_rate": 0.06463382197053809,
       "a14_revenue": 191154,
       "a14_revenue_per_visit": 5030.367907072368,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -531,13 +554,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "검색",
@@ -555,12 +579,13 @@
       "a14_revenue": 103862,
       "a14_revenue_per_visit": 4945.816964285715,
       "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l2": "naver_web_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -577,13 +602,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -600,13 +626,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -623,13 +650,14 @@
       "a14_conversion_rate": 0.0347779954180998,
       "a14_revenue": 21550,
       "a14_revenue_per_visit": 1267.6578584558824,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "웹사이트",
@@ -647,12 +675,13 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "external_untracked",
-      "channel_class_l2": "referral"
+      "channel_class_l2": "referral_website"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "검색광고",
@@ -670,12 +699,13 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "소셜",
@@ -692,13 +722,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_blog"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -715,13 +746,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -738,13 +770,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -761,13 +794,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "일반유입",
@@ -784,13 +818,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "direct"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_main"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "메신저",
@@ -807,13 +842,14 @@
       "a14_conversion_rate": 0.1954594680241176,
       "a14_revenue": 293722,
       "a14_revenue_per_visit": 41960.21428571428,
-      "channel_class_l1": "external",
-      "channel_class_l2": "messenger"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_talktalk"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -830,13 +866,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -853,13 +890,14 @@
       "a14_conversion_rate": 0.23597500721613565,
       "a14_revenue": 51254,
       "a14_revenue_per_visit": 8542.294921875,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "기타",
@@ -883,6 +921,7 @@
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -899,13 +938,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -922,13 +962,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -945,13 +986,14 @@
       "a14_conversion_rate": 0.179366668065389,
       "a14_revenue": 61672,
       "a14_revenue_per_visit": 20557.213541666668,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -968,13 +1010,14 @@
       "a14_conversion_rate": 0.5,
       "a14_revenue": 90090,
       "a14_revenue_per_visit": 45045.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "소셜",
@@ -991,13 +1034,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_blog"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색광고",
@@ -1015,12 +1059,13 @@
       "a14_revenue": 1806,
       "a14_revenue_per_visit": 903.1222534179688,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "site_search_ad"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1037,13 +1082,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -1060,13 +1106,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1083,13 +1130,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "external_tracked",
+      "channel_class_l2": "custom_channel"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1106,13 +1154,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색",
@@ -1129,13 +1178,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l1": "external",
+      "channel_class_l2": "search_daum"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1152,13 +1202,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_paid",
+      "channel_class_l2": "shopping_ad"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1175,13 +1226,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-07-13",
       "period_end": "2026-07-19",
       "period_label": "2026-07-13~2026-07-19",
+      "period_role": "current",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "검색광고",
@@ -1199,12 +1251,13 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "광고",
@@ -1222,12 +1275,13 @@
       "a14_revenue": 5608125,
       "a14_revenue_per_visit": 3930.010467764541,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1244,13 +1298,14 @@
       "a14_conversion_rate": 0.10870328356129254,
       "a14_revenue": 4383361,
       "a14_revenue_per_visit": 6795.908430232558,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색광고",
@@ -1268,12 +1323,13 @@
       "a14_revenue": 1886481,
       "a14_revenue_per_visit": 3979.9171446466244,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색광고",
@@ -1291,12 +1347,13 @@
       "a14_revenue": 1644390,
       "a14_revenue_per_visit": 5481.2996484375,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "brand_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "검색광고",
@@ -1314,12 +1371,13 @@
       "a14_revenue": 2462734,
       "a14_revenue_per_visit": 8580.955207425959,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "brand_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1336,13 +1394,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1359,13 +1418,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "광고",
@@ -1383,12 +1443,13 @@
       "a14_revenue": 1215698,
       "a14_revenue_per_visit": 10854.44419642857,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "검색",
@@ -1406,12 +1467,13 @@
       "a14_revenue": 831820,
       "a14_revenue_per_visit": 10397.75478515625,
       "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l2": "naver_web_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -1428,13 +1490,14 @@
       "a14_conversion_rate": 0.2091504046993871,
       "a14_revenue": 758050,
       "a14_revenue_per_visit": 12226.612903225807,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1451,13 +1514,14 @@
       "a14_conversion_rate": 0.0305963930536489,
       "a14_revenue": 130993,
       "a14_revenue_per_visit": 2147.4242603739754,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1474,13 +1538,14 @@
       "a14_conversion_rate": 0.07084032624471383,
       "a14_revenue": 363286,
       "a14_revenue_per_visit": 5955.503474001024,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "광고",
@@ -1498,12 +1563,13 @@
       "a14_revenue": 852432,
       "a14_revenue_per_visit": 14697.107893318966,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "웹사이트",
@@ -1521,12 +1587,13 @@
       "a14_revenue": 195830,
       "a14_revenue_per_visit": 3839.813507977654,
       "channel_class_l1": "external_untracked",
-      "channel_class_l2": "referral"
+      "channel_class_l2": "referral_website"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -1543,13 +1610,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1566,13 +1634,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1589,13 +1658,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "소셜",
@@ -1613,12 +1683,13 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l2": "social_instagram"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1635,13 +1706,14 @@
       "a14_conversion_rate": 0.10114540602709796,
       "a14_revenue": 176216,
       "a14_revenue_per_visit": 4762.591110641892,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -1658,13 +1730,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "검색광고",
@@ -1682,12 +1755,13 @@
       "a14_revenue": 240952,
       "a14_revenue_per_visit": 7086.830193014706,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1704,13 +1778,14 @@
       "a14_conversion_rate": 0.044927059561279535,
       "a14_revenue": 74756,
       "a14_revenue_per_visit": 2198.7034209616045,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -1727,13 +1802,14 @@
       "a14_conversion_rate": 0.04262329638004303,
       "a14_revenue": 151547,
       "a14_revenue_per_visit": 4457.259650735294,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -1750,13 +1826,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1773,13 +1850,14 @@
       "a14_conversion_rate": 0.0849395057429438,
       "a14_revenue": 148854,
       "a14_revenue_per_visit": 6471.921577785326,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1796,13 +1874,14 @@
       "a14_conversion_rate": 0.14334750446406277,
       "a14_revenue": 135621,
       "a14_revenue_per_visit": 6164.6044921875,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "웹사이트",
@@ -1820,12 +1899,13 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "external_untracked",
-      "channel_class_l2": "referral"
+      "channel_class_l2": "referral_website"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1842,13 +1922,14 @@
       "a14_conversion_rate": 0.08590388776630992,
       "a14_revenue": 167989,
       "a14_revenue_per_visit": 9332.725419786242,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -1865,13 +1946,14 @@
       "a14_conversion_rate": 0.031466249376535416,
       "a14_revenue": 17118,
       "a14_revenue_per_visit": 1069.8525390625,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1888,13 +1970,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1911,13 +1994,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1934,13 +2018,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "소셜",
@@ -1957,13 +2042,14 @@
       "a14_conversion_rate": 3.272727322341366e-05,
       "a14_revenue": 11,
       "a14_revenue_per_visit": 1.0014545267278498,
-      "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_blog"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -1980,13 +2066,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -2003,13 +2090,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "검색",
@@ -2027,12 +2115,13 @@
       "a14_revenue": 42744,
       "a14_revenue_per_visit": 5343.046875,
       "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l2": "naver_web_search"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "메신저",
@@ -2049,13 +2138,14 @@
       "a14_conversion_rate": 0.09393428904669625,
       "a14_revenue": 65096,
       "a14_revenue_per_visit": 9299.494419642857,
-      "channel_class_l1": "external",
-      "channel_class_l2": "messenger"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_talktalk"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "일반유입",
@@ -2072,13 +2162,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "direct"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_main"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "기타",
@@ -2102,6 +2193,7 @@
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "검색광고",
@@ -2119,12 +2211,13 @@
       "a14_revenue": 36450,
       "a14_revenue_per_visit": 7290.0,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -2141,13 +2234,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "검색",
@@ -2164,13 +2258,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l1": "external",
+      "channel_class_l2": "search_google"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -2187,13 +2282,14 @@
       "a14_conversion_rate": 0.39575499296188354,
       "a14_revenue": 47728,
       "a14_revenue_per_visit": 23864.02734375,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -2210,13 +2306,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
@@ -2233,13 +2330,14 @@
       "a14_conversion_rate": 0.03784685954451561,
       "a14_revenue": 11048,
       "a14_revenue_per_visit": 5524.12744140625,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "메신저",
@@ -2256,13 +2354,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "external",
-      "channel_class_l2": "messenger"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_talktalk"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -2279,13 +2378,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "external_tracked",
+      "channel_class_l2": "custom_channel"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "쇼핑",
@@ -2302,13 +2402,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "PC",
       "channel_group_raw": "소셜",
@@ -2325,13 +2426,14 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_blog"
     },
     {
       "period_start": "2026-07-06",
       "period_end": "2026-07-12",
       "period_label": "2026-07-06~2026-07-12",
+      "period_role": "prior",
       "is_provisional": true,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
@@ -2348,14 +2450,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "광고",
       "channel_name_raw": "네이버 ADVoost쇼핑",
@@ -2372,13 +2475,14 @@
       "a14_revenue": 23099594,
       "a14_revenue_per_visit": 4144.911836365064,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "소셜",
       "channel_name_raw": "인스타그램",
@@ -2395,13 +2499,14 @@
       "a14_revenue": 119912,
       "a14_revenue_per_visit": 43.90789604955259,
       "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l2": "social_instagram"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-통합검색",
@@ -2417,14 +2522,15 @@
       "a14_conversion_rate": 0.11308279966731145,
       "a14_revenue": 17302214,
       "a14_revenue_per_visit": 7218.278672722414,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "검색광고",
       "channel_name_raw": "네이버 브랜드검색(일반형)",
@@ -2441,13 +2547,14 @@
       "a14_revenue": 14490256,
       "a14_revenue_per_visit": 6896.837496351254,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "brand_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "검색광고",
       "channel_name_raw": "네이버 쇼핑검색광고",
@@ -2464,13 +2571,14 @@
       "a14_revenue": 7617329,
       "a14_revenue_per_visit": 4301.145766979284,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "검색광고",
       "channel_name_raw": "네이버 브랜드검색(일반형)",
@@ -2487,13 +2595,14 @@
       "a14_revenue": 8244931,
       "a14_revenue_per_visit": 6381.525559936145,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "brand_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "검색",
       "channel_name_raw": "네이버검색",
@@ -2510,13 +2619,14 @@
       "a14_revenue": 8185603,
       "a14_revenue_per_visit": 6595.9737225209,
       "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l2": "naver_web_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -2532,14 +2642,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-통합검색",
@@ -2555,14 +2666,15 @@
       "a14_conversion_rate": 0.03133795977732457,
       "a14_revenue": 1250288,
       "a14_revenue_per_visit": 2294.1057500716743,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -2578,14 +2690,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "광고",
       "channel_name_raw": "네이버 ADVoost쇼핑",
@@ -2602,13 +2715,14 @@
       "a14_revenue": 3467030,
       "a14_revenue_per_visit": 7951.90269316227,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "웹사이트",
       "channel_name_raw": "웹사이트",
@@ -2625,13 +2739,14 @@
       "a14_revenue": 1125078,
       "a14_revenue_per_visit": 2580.45365587287,
       "channel_class_l1": "external_untracked",
-      "channel_class_l2": "referral"
+      "channel_class_l2": "referral_website"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-검색",
@@ -2647,14 +2762,15 @@
       "a14_conversion_rate": 0.19036816426236694,
       "a14_revenue": 6622767,
       "a14_revenue_per_visit": 15189.831717674886,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -2670,14 +2786,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-검색",
@@ -2693,14 +2810,15 @@
       "a14_conversion_rate": 0.10063305223474697,
       "a14_revenue": 2566295,
       "a14_revenue_per_visit": 7481.909629532616,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "웹사이트",
       "channel_name_raw": "웹사이트",
@@ -2717,13 +2835,14 @@
       "a14_revenue": 727203,
       "a14_revenue_per_visit": 2223.8612531434505,
       "channel_class_l1": "external_untracked",
-      "channel_class_l2": "referral"
+      "channel_class_l2": "referral_website"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "광고",
       "channel_name_raw": "네이버 ADVoost쇼핑",
@@ -2740,13 +2859,14 @@
       "a14_revenue": 3873629,
       "a14_revenue_per_visit": 12067.379356503116,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "display_ad"
+      "channel_class_l2": "advoost"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-검색",
@@ -2762,14 +2882,15 @@
       "a14_conversion_rate": 0.11451025585941717,
       "a14_revenue": 2865361,
       "a14_revenue_per_visit": 9746.12652131165,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버-서비스",
@@ -2785,14 +2906,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-홈",
@@ -2808,14 +2930,15 @@
       "a14_conversion_rate": 0.09535330262100487,
       "a14_revenue": 2090556,
       "a14_revenue_per_visit": 7335.2825315241225,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -2831,14 +2954,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-통합검색",
@@ -2854,14 +2978,15 @@
       "a14_conversion_rate": 0.0830921799485534,
       "a14_revenue": 1273936,
       "a14_revenue_per_visit": 5636.887013897432,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "소셜",
       "channel_name_raw": "페이스북",
@@ -2878,13 +3003,14 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l2": "social_facebook"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "소셜",
       "channel_name_raw": "네이버 블로그",
@@ -2900,14 +3026,15 @@
       "a14_conversion_rate": 0.037293063803664005,
       "a14_revenue": 189979,
       "a14_revenue_per_visit": 989.4737070053816,
-      "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_blog"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "검색",
       "channel_name_raw": "네이버검색",
@@ -2924,13 +3051,14 @@
       "a14_revenue": 769439,
       "a14_revenue_per_visit": 4499.642127098396,
       "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l2": "naver_web_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버-서비스",
@@ -2946,14 +3074,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "검색광고",
       "channel_name_raw": "네이버 쇼핑검색광고",
@@ -2970,13 +3099,14 @@
       "a14_revenue": 672019,
       "a14_revenue_per_visit": 4450.456087024007,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "메신저",
       "channel_name_raw": "네이버톡톡",
@@ -2992,14 +3122,15 @@
       "a14_conversion_rate": 0.11783275868268621,
       "a14_revenue": 1278909,
       "a14_revenue_per_visit": 8583.283008140206,
-      "channel_class_l1": "external",
-      "channel_class_l2": "messenger"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_talktalk"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-검색",
@@ -3015,14 +3146,15 @@
       "a14_conversion_rate": 0.11525922890887746,
       "a14_revenue": 831497,
       "a14_revenue_per_visit": 6705.620888494676,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -3038,14 +3170,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-검색",
@@ -3061,14 +3194,15 @@
       "a14_conversion_rate": 0.12801385104656218,
       "a14_revenue": 987047,
       "a14_revenue_per_visit": 9870.47396484375,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -3084,14 +3218,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-홈",
@@ -3107,14 +3242,15 @@
       "a14_conversion_rate": 0.047107040578005265,
       "a14_revenue": 360371,
       "a14_revenue_per_visit": 3677.254793128189,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -3130,14 +3266,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-통합검색",
@@ -3153,14 +3290,15 @@
       "a14_conversion_rate": 0.06482212543487549,
       "a14_revenue": 276595,
       "a14_revenue_per_visit": 3457.438513183594,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_search"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버-서비스",
@@ -3176,14 +3314,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버 마케팅링크",
@@ -3199,14 +3338,15 @@
       "a14_conversion_rate": 0.011066545139659534,
       "a14_revenue": 18406,
       "a14_revenue_per_visit": 334.65234375,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "external_tracked",
+      "channel_class_l2": "custom_channel"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "기타",
       "channel_name_raw": "기타채널",
@@ -3229,7 +3369,8 @@
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -3245,14 +3386,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버-서비스",
@@ -3268,14 +3410,15 @@
       "a14_conversion_rate": 0.06077338137277743,
       "a14_revenue": 210526,
       "a14_revenue_per_visit": 5134.7765100990855,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "일반유입",
       "channel_name_raw": "네이버 모바일메인",
@@ -3291,14 +3434,15 @@
       "a14_conversion_rate": 0.033000256006534286,
       "a14_revenue": 55453,
       "a14_revenue_per_visit": 1421.8710436698718,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "direct"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_main"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버페이",
@@ -3314,14 +3458,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naverpay_reentry"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "소셜",
       "channel_name_raw": "네이버 블로그",
@@ -3337,14 +3482,15 @@
       "a14_conversion_rate": 0.03125,
       "a14_revenue": 60300,
       "a14_revenue_per_visit": 1884.375,
-      "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_blog"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버-서비스",
@@ -3360,14 +3506,15 @@
       "a14_conversion_rate": 0.16877458915114402,
       "a14_revenue": 186317,
       "a14_revenue_per_visit": 6210.567708333333,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "검색광고",
       "channel_name_raw": "네이버 쇼핑검색광고",
@@ -3384,13 +3531,14 @@
       "a14_revenue": 117391,
       "a14_revenue_per_visit": 4695.658515625,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "shopping_search_ad"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "소셜",
       "channel_name_raw": "네이버 클립",
@@ -3406,14 +3554,15 @@
       "a14_conversion_rate": 0.05,
       "a14_revenue": 99000,
       "a14_revenue_per_visit": 4950.0,
-      "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_clip"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "검색",
       "channel_name_raw": "구글검색",
@@ -3429,14 +3578,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l1": "external",
+      "channel_class_l2": "search_google"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "검색광고",
       "channel_name_raw": "네이버 사이트검색광고",
@@ -3453,13 +3603,14 @@
       "a14_revenue": 1806,
       "a14_revenue_per_visit": 138.94188514122595,
       "channel_class_l1": "naver_paid",
-      "channel_class_l2": "search_ad"
+      "channel_class_l2": "site_search_ad"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-카테고리",
@@ -3475,14 +3626,15 @@
       "a14_conversion_rate": 0.023317667570981113,
       "a14_revenue": 21953,
       "a14_revenue_per_visit": 1995.7592329545455,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-카탈로그(검색)",
@@ -3498,14 +3650,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버 마케팅링크",
@@ -3521,14 +3674,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "external_tracked",
+      "channel_class_l2": "custom_channel"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "소셜",
       "channel_name_raw": "인스타그램",
@@ -3545,13 +3699,14 @@
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
       "channel_class_l1": "external",
-      "channel_class_l2": "social"
+      "channel_class_l2": "social_instagram"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "메신저",
       "channel_name_raw": "네이버톡톡",
@@ -3567,14 +3722,15 @@
       "a14_conversion_rate": 0.016574375331401825,
       "a14_revenue": 3022,
       "a14_revenue_per_visit": 377.7300109863281,
-      "channel_class_l1": "external",
-      "channel_class_l2": "messenger"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_talktalk"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "메신저",
       "channel_name_raw": "네이버톡톡",
@@ -3590,14 +3746,15 @@
       "a14_conversion_rate": 0.125,
       "a14_revenue": 30370,
       "a14_revenue_per_visit": 3796.25,
-      "channel_class_l1": "external",
-      "channel_class_l2": "messenger"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_talktalk"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-홈",
@@ -3613,14 +3770,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-카탈로그(검색외)",
@@ -3636,14 +3794,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "검색",
       "channel_name_raw": "구글검색",
@@ -3659,14 +3818,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l1": "external",
+      "channel_class_l2": "search_google"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-카탈로그(검색외)",
@@ -3682,14 +3842,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버-서비스",
@@ -3705,14 +3866,15 @@
       "a14_conversion_rate": 0.796150008837382,
       "a14_revenue": 87828,
       "a14_revenue_per_visit": 29276.07421875,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_service"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "일반유입",
       "channel_name_raw": "네이버 PC메인",
@@ -3728,14 +3890,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "direct"
+      "channel_class_l1": "naver_owned",
+      "channel_class_l2": "naver_main"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "PC",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버가격비교-카탈로그(검색외)",
@@ -3751,14 +3914,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "price_compare_catalog"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "검색",
       "channel_name_raw": "다음검색",
@@ -3774,14 +3938,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_organic",
-      "channel_class_l2": "web_search"
+      "channel_class_l1": "external",
+      "channel_class_l2": "search_daum"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "모바일",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버쇼핑-광고",
@@ -3797,14 +3962,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_paid",
+      "channel_class_l2": "shopping_ad"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "쇼핑",
       "channel_name_raw": "네이버플러스스토어-카테고리",
@@ -3820,14 +3986,15 @@
       "a14_conversion_rate": 0.0,
       "a14_revenue": 0,
       "a14_revenue_per_visit": 0.0,
-      "channel_class_l1": "naver_shopping",
-      "channel_class_l2": "shopping"
+      "channel_class_l1": "naver_organic",
+      "channel_class_l2": "plus_store_browse"
     },
     {
       "period_start": "2026-04-20",
       "period_end": "2026-07-19",
       "period_label": "2026-04-20~2026-07-19",
-      "is_provisional": true,
+      "period_role": "baseline",
+      "is_provisional": false,
       "device": "N+스토어앱",
       "channel_group_raw": "웹사이트",
       "channel_name_raw": "웹사이트",
@@ -3844,7 +4011,7 @@
       "a14_revenue": 15973,
       "a14_revenue_per_visit": 15973.119140625,
       "channel_class_l1": "external_untracked",
-      "channel_class_l2": "referral"
+      "channel_class_l2": "referral_website"
     }
   ]
 }
