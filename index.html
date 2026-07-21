@@ -3635,6 +3635,58 @@ function TabSales({ data, setData }) {
           })()}
         </div>
 
+        {(() => {
+          const cuRaw = r && r.customers && r.customers.total != null ? r.customers : null;
+          let cu = cuRaw, isAgg = false, aggDays = 0;
+          if (!cu && mode !== 'day' && r && r.periodStart && r.periodEnd) {
+            const ds = ((full && full.days) || []).filter(d => d.key && d.key >= r.periodStart && d.key <= r.periodEnd && d.customers && d.customers.total != null);
+            if (ds.length > 0) { let t = 0, n = 0, rr = 0; ds.forEach(d => { t += d.customers.total || 0; n += d.customers.new || 0; rr += d.customers.returning || 0; }); cu = { total: t, new: n, returning: rr }; isAgg = true; aggDays = ds.length; }
+          }
+          if (!cu || cu.total == null) {
+            return (mode !== 'day') ? <div style={{ fontSize: 11, color: '#A29C95', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 8, padding: '9px 12px', marginBottom: 16 }}>👥 주문 고객(신규/재구매) 구성은 이 기간의 일간 고객 데이터가 있으면 실시간 합산으로 표시됩니다 — 아직 해당 일간 데이터가 없습니다.</div> : null;
+          }
+          const total = cu.total || 0, nw = cu.new || 0, rt = cu.returning || 0;
+          const newPct = total > 0 ? Math.round(nw / total * 1000) / 10 : 0;
+          const rtPct = total > 0 ? Math.round(rt / total * 1000) / 10 : 0;
+          const statBox = (label, val, pct, color, bg) => (
+            <div style={{ background: bg, border: '1px solid ' + color + '33', borderRadius: 10, padding: '11px 12px', textAlign: 'center' }}>
+              <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>{label}</div>
+              <div style={{ fontSize: 21, fontWeight: 800, color: color }}>{val.toLocaleString()}<span style={{ fontSize: 12, fontWeight: 600 }}>명</span></div>
+              {pct != null ? <div style={{ fontSize: 11, fontWeight: 700, color: color, marginTop: 1 }}>{pct}%</div> : <div style={{ fontSize: 11, color: '#A29C95', marginTop: 1 }}>전체</div>}
+            </div>
+          );
+          return (
+            <Card style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: G }}>👥 주문 고객</div>
+                {isAgg
+                  ? <span style={{ fontSize: 10.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '2px 7px' }}>실시간 · 일간 합산 ({aggDays}일)</span>
+                  : <span style={{ fontSize: 11, color: '#A29C95' }}>{modeLabel[mode]} · 결제일 기준 · 네이버 고객현황</span>}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
+                {statBox('전체 고객', total, null, G, '#F8F7F5')}
+                {statBox('신규', nw, newPct, '#2563EB', '#F5F8FE')}
+                {statBox('재구매', rt, rtPct, '#1FA463', '#F4FBF7')}
+              </div>
+              {total > 0 ? (
+                <div>
+                  <div style={{ display: 'flex', height: 12, borderRadius: 6, overflow: 'hidden', border: '1px solid #EDEBE7' }}>
+                    <div style={{ width: newPct + '%', background: '#2563EB' }} title={'신규 ' + nw + '명 (' + newPct + '%)'} />
+                    <div style={{ width: rtPct + '%', background: '#1FA463' }} title={'재구매 ' + rt + '명 (' + rtPct + '%)'} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#A29C95', marginTop: 4 }}>
+                    <span><span style={{ color: '#2563EB', fontWeight: 700 }}>■</span> 신규 {newPct}%</span>
+                    <span><span style={{ color: '#1FA463', fontWeight: 700 }}>■</span> 재구매 {rtPct}%</span>
+                  </div>
+                </div>
+              ) : null}
+              {isAgg
+                ? <div style={{ fontSize: 9.5, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>※ 일별 신규/재구매를 합산한 <b>실시간 누계</b>예요. 같은 고객의 반복 주문은 <b>주문 기준</b>으로 중복 집계될 수 있어, {mode === 'month' ? '월' : '주'} 마감 후 네이버 고객현황(고유 고객 기준)으로 대체됩니다.</div>
+                : ((nw + rt) !== total ? <div style={{ fontSize: 9.5, color: '#B45309', marginTop: 8 }}>※ 신규+재구매({(nw + rt).toLocaleString()})가 전체({total.toLocaleString()})와 달라요 — 네이버 고객현황 집계 특성상 차이가 날 수 있습니다.</div> : null)}
+            </Card>
+          );
+        })()}
+
         {daily.length > 0 && mode !== 'day' && (
           <Card style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
