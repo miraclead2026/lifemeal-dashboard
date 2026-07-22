@@ -3544,8 +3544,14 @@ function TabChannel({ data, setData }) {
   const cuKey = r => [r.nt_source, r.nt_medium, r.nt_detail, r.nt_keyword].filter(Boolean).join(' / ') || '(미지정)';
   const cuG = groupBy(rowsIn(cuD, curP), cuKey);
   const cuRows = Object.keys(cuG).map(k => { const cur = cuG[k], r0 = cur[0] || {}; return { k, campaign: r0.campaign_name, placement: r0.placement_name, creative: r0.creative_name, owner: r0.owner, visit: sf(cur, 'visit_count'), ord: sf(cur, OC), rv: sf(cur, REV) }; }).sort((a, b) => b.rv - a.rv);
-  const prG = groupBy(rowsIn(prD, curP), r => (r.product_name_raw || r.product_id) + '||' + (r.channel_name_raw || r.channel_group_raw || '(미지정)'));
-  const prRows = Object.keys(prG).map(k => { const cur = prG[k], r0 = cur[0] || {}; return { product: r0.product_name_raw || r0.product_id, group: r0.product_group, channel: r0.channel_name_raw || r0.channel_group_raw, ord: sf(cur, 'order_count'), rv: sf(cur, 'revenue') }; }).sort((a, b) => b.rv - a.rv).slice(0, 40);
+  const prPMap = {}; prD.forEach(r => { const k = pk(r); if (!prPMap[k]) prPMap[k] = { label: k, start: r.period_start, end: r.period_end || r.date, role: r.period_role, prov: !!r.is_provisional }; });
+  const prodP = Object.values(prPMap).sort((a, b) => (b.end || '').localeCompare(a.end || ''))[0] || null;
+  const prSel = prodP ? prD.filter(r => pk(r) === prodP.label) : prD;
+  const prSpan = (prodP && prodP.start && prodP.end) ? Math.round((new Date(prodP.end) - new Date(prodP.start)) / 86400000) + 1 : 0;
+  const mdShort = s => s ? (Number(s.slice(5, 7)) + '/' + Number(s.slice(8, 10))) : '';
+  const prodLabel = prodP ? ((prSpan ? '최근 ' + prSpan + '일 · ' : '') + mdShort(prodP.start) + '~' + mdShort(prodP.end)) : '';
+  const prG = groupBy(prSel, r => (r.product_id || r.product_name_raw || '(미지정)'));
+  const prRows = Object.keys(prG).map(k => { const cur = prG[k], r0 = cur[0] || {}; return { product: r0.product_name_raw || r0.product_id, group: r0.product_group, line: r0.product_line, ord: sf(cur, 'order_count'), rv: sf(cur, 'revenue'), buyers: sf(cur, 'buyer_count') }; }).sort((a, b) => b.rv - a.rv).slice(0, 40);
   const movers = chanRows.filter(r => r.drev != null);
   const up3 = movers.slice().sort((a, b) => b.drev - a.drev).filter(m => m.drev > 0).slice(0, 3);
   const down3 = movers.slice().sort((a, b) => a.drev - b.drev).filter(m => m.drev < 0).slice(0, 3);
@@ -3607,10 +3613,11 @@ function TabChannel({ data, setData }) {
         )}
       </Sec>
 
-      <Sec title="4. 상품별 성과" desc="상품군·상품별 결제수·결제금액·구매자수 (판매분석 기준 — 마케팅분석 결제금액과 다를 수 있음)">
-        {prRows.length === 0 ? <Empty what="상품×채널 데이터 없음" /> : (
-          <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 520 }}><thead><tr><th style={th}>상품</th><th style={th}>상품군</th><th style={th}>채널</th><th style={{ ...th, textAlign: 'right' }}>결제수</th><th style={{ ...th, textAlign: 'right' }}>결제금액</th></tr></thead><tbody>{prRows.map((r, i) => <tr key={i}><td style={td}>{r.product}</td><td style={td}>{r.group || '—'}</td><td style={td}>{r.channel}</td><td style={tdR}>{num(r.ord)}</td><td style={tdR}>{won(r.rv)}</td></tr>)}</tbody></table></div>
-        )}
+      <Sec title="4. 상품별 성과" desc="상품·상품군별 결제수·결제금액·구매자수 · 월 누적(MTD) 기준이라 상단 주간 비교와 기간이 다름 · 판매분석 확정매출(마케팅분석 채널 기여매출과 다른 축)">
+        {prRows.length === 0 ? <Empty what="상품별 데이터 없음" /> : (<React.Fragment>
+          {prodLabel ? <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', border: '1px solid #EDEBE7', borderRadius: 7, padding: '5px 10px', marginBottom: 10 }}>📅 {prodLabel}{prodP && prodP.role === 'product_mtd' ? <span style={{ fontWeight: 600, color: '#A29C95' }}>· 월 누적</span> : null}</div> : null}
+          <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}><thead><tr><th style={th}>상품</th><th style={th}>상품군</th><th style={{ ...th, textAlign: 'right' }}>결제수</th><th style={{ ...th, textAlign: 'right' }}>결제금액</th><th style={{ ...th, textAlign: 'right' }}>구매자수</th></tr></thead><tbody>{prRows.map((r, i) => <tr key={i}><td style={{ ...td, whiteSpace: 'normal', maxWidth: 300, lineHeight: 1.4 }}>{r.product}{r.line ? <span style={{ fontSize: 9.5, color: '#A29C95', marginLeft: 4 }}>{r.line}</span> : null}</td><td style={td}>{r.group || '—'}</td><td style={tdR}>{num(r.ord)}</td><td style={tdR}>{won(r.rv)}</td><td style={tdR}>{num(r.buyers)}</td></tr>)}</tbody></table></div>
+        </React.Fragment>)}
       </Sec>
 
       <Sec title="5. 매출 증감 기여" desc="비교 기간 · 채널 결제금액 증감 기준">
@@ -3625,6 +3632,62 @@ function TabChannel({ data, setData }) {
   );
 }
 
+function aggSalesRange(days, start, end) {
+  if (!start || !end || start > end) return null;
+  const inR = (days || []).filter(d => d.key && d.key >= start && d.key <= end).sort((a, b) => a.key < b.key ? -1 : 1);
+  if (!inR.length) return null;
+  const ad = (s, n) => { const t = new Date(s + 'T00:00:00'); t.setDate(t.getDate() + n); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); };
+  const span = Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+  const prior = (days || []).filter(d => d.key && d.key >= ad(start, -span) && d.key <= ad(start, -1));
+  const sv = (arr, k) => arr.reduce((s, d) => s + (((d.summary && d.summary[k]) || {}).value || 0), 0);
+  const refSum = arr => arr.reduce((s, d) => { const b = d.summary && d.summary.refund && d.summary.refund.breakdown; return s + ((b && b.total && b.total.amount) || 0); }, 0);
+  const tot = arr => ({ rev: sv(arr, 'revenue'), ord: sv(arr, 'orders'), vis: sv(arr, 'visitors'), ref: refSum(arr) });
+  const cur = tot(inR), pr = prior.length ? tot(prior) : null;
+  const r1 = x => Math.round(x * 10) / 10;
+  const mk = (v, pv) => ({ value: v, deltaValue: pv == null ? null : v - pv, deltaPct: (pv == null || pv === 0) ? null : r1((v - pv) / pv * 100) });
+  const aov = cur.ord ? Math.round(cur.rev / cur.ord) : 0, paov = (pr && pr.ord) ? Math.round(pr.rev / pr.ord) : null;
+  const conv = cur.vis ? Math.round(cur.ord / cur.vis * 10000) / 100 : 0, pconv = (pr && pr.vis) ? Math.round(pr.ord / pr.vis * 10000) / 100 : null;
+  const rb = key => inR.reduce((a, d) => { const x = ((d.summary && d.summary.refund && d.summary.refund.breakdown) || {})[key]; return { amount: a.amount + ((x && x.amount) || 0), count: a.count + ((x && x.count) || 0) }; }, { amount: 0, count: 0 });
+  const cancel = rb('cancel'), ret = rb('return'), exch = rb('exchange');
+  const refTot = { amount: cancel.amount + ret.amount + exch.amount, count: cancel.count + ret.count + exch.count };
+  const refDelta = pr == null ? null : refTot.amount - pr.ref, refPct = (pr == null || pr.ref === 0) ? null : r1((refTot.amount - pr.ref) / pr.ref * 100);
+  const summary = {
+    revenue: mk(cur.rev, pr && pr.rev), orders: mk(cur.ord, pr && pr.ord),
+    aov: { value: aov, deltaValue: paov == null ? null : aov - paov, deltaPct: (paov == null || paov === 0) ? null : r1((aov - paov) / paov * 100) },
+    visitors: mk(cur.vis, pr && pr.vis),
+    conversion: { value: conv, deltaValue: pconv == null ? null : Math.round((conv - pconv) * 100) / 100, deltaPct: (pconv == null || pconv === 0) ? null : r1((conv - pconv) / pconv * 100) },
+    refund: { value: null, deltaValue: refDelta, deltaPct: refPct, breakdown: { basis: '처리일(취소완료일)', cancel: cancel, return: ret, exchange: exch, total: refTot, deltaValue: refDelta, deltaPct: refPct } }
+  };
+  const daily = inR.map(d => ({ date: d.key, revenue: ((d.summary && d.summary.revenue) || {}).value || 0 }));
+  const chMap = {};
+  inR.forEach(d => (d.channels || []).forEach(c => { const k = c.name || '(미지정)'; const m = chMap[k] || (chMap[k] = { name: k, revenue: 0, visitors: 0 }); m.revenue += c.revenue || 0; m.visitors += c.visitors || 0; }));
+  const chSum = Object.values(chMap).reduce((s, c) => s + c.revenue, 0);
+  const channels = Object.values(chMap).map(c => ({ name: c.name, revenue: c.revenue, visitors: c.visitors, sharePct: chSum ? Math.round(c.revenue / chSum * 1000) / 10 : 0 })).sort((a, b) => b.revenue - a.revenue);
+  const prMap = {};
+  inR.forEach(d => (d.products || []).forEach(p => { const k = p.productId || p.name; const m = prMap[k] || (prMap[k] = { name: p.name, productId: p.productId, revenue: 0, qty: 0 }); m.revenue += p.revenue || 0; m.qty += p.qty || 0; }));
+  const products = Object.values(prMap).sort((a, b) => b.revenue - a.revenue).map((p, i) => ({ rank: i + 1, name: p.name, productId: p.productId, revenue: p.revenue, qty: p.qty }));
+  const subDays = inR.filter(d => d.subscription && ((d.subscription.orders || 0) > 0 || (d.subscription.activeSubscribers || 0) > 0));
+  let subscription = null;
+  if (subDays.length) {
+    const ss = f => subDays.reduce((a, d) => a + ((d.subscription && d.subscription[f]) || 0), 0);
+    const lastAct = [...subDays].reverse().find(d => d.subscription.activeSubscribers != null);
+    const spMap = {};
+    subDays.forEach(d => (d.subscription.products || []).forEach(p => { const k = p.productId || p.name; const m = spMap[k] || (spMap[k] = { productId: p.productId, name: p.name, orders: 0, revenue: 0 }); m.orders += p.orders || 0; m.revenue += p.revenue || 0; }));
+    subscription = { orders: ss('orders'), newOrders: ss('newOrders'), renewOrders: ss('renewOrders'), canceled: ss('canceled'), revenue: ss('revenue'), activeSubscribers: lastAct ? lastAct.subscription.activeSubscribers : 0, products: Object.values(spMap) };
+  }
+  const nDays = inR.filter(d => d.subscribers && d.subscribers.notify);
+  let subscribers = null;
+  if (nDays.length) {
+    const lastN = nDays[nDays.length - 1].subscribers.notify;
+    const addN = nDays.reduce((a, d) => a + ((d.subscribers.notify && d.subscribers.notify.added) || 0), 0);
+    const iDays = inR.filter(d => d.subscribers && d.subscribers.interest);
+    const lastI = iDays.length ? iDays[iDays.length - 1].subscribers.interest : null;
+    const addI = iDays.reduce((a, d) => a + ((d.subscribers.interest && d.subscribers.interest.added) || 0), 0);
+    subscribers = { notify: { total: (lastN && lastN.total) || 0, added: addN }, interest: lastI ? { total: lastI.total || 0, added: addI } : null };
+  }
+  return { key: start + '~' + end, label: start + ' ~ ' + end, periodStart: start, periodEnd: end, summary: summary, daily: daily, channels: channels, products: products, subscription: subscription, subscribers: subscribers };
+}
+
 function TabSales({ data, setData }) {
   const [mode, setMode] = useState('month');
   const [full, setFull] = useState(null);
@@ -3634,6 +3697,7 @@ function TabSales({ data, setData }) {
   const [hoverBar, setHoverBar] = useState(null);
   const [hoverDow, setHoverDow] = useState(null);
   const [idx, setIdx] = useState({ month: 0, week: 0, day: 0 });
+  const [range, setRange] = useState({ start: '', end: '' });
   const BASE = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/';
 
   const normalize = j => {
@@ -3661,10 +3725,15 @@ function TabSales({ data, setData }) {
   const fmtMan = v => { const n = Math.round((v || 0) / 10000); return n.toLocaleString() + '만'; };
 
   const modeKeyMap = { month: 'months', week: 'weeks', day: 'days' };
-  const modeLabel = { month: '월간', week: '주간', day: '일간' };
+  const modeLabel = { month: '월간', week: '주간', day: '일간', custom: '기간' };
+  const isCustom = mode === 'custom';
+  const daysAll = (full && full.days) || [];
+  const availKeys = daysAll.map(d => d.key).filter(Boolean).sort();
+  const availMin = availKeys[0] || '', availMax = availKeys[availKeys.length - 1] || '';
   const list = (full && full[modeKeyMap[mode]]) || [];
   const curIdx = Math.min(idx[mode] || 0, Math.max(0, list.length - 1));
-  const r = list[curIdx] || null;
+  const customRec = isCustom ? aggSalesRange(daysAll, range.start, range.end) : null;
+  const r = isCustom ? customRec : (list[curIdx] || null);
   const sum = (r && r.summary) || {}; const daily = (r && r.daily) || []; const channels = (r && r.channels) || []; const products = (r && r.products) || [];
   const sub = (r && r.subscription) || null;
   const maxRev = Math.max(1, ...daily.map(x => x.revenue || 0));
@@ -3681,7 +3750,7 @@ function TabSales({ data, setData }) {
   const subDaily = r ? daysArr.filter(d => d.key && d.key >= r.periodStart && d.key <= r.periodEnd).map(d => ({ date: d.key, added: (d.subscribers && d.subscribers.notify ? d.subscribers.notify.added : 0) || 0, total: (d.subscribers && d.subscribers.notify ? d.subscribers.notify.total : 0) || 0 })).sort((a, b) => a.date < b.date ? -1 : 1) : [];
   const subMax = Math.max(1, ...subDaily.map(z => z.added || 0));
 
-  const setMode2 = m => { setMode(m); setHoverBar(null); setHoverDow(null); };
+  const setMode2 = m => { setMode(m); setHoverBar(null); setHoverDow(null); if (m === 'custom' && !range.start && availKeys.length) { const e = availKeys[availKeys.length - 1]; const s = availKeys[Math.max(0, availKeys.length - 30)]; setRange({ start: s, end: e }); } };
 
   return (
     <div style={{ padding: 20 }}>
@@ -3689,12 +3758,28 @@ function TabSales({ data, setData }) {
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>💵 네이버 매출</div>
         <span style={{ fontSize: 11, color: 'white', background: '#03C75A', borderRadius: 6, padding: '2px 8px', fontWeight: 700 }}>NAVER</span>
         <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexWrap: 'wrap' }}>
-          {[['month', '월간'], ['week', '주간'], ['day', '일간']].map(([v, l]) => <button key={v} onClick={() => setMode2(v)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: mode === v ? G : '#E3E0DC', color: mode === v ? 'white' : '#3A3631' }}>{l}</button>)}
+          {[['month', '월간'], ['week', '주간'], ['day', '일간'], ['custom', '기간지정']].map(([v, l]) => <button key={v} onClick={() => setMode2(v)} style={{ padding: '6px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: mode === v ? G : '#E3E0DC', color: mode === v ? 'white' : '#3A3631' }}>{l}</button>)}
           <button onClick={() => setReloadKey(k => k + 1)} style={{ padding: '6px 12px', borderRadius: 20, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#6E6863' }}>↻ 새로고침</button>
         </div>
       </div>
 
-      {status !== 'loading' && list.length > 0 && (
+      {isCustom && status !== 'loading' && (
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 10, padding: '10px 12px' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: G }}>기간 지정</span>
+            <input type="date" value={range.start} min={availMin} max={range.end || availMax} onChange={e => setRange(s => ({ ...s, start: e.target.value }))} style={{ padding: '6px 9px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 12, color: '#3A3631', background: 'white' }} />
+            <span style={{ color: '#A29C95' }}>~</span>
+            <input type="date" value={range.end} min={range.start || availMin} max={availMax} onChange={e => setRange(s => ({ ...s, end: e.target.value }))} style={{ padding: '6px 9px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 12, color: '#3A3631', background: 'white' }} />
+            <div style={{ display: 'flex', gap: 4, marginLeft: 4 }}>
+              {[['최근 7일', 7], ['최근 30일', 30]].map(([lb, n]) => <button key={n} onClick={() => { if (!availMax) return; const t = new Date(availMax + 'T00:00:00'); t.setDate(t.getDate() - (n - 1)); const s = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0'); setRange({ start: (availMin && s < availMin) ? availMin : s, end: availMax }); }} style={{ fontSize: 11, fontWeight: 700, padding: '5px 10px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer' }}>{lb}</button>)}
+            </div>
+            {availMin ? <span style={{ fontSize: 10.5, color: '#A29C95', marginLeft: 'auto' }}>선택 가능 {availMin.slice(5).replace('-', '/')} ~ {availMax.slice(5).replace('-', '/')}</span> : null}
+          </div>
+          {customRec ? <div style={{ fontSize: 11, color: '#6E6863', marginTop: 6 }}>📅 <b style={{ color: G }}>{range.start} ~ {range.end}</b> · {customRec.daily.length}일 합산 <span style={{ color: '#A29C95' }}>· 증감은 직전 동일 길이 기간 대비</span></div> : ((range.start && range.end) ? <div style={{ fontSize: 11, color: '#B45309', marginTop: 6 }}>선택한 기간에 매출 데이터가 없어요 (가용 {availMin} ~ {availMax}).</div> : null)}
+        </div>
+      )}
+
+      {status !== 'loading' && list.length > 0 && !isCustom && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           {mode === 'month' ? (<>
             <button onClick={() => setIdx(s => ({ ...s, month: Math.min((s.month || 0) + 1, list.length - 1) }))} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', cursor: curIdx >= list.length - 1 ? 'default' : 'pointer', color: '#3A3631', fontSize: 12, opacity: curIdx >= list.length - 1 ? 0.35 : 1 }}>◀</button>
@@ -3718,7 +3803,7 @@ function TabSales({ data, setData }) {
         </div>
       )}
 
-      {status !== 'loading' && list.length === 0 && (
+      {status !== 'loading' && !isCustom && list.length === 0 && (
         <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>{modeLabel[mode]} 데이터가 아직 없습니다</Card>
       )}
 
