@@ -1063,6 +1063,10 @@ function TeamCalendar({ data, setData, onEdit }) {
   const [openChk, setOpenChk] = useState(null);
   const [ownerFilter, setOwnerFilter] = useState('');
   const setDate = (id, date) => setData(d => applyChklDate(d, id, date));
+  const isManual = c => c.standalone === true || !c.subplanId;
+  const [newText, setNewText] = useState('');
+  const [newOwner, setNewOwner] = useState('');
+  const addManual = () => { const t = newText.trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: null, standalone: true, text: t, done: false, date: '', owner: newOwner, memo: '' }] })); setNewText(''); setNewOwner(''); };
   const navBtnSmall = { width: 28, height: 28, borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 14, color: '#3A3631', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' };
   const filterBtn = active => ({ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 15, fontSize: 11, fontWeight: 600, cursor: 'pointer', border: '1px solid ' + (active ? G : '#E3E0DC'), background: active ? G : 'white', color: active ? 'white' : '#6E6863' });
   const [yy, mm] = ym.split('-').map(Number);
@@ -1082,12 +1086,14 @@ function TeamCalendar({ data, setData, onEdit }) {
   const isOver = c => { const s = subOf(c.subplanId); return !!(c.date && s && s.due && c.date > s.due); };
   const warnCnt = (data.checklists || []).filter(c => visible(c) && isOver(c)).length;
   const chip = (c, hideSub) => {
-    const s = subOf(c.subplanId); const over = isOver(c); const av = c.owner ? AV[c.owner] : '';
+    const s = subOf(c.subplanId); const over = isOver(c); const av = c.owner ? AV[c.owner] : ''; const man = isManual(c);
+    const bg = over ? '#FEF2F2' : (c.done ? '#F1F0ED' : (man ? '#F1ECFB' : '#EEF4EC'));
+    const bd = over ? '#FCA5A5' : (c.done ? '#E3E0DC' : (man ? '#D3C4EF' : '#CDE3C6'));
     return (
       <div key={c.id} draggable onDragStart={e => { e.stopPropagation(); e.dataTransfer.setData('chk-id', String(c.id)); }} onClick={e => { e.stopPropagation(); setOpenChk(c.id); }}
-        title={(s ? s.name : '') + (c.owner ? ' · ' + c.owner : '') + (over && s ? ' · 마감일(' + s.due + ') 초과' : '')}
-        style={{ padding: '3px 6px', marginBottom: 3, borderRadius: 6, cursor: 'pointer', lineHeight: 1.3, background: over ? '#FEF2F2' : (c.done ? '#F1F0ED' : '#EEF4EC'), border: '1px solid ' + (over ? '#FCA5A5' : (c.done ? '#E3E0DC' : '#CDE3C6')) }}>
-        {s && !hideSub && <div style={{ fontSize: 9, color: '#A29C95', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</div>}
+        title={(man ? '수동 체크리스트' : (s ? s.name : '')) + (c.owner ? ' · ' + c.owner : '') + (over && s ? ' · 마감일(' + s.due + ') 초과' : '')}
+        style={{ padding: '3px 6px', marginBottom: 3, borderRadius: 6, cursor: 'pointer', lineHeight: 1.3, background: bg, border: '1px solid ' + bd, borderLeft: man ? '3px solid #8B5CF6' : '1px solid ' + bd }}>
+        {man && !hideSub ? <div style={{ fontSize: 9, color: '#8B5CF6', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📌 수동</div> : (s && !hideSub && <div style={{ fontSize: 9, color: '#A29C95', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</div>)}
         <div style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5 }}>
           {over && <span style={{ color: '#DC2626', fontWeight: 800, flexShrink: 0 }}>⚠</span>}
           <span style={{ flexShrink: 0, width: 9, height: 9, borderRadius: '50%', border: '1.5px solid ' + (c.done ? '#1FA463' : '#B8B2AA'), background: c.done ? '#1FA463' : 'transparent' }} />
@@ -1101,8 +1107,16 @@ function TeamCalendar({ data, setData, onEdit }) {
   const groupChks = list => { const g = {}; list.forEach(c => { const sub = data.subplans.find(s => s.id === c.subplanId); const plan = sub ? data.plans.find(p => p.id === sub.planId) : null; const o = plan ? data.outputs.find(x => x.id === plan.outputId) : null; const oK = o ? outLabel(o) : '기타'; const pK = plan ? plan.name : '기타'; const sK = sub ? sub.name : '기타'; (((g[oK] = g[oK] || {})[pK] = g[oK][pK] || {})[sK] = g[oK][pK][sK] || []).push(c); }); return g; };
   const renderGrouped = list => {
     if (list.length === 0) return <div style={{ fontSize: 10, color: '#C4BEB6', padding: '2px 0' }}>없음</div>;
-    const g = groupChks(list);
-    return Object.keys(g).map(oK => (
+    const manual = list.filter(isManual); const linked = list.filter(c => !isManual(c));
+    const g = groupChks(linked);
+    return (<React.Fragment>
+      {manual.length > 0 && (
+      <div style={{ marginBottom: 7 }}>
+        <div style={{ fontSize: 10, fontWeight: 800, color: '#8B5CF6', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📌 수동 체크리스트</div>
+        <div style={{ marginLeft: 5, marginTop: 3 }}>{manual.map(c => chip(c, true))}</div>
+      </div>
+      )}
+      {Object.keys(g).map(oK => (
       <div key={oK} style={{ marginBottom: 7 }}>
         <div style={{ fontSize: 10, fontWeight: 800, color: G, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📁 {oK}</div>
         {Object.keys(g[oK]).map(pK => (
@@ -1117,7 +1131,8 @@ function TeamCalendar({ data, setData, onEdit }) {
           </div>
         ))}
       </div>
-    ));
+      ))}
+    </React.Fragment>);
   };
   return (
     <Card style={{ marginTop: 18 }}>
@@ -1154,6 +1169,12 @@ function TeamCalendar({ data, setData, onEdit }) {
       <div onDragOver={e => { e.preventDefault(); setDragOver('un'); }} onDragLeave={() => setDragOver(o => o === 'un' ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, ''); setDragOver(null); }}
         style={{ marginTop: 10, border: '1px dashed ' + (dragOver === 'un' ? '#93C5FD' : '#D5D2CE'), background: dragOver === 'un' ? '#EAF0FE' : '#FAFAF9', borderRadius: 8, padding: 8 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>📥 미배정 체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({undated.length}) — 날짜 칸으로 끌어 놓으세요</span></div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 9, background: '#F6F2FD', border: '1px solid #E4DAF7', borderRadius: 8, padding: '7px 9px' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#8B5CF6', flexShrink: 0 }}>📌 수동 추가</span>
+          <input value={newText} onChange={e => setNewText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addManual(); }} placeholder="세부계획·프로젝트 없이 체크리스트 추가" style={{ flex: 1, minWidth: 140, fontSize: 12, padding: '6px 8px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
+          <select value={newOwner} onChange={e => setNewOwner(e.target.value)} title="담당자" style={{ fontSize: 11, padding: '5px 7px', border: '1px solid #D8D3CC', borderRadius: 6, color: newOwner ? '#3A3631' : '#A29C95', background: 'white' }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
+          <button onClick={addManual} style={{ fontSize: 12, fontWeight: 700, padding: '6px 12px', borderRadius: 7, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer', flexShrink: 0 }}>+ 추가</button>
+        </div>
         {undated.length === 0 ? <div style={{ fontSize: 10.5, color: '#A29C95' }}>모든 체크리스트에 실행일이 지정되었습니다.</div> :
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
