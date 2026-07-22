@@ -191,6 +191,8 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
 }); };
 const won = n => (n || 0).toLocaleString() + '원';
 const weekKeyOf = dateStr => { const d = new Date(dateStr); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return d.toISOString().slice(0, 10); };
+const visitKeyOf = (mode, d) => mode === 'month' ? d.slice(0, 7) : (mode === 'week' ? weekKeyOf(d) : d);
+const visitBucketKeys = (dates, mode) => { const out = [], seen = {}; dates.forEach(d => { const k = visitKeyOf(mode, d); if (!seen[k]) { seen[k] = 1; out.push(k); } }); return out; };
 const itemTotal = b => b.vat === '별도' ? Math.round(b.amount * 1.1) : b.amount;
 const effDate = b => (b.status === '결제완료' && b.paidDate) ? b.paidDate : b.date;
 const effTotal = b => (b.status === '결제완료' && b.paidAmount != null && b.paidAmount !== '') ? Number(b.paidAmount) : itemTotal(b);
@@ -3670,16 +3672,189 @@ function TabKakao() {
   );
 }
 
+function VisitPathSection({ vd, vc, meta, data, setData, mode, vIdx, range }) {
+  const [showConv, setShowConv] = useState(false);
+  const [tip, setTip] = useState(null);
+  const [openL1, setOpenL1] = useState({});
+  const [rejId, setRejId] = useState(null);
+  const [rejReason, setRejReason] = useState('');
+  const num = n => (Math.round(Number(n) || 0)).toLocaleString();
+  const pctS = n => (Math.round((Number(n) || 0) * 10) / 10) + '%';
+  const won = n => (Math.round(Number(n) || 0)).toLocaleString() + '원';
+  const L1COLOR = { '네이버 광고': '#E08700', '네이버 검색': '#2D5FE0', '네이버 서비스': '#1FA463', '직유입': '#8B5CF6', '네이버 외부': '#E53935', '네이버 광고 외 마케팅채널': '#0EA5B7' };
+  const L1ORDER = ['네이버 광고', '네이버 검색', '네이버 서비스', '직유입', '네이버 외부', '네이버 광고 외 마케팅채널'];
+  const GROUPS = [['발견형', '#E08700', '안 찾았는데 광고 노출로 옴'], ['검색형(광고)', '#EAB308', '상품 키워드 검색→상단 쇼핑광고'], ['브랜드형', '#7C5CD6', '브랜드명 검색으로 옴'], ['검색형(자연)', '#2D5FE0', '검색·가격비교 자연 유입(무료)'], ['내부·재방문형', '#1FA463', '쇼핑·스토어 내부 이동/재방문'], ['외부', '#E53935', '인스타·페북 등 네이버 밖']];
+  const groupOf = (l1, l2, l3) => { const p = [l1, l2, l3].join(' '); if (l1 === '네이버 광고') { if (/브랜드검색/.test(p)) return '브랜드형'; if (/쇼핑검색/.test(p)) return '검색형(광고)'; return '발견형'; } if (l1 === '네이버 검색') return '검색형(자연)'; if (l1 === '네이버 서비스' || l1 === '직유입') return '내부·재방문형'; if (l1 === '네이버 외부' || l1 === '네이버 광고 외 마케팅채널') return '외부'; return '외부'; };
+  const tipOf = (l1, l2, l3) => { const p = [l1, l2, l3].join(' '); if (/자동성과최대화/.test(p)) return '네이버가 뉴스·피드 지면에 자동 노출한 우리 배너/피드 광고 클릭. 발견형(안 찾던 사람에 노출) — 유입 크고 전환 낮음.'; if (/디스플레이|ADVoost/.test(p)) return '네이버 피드·지면에 노출된 성과형 디스플레이 광고 클릭. 발견형 — 유입 크고 전환 낮음.'; if (/쇼핑검색/.test(p)) return '네이버쇼핑에서 상품 키워드를 검색해 상단 쇼핑광고를 클릭. 구매의도 높은 검색형(광고).'; if (/브랜드검색/.test(p)) return '브랜드명(예: 라이프밀)을 검색해 최상단 브랜드영역 광고로 유입. 브랜드형(인지도 있어야 발생).'; if (l1 === '네이버 검색' && /가격비교/.test(p)) return '통합검색 가격비교 영역에서 여러 판매처를 비교하다 우리를 선택. 자연(무료) 유입.'; if (l1 === '네이버 검색') return '네이버 검색·쇼핑에서의 자연(무료) 유입(통합검색·플러스스토어 검색 등).'; if (/네이버 페이/.test(p)) return '네이버페이 장바구니·결제내역을 통한 재진입 = 구매 임박.'; if (/스토어 내부/.test(p)) return '이미 우리 스토어 안에서 다른 상품·스토어홈으로 이동 = 교차구매 신호(전환 높음).'; if (/네이버플러스스토어/.test(p)) return '네이버쇼핑 홈·찜·최근 본 상품 등을 통한 탐색·재방문.'; if (l1 === '네이버 서비스') return '네이버쇼핑 서비스 면을 통한 유입(탐색·재방문).'; if (l1 === '직유입') return '주소 직접입력·즐겨찾기로 바로 옴 = 충성·재방문.'; if (/instagram|facebook|inpk/.test(p)) return '인스타·페북·인포크 링크 유입(도메인까지 잡힘, 게시물 단위는 nt 배포해야 보임).'; if (/criteo|buzzvil/.test(p)) return '크리테오·버즈빌 등 외부 리타겟·보상형 광고 유입.'; if (/foodqr/.test(p)) return '오프라인/QR 코드를 통한 유입.'; if (/hemily|hemilygroup/.test(p)) return '자사·그룹 사이트를 통한 유입.'; if (/톡톡/.test(p)) return '네이버 톡톡 상담을 거쳐 유입.'; if (l1 === '네이버 외부') return '네이버 밖(외부 사이트·앱)에서의 유입.'; if (l1 === '네이버 광고') return '네이버 광고 전체 — 디스플레이·자동성과최대화(발견형), 쇼핑검색광고(검색형), 브랜드검색광고(브랜드형)가 섞여 있어요. 하위 항목을 펼쳐 확인.'; if (l1 === '네이버 서비스') return '네이버쇼핑 서비스 면(플러스스토어·스토어 내부·네이버페이)을 통한 탐색·재방문.'; if (l1 === '네이버 광고 외 마케팅채널') return '네이버 톡톡 등 마케팅 채널을 경유한 유입.'; return '외부/기타 경로 유입.'; };
+  const RULES = { '발견형': { d1: { i: '광고 예산·소재가 일시적으로 줄었을 수 있어요.', a: '3일 지속되면 타겟 확장·소재 리프레시.' }, dP: { i: '신규 노출이 마르고 기존 타겟만 유입 → 성장 정체 위험.', a: '타겟 키워드 브랜드→제품→카테고리 확장, 자동 타겟확장 ON, 소재 A/B·리프레시, 예산 점검.' }, up: { i: '신규 노출이 확대됐어요.', a: '전환이 낮으면 소재·랜딩 품질 점검.' } }, '검색형(광고)': { down: { i: '노출순위·입찰이 밀렸거나 품질지수가 떨어졌을 수 있어요.', a: '상품 품질지수·입찰가·키워드 점검(품질지수가 입찰가보다 중요).' }, up: { i: '구매의도 검색 수요·노출이 강해졌어요.', a: '전환 동반 시 확대.' } }, '브랜드형': { d1: { i: '브랜드 검색이 일시 감소했어요.', a: '2주 지속되면 외부 브랜딩 점검.' }, dP: { i: '외부 브랜딩·인지도 둔화의 후행 신호.', a: '인스타·PR·콘텐츠 재점화 + 브랜드검색광고로 자사 고객 방어.' }, up: { i: '외부 브랜딩·바이럴이 검색으로 전환된 호신호.', a: '무엇이 올렸는지 역추적.' } }, '검색형(자연)': { down: { i: '상품 노출·검색순위 하락 또는 경쟁사 가격·리뷰 우위.', a: '상품명·태그·리뷰·가격 경쟁력 점검.' }, up: { i: '랭킹 개선 또는 시즌 수요.', a: '좋은 키워드·상품을 파악해 유지.' } }, '내부·재방문형': { down: { i: '재방문·재구매 동력이 약해졌어요.', a: 'CRM(카카오·알림·쿠폰) 재방문 유도, 장바구니 리마인드.' }, up: { i: '충성·재구매가 활발해요.', a: '신규가 안 늘고 이것만 오르면 기존 고객 의존을 경계.' } }, '외부': { down: { i: '외부 활동·광고가 축소됐거나 소재가 피로해졌어요.', a: '외부 캠페인·소재 점검.' }, up: { i: '외부 콘텐츠/광고가 유입을 견인했어요.', a: '어느 게시물·캠페인인지 확인(nt 배포 시 게시물 단위 식별), 잘 되는 소재 확대.' } } };
+  const CONV_RULE = { down: { i: '유입은 있는데 안 삼 = 저품질 유입 또는 상세·가격·리뷰·품절·옵션 문제.', a: '저전환 유입 채널 점검 + 상세·리뷰·가격·재고 점검.' }, up: { i: '유입 품질·설득력이 개선됐어요.', a: '유지 요인 파악.' } };
+  const AOV_RULE = { down: { i: '저가 상품 비중↑·할인 확대·세트 감소.', a: '세트·업셀·묶음 구성 점검.' } };
+  const ruleFor = (kind, g, dir, per) => { if (kind === 'conv') return CONV_RULE[dir]; if (kind === 'aov') return AOV_RULE.down; const R = RULES[g]; if (!R) return { i: '', a: '' }; if (dir === 'up') return R.up; if (R.dP) return per ? R.dP : R.d1; return R.down; };
+
+  const totalRows = vd.filter(r => r.path_l1 === '전체').slice().sort((a, b) => a.date < b.date ? -1 : 1);
+  const pathRows = vd.filter(r => r.path_l1 !== '전체');
+  const vDates = [...new Set(vd.map(r => r.date))].filter(Boolean).sort();
+  const baseDate = (meta && meta.extracted_at) || (vDates.length ? vDates[vDates.length - 1] : '');
+  const availMin = vDates[0] || '', availMax = vDates[vDates.length - 1] || '';
+  const mkeys = visitBucketKeys(vDates, mode === 'custom' ? 'day' : mode);
+  let curDates = [], priDates = [], curLabel = '', priCmp = '직전', ci = -1;
+  if (mode === 'custom') { const st = range.start || availMin, en = range.end || availMax; curDates = vDates.filter(d => d >= st && d <= en); const i0 = curDates.length ? vDates.indexOf(curDates[0]) : -1; priDates = i0 > 0 ? vDates.slice(Math.max(0, i0 - curDates.length), i0) : []; curLabel = (st ? st.slice(5) : '') + '~' + (en ? en.slice(5) : ''); priCmp = '직전 동기간'; ci = mkeys.length - 1; }
+  else { ci = mkeys.length - 1 - vIdx; const cK = mkeys[ci], pK = mkeys[ci - 1]; curDates = cK ? vDates.filter(d => visitKeyOf(mode, d) === cK) : []; priDates = pK ? vDates.filter(d => visitKeyOf(mode, d) === pK) : []; curLabel = mode === 'day' ? (cK || '').slice(5).replace('-', '/') : (mode === 'week' ? (cK ? cK.slice(5).replace('-', '/') + ' 주' : '') : (cK || '')); priCmp = mode === 'day' ? '전일' : (mode === 'week' ? '전주' : '전월'); }
+
+  const aggPaths = ds => { const S = new Set(ds); let total = 0, orders = 0; const byL1 = {}, byGroup = {}, paths = {}; pathRows.forEach(r => { if (!S.has(r.date)) return; const v = r.visits || 0, o = r.order_count || 0; total += v; orders += o; byL1[r.path_l1] = (byL1[r.path_l1] || 0) + v; const g = groupOf(r.path_l1, r.path_l2, r.path_l3); (byGroup[g] = byGroup[g] || { v: 0, o: 0 }); byGroup[g].v += v; byGroup[g].o += o; const pk = r.path_l1 + '|' + (r.path_l2 || '-') + '|' + (r.path_l3 || '-'); (paths[pk] = paths[pk] || { l1: r.path_l1, l2: r.path_l2 || '-', l3: r.path_l3 || '-', v: 0, o: 0 }); paths[pk].v += v; paths[pk].o += o; }); return { total: total, orders: orders, byL1: byL1, byGroup: byGroup, paths: paths, conv: total ? orders / total * 100 : 0 }; };
+  const cur = aggPaths(curDates), pri = aggPaths(priDates);
+  const hasPri = priDates.length > 0;
+  const gd = (cv, pv) => (!pv ? null : Math.round((cv - pv) / pv * 100));
+  const revIn = ds => { const S = new Set(ds); return totalRows.filter(r => S.has(r.date)).reduce((a, r) => a + (r.revenue || 0), 0); };
+  const curAov = cur.orders ? revIn(curDates) / cur.orders : 0, priAov = pri.orders ? revIn(priDates) / pri.orders : 0;
+
+  const pm = mode === 'custom' ? 'day' : mode;
+  const bg = {}; pathRows.forEach(r => { if (!vDates.includes(r.date)) return; const k = visitKeyOf(pm, r.date); (bg[k] = bg[k] || {}); const g = groupOf(r.path_l1, r.path_l2, r.path_l3); bg[k][g] = (bg[k][g] || 0) + (r.visits || 0); });
+  const persistOf = (g, dir) => { const need = (mode === 'week' || mode === 'month') ? 2 : 3; if (ci < need) return false; for (let i = ci - need + 1; i <= ci; i++) { const c = (bg[mkeys[i]] || {})[g] || 0, pv = (bg[mkeys[i - 1]] || {})[g] || 0; const dd = c - pv; if (dir === 'up' ? dd <= 0 : dd >= 0) return false; } return true; };
+
+  const insights = [];
+  GROUPS.forEach(gr => { const g = gr[0]; const cv = (cur.byGroup[g] || { v: 0 }).v, pv = (pri.byGroup[g] || { v: 0 }).v; if (hasPri && pv >= 25 && cv >= 12) { const d = Math.round((cv - pv) / pv * 100); if (Math.abs(d) >= 25) { const dir = d >= 0 ? 'up' : 'down'; const per = persistOf(g, dir); let drv = ''; if (g === '외부' && dir === 'up') { const subs = {}; const S = new Set(curDates); pathRows.forEach(r => { if (!S.has(r.date)) return; if (groupOf(r.path_l1, r.path_l2, r.path_l3) !== '외부') return; const kk = (r.path_l2 && r.path_l2 !== '-') ? r.path_l2 : r.path_l1; subs[kk] = (subs[kk] || 0) + (r.visits || 0); }); const top = Object.keys(subs).sort((a, b) => subs[b] - subs[a])[0]; if (top) drv = ' (' + String(top).replace('.com', '').replace('instagram', '인스타') + ' 주도)'; } const rl = ruleFor('grp', g, dir, per); insights.push({ id: 'grp:' + g, grp: true, title: priCmp + ' 대비 ' + g + ' 유입 ' + (d >= 0 ? '+' : '') + d + '%' + drv, per: per, interp: rl.i, action: rl.a, mag: Math.abs(d) * Math.log(cv + 1) }); } } });
+  if (hasPri) { const cc = cur.conv, pc = pri.conv; if (Math.abs(cc - pc) >= 3) { const dir = cc >= pc ? 'up' : 'down'; const rl = CONV_RULE[dir]; insights.push({ id: 'conv:전체', grp: false, title: '구매전환율 ' + (dir === 'up' ? '상승' : '하락') + ' ' + pctS(pc) + '→' + pctS(cc), per: false, interp: rl.i, action: rl.a, mag: Math.abs(cc - pc) * 12 }); } }
+  if (hasPri && priAov > 0) { const d = Math.round((curAov - priAov) / priAov * 100); if (d <= -15) { insights.push({ id: 'aov:전체', grp: false, title: '객단가 하락 ' + d + '% (' + won(priAov) + '→' + won(curAov) + ')', per: false, interp: AOV_RULE.down.i, action: AOV_RULE.down.a, mag: Math.abs(d) * 8 }); } }
+  insights.sort((a, b) => b.mag - a.mag);
+  const topIns = insights.slice(0, 5);
+  const feedback = (data && data.insightFeedback) || {};
+  const setFb = (id, verdict, reason, text) => setData(d => ({ ...d, insightFeedback: { ...(d.insightFeedback || {}), [id]: { verdict: verdict, reason: reason || '', period: curLabel, text: text || '', ts: Date.now() } } }));
+  const visIns = topIns.filter(x => (feedback[x.id] || {}).verdict !== 'rejected');
+  const rejCnt = topIns.filter(x => (feedback[x.id] || {}).verdict === 'rejected').length;
+
+  const chMode = mode === 'custom' ? 'day' : mode;
+  const chDates = mode === 'custom' ? curDates : vDates;
+  const bmap = {}; const cset = new Set(chDates);
+  totalRows.forEach(r => { if (!cset.has(r.date)) return; const k = visitKeyOf(chMode, r.date); (bmap[k] = bmap[k] || { key: k, total: 0, orders: 0, l1v: {} }); bmap[k].total += r.visits || 0; bmap[k].orders += r.order_count || 0; });
+  pathRows.forEach(r => { if (!cset.has(r.date)) return; const k = visitKeyOf(chMode, r.date); if (!bmap[k]) return; bmap[k].l1v[r.path_l1] = (bmap[k].l1v[r.path_l1] || 0) + (r.visits || 0); });
+  const buckets = Object.values(bmap).sort((a, b) => a.key < b.key ? -1 : 1);
+  const maxV = Math.max(1, ...buckets.map(b => b.total));
+  const maxConv = Math.max(1, ...buckets.map(b => b.total ? b.orders / b.total * 100 : 0));
+  const bw = chMode === 'day' ? 22 : 46, gap = 6, padL = 10, padB = 22, padT = 10, H = 190;
+  const W = Math.max(320, padL * 2 + buckets.length * (bw + gap));
+  const blab = k => chMode === 'day' ? k.slice(5).replace('-', '/') : (chMode === 'month' ? k.slice(2) : k.slice(-5));
+
+  const top3 = Object.values(cur.paths).sort((a, b) => b.v - a.v).slice(0, 3);
+  const tree = {}; Object.values(cur.paths).forEach(pp => { const T = tree[pp.l1] = tree[pp.l1] || { v: 0, o: 0, ch: {} }; T.v += pp.v; T.o += pp.o; const ck = pp.l2 + ' ▸ ' + pp.l3; const C = T.ch[ck] = T.ch[ck] || { l2: pp.l2, l3: pp.l3, v: 0, o: 0 }; C.v += pp.v; C.o += pp.o; });
+  const l1rows = Object.keys(tree).map(l1 => ({ l1: l1, v: tree[l1].v, o: tree[l1].o, kids: Object.values(tree[l1].ch).sort((a, b) => b.v - a.v) })).sort((a, b) => b.v - a.v);
+  const vcTot = vc.find(r => r.path_l1 === '전체') || null;
+  const periodVisits = totalRows.reduce((a, r) => a + (r.visits || 0), 0);
+  const periodOrders = totalRows.reduce((a, r) => a + (r.order_count || 0), 0);
+  const periodLabel = vcTot ? vcTot.date_or_period : (vDates.length ? vDates[0] + '~' + vDates[vDates.length - 1] : '');
+  const th = { textAlign: 'left', fontSize: 10.5, fontWeight: 700, color: '#8A8580', padding: '6px 8px', borderBottom: '1.5px solid #E3E0DC', whiteSpace: 'nowrap' };
+  const td = { fontSize: 11.5, color: '#3A3631', padding: '5px 8px', borderBottom: '1px solid #F0EEEB', whiteSpace: 'nowrap' };
+  const tdR = { ...td, textAlign: 'right' };
+  const Sub = ({ n, t, d }) => <div style={{ marginBottom: 8, marginTop: 4 }}><div style={{ fontSize: 13, fontWeight: 800, color: G }}>{n}. {t}</div>{d ? <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 1, lineHeight: 1.5 }}>{d}</div> : null}</div>;
+  const gTot = GROUPS.reduce((a, gr) => a + ((cur.byGroup[gr[0]] || { v: 0 }).v), 0) || 1;
+
+  return (
+    <Card style={{ marginBottom: 16, borderTop: '3px solid #2D5FE0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: '#1A1614' }}>🧭 일별 유입·경로 해석</div>
+        <span style={{ fontSize: 10.5, fontWeight: 700, color: '#2D5FE0', background: '#EFF6FF', borderRadius: 5, padding: '2px 7px' }}>방문 인사이트</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#A29C95' }}>선택 {curLabel || '전체'} · 비교 {priCmp} · 기준일 {baseDate}</span>
+      </div>
+      <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 12, lineHeight: 1.5 }}>기간은 위 헤더 컨트롤로 조절합니다. <b style={{ color: '#B45309' }}>방문수는 전체채널 '유입수'·매출과 다른 축</b>(매출은 매출 탭).</div>
+
+      <Sub n="1" t="주요 인사이트" d={priCmp + ' 대비 큰 변화를 자동 추출 · 해석·실행방향 포함 · 카드마다 승인/반려(다음 생성 학습)'} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 8, marginBottom: 8 }}>
+        {!hasPri ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>비교할 직전 기간이 없어요.</div> : visIns.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>{priCmp} 대비 큰 변화가 없어요(안정적).</div> : visIns.map(ins => { const fb = feedback[ins.id] || {}; const appr = fb.verdict === 'approved'; return (
+          <div key={ins.id} style={{ border: '1px solid ' + (appr ? '#A7F3D0' : '#E3E0DC'), background: appr ? '#F4FBF7' : 'white', borderRadius: 10, padding: '10px 12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}><div style={{ fontSize: 12.5, fontWeight: 800, color: '#1A1614', flex: 1, minWidth: 0, lineHeight: 1.4 }}>💡 {ins.title}</div>{ins.grp ? <span style={{ fontSize: 9, fontWeight: 800, borderRadius: 4, padding: '1px 6px', color: ins.per ? '#B45309' : '#8A8580', background: ins.per ? '#FEF3C7' : '#F0EEEB' }}>{ins.per ? '지속' : '일시'}</span> : null}</div>
+            <div style={{ fontSize: 11, color: '#3A3631', marginTop: 5, lineHeight: 1.5 }}>{ins.interp}</div>
+            <div style={{ fontSize: 11, color: '#1E3A8A', background: '#EFF6FF', borderRadius: 6, padding: '5px 8px', marginTop: 5, lineHeight: 1.5 }}>▶ 실행: {ins.action}</div>
+            {rejId === ins.id ? <div style={{ marginTop: 8 }}><input value={rejReason} onChange={e => setRejReason(e.target.value)} placeholder="반려 사유 (예: 계절성/일시적)" style={{ width: '100%', boxSizing: 'border-box', fontSize: 11.5, padding: '6px 8px', border: '1px solid #E3E0DC', borderRadius: 7 }} /><div style={{ display: 'flex', gap: 6, marginTop: 6 }}><button onClick={() => { setFb(ins.id, 'rejected', rejReason, ins.title); setRejId(null); setRejReason(''); }} style={{ fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 6, border: 'none', background: '#E53935', color: 'white', cursor: 'pointer' }}>반려 저장</button><button onClick={() => { setRejId(null); setRejReason(''); }} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer' }}>취소</button></div></div> : <div style={{ display: 'flex', gap: 6, marginTop: 8, alignItems: 'center' }}>{appr ? <span style={{ fontSize: 10.5, fontWeight: 700, color: '#1FA463' }}>✓ 승인됨</span> : <button onClick={() => setFb(ins.id, 'approved', '', ins.title)} style={{ fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 6, border: '1px solid #A7F3D0', background: '#ECFDF5', color: '#1FA463', cursor: 'pointer' }}>승인</button>}<button onClick={() => { setRejId(ins.id); setRejReason(''); }} style={{ fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#E53935', cursor: 'pointer' }}>반려</button></div>}
+          </div>
+        ); })}
+      </div>
+      {rejCnt > 0 ? <div style={{ fontSize: 10.5, color: '#A29C95', marginBottom: 14 }}>🚫 반려 {rejCnt}건 저장됨 — 다음 데이터 업로드 시 인사이트 생성기가 억제·보정합니다.</div> : <div style={{ marginBottom: 14 }} />}
+
+      <Sub n="2" t="방문 요약 (경로 중심)" d={'선택 기간(' + (curLabel || '전체') + ') 기준 · 매출 지표는 매출 탭 참고'} />
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
+        <div style={{ flex: '1 1 220px', border: '1px solid #EDEBE7', borderRadius: 10, padding: '10px 12px' }}>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A8580', marginBottom: 6 }}>유입 Top 경로 3</div>
+          {top3.length === 0 ? <div style={{ fontSize: 11, color: '#A29C95' }}>없음</div> : top3.map((r, i) => <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5, fontSize: 11.5 }}><span style={{ fontWeight: 800, color: G, width: 14 }}>{i + 1}</span><span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#3A3631' }}>{r.l1}{r.l2 && r.l2 !== '-' ? ' ▸ ' + r.l2 : ''}{r.l3 && r.l3 !== '-' ? ' ▸ ' + r.l3 : ''}</span><span style={{ fontWeight: 700 }}>{num(r.v)}</span><span style={{ color: '#A29C95', fontSize: 10 }}>{pctS(cur.total ? r.v / cur.total * 100 : 0)}</span></div>)}
+        </div>
+        <div style={{ flex: '1 1 220px', border: '1px solid #EDEBE7', borderRadius: 10, padding: '10px 12px' }}>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A8580', marginBottom: 6 }}>유입 성격 분포</div>
+          <div style={{ display: 'flex', height: 16, borderRadius: 5, overflow: 'hidden', border: '1px solid #EDEBE7' }}>{GROUPS.map(gr => { const v = (cur.byGroup[gr[0]] || { v: 0 }).v; const w = v / gTot * 100; return w > 0 ? <div key={gr[0]} title={gr[0] + ' ' + num(v)} style={{ width: w + '%', background: gr[1] }} /> : null; })}</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 7 }}>{GROUPS.filter(gr => (cur.byGroup[gr[0]] || { v: 0 }).v > 0).map(gr => <span key={gr[0]} style={{ fontSize: 9.5, color: '#6E6863', display: 'inline-flex', alignItems: 'center', gap: 3 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: gr[1] }} />{gr[0]}</span>)}</div>
+        </div>
+        <div style={{ flex: '1 1 130px', border: '1px solid #EDEBE7', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A8580', marginBottom: 6 }}>구매전환율</div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: G }}>{pctS(cur.conv)}</div>
+          <div style={{ fontSize: 10.5, marginTop: 2 }}>{hasPri ? (() => { const d = gd(cur.conv, pri.conv); return d == null ? null : <span style={{ fontWeight: 700, color: d >= 0 ? '#1FA463' : '#DC2626' }}>{d >= 0 ? '▲' : '▼'} {Math.abs(d)}% <span style={{ color: '#A29C95', fontWeight: 400 }}>vs {priCmp}</span></span>; })() : null}</div>
+        </div>
+      </div>
+
+      <Sub n="3" t="일별 유입 추이" d="방문수를 유입 경로(대분류)별로 쌓아서 봅니다 · 전환율 라인 토글" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        <button onClick={() => setShowConv(!showConv)} style={{ fontSize: 11, fontWeight: 700, padding: '5px 11px', borderRadius: 7, border: '1px solid ' + (showConv ? '#1A1614' : '#E3E0DC'), background: showConv ? '#1A1614' : 'white', color: showConv ? 'white' : '#6E6863', cursor: 'pointer' }}>전환율 라인</button>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, flexWrap: 'wrap' }}>{L1ORDER.filter(l1 => buckets.some(b => b.l1v[l1])).map(l1 => <span key={l1} style={{ fontSize: 10, color: '#6E6863', display: 'inline-flex', alignItems: 'center', gap: 3 }}><span style={{ width: 9, height: 9, borderRadius: 2, background: L1COLOR[l1] }} />{l1}</span>)}</div>
+      </div>
+      <div style={{ overflowX: 'auto', marginBottom: 16 }}>
+        <svg width={W} height={H} style={{ display: 'block' }}>
+          {buckets.map((b, i) => { const x = padL + i * (bw + gap); let yAcc = H - padB; return (<g key={b.key}>{L1ORDER.map(l1 => { const v = b.l1v[l1] || 0; if (!v) return null; const h = (v / maxV) * (H - padB - padT); yAcc -= h; return <rect key={l1} x={x} y={yAcc} width={bw} height={Math.max(0, h)} fill={L1COLOR[l1] || '#CBC4BA'} />; })}<text x={x + bw / 2} y={H - padB + 12} textAnchor="middle" fontSize="8" fill="#A29C95">{blab(b.key)}</text></g>); })}
+          {showConv ? <polyline fill="none" stroke="#1A1614" strokeWidth="1.5" points={buckets.map((b, i) => { const x = padL + i * (bw + gap) + bw / 2; const cv = b.total ? b.orders / b.total * 100 : 0; const y = padT + (1 - cv / maxConv) * (H - padB - padT); return x + ',' + y; }).join(' ')} /> : null}
+          {showConv ? buckets.map((b, i) => { const x = padL + i * (bw + gap) + bw / 2; const cv = b.total ? b.orders / b.total * 100 : 0; const y = padT + (1 - cv / maxConv) * (H - padB - padT); return <circle key={'c' + b.key} cx={x} cy={y} r="2.2" fill="#1A1614" />; }) : null}
+        </svg>
+      </div>
+
+      <Sub n="4" t="경로별 성과" d={'선택 기간(' + (curLabel || '전체') + ') · 대분류 ▸ 중·소분류. 경로 옆 ❓로 뜻 확인.'} />
+      {tip ? <div style={{ fontSize: 11.5, color: '#1E3A8A', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, padding: '8px 11px', marginBottom: 8, lineHeight: 1.5 }}>💡 <b>{tip.name}</b> — {tip.text} <span onClick={() => setTip(null)} style={{ marginLeft: 6, cursor: 'pointer', color: '#6E6863' }}>✕</span></div> : null}
+      <div style={{ overflowX: 'auto', marginBottom: 16 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 460 }}>
+          <thead><tr><th style={th}>경로</th><th style={{ ...th, textAlign: 'right' }}>방문수</th><th style={{ ...th, textAlign: 'right' }}>전환율</th><th style={{ ...th, textAlign: 'right' }}>결제건</th></tr></thead>
+          <tbody>{l1rows.map(R => { const open = !!openL1[R.l1]; return [
+            <tr key={R.l1} style={{ background: '#FAFAF9' }}>
+              <td style={{ ...td, fontWeight: 700 }}><span onClick={() => setOpenL1(o => ({ ...o, [R.l1]: !o[R.l1] }))} style={{ cursor: 'pointer' }}><span style={{ color: '#A29C95', marginRight: 4 }}>{open ? '▾' : '▸'}</span><span style={{ display: 'inline-block', width: 9, height: 9, borderRadius: 2, background: L1COLOR[R.l1] || '#CBC4BA', marginRight: 5 }} />{R.l1}</span><span onClick={() => setTip({ name: R.l1, text: tipOf(R.l1, '', '') })} style={{ cursor: 'pointer', color: '#2D5FE0', marginLeft: 5, fontSize: 11 }}>❓</span></td>
+              <td style={tdR}>{num(R.v)}</td><td style={tdR}>{pctS(R.v ? R.o / R.v * 100 : 0)}</td><td style={tdR}>{num(R.o)}</td>
+            </tr>
+          ].concat(open ? R.kids.map((k, ki) => <tr key={R.l1 + '~' + ki}>
+              <td style={{ ...td, paddingLeft: 22, color: '#6E6863' }}>{k.l2}{k.l3 && k.l3 !== '-' ? ' ▸ ' + k.l3 : ''}<span onClick={() => setTip({ name: R.l1 + ' ▸ ' + k.l2 + (k.l3 && k.l3 !== '-' ? ' ▸ ' + k.l3 : ''), text: tipOf(R.l1, k.l2, k.l3) })} style={{ cursor: 'pointer', color: '#2D5FE0', marginLeft: 5, fontSize: 10.5 }}>❓</span></td>
+              <td style={tdR}>{num(k.v)}</td><td style={tdR}>{pctS(k.v ? k.o / k.v * 100 : 0)}</td><td style={tdR}>{num(k.o)}</td>
+            </tr>) : []); })}</tbody>
+        </table>
+      </div>
+
+      <Sub n="5" t="유입 성격 요약" d={'선택 기간(' + (curLabel || '전체') + ') · 6가지 성격 · ' + priCmp + ' 대비 증감'} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 8, marginBottom: 16 }}>
+        {GROUPS.map(gr => { const c = cur.byGroup[gr[0]] || { v: 0, o: 0 }; const pv = (pri.byGroup[gr[0]] || { v: 0 }).v; const conv = c.v ? c.o / c.v * 100 : 0; const d = hasPri ? gd(c.v, pv) : null; return <div key={gr[0]} style={{ border: '1px solid #EDEBE7', borderLeft: '4px solid ' + gr[1], borderRadius: 9, padding: '9px 11px' }}><div style={{ fontSize: 12, fontWeight: 800, color: gr[1] }}>{gr[0]}</div><div style={{ fontSize: 9, color: '#A29C95', margin: '1px 0 5px', lineHeight: 1.35, minHeight: 22 }}>{gr[2]}</div><div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}><div style={{ fontSize: 15, fontWeight: 800, color: G }}>{num(c.v)}</div><div style={{ fontSize: 9, color: '#6E6863' }}>방문</div>{d == null ? null : <div style={{ fontSize: 10, fontWeight: 700, marginLeft: 'auto', color: d >= 0 ? '#1FA463' : '#DC2626' }}>{d >= 0 ? '▲' : '▼'}{Math.abs(d)}%</div>}</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>전환 {pctS(conv)} · 결제 {num(c.o)}</div></div>; })}
+      </div>
+
+      {vcTot ? <React.Fragment>
+        <Sub n="6" t="고객 요약 (기간합계·보조)" d={'순인원 기준 · ' + periodLabel + ' · 고객수는 전체만 신뢰(경로별 합산 금지)'} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(110px,1fr))', gap: 8 }}>
+          {[['순방문', num(vcTot.visitors) + '명'], ['순구매', num(vcTot.buyers) + '명'], ['1인당 방문', (vcTot.visitors ? Math.round(periodVisits / vcTot.visitors * 10) / 10 : 0) + '회'], ['재구매(주문/구매자)', (vcTot.buyers ? Math.round(periodOrders / vcTot.buyers * 100) / 100 : 0) + '회'], ['객단가', won(vcTot.aov)]].map((c, i) => <div key={i} style={{ background: '#F5F8FE', border: '1px solid #DBE7FA', borderRadius: 9, padding: '9px 10px' }}><div style={{ fontSize: 10, color: '#6E6863', marginBottom: 2 }}>{c[0]}</div><div style={{ fontSize: 15, fontWeight: 800, color: '#2D5FE0' }}>{c[1]}</div></div>)}
+        </div>
+      </React.Fragment> : null}
+    </Card>
+  );
+}
+
 function TabChannel({ data, setData }) {
   const [raw, setRaw] = useState(null);
   const [status, setStatus] = useState('loading');
-  const [metric, setMetric] = useState('a14');
+  const metric = 'a14';
+  const [vMode, setVMode] = useState('day');
+  const [vIdx, setVIdx] = useState(0);
+  const [vRange, setVRange] = useState({ start: '', end: '' });
   useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/channel-tracking.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && (Array.isArray(j.rows) || (j.reports && typeof j.reports === 'object') || Array.isArray(j.channel_daily) || Array.isArray(j.custom_channel_daily) || Array.isArray(j.product_channel_daily))) { setRaw(j); setStatus('ok'); } else setStatus('none'); }).catch(() => { if (alive) setStatus('none'); }); return () => { alive = false; }; }, []);
   const _rows = (raw && Array.isArray(raw.rows)) ? raw.rows : [];
   const _byType = t => ((raw && raw.report_type === t) ? _rows : []);
   const _rep = (raw && raw.reports) || {};
   const chD = (raw && raw.channel_daily) || (Array.isArray(_rep.full_channel) ? _rep.full_channel : null) || _byType('full_channel') || [], cuD = (raw && raw.custom_channel_daily) || (Array.isArray(_rep.custom_channel) ? _rep.custom_channel : null) || _byType('custom_channel') || [], prD = (raw && raw.product_channel_daily) || (Array.isArray(_rep.product_channel) ? _rep.product_channel : null) || _byType('product_channel') || [];
   const meta = (raw && raw.meta) || {};
+  const vdAll = Array.isArray(_rep.visit_daily) ? _rep.visit_daily : [];
+  const vcAll = Array.isArray(_rep.visit_customer_daily) ? _rep.visit_customer_daily : [];
+  const vDatesAll = [...new Set(vdAll.map(r => r.date))].filter(Boolean).sort();
+  const vKeys = visitBucketKeys(vDatesAll, vMode === 'custom' ? 'day' : vMode);
+  const vCurKey = vKeys[vKeys.length - 1 - vIdx] || '';
+  const vNavDate = vMode === 'month' ? (vDatesAll.filter(d => d.slice(0, 7) === vCurKey)[0] || vCurKey) : vCurKey;
+  const vCurLabel = vMode === 'month' ? vCurKey : (vMode === 'week' ? (vCurKey ? vCurKey.slice(5).replace('-', '/') + ' 주' : '') : (vCurKey ? vCurKey.slice(5).replace('-', '/') : ''));
+  const vPriCmp = vMode === 'day' ? '전일' : (vMode === 'week' ? '전주' : (vMode === 'month' ? '전월' : '직전 동기간'));
+  const vNavTo = ds => { if (!ds) return; const k = visitKeyOf(vMode === 'custom' ? 'day' : vMode, ds); const ix = vKeys.indexOf(k); if (ix >= 0) setVIdx(vKeys.length - 1 - ix); };
   const extractedAt = meta.extracted_at || (raw && (raw.data_loaded_at || raw.extracted_at)) || '';
   const OC = metric === 'a14' ? 'a14_order_count' : 'lc_order_count', REV = metric === 'a14' ? 'a14_revenue' : 'lc_revenue';
   const won = n => (Math.round(Number(n) || 0)).toLocaleString() + '원', num = n => (Math.round(Number(n) || 0)).toLocaleString(), pctS = n => (Math.round((Number(n) || 0) * 1000) / 10) + '%';
@@ -3734,12 +3909,19 @@ function TabChannel({ data, setData }) {
     <div style={{ padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: '#1A1614' }}>🔎 네이버 채널 추적</div>
-        <div style={{ display: 'flex', gap: 2, background: '#EFEDEA', borderRadius: 9, padding: 3 }}>
-          {[['a14', '+14일 기여'], ['lc', '마지막클릭']].map(([v, l]) => <button key={v} onClick={() => setMetric(v)} style={{ fontSize: 11.5, fontWeight: 700, padding: '5px 11px', borderRadius: 7, border: 'none', cursor: 'pointer', background: metric === v ? 'white' : 'transparent', color: metric === v ? G : '#8A8580', boxShadow: metric === v ? '0 1px 3px rgba(0,0,0,0.08)' : 'none' }}>{l}</button>)}
-        </div>
         {extractedAt ? <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#A29C95' }}>추출일 {extractedAt}</span> : null}
       </div>
-      <div style={{ fontSize: 11.5, color: '#6E6863', marginBottom: 10, lineHeight: 1.5 }}>어느 채널·경로로 유입되어 매출로 이어지는지 추적. 주 지표는 <b>+14일 기여도(a14)</b>, 마지막클릭(lc)은 토글로 분리. <span style={{ color: '#B45309' }}>기간이 최근 14일과 겹치면 <b>잠정</b>.</span></div>
+      {vdAll.length > 0 ? <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8, background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 10, padding: '8px 10px' }}>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>{[['day', '일간'], ['week', '주간'], ['month', '월간'], ['custom', '기간선택']].map(mm => <button key={mm[0]} onClick={() => { setVMode(mm[0]); setVIdx(0); }} style={{ fontSize: 12, fontWeight: 700, padding: '6px 13px', borderRadius: 8, border: 'none', cursor: 'pointer', background: vMode === mm[0] ? G : '#E3E0DC', color: vMode === mm[0] ? 'white' : '#6E6863' }}>{mm[1]}</button>)}</div>
+        {vMode !== 'custom' ? <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <button onClick={() => setVIdx(x => x + 1)} disabled={vKeys.length - 1 - vIdx <= 0} style={{ width: 28, height: 28, borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', cursor: (vKeys.length - 1 - vIdx <= 0) ? 'default' : 'pointer', opacity: (vKeys.length - 1 - vIdx <= 0) ? 0.4 : 1, color: '#3A3631' }}>◀</button>
+          <input type="date" value={vNavDate} min={vDatesAll[0]} max={vDatesAll[vDatesAll.length - 1]} onChange={e => vNavTo(e.target.value)} style={{ padding: '5px 8px', border: '1px solid #D8D3CC', borderRadius: 7, fontSize: 11.5 }} />
+          <button onClick={() => setVIdx(x => Math.max(0, x - 1))} disabled={vIdx <= 0} style={{ width: 28, height: 28, borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', cursor: vIdx <= 0 ? 'default' : 'pointer', opacity: vIdx <= 0 ? 0.4 : 1, color: '#3A3631' }}>▶</button>
+          <span style={{ fontSize: 12, fontWeight: 700, color: G }}>{vCurLabel}</span>{vIdx === 0 ? <span style={{ fontSize: 9.5, color: '#A29C95' }}>최신</span> : null}
+        </div> : <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}><input type="date" value={vRange.start} min={vDatesAll[0]} max={vRange.end || vDatesAll[vDatesAll.length - 1]} onChange={e => setVRange(st => ({ ...st, start: e.target.value }))} style={{ padding: '5px 8px', border: '1px solid #D8D3CC', borderRadius: 7, fontSize: 11.5 }} /><span style={{ color: '#A29C95' }}>~</span><input type="date" value={vRange.end} min={vRange.start || vDatesAll[0]} max={vDatesAll[vDatesAll.length - 1]} onChange={e => setVRange(st => ({ ...st, end: e.target.value }))} style={{ padding: '5px 8px', border: '1px solid #D8D3CC', borderRadius: 7, fontSize: 11.5 }} /></div>}
+        <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#6E6863' }}>방문 인사이트 기간 · 비교 {vPriCmp}</span>
+      </div> : null}
+      <div style={{ fontSize: 11.5, color: '#6E6863', marginBottom: 10, lineHeight: 1.5 }}>어느 경로로 방문·유입되는지 추적. 위 기간 컨트롤은 <b>방문 인사이트</b> 기준이며, 채널별 성과표는 <b>+14일 기여도</b>로 고정 표시돼요. <span style={{ color: '#B45309' }}>기간이 최근 14일과 겹치면 <b>잠정</b>.</span></div>
       {status === 'ok' && curP ? <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 11.5, background: '#F5F4F2', border: '1px solid #EDEBE7', borderRadius: 9, padding: '9px 12px', marginBottom: 14 }}>
         <span style={{ fontWeight: 700, color: G }}>비교 기간</span>
         <span style={{ fontWeight: 700 }}>{curP.label}</span>{curP.start ? <span style={{ color: '#8A8580' }}>({curP.start}~{curP.end})</span> : null}{curP.prov ? <span style={{ fontSize: 9.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 4, padding: '1px 5px' }}>잠정</span> : null}
@@ -3750,6 +3932,7 @@ function TabChannel({ data, setData }) {
       {status === 'loading' && <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div>}
       {status === 'none' && <div style={{ fontSize: 12.5, color: '#A29C95', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 10, padding: '14px 16px', marginBottom: 14 }}>아직 채널 추적 데이터가 없습니다 — 매출·분석 허브가 <b>data/channel-tracking.json</b>(channel_daily · custom_channel_daily · product_channel_daily)을 push하면 아래 섹션이 자동으로 채워집니다. <b>현재는 골격(빈 상태)</b>입니다.</div>}
 
+      {vdAll.length > 0 ? <VisitPathSection vd={vdAll} vc={vcAll} meta={meta} data={data} setData={setData} mode={vMode} vIdx={vIdx} range={vRange} /> : null}
       <Sec title="0. 추적 정확도 (진단)" desc="유입이 어느 채널인지 얼마나 식별되는지 — 추적이 새는지 한눈에.">
         {chD.length === 0 ? <Empty what="채널 유입 데이터 없음" /> : (
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -3760,15 +3943,7 @@ function TabChannel({ data, setData }) {
         )}
       </Sec>
 
-      <Sec title="1. 주간 요약 KPI" desc="기간 스냅샷 비교 (위 비교 기간 기준) · 광고비·ROAS는 이후 단계">
-        {chD.length === 0 ? <Empty what="유입 데이터 없음" /> : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 10 }}>
-            {[{ l: '전체 유입수', v: num(k1.visit), d: delta(k1.visit, k0.visit) }, { l: '기여 결제금액', v: won(k1.rev), d: delta(k1.rev, k0.rev), sub: metric === 'a14' ? '+14일' : 'lc' }, { l: '유입당 결제율', v: k1.visit ? pctS(k1.ord / k1.visit) : '—', d: delta(k1.visit ? k1.ord / k1.visit : 0, k0.visit ? k0.ord / k0.visit : 0) }, { l: '유입당 결제금액', v: k1.visit ? won(k1.rev / k1.visit) : '—', d: delta(k1.visit ? k1.rev / k1.visit : 0, k0.visit ? k0.rev / k0.visit : 0) }, { l: '광고비', v: k1.spend ? won(k1.spend) : '준비중', d: null, muted: !k1.spend }, { l: 'ROAS', v: k1.spend ? pctS(k1.rev / k1.spend) : '준비중', d: null, muted: !k1.spend }].map((c, i) => <div key={i}>{kpiBox(c)}</div>)}
-          </div>
-        )}
-      </Sec>
-
-      <Sec title="2. 채널별 성과표" desc="네이버 기본 채널 + 사용자정의 · 원본 채널명 보존">
+      <Sec title="2. 채널별 성과표" desc="네이버 기본 채널 + 사용자정의 · 원본 채널명 보존 · +14일 기여도 기준(고정)">
         {chanRows.length === 0 ? <Empty what="채널 데이터 없음" /> : (
           <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 620 }}><thead><tr><th style={th}>채널</th><th style={{ ...th, textAlign: 'right' }}>유입수</th><th style={{ ...th, textAlign: 'right' }}>증감</th><th style={{ ...th, textAlign: 'right' }}>결제금액</th><th style={{ ...th, textAlign: 'right' }}>증감</th><th style={{ ...th, textAlign: 'right' }}>전환율</th><th style={{ ...th, textAlign: 'right' }}>유입당매출</th></tr></thead><tbody>{chanRows.map((r, i) => <tr key={i}><td style={td}>{r.k}{r.l1 ? <span style={{ fontSize: 9, color: '#A29C95', marginLeft: 4 }}>{r.l1}</span> : null}</td><td style={tdR}>{num(r.visit)}</td><td style={tdR}><DChip v={r.dvisit} /></td><td style={tdR}>{won(r.rv)}</td><td style={tdR}><DChip v={r.drev} /></td><td style={tdR}>{pctS(r.cvr)}</td><td style={tdR}>{won(r.rpv)}</td></tr>)}</tbody></table></div>
         )}
@@ -3780,11 +3955,12 @@ function TabChannel({ data, setData }) {
         )}
       </Sec>
 
-      <Sec title="4. 상품별 성과" desc="상품·상품군별 결제수·결제금액·구매자수 · 월 누적(MTD) 기준이라 상단 주간 비교와 기간이 다름 · 판매분석 확정매출(마케팅분석 채널 기여매출과 다른 축)">
-        {prRows.length === 0 ? <Empty what="상품별 데이터 없음" /> : (<React.Fragment>
-          {prodLabel ? <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', border: '1px solid #EDEBE7', borderRadius: 7, padding: '5px 10px', marginBottom: 10 }}>📅 {prodLabel}{prodP && prodP.role === 'product_mtd' ? <span style={{ fontWeight: 600, color: '#A29C95' }}>· 월 누적</span> : null}</div> : null}
-          <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}><thead><tr><th style={th}>상품</th><th style={th}>상품군</th><th style={{ ...th, textAlign: 'right' }}>결제수</th><th style={{ ...th, textAlign: 'right' }}>결제금액</th><th style={{ ...th, textAlign: 'right' }}>구매자수</th></tr></thead><tbody>{prRows.map((r, i) => <tr key={i}><td style={{ ...td, whiteSpace: 'normal', maxWidth: 300, lineHeight: 1.4 }}>{r.product}{r.line ? <span style={{ fontSize: 9.5, color: '#A29C95', marginLeft: 4 }}>{r.line}</span> : null}</td><td style={td}>{r.group || '—'}</td><td style={tdR}>{num(r.ord)}</td><td style={tdR}>{won(r.rv)}</td><td style={tdR}>{num(r.buyers)}</td></tr>)}</tbody></table></div>
-        </React.Fragment>)}
+      <Sec title="4. 키워드 성과관리" desc="네이버 검색 리포트(키워드별 노출·클릭·전환·순위) 연동 예정">
+        <div style={{ fontSize: 12, color: '#A29C95', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 8, padding: '16px', textAlign: 'center', lineHeight: 1.6 }}>
+          <div style={{ fontSize: 26, marginBottom: 6 }}>🔑</div>
+          <div style={{ fontWeight: 700, color: '#6E6863', marginBottom: 3 }}>검색 리포트 연동 예정</div>
+          <div><b>reports.keyword_daily</b>가 연결되면 키워드별 노출·클릭·전환·순위가 여기에 표시됩니다.</div>
+        </div>
       </Sec>
 
       <Sec title="5. 매출 증감 기여" desc="비교 기간 · 채널 결제금액 증감 기준">
