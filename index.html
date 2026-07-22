@@ -49,6 +49,14 @@ const MAIN_STAGES = ['예정', '진행중', '검토중', '완료'];
 const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 const TODAY = new Date().toISOString().slice(0, 10);
 const CAT_PALETTE = ['#1A1614', '#7C4DFF', '#6E6863', '#2D5FE0', '#E08700', '#E53935', '#E91E8C', '#00ACC1'];
+const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E08700', '안내': '#6E6863' };
+const DEFAULT_UPDATES = [
+  { id: 1000006, date: '2026-07-22', tag: '신규기능', title: '예산 · 미연결 실결제를 프로젝트에 연결', content: '실결제 탭의 기안 미연결 실결제 항목을 열어 결제 건별로 원하는 프로젝트에 직접 연결할 수 있어요. 연결하면 그 프로젝트 사용금액에 반영되고, 연결 해제로 되돌릴 수 있습니다.', pinned: false },
+  { id: 1000005, date: '2026-07-22', tag: '개선', title: '예산 탭 · 실결제 우선 + 프로젝트별 예산 현황', content: '예산 탭 진입 시 실결제가 먼저 보이고, 실결제 영역이 프로젝트별 카드로 바뀌었어요. 프로젝트마다 사용가능·사용·잔여와 업체별 사용내역이 나오고, 기안완료 항목 보기로 세부 내역을 펼칠 수 있습니다.', pinned: false },
+  { id: 1000004, date: '2026-07-22', tag: '신규기능', title: '팀 현황 · 수동 체크리스트 추가', content: '캘린더의 미배정 영역에서 세부계획·프로젝트와 상관없이 담당자만 지정해 체크리스트를 바로 추가할 수 있어요. 수동 항목은 보라색으로 구분됩니다.', pinned: false },
+  { id: 1000003, date: '2026-07-22', tag: '신규기능', title: '매출 탭 · 기간 지정(커스텀 기간) 조회', content: '월간·주간·일간 외에 기간지정이 생겨서 시작일부터 종료일까지 직접 골라 그 구간 매출을 합산해 볼 수 있어요. 최근 7일·30일 빠른 버튼도 있습니다.', pinned: false },
+  { id: 1000002, date: '2026-07-22', tag: '개선', title: '채널 추적 · 상품별 성과 정비', content: '상품별 성과 섹션에 기간 라벨(최근 30일)과 구매자수가 표시되도록 정비했어요.', pinned: false },
+];
 
 // ===== Google Drive 연동 (브라우저 OAuth, scope=drive) =====
 const DRIVE_CLIENT_ID = '922127709768-fblujicah9kbma4fn1pd6nup8h44siac.apps.googleusercontent.com';
@@ -166,6 +174,7 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, kind: '일반', ...b })),
   trash: raw.trash || [],
   notices: raw.notices || [],
+  updates: raw.updates !== undefined ? raw.updates : DEFAULT_UPDATES,
   meetings: raw.meetings || [],
   payments: raw.payments || [],
   vendors: raw.vendors || [],
@@ -290,6 +299,7 @@ const INIT = {
   mainKpis: DEFAULT_MAIN_KPIS,
   kpiLogs: [],
   notices: [],
+  updates: DEFAULT_UPDATES,
   payments: [],
   outputs: [
     { id: 1, code: 'MD-1', type: 'MD출력', name: '쿠팡 광고 운영' }, { id: 2, code: 'MD-2', type: 'MD출력', name: '네이버 대용량 할인제품 & 정기배송' },
@@ -1302,6 +1312,98 @@ function NoticeBoard({ data, setData }) {
       })}
       {modal && <NoticeModal data={data} setData={setData} edit={modal === true ? null : modal} onClose={() => setModal(false)} />}
     </div>
+  );
+}
+
+function UpdateModal({ data, setData, edit, onClose }) {
+  const [date, setDate] = useState(edit ? (edit.date || TODAY) : TODAY);
+  const [tag, setTag] = useState(edit ? (edit.tag || '안내') : '신규기능');
+  const [title, setTitle] = useState(edit ? edit.title : '');
+  const [content, setContent] = useState(edit ? edit.content : '');
+  const [pinned, setPinned] = useState(edit ? !!edit.pinned : false);
+  const save = () => {
+    if (!title.trim() && !content.trim()) { alert('제목 또는 내용을 입력하세요.'); return; }
+    setData(d => {
+      let updates = [...(d.updates || [])];
+      if (pinned) updates = updates.map(n => ({ ...n, pinned: false }));
+      if (edit) updates = updates.map(n => n.id === edit.id ? { ...n, date: date, tag: tag, title: title.trim(), content: content.trim(), pinned: pinned } : n);
+      else updates = [{ id: Date.now(), date: date, tag: tag, title: title.trim(), content: content.trim(), pinned: pinned }, ...updates];
+      return { ...d, updates: updates };
+    });
+    onClose();
+  };
+  return (
+    <ModalShell title={edit ? '업데이트 안내 수정' : '업데이트 안내 작성'} onClose={onClose}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: 10 }}>
+        <div><Lbl c="날짜" /><Inp type="date" value={date} onChange={setDate} /></div>
+        <div><Lbl c="구분" /><div style={{ display: 'flex', gap: 5 }}>{Object.keys(UP_TAGS).map(tg => <button key={tg} onClick={() => setTag(tg)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, background: tag === tg ? UP_TAGS[tg] : '#E3E0DC', color: tag === tg ? 'white' : '#3A3631' }}>{tg}</button>)}</div></div>
+      </div>
+      <div><Lbl c="제목" /><Inp value={title} onChange={setTitle} placeholder="예: 매출 탭 기간지정 기능 추가" /></div>
+      <div><Lbl c="내용" /><textarea value={content} onChange={e => setContent(e.target.value)} rows={5} placeholder="어떤 업데이트인지 이용자에게 설명하세요" style={{ width: '100%', boxSizing: 'border-box', fontSize: 13, padding: '9px 11px', border: '1px solid #E3E0DC', borderRadius: 9, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }} /></div>
+      <label onClick={() => setPinned(!pinned)} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', background: pinned ? '#FBF6EC' : '#FAFAFA', border: '1.5px solid ' + (pinned ? GO : '#E3E0DC'), borderRadius: 10, padding: '10px 14px' }}><div style={{ width: 20, height: 20, borderRadius: 4, border: '2px solid ' + (pinned ? GO : '#D1D5DB'), background: pinned ? GO : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pinned ? <span style={{ color: 'white', fontSize: 12, fontWeight: 900 }}>✓</span> : null}</div><div><div style={{ fontSize: 13, fontWeight: 700 }}>📌 상단 고정</div><div style={{ fontSize: 11, color: '#A29C95' }}>고정하면 맨 위에 크게 표시됩니다 (하나만)</div></div></label>
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+    </ModalShell>
+  );
+}
+
+function UpdateBoard({ data, setData, embedded }) {
+  const [modal, setModal] = useState(false);
+  const [openId, setOpenId] = useState(null);
+  const updates = data.updates || [];
+  const pinned = updates.find(n => n.pinned);
+  const rest = updates.filter(n => !n.pinned);
+  const del = id => { if (!confirm('이 업데이트 안내를 삭제할까요?')) return; setData(d => ({ ...d, updates: (d.updates || []).filter(n => n.id !== id) })); };
+  const togglePin = id => setData(d => ({ ...d, updates: (d.updates || []).map(n => n.id === id ? { ...n, pinned: !n.pinned } : (n.pinned ? { ...n, pinned: false } : n)) }));
+  const tagBadge = tg => <span style={{ fontSize: 9.5, fontWeight: 800, color: 'white', background: UP_TAGS[tg] || '#6E6863', borderRadius: 5, padding: '1px 6px', flexShrink: 0 }}>{tg}</span>;
+  const actBtn = { padding: '4px 10px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: '#6E6863' };
+  const inner = (<React.Fragment>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        {!embedded && <div style={{ fontSize: 15, fontWeight: 700, color: G }}>🆕 대시보드 업데이트 안내</div>}
+        <button onClick={() => setModal(true)} style={{ marginLeft: 'auto', padding: '5px 11px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 11.5, fontWeight: 600, background: G, color: 'white' }}>+ 작성</button>
+      </div>
+      <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 10, lineHeight: 1.5 }}>대시보드에 반영된 변경 사항을 이용자에게 알립니다.</div>
+      {pinned && (
+        <div style={{ marginBottom: 10, border: '1px solid #F0E2C0', borderRadius: 10, overflow: 'hidden' }}>
+          <div style={{ borderLeft: '4px solid ' + GO, background: '#FBF6EC', padding: '12px 13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>{tagBadge(pinned.tag)}<span style={{ fontSize: 11, fontWeight: 700, color: GO }}>📌 고정</span><span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#A29C95' }}>{pinned.date}</span></div>
+            {pinned.title && <div style={{ fontSize: 13.5, fontWeight: 800, marginBottom: 5, color: '#1A1614' }}>{pinned.title}</div>}
+            <div style={{ fontSize: 12.5, lineHeight: 1.6, whiteSpace: 'pre-wrap', color: '#3A3631' }}>{pinned.content}</div>
+            <div style={{ display: 'flex', gap: 6, marginTop: 9, flexWrap: 'wrap' }}><button onClick={() => togglePin(pinned.id)} style={{ ...actBtn, borderColor: GO, color: GO }}>고정 해제</button><button onClick={() => setModal(pinned)} style={actBtn}>수정</button><button onClick={() => del(pinned.id)} style={{ ...actBtn, color: '#E53935' }}>삭제</button></div>
+          </div>
+        </div>
+      )}
+      {(rest.length === 0 && !pinned) ? (
+        <div style={{ textAlign: 'center', padding: 20, color: '#A29C95', fontSize: 12.5 }}>등록된 업데이트 안내가 없습니다</div>
+      ) : rest.map(n => {
+        const open = openId === n.id;
+        return (
+          <div key={n.id} style={{ marginBottom: 5, border: '1px solid #EDEBE7', borderRadius: 9, overflow: 'hidden' }}>
+            <div onClick={() => setOpenId(open ? null : n.id)} style={{ cursor: 'pointer', padding: '8px 11px', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <span style={{ fontSize: 10, color: '#A29C95', flexShrink: 0 }}>{open ? '▾' : '▸'}</span>
+              {tagBadge(n.tag)}
+              <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: '#1A1614', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.title || '(제목 없음)'}</span>
+              <span style={{ fontSize: 10.5, color: '#A29C95', flexShrink: 0 }}>{(n.date || '').slice(5)}</span>
+            </div>
+            {open && (
+              <div style={{ padding: '0 11px 11px', borderTop: '1px solid #F0EEEB' }}>
+                {n.content && <div style={{ fontSize: 12.5, lineHeight: 1.55, whiteSpace: 'pre-wrap', color: '#3A3631', marginTop: 8 }}>{n.content}</div>}
+                <div style={{ display: 'flex', gap: 6, marginTop: 9, flexWrap: 'wrap' }}><button onClick={() => togglePin(n.id)} style={actBtn}>📌 상단 고정</button><button onClick={() => setModal(n)} style={actBtn}>수정</button><button onClick={() => del(n.id)} style={{ ...actBtn, color: '#E53935' }}>삭제</button></div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {modal && <UpdateModal data={data} setData={setData} edit={modal === true ? null : modal} onClose={() => setModal(false)} />}
+    </React.Fragment>);
+  return embedded ? <div>{inner}</div> : <Card style={{ marginBottom: 16, padding: 14, borderTop: '3px solid ' + G }}>{inner}</Card>;
+}
+
+function UpdateCenterModal({ data, setData, onClose }) {
+  return (
+    <ModalShell title="🆕 대시보드 업데이트 내역" onClose={onClose}>
+      <div style={{ fontSize: 12, color: '#6E6863', marginTop: -4 }}>대시보드에 새로 반영된 기능·변경 사항이에요. 자세히 보려면 항목을 누르세요.</div>
+      <UpdateBoard data={data} setData={setData} embedded={true} />
+    </ModalShell>
   );
 }
 
@@ -5378,6 +5480,7 @@ function App() {
   const [data, setData] = useState(null);
   const [ready, setReady] = useState(false);
   const [modal, setModal] = useState(false);
+  const [showUpdates, setShowUpdates] = useState(false);
   const [editStack, setEditStack] = useState([]);
   const [recordId, setRecordId] = useState(null);
   const [sync, setSync] = useState('loading');
@@ -5455,6 +5558,7 @@ function App() {
       <div style={{ background: G, color: 'white', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.2)', flexWrap: 'wrap' }}>
         <span style={{ fontSize: 22 }}>🌿</span>
         <div><div style={{ fontSize: 16, fontWeight: 800 }}>통합 팀 대시보드</div><div style={{ fontSize: 11, opacity: 0.7 }}>LIFEMEAL · Firebase 실시간 연동</div></div>
+        <button onClick={() => setShowUpdates(true)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.28)', background: 'rgba(255,255,255,0.12)', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>🆕 업데이트 확인하기{(data.updates || []).length > 0 ? <span style={{ background: '#E53935', color: 'white', borderRadius: 10, padding: '0 6px', fontSize: 10, fontWeight: 800 }}>{(data.updates || []).length}</span> : null}</button>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <SyncBadge status={sync} errMsg={syncErr} />
           {MEMBERS.map(m => <div key={m} style={{ width: 30, height: 30, borderRadius: '50%', background: GO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, border: '2px solid rgba(255,255,255,0.25)' }}>{AV[m]}</div>)}
@@ -5471,6 +5575,7 @@ function App() {
         <TabC data={data} setData={setData} onEdit={t => setEditStack([t])} onRecord={id => setRecordId(id)} goTab={label => { const i = TABS.findIndex(t => t.label === label); if (i >= 0) setTab(i); }} />
       </div>
       {modal && <AddModal data={data} setData={setData} onClose={() => setModal(false)} />}
+      {showUpdates && <UpdateCenterModal data={data} setData={setData} onClose={() => setShowUpdates(false)} />}
       {editStack.length > 0 && (() => { const cur = editStack[editStack.length - 1]; return <EditModal key={cur.kind + '-' + cur.id} target={cur} data={data} setData={setData} onClose={() => setEditStack([])} onSwitch={t => setEditStack(s => [...s, t])} canBack={editStack.length > 1} onBack={() => setEditStack(s => s.slice(0, -1))} />; })()}
       {recordId && <PerfModal subId={recordId} data={data} setData={setData} onClose={() => setRecordId(null)} />}
     </div>
