@@ -4084,6 +4084,7 @@ function TabSales({ data, setData }) {
   const [repModal, setRepModal] = useState(null);
   const [linkModal, setLinkModal] = useState(null);
   const [itemPack, setItemPack] = useState({});
+  const [linkTab, setLinkTab] = useState('wait');
   const [regOpen, setRegOpen] = useState(false);
   const [regName, setRegName] = useState('');
   const [dragId, setDragId] = useState(null);
@@ -4149,22 +4150,25 @@ function TabSales({ data, setData }) {
   const guessPerBox = nm => { const m = String(nm || '').match(/(\d+)\s*(포|개입|캡슐|정|스틱|팩|봉|매|개)\s*$/); return m ? parseInt(m[1], 10) : null; };
   const perBoxById = {}; repProducts.forEach(r => { const pb = parseInt(r.perBox, 10); if (pb > 0) perBoxById[r.id] = pb; });
   const effPerBox = g => (perBoxById[g.id] || guessPerBox(g.label) || null);
+  const repLabel = g => g.label + (perBoxById[g.id] ? ',' + perBoxById[g.id] : '');
+  const periodText = () => { if (isCustom) return '조회기간 ' + (range.start || '') + '~' + (range.end || ''); if (r && r.periodStart && r.periodEnd) return '조회기간 ' + r.periodStart + '~' + r.periodEnd; return '조회기간 ' + ((r && (r.label || r.key)) || modeLabel[mode]); };
   const parsePack = nm => { const mt = String(nm || '').match(/,\s*(\d+)\s*개\s*$/); return { pack: mt ? parseInt(mt[1], 10) : 1, base: mt ? String(nm).replace(/,\s*\d+\s*개\s*$/, '').trim() : String(nm || '') }; };
-  const resolveRepId = (pid, base) => { const lk = links[pid]; if (lk) { if (lk.repId && repNameById[lk.repId]) return lk.repId; if (lk.rep && nameToId[repN(lk.rep)]) return nameToId[repN(lk.rep)]; } const autoId = REP_AUTO[repN(base)]; if (autoId && repNameById[autoId]) return autoId; return null; };
+  const resolveRepId = (pid, base) => { const lk = links[pid]; if (lk && lk.excluded) return null; if (lk) { if (lk.repId && repNameById[lk.repId]) return lk.repId; if (lk.rep && nameToId[repN(lk.rep)]) return nameToId[repN(lk.rep)]; } const autoId = REP_AUTO[repN(base)]; if (autoId && repNameById[autoId]) return autoId; return null; };
   const _repAgg = {}; const _unmapped = [];
   (products || []).forEach(pp => { const pid = String(pp.productId || pp.name || ''); const pk = parsePack(pp.name); const rid = resolveRepId(pid, pk.base); const lk = links[pid]; const pack = (lk && lk.qty) ? lk.qty : pk.pack; const boxes = (pp.qty || 0) * pack; if (!rid) { _unmapped.push({ pid: pid, name: pp.name || pid, rev: pp.revenue || 0, qty: pp.qty || 0, pack: pk.pack }); return; } const g = _repAgg[rid] = _repAgg[rid] || { id: rid, label: repNameById[rid], rev: 0, boxes: 0, rawQty: 0, items: [] }; g.rev += pp.revenue || 0; g.boxes += boxes; g.rawQty += pp.qty || 0; g.items.push({ name: pp.name, pid: pid, pack: pack, qty: pp.qty || 0, boxes: boxes, linked: !!(lk && (lk.repId || lk.rep)) }); });
   const unitGroups = Object.values(_repAgg).map(g => ({ id: g.id, label: g.label, rev: g.rev, boxes: g.boxes, rawQty: g.rawQty, items: g.items.sort((a, b) => a.pack - b.pack), unit: g.boxes > 0 ? Math.round(g.rev / g.boxes) : null })).sort((a, b) => b.rev - a.rev);
   const unmappedSorted = _unmapped.slice().sort((a, b) => b.rev - a.rev);
+  const linkedList = []; unitGroups.forEach(g => g.items.forEach(it => linkedList.push({ name: it.name, pid: it.pid, pack: it.pack, qty: it.qty, boxes: it.boxes, rep: g.label }))); linkedList.sort((a, b) => (a.rep < b.rep ? -1 : a.rep > b.rep ? 1 : 0) || (b.boxes - a.boxes));
   const _repOrder = (data && data.repOrder) || [];
   unitGroups.sort((a, b) => { const ia = _repOrder.indexOf(a.id), ib = _repOrder.indexOf(b.id); return (ia < 0 ? 100000 : ia) - (ib < 0 ? 100000 : ib); });
-  const excelTSV = () => { const names = unitGroups.map(g => g.label); const prices = unitGroups.map(g => g.unit != null ? g.unit : ''); return names.join('\t') + '\n' + prices.join('\t'); };
+  const excelTSV = () => { const names = unitGroups.map(g => repLabel(g)); const prices = unitGroups.map(g => g.unit != null ? g.unit : ''); return periodText() + '\n' + names.join('\t') + '\n' + prices.join('\t'); };
   const persistReps = arr => setData(d => ({ ...d, repProducts: arr.map(r => { const o = { id: r.id, name: r.name }; const pb = parseInt(r.perBox, 10); if (pb > 0) o.perBox = pb; return o; }) }));
   const registerRep = nm => { const name = (nm || '').trim(); if (!name) { alert('대표상품 이름을 입력해주세요.'); return; } if (repProducts.some(r => repN(r.name) === repN(name))) { alert('이미 있는 대표상품이에요.'); return; } persistReps([...repProducts, { id: 'rep' + Date.now(), name: name }]); };
   const renameRep = (id, nm) => { const name = (nm || '').trim(); if (!name) { alert('이름을 입력해주세요.'); return; } persistReps(repProducts.map(r => r.id === id ? { id: r.id, name: name } : r)); };
   const saveRep = (id, nm, pb) => { const name = (nm || '').trim(); if (!name) { alert('이름을 입력해주세요.'); return; } const pn = parseInt(pb, 10); persistReps(repProducts.map(r => r.id === id ? { id: r.id, name: name, perBox: (pn > 0 ? pn : undefined) } : r)); };
   const deleteRep = id => { setData(d => { const nl = { ...((d && d.repLinks) || {}) }; Object.keys(nl).forEach(k => { if (nl[k] && nl[k].repId === id) delete nl[k]; }); const base = (d && Array.isArray(d.repProducts) && d.repProducts.length) ? d.repProducts : REP_DEFAULTS; return { ...d, repProducts: base.filter(r => r.id !== id).map(r => { const o = { id: r.id, name: r.name }; const pb = parseInt(r.perBox, 10); if (pb > 0) o.perBox = pb; return o; }), repLinks: nl }; }); };
   const linkProduct = (pid, repId, qty) => { const q = parseInt(qty, 10); if (!pid || !repId || !q || q < 1) { alert('대표상품과 수량(1 이상)을 선택해주세요.'); return; } setData(d => ({ ...d, repLinks: { ...((d && d.repLinks) || {}), [pid]: { repId: repId, qty: q } } })); };
-  const unlinkProduct = pid => { setData(d => { const nl = { ...((d && d.repLinks) || {}) }; delete nl[pid]; return { ...d, repLinks: nl }; }); };
+  const unlinkProduct = pid => { setData(d => ({ ...d, repLinks: { ...((d && d.repLinks) || {}), [pid]: { excluded: true } } })); };
   const openRep = g => setRepModal({ id: g.id, name: g.label, perBox: perBoxById[g.id] != null ? String(perBoxById[g.id]) : '' });
   const commitPack = it => { const raw = itemPack[it.pid]; setItemPack(pp => { const nn = { ...pp }; delete nn[it.pid]; return nn; }); if (raw == null || raw === '' || !repModal) return; const q = parseInt(raw, 10); if (!(q > 0) || q === it.pack) return; linkProduct(it.pid, repModal.id, q); };
   const moveCard = (fromId, toId) => { if (!fromId || fromId === toId) return; const ids = unitGroups.map(g => g.id); const from = ids.indexOf(fromId), to = ids.indexOf(toId); if (from < 0 || to < 0) return; ids.splice(from, 1); ids.splice(to, 0, fromId); setData(d => ({ ...d, repOrder: ids })); };
@@ -4481,41 +4485,57 @@ function TabSales({ data, setData }) {
                 <button onClick={copyExcel} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, border: '1px solid ' + (copied ? '#1FA463' : '#D8D3CC'), background: copied ? '#ECFDF5' : 'white', color: copied ? '#1FA463' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>{copied ? '✓ 복사됨' : '📋 엑셀 붙여넣기'}</button>
               </div>
             </div>
-            {unitGroups.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95', padding: '10px 2px 14px' }}>이 기간에 대표상품으로 연동된 판매가 없어요. 아래 '연동 안 된 상품'에서 연결하거나 '대표상품 등록'을 눌러주세요.</div> : <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 10, marginBottom: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, color: '#3A3631', margin: '2px 0 8px' }}>대표상품</div>
+            {unitGroups.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95', padding: '10px 2px 14px' }}>이 기간에 대표상품으로 연동된 판매가 없어요. 아래 '연동상품 › 연동대기'에서 연결하거나 '대표상품 등록'을 눌러주세요.</div> : <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 10, marginBottom: 14 }}>
               {unitGroups.map((g, i) => (
                 <div key={g.id + '-c-' + i} draggable onDragStart={() => setDragId(g.id)} onDragOver={e => e.preventDefault()} onDrop={() => { moveCard(dragId, g.id); setDragId(null); }} onDragEnd={() => setDragId(null)} onClick={() => openRep(g)} title="드래그: 순서 변경 · 클릭: 편집" style={{ border: '1px solid ' + (dragId === g.id ? '#2D5FE0' : '#E3E0DC'), background: 'white', borderRadius: 12, padding: '9px 13px 12px', display: 'flex', flexDirection: 'column', gap: 3, cursor: 'grab', opacity: dragId === g.id ? 0.5 : 1 }}>
                   <div style={{ fontSize: 9, color: '#C4BDB4', letterSpacing: 1 }}>⠿ 순서변경</div>
-                  <div style={{ fontSize: 12.5, fontWeight: 800, color: G, lineHeight: 1.35, minHeight: 34 }}>{g.label}</div>
+                  <div style={{ fontSize: 12.5, fontWeight: 800, color: G, lineHeight: 1.35, minHeight: 34 }}>{repLabel(g)}</div>
                   <div style={{ fontSize: 21, fontWeight: 800, color: G }}>{g.unit != null ? won2(g.unit) : '-'}</div>
-                  <div style={{ fontSize: 10, color: '#A29C95', lineHeight: 1.5 }}>{g.boxes.toLocaleString()}낱개 · {won2(g.rev)}{g.items.length > 1 ? ' · ' + g.items.length + '개 구성' : ''}</div>
-                  {effPerBox(g) ? <div style={{ fontSize: 9.5, color: '#B9B2A9', marginTop: 1 }}>박스당 {effPerBox(g)}개</div> : null}
+                  <div style={{ fontSize: 10, color: '#A29C95', lineHeight: 1.5 }}>{g.boxes.toLocaleString()}pk · {won2(g.rev)}{g.items.length > 1 ? ' · ' + g.items.length + '개 구성' : ''}</div>
                 </div>
               ))}
             </div>}
-            {unmappedSorted.length > 0 ? <div style={{ marginBottom: 14, border: '1px solid #FDE68A', background: '#FFFBEB', borderRadius: 10, padding: '10px 12px' }}>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: '#B45309', marginBottom: 7 }}>🔗 연동 안 된 상품 {unmappedSorted.length}개 <span style={{ fontWeight: 400, color: '#A29C95' }}>· 클릭해서 대표상품에 연결</span></div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{unmappedSorted.map(u => (
-                <div key={u.pid} onClick={() => setLinkModal({ pid: u.pid, name: u.name, repId: '', qty: String(u.pack || 1) })} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, maxWidth: 340, background: 'white', border: '1px solid #F0D9A0', borderRadius: 7, padding: '5px 9px', cursor: 'pointer', fontSize: 11 }}>
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#6E6863' }}>{u.name}</span>
-                  <span style={{ fontWeight: 700, color: '#B45309', whiteSpace: 'nowrap' }}>+ 연동</span>
-                </div>
-              ))}</div>
-            </div> : null}
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 520 }}>
-                <thead><tr style={{ background: '#FAFAFA' }}>{['대표상품', '구성', '총수량(낱개)', '총매출', '1개당 단가'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
+                <thead><tr style={{ background: '#FAFAFA' }}>{['대표상품', '구성', '총수량(pk)', '총매출', '1개당 단가'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
                 <tbody>{unitGroups.map((g, i) => (
                   <tr key={g.id + '-r-' + i} onClick={() => openRep(g)} style={{ borderBottom: '1px solid #F5F4F2', cursor: 'pointer' }}>
-                    <td style={{ padding: '8px 10px', fontWeight: 600, maxWidth: 260, whiteSpace: 'normal', lineHeight: 1.4 }}>{g.label}{g.items.length > 1 ? <span style={{ marginLeft: 6, fontSize: 9.5, fontWeight: 700, color: '#1FA463', background: '#ECFDF5', borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap' }}>묶음 {g.items.length}</span> : null}{effPerBox(g) ? <span style={{ marginLeft: 6, fontSize: 9, color: '#B9B2A9', whiteSpace: 'nowrap' }}>박스당 {effPerBox(g)}</span> : null}</td>
+                    <td style={{ padding: '8px 10px', fontWeight: 600, maxWidth: 260, whiteSpace: 'normal', lineHeight: 1.4 }}>{repLabel(g)}{g.items.length > 1 ? <span style={{ marginLeft: 6, fontSize: 9.5, fontWeight: 700, color: '#1FA463', background: '#ECFDF5', borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap' }}>묶음 {g.items.length}</span> : null}</td>
                     <td style={td}>{g.items.length > 1 ? g.items.map(o => o.pack + '개').join('·') : '단일'}</td>
-                    <td style={td}>{g.boxes.toLocaleString()}개</td>
+                    <td style={td}>{g.boxes.toLocaleString()}pk</td>
                     <td style={td}>{won2(g.rev)}</td>
                     <td style={{ ...td, fontWeight: 800, color: G }}>{g.unit != null ? won2(g.unit) : '-'}</td>
                   </tr>
                 ))}</tbody>
               </table>
             </div>
-            <div style={{ fontSize: 10, color: '#A29C95', padding: '8px 2px 0', lineHeight: 1.6 }}>1개당 단가 = 총매출 ÷ 총 낱개수량 · 옵션 'N개'=N낱개 환산 · <b>카드/행 클릭</b>: 연동 상품·이름 변경 · <b>연동 안 된 상품 클릭</b>: 대표상품에 연결 · <b>카드 드래그</b>로 순서 변경(표·엑셀에 그대로 반영). <b>📋 엑셀 붙여넣기</b>: 상품명 가로, 그 아래 1개당 단가(숫자). · <b>박스당(개수)</b>는 표시용(1개당 단가 계산에 미반영) · 편집 창에서 연동 상품 <b>수량</b>도 수정.</div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: '#3A3631', margin: '18px 0 8px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              연동상품
+              <div style={{ display: 'inline-flex', gap: 4, background: '#F5F4F2', borderRadius: 8, padding: 3 }}>
+                {[['wait', '연동대기', unmappedSorted.length], ['done', '연동완료', linkedList.length]].map(t => (
+                  <button key={t[0]} onClick={() => setLinkTab(t[0])} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 11.5, fontWeight: 700, background: linkTab === t[0] ? 'white' : 'transparent', color: linkTab === t[0] ? G : '#8A847D', boxShadow: linkTab === t[0] ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>{t[1]} {t[2]}</button>
+                ))}
+              </div>
+            </div>
+            {linkTab === 'wait' ? (unmappedSorted.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95', padding: '4px 2px 10px' }}>연동 대기 중인 상품이 없어요. 모든 판매 상품이 대표상품에 연결돼 있어요.</div> : <div style={{ marginBottom: 6, border: '1px solid #FDE68A', background: '#FFFBEB', borderRadius: 10, padding: '10px 12px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#B45309', marginBottom: 7 }}>🔗 상품을 클릭해 대표상품에 연결하세요</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{unmappedSorted.map(u => (
+                <div key={u.pid} onClick={() => setLinkModal({ pid: u.pid, name: u.name, repId: '', qty: String(u.pack || 1) })} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: 'white', border: '1px solid #F0D9A0', borderRadius: 7, padding: '7px 10px', cursor: 'pointer', fontSize: 11 }}>
+                  <span style={{ flex: 1, minWidth: 0, whiteSpace: 'normal', wordBreak: 'break-all', lineHeight: 1.45, color: '#6E6863' }}>{u.name}</span>
+                  <span style={{ fontWeight: 700, color: '#B45309', whiteSpace: 'nowrap', flexShrink: 0 }}>+ 연동</span>
+                </div>
+              ))}</div>
+            </div>) : (linkedList.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95', padding: '4px 2px 10px' }}>아직 연동된 상품이 없어요. '연동대기'에서 연결해주세요.</div> : <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 6 }}>{linkedList.map(it => (
+              <div key={it.pid} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: '#FAFAF9', border: '1px solid #F0EEEB', borderRadius: 8, padding: '8px 10px', fontSize: 11 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ whiteSpace: 'normal', wordBreak: 'break-all', lineHeight: 1.45, color: '#3A3631' }}>{it.name}</div>
+                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>▸ {it.rep} · 1건={it.pack}pk · {it.qty}건 → {it.boxes}pk</div>
+                </div>
+                <button onClick={() => unlinkProduct(it.pid)} style={{ flexShrink: 0, padding: '4px 9px', borderRadius: 6, border: '1px solid #FECACA', background: '#FEF2F2', color: '#E53935', cursor: 'pointer', fontSize: 10.5, fontWeight: 700, whiteSpace: 'nowrap' }}>연동 해제</button>
+              </div>
+            ))}</div>)}
+            <div style={{ fontSize: 10, color: '#A29C95', padding: '10px 2px 0', lineHeight: 1.6 }}>1개당 단가 = 총매출 ÷ 총 pk수량 · 옵션 'N개'=N pk 환산 · <b>카드/행 클릭</b>: 상품명·박스당(개수)·연동수량 수정 · <b>연동상품 › 연동대기</b>: 상품 클릭 → 대표상품 연결 · <b>연동완료</b>: 연동 해제 · <b>카드 드래그</b>로 순서 변경(표·엑셀 반영). <b>📋 엑셀 붙여넣기</b>: 맨 위 조회기간 → 상품명,개수(가로) → 평균금액(숫자). <b>박스당(개수)</b>는 표시용(1개당 단가 계산에 미반영).</div>
 
             {regOpen ? <div onClick={() => setRegOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(20,18,15,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
               <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 14, padding: 20, width: 360, maxWidth: '90vw', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
@@ -4531,7 +4551,7 @@ function TabSales({ data, setData }) {
             {repModal ? (() => { const grp = unitGroups.find(g => g.id === repModal.id); const items = grp ? grp.items : []; return <div onClick={() => setRepModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(20,18,15,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
               <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 14, padding: 20, width: 480, maxWidth: '92vw', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 3 }}>대표상품 편집</div>
-                <div style={{ fontSize: 10.5, color: '#A29C95', marginBottom: 12 }}>상품명·박스당(개수)를 수정하거나 연동 상품의 수량을 바꾸세요. 박스당(개수)는 표시용이라 1개당 단가(박스 기준)에는 반영되지 않아요.</div>
+                <div style={{ fontSize: 10.5, color: '#A29C95', marginBottom: 12 }}>상품명·박스당(개수)를 수정하거나 연동 상품의 수량 변경·해제를 하세요. 박스당(개수)는 표시용이라 1개당 단가(박스 기준)에는 반영되지 않아요.</div>
                 <div style={{ display: 'flex', gap: 6, marginBottom: 8, alignItems: 'stretch' }}>
                   <input value={repModal.name} onChange={e => setRepModal(m => ({ ...m, name: e.target.value }))} placeholder="상품명" style={{ flex: 1, minWidth: 0, padding: '8px 10px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 13 }} />
                   <input type="number" min="1" value={repModal.perBox || ''} onChange={e => setRepModal(m => ({ ...m, perBox: e.target.value }))} placeholder={guessPerBox(repModal.name) ? '박스당 ' + guessPerBox(repModal.name) : '박스당(개수)'} title="한 박스에 든 개수 · 표시용" style={{ width: 108, padding: '8px 8px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 12.5 }} />
@@ -4541,12 +4561,14 @@ function TabSales({ data, setData }) {
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>연동된 상품 {items.length}개</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 240, overflowY: 'auto' }}>
                   {items.length === 0 ? <div style={{ fontSize: 11, color: '#A29C95' }}>이 기간에 연동된 판매가 없어요.</div> : items.map(it => (
-                    <div key={it.pid} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, background: '#FAFAF9', border: '1px solid #F0EEEB', borderRadius: 7, padding: '6px 9px' }}>
-                      <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#3A3631' }}>{it.name}</span>
+                    <div key={it.pid} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11, background: '#FAFAF9', border: '1px solid #F0EEEB', borderRadius: 7, padding: '6px 9px' }}>
+                      <span style={{ flex: 1, minWidth: 0, whiteSpace: 'normal', wordBreak: 'break-all', lineHeight: 1.4, color: '#3A3631' }}>{it.name}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                       <span style={{ color: '#6E6863', whiteSpace: 'nowrap' }}>1건=</span>
-                      <input type="number" min="1" value={itemPack[it.pid] != null ? itemPack[it.pid] : String(it.pack)} onChange={e => setItemPack(pp => ({ ...pp, [it.pid]: e.target.value }))} onBlur={() => commitPack(it)} onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }} title="이 상품 1건 = 몇 낱개(박스)" style={{ width: 46, padding: '3px 5px', border: '1px solid #D8D3CC', borderRadius: 5, fontSize: 11, textAlign: 'right' }} />
-                      <span style={{ color: '#6E6863', whiteSpace: 'nowrap' }}>낱개</span>
-                      {it.linked ? <span onClick={() => unlinkProduct(it.pid)} style={{ cursor: 'pointer', color: '#E53935', fontWeight: 700, whiteSpace: 'nowrap' }}>연동 해제</span> : <span style={{ color: '#A29C95', fontSize: 9.5, whiteSpace: 'nowrap' }}>자동</span>}
+                      <input type="number" min="1" value={itemPack[it.pid] != null ? itemPack[it.pid] : String(it.pack)} onChange={e => setItemPack(pp => ({ ...pp, [it.pid]: e.target.value }))} onBlur={() => commitPack(it)} onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }} title="이 상품 1건 = 몇 pk(박스)" style={{ width: 46, padding: '3px 5px', border: '1px solid #D8D3CC', borderRadius: 5, fontSize: 11, textAlign: 'right' }} />
+                      <span style={{ color: '#6E6863', whiteSpace: 'nowrap' }}>pk</span>
+                      <span onClick={() => unlinkProduct(it.pid)} style={{ cursor: 'pointer', color: '#E53935', fontWeight: 700, whiteSpace: 'nowrap' }}>해제</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -4566,8 +4588,8 @@ function TabSales({ data, setData }) {
                   <option value="">대표상품 선택</option>
                   {repProducts.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                 </select>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>수량 (이 제품 1건 = 몇 낱개)</div>
-                <input type="number" min="1" value={linkModal.qty} onChange={e => setLinkModal(m => ({ ...m, qty: e.target.value }))} placeholder="낱개" style={{ width: '100%', boxSizing: 'border-box', padding: '9px 10px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 13, marginBottom: 14 }} />
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>수량 (이 제품 1건 = 몇 pk)</div>
+                <input type="number" min="1" value={linkModal.qty} onChange={e => setLinkModal(m => ({ ...m, qty: e.target.value }))} placeholder="pk" style={{ width: '100%', boxSizing: 'border-box', padding: '9px 10px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 13, marginBottom: 14 }} />
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                   <button onClick={() => setLinkModal(null)} style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>취소</button>
                   <button onClick={() => { linkProduct(linkModal.pid, linkModal.repId, linkModal.qty); setLinkModal(null); }} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: G, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>연동</button>
