@@ -165,6 +165,7 @@ const DEFAULT_MAIN_KPIS = [
 ];
 const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? raw.members : DEFAULT_MEMBERS; syncMembers(_mem); return ({
   ...raw,
+  rev: (typeof raw.rev === 'number') ? raw.rev : 0,
   categories: raw.categories || [{ name: 'MD출력', prefix: 'MD' }, { name: '기타추가', prefix: 'P' }, { name: '반복지원', prefix: 'R' }],
   mainKpis: (raw.mainKpis || []).map(mk => ({ ...mk, linkedKpiIds: mk.linkedKpiIds || (mk.linkedPlanIds || []).map(pid => 'k' + pid) })),
   kpiLogs: (raw.kpiLogs || []).map(l => ({ kpiId: 'k' + l.planId, ...l })),
@@ -296,6 +297,7 @@ const monthsInRange = (start, end) => {
 };
 
 const INIT = {
+  rev: 0,
   nid: 600,
   categories: [{ name: 'MD출력', prefix: 'MD' }, { name: '기타추가', prefix: 'P' }, { name: '반복지원', prefix: 'R' }],
   mainKpis: DEFAULT_MAIN_KPIS,
@@ -5819,6 +5821,8 @@ function TabSchedule({ data, setData }) {
 
 const TAB_SLUG = { team: '팀 현황', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
 
+const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
+
 function App() {
   const [tab, setTab] = useState(0);
   const [data, setData] = useState(null);
@@ -5833,20 +5837,23 @@ function App() {
   const lastSavedRef = useRef(null);
   const initDoneRef = useRef(false);
   const canSaveRef = useRef(false);
+  const revRef = useRef(0);
+  const serverSnapRef = useRef(null);
+  const backupDayRef = useRef('');
 
   useEffect(() => {
     const ref = db.ref(DB_PATH);
     ref.on('value', snap => {
       const remote = snap.val();
-      const remoteStr = remote ? JSON.stringify(remote) : null;
+      if (remote && typeof remote.rev === 'number') revRef.current = Math.max(revRef.current, remote.rev);
       if (!initDoneRef.current) {
         initDoneRef.current = true;
-        if (remote && remote.nid) { const m = migrateData(remote); setData(m); lastSavedRef.current = JSON.stringify(m); canSaveRef.current = true; }
-        else if (remote == null) { setData(INIT); lastSavedRef.current = null; canSaveRef.current = true; }
-        else { setData(INIT); lastSavedRef.current = null; }
+        if (remote && remote.nid) { const m = migrateData(remote); setData(m); serverSnapRef.current = m; lastSavedRef.current = sigOf(m); canSaveRef.current = true; }
+        else if (remote == null) { setData(INIT); serverSnapRef.current = null; lastSavedRef.current = null; canSaveRef.current = true; }
+        else { setData(INIT); serverSnapRef.current = null; lastSavedRef.current = null; }
         setReady(true); setSync('ok');
       } else {
-        if (remote && remote.nid && remoteStr !== lastSavedRef.current) { const m = migrateData(remote); setData(m); lastSavedRef.current = JSON.stringify(m); canSaveRef.current = true; }
+        if (remote && remote.nid) { const m = migrateData(remote); serverSnapRef.current = m; const sg = sigOf(m); if (sg !== lastSavedRef.current) { setData(m); lastSavedRef.current = sg; } canSaveRef.current = true; }
       }
     }, err => { setSyncErr(err.message); setSync('error'); if (!initDoneRef.current) { initDoneRef.current = true; setData(INIT); setReady(true); } });
     return () => ref.off('value');
@@ -5854,13 +5861,18 @@ function App() {
 
   useEffect(() => {
     if (!ready || !data || !canSaveRef.current) return;
-    const str = JSON.stringify(data);
+    const str = sigOf(data);
     if (str === lastSavedRef.current) return;
     if (pendingRef.current) clearTimeout(pendingRef.current);
     setSync('saving');
     pendingRef.current = setTimeout(() => {
+      const srv = serverSnapRef.current;
+      if (srv) { const SK = ['budgets', 'payments', 'notices', 'plans', 'subplans']; for (let i = 0; i < SK.length; i++) { const k = SK[i]; const sv = Array.isArray(srv[k]) ? srv[k].length : 0; const cv = Array.isArray(data[k]) ? data[k].length : 0; if (sv >= 5 && cv === 0) { setSync('error'); setSyncErr('데이터 유실 위험 — 저장 중단(' + k + ')'); try { alert('⚠ 데이터 유실 위험이 감지되어 저장을 막았어요.\n' + k + '가 서버 ' + sv + '건인데 저장하려는 값은 0건입니다.\n새로고침 후 다시 시도해주세요.'); } catch (e) {} return; } } }
+      if (backupDayRef.current !== TODAY) { backupDayRef.current = TODAY; try { db.ref(DB_PATH).once('value').then(sn => { const cur = sn.val(); if (cur && cur.nid) db.ref('/backups/auto/' + TODAY).set(cur).catch(() => {}); }).catch(() => {}); } catch (e) {} }
+      const newRev = (revRef.current || 0) + 1;
+      const payload = { ...data, rev: newRev };
       lastSavedRef.current = str;
-      db.ref(DB_PATH).set(data).then(() => setSync('ok')).catch(e => { setSync('error'); setSyncErr(e.message || '저장 실패'); lastSavedRef.current = null; });
+      db.ref(DB_PATH).set(payload).then(() => { revRef.current = newRev; serverSnapRef.current = payload; setSync('ok'); }).catch(e => { setSync('error'); setSyncErr(e.message || '저장 실패'); lastSavedRef.current = null; });
     }, 800);
   }, [data, ready]);
 
