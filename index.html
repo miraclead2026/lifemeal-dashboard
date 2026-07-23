@@ -3712,10 +3712,28 @@ function VisitPathSection({ vd, vc, meta, data, setData, mode, vIdx, range }) {
   const bg = {}; pathRows.forEach(r => { if (!vDates.includes(r.date)) return; const k = visitKeyOf(pm, r.date); (bg[k] = bg[k] || {}); const g = groupOf(r.path_l1, r.path_l2, r.path_l3); bg[k][g] = (bg[k][g] || 0) + (r.visits || 0); });
   const persistOf = (g, dir) => { const need = (mode === 'week' || mode === 'month') ? 2 : 3; if (ci < need) return false; for (let i = ci - need + 1; i <= ci; i++) { const c = (bg[mkeys[i]] || {})[g] || 0, pv = (bg[mkeys[i - 1]] || {})[g] || 0; const dd = c - pv; if (dir === 'up' ? dd <= 0 : dd >= 0) return false; } return true; };
 
+  const MINABS = { day: 30, week: 50, month: 100, custom: 50 };
+  const LOWVOL = { day: 40, week: 70, month: 140, custom: 70 };
+  const PCTCAP = 300;
+  const _minAbs = MINABS[mode] || 30, _lowVol = LOWVOL[mode] || 60;
+  const daysInMonthOf = ym => { const a = ym.split('-'); return new Date(+a[0], +a[1], 0).getDate(); };
+  const enumBucketDates = (m, key) => { if (!key) return []; const out = []; if (m === 'month') { const n = daysInMonthOf(key); for (let i = 1; i <= n; i++) out.push(key + '-' + String(i).padStart(2, '0')); } else if (m === 'week') { const base = new Date(key); for (let i = 0; i < 7; i++) { const d = new Date(base); d.setDate(d.getDate() + i); out.push(d.toISOString().slice(0, 10)); } } return out; };
+  const collectedArr = (meta && Array.isArray(meta.visit_collected_dates) && meta.visit_collected_dates.length) ? meta.visit_collected_dates : vDates;
+  const collectedSet = new Set(collectedArr);
+  const bucketComplete = (m, key) => { if (!key || m === 'day' || m === 'custom') return true; const ds = enumBucketDates(m, key); return ds.length > 0 && ds.every(d => collectedSet.has(d)); };
+  const cKk = mkeys[ci], pKk = mkeys[ci - 1];
+  const curComplete = mode === 'custom' ? true : bucketComplete(mode, cKk);
+  const priComplete = mode === 'custom' ? true : bucketComplete(mode, pKk);
+  const partialPeriod = (mode === 'week' || mode === 'month') && !curComplete;
+  const cmpSuppressed = (mode === 'week' || mode === 'month') && (!curComplete || !priComplete);
+  const curBucketDates = (mode === 'week' || mode === 'month') ? enumBucketDates(mode, cKk) : [];
+  const curHave = curBucketDates.filter(d => collectedSet.has(d)).length;
+  const curDaysExpected = curBucketDates.length || (mode === 'month' ? 30 : 7);
+  const partialBadge = partialPeriod ? ('부분 ' + curHave + '/' + curDaysExpected + '일 · 누적 중') : '';
   const insights = [];
-  GROUPS.forEach(gr => { const g = gr[0]; const cv = (cur.byGroup[g] || { v: 0 }).v, pv = (pri.byGroup[g] || { v: 0 }).v; if (hasPri && pv >= 25 && cv >= 12) { const d = Math.round((cv - pv) / pv * 100); if (Math.abs(d) >= 25) { const dir = d >= 0 ? 'up' : 'down'; const per = persistOf(g, dir); let drv = ''; if (g === '외부' && dir === 'up') { const subs = {}; const S = new Set(curDates); pathRows.forEach(r => { if (!S.has(r.date)) return; if (groupOf(r.path_l1, r.path_l2, r.path_l3) !== '외부') return; const kk = (r.path_l2 && r.path_l2 !== '-') ? r.path_l2 : r.path_l1; subs[kk] = (subs[kk] || 0) + (r.visits || 0); }); const top = Object.keys(subs).sort((a, b) => subs[b] - subs[a])[0]; if (top) drv = ' (' + String(top).replace('.com', '').replace('instagram', '인스타') + ' 주도)'; } const rl = ruleFor('grp', g, dir, per); insights.push({ id: 'grp:' + g, grp: true, title: priCmp + ' 대비 ' + g + ' 유입 ' + (d >= 0 ? '+' : '') + d + '%' + drv, per: per, interp: rl.i, action: rl.a, mag: Math.abs(d) * Math.log(cv + 1) }); } } });
-  if (hasPri) { const cc = cur.conv, pc = pri.conv; if (Math.abs(cc - pc) >= 3) { const dir = cc >= pc ? 'up' : 'down'; const rl = CONV_RULE[dir]; insights.push({ id: 'conv:전체', grp: false, title: '구매전환율 ' + (dir === 'up' ? '상승' : '하락') + ' ' + pctS(pc) + '→' + pctS(cc), per: false, interp: rl.i, action: rl.a, mag: Math.abs(cc - pc) * 12 }); } }
-  if (hasPri && priAov > 0) { const d = Math.round((curAov - priAov) / priAov * 100); if (d <= -15) { insights.push({ id: 'aov:전체', grp: false, title: '객단가 하락 ' + d + '% (' + won(priAov) + '→' + won(curAov) + ')', per: false, interp: AOV_RULE.down.i, action: AOV_RULE.down.a, mag: Math.abs(d) * 8 }); } }
+  GROUPS.forEach(gr => { const g = gr[0]; const cv = (cur.byGroup[g] || { v: 0 }).v, pv = (pri.byGroup[g] || { v: 0 }).v; if (!hasPri || cmpSuppressed) return; const absD = cv - pv; if (Math.max(cv, pv) < 12) return; if (Math.abs(absD) < _minAbs) return; const d = pv ? Math.round(absD / pv * 100) : (cv ? 999 : 0); if (Math.abs(d) < 25) return; const dir = absD >= 0 ? 'up' : 'down'; const per = persistOf(g, dir); const low = pv < _lowVol; const shownPct = low ? Math.min(Math.abs(d), PCTCAP) : Math.abs(d); const pctStr = (absD >= 0 ? '+' : '-') + shownPct + '%' + (low && Math.abs(d) > PCTCAP ? '↑' : ''); let drv = ''; if (g === '외부' && dir === 'up') { const subs = {}; const S = new Set(curDates); pathRows.forEach(r => { if (!S.has(r.date)) return; if (groupOf(r.path_l1, r.path_l2, r.path_l3) !== '외부') return; const kk = (r.path_l2 && r.path_l2 !== '-') ? r.path_l2 : r.path_l1; subs[kk] = (subs[kk] || 0) + (r.visits || 0); }); const top = Object.keys(subs).sort((a, b) => subs[b] - subs[a])[0]; if (top) drv = ' (' + String(top).replace('.com', '').replace('instagram', '인스타') + ' 주도)'; } const rl = ruleFor('grp', g, dir, per); insights.push({ id: 'grp:' + g, grp: true, low: low, title: priCmp + ' 대비 ' + g + ' 유입 ' + (absD >= 0 ? '+' : '-') + num(Math.abs(absD)) + '방문 (' + num(pv) + '→' + num(cv) + ', ' + pctStr + ')' + drv, per: per, interp: rl.i, action: rl.a, mag: Math.abs(absD) * (low ? 0.5 : 1) * (per ? 1.3 : 1) }); });
+  if (hasPri && !cmpSuppressed && cur.total >= 50 && pri.total >= 50) { const cc = cur.conv, pc = pri.conv; if (Math.abs(cc - pc) >= 3) { const dir = cc >= pc ? 'up' : 'down'; const rl = CONV_RULE[dir]; insights.push({ id: 'conv:전체', grp: false, title: '구매전환율 ' + (dir === 'up' ? '상승' : '하락') + ' ' + pctS(pc) + '→' + pctS(cc), per: false, interp: rl.i, action: rl.a, mag: Math.abs(cc - pc) * 12 }); } }
+  if (hasPri && !cmpSuppressed && priAov > 0 && cur.orders >= 5 && pri.orders >= 5) { const d = Math.round((curAov - priAov) / priAov * 100); if (d <= -15) { insights.push({ id: 'aov:전체', grp: false, title: '객단가 하락 ' + d + '% (' + won(priAov) + '→' + won(curAov) + ')', per: false, interp: AOV_RULE.down.i, action: AOV_RULE.down.a, mag: Math.abs(d) * 8 }); } }
   insights.sort((a, b) => b.mag - a.mag);
   const topIns = insights.slice(0, 5);
   const feedback = (data && data.insightFeedback) || {};
@@ -3753,15 +3771,15 @@ function VisitPathSection({ vd, vc, meta, data, setData, mode, vIdx, range }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: '#1A1614' }}>🧭 일별 유입·경로 해석</div>
         <span style={{ fontSize: 10.5, fontWeight: 700, color: '#2D5FE0', background: '#EFF6FF', borderRadius: 5, padding: '2px 7px' }}>방문 인사이트</span>
-        <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#A29C95' }}>선택 {curLabel || '전체'} · 비교 {priCmp} · 기준일 {baseDate}</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#A29C95', display: 'flex', alignItems: 'center', gap: 6 }}>{partialBadge ? <span style={{ fontWeight: 800, color: '#8A5A00', background: '#FEF3C7', borderRadius: 4, padding: '1px 6px' }}>{partialBadge}</span> : null}선택 {curLabel || '전체'} · 비교 {priCmp} · 기준일 {baseDate}</span>
       </div>
       <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 12, lineHeight: 1.5 }}>기간은 위 헤더 컨트롤로 조절합니다. <b style={{ color: '#B45309' }}>방문수는 전체채널 '유입수'·매출과 다른 축</b>(매출은 매출 탭).</div>
 
       <Sub n="1" t="주요 인사이트" d={priCmp + ' 대비 큰 변화를 자동 추출 · 해석·실행방향 포함 · 카드마다 승인/반려(다음 생성 학습)'} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 8, marginBottom: 8 }}>
-        {!hasPri ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>비교할 직전 기간이 없어요.</div> : visIns.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>{priCmp} 대비 큰 변화가 없어요(안정적).</div> : visIns.map(ins => { const fb = feedback[ins.id] || {}; const appr = fb.verdict === 'approved'; return (
+        {cmpSuppressed ? <div style={{ fontSize: 11.5, color: '#8A5A00', background: '#FEF9EF', border: '1px solid #FCE9C8', borderRadius: 8, padding: '9px 11px', lineHeight: 1.55 }}>⏳ {!curComplete ? ((mode === 'month' ? '이번 달이' : '이번 주가') + ' 아직 완결되지 않았어요' + (partialBadge ? ' (' + partialBadge + ')' : '')) : ('직전 ' + (mode === 'month' ? '달' : '주') + ' 데이터가 부분 구간이라')}. 일수 차이로 {priCmp} 대비 비교가 왜곡될 수 있어 <b>완결 후 표시</b>합니다. 그동안은 <b>일간</b>으로 확인하세요.</div> : !hasPri ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>비교할 직전 기간이 없어요.</div> : visIns.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95' }}>{priCmp} 대비 큰 변화가 없어요(안정적).</div> : visIns.map(ins => { const fb = feedback[ins.id] || {}; const appr = fb.verdict === 'approved'; return (
           <div key={ins.id} style={{ border: '1px solid ' + (appr ? '#A7F3D0' : '#E3E0DC'), background: appr ? '#F4FBF7' : 'white', borderRadius: 10, padding: '10px 12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}><div style={{ fontSize: 12.5, fontWeight: 800, color: '#1A1614', flex: 1, minWidth: 0, lineHeight: 1.4 }}>💡 {ins.title}</div>{ins.grp ? <span style={{ fontSize: 9, fontWeight: 800, borderRadius: 4, padding: '1px 6px', color: ins.per ? '#B45309' : '#8A8580', background: ins.per ? '#FEF3C7' : '#F0EEEB' }}>{ins.per ? '지속' : '일시'}</span> : null}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}><div style={{ fontSize: 12.5, fontWeight: 800, color: '#1A1614', flex: 1, minWidth: 0, lineHeight: 1.4 }}>💡 {ins.title}</div>{ins.grp ? <span style={{ fontSize: 9, fontWeight: 800, borderRadius: 4, padding: '1px 6px', color: ins.per ? '#B45309' : '#8A8580', background: ins.per ? '#FEF3C7' : '#F0EEEB' }}>{ins.per ? '지속' : '일시'}</span> : null}{ins.low ? <span style={{ fontSize: 9, fontWeight: 800, borderRadius: 4, padding: '1px 6px', color: '#0369A1', background: '#E0F2FE' }}>저볼륨</span> : null}</div>
             <div style={{ fontSize: 11, color: '#3A3631', marginTop: 5, lineHeight: 1.5 }}>{ins.interp}</div>
             <div style={{ fontSize: 11, color: '#1E3A8A', background: '#EFF6FF', borderRadius: 6, padding: '5px 8px', marginTop: 5, lineHeight: 1.5 }}>▶ 실행: {ins.action}</div>
             {rejId === ins.id ? <div style={{ marginTop: 8 }}><input value={rejReason} onChange={e => setRejReason(e.target.value)} placeholder="반려 사유 (예: 계절성/일시적)" style={{ width: '100%', boxSizing: 'border-box', fontSize: 11.5, padding: '6px 8px', border: '1px solid #E3E0DC', borderRadius: 7 }} /><div style={{ display: 'flex', gap: 6, marginTop: 6 }}><button onClick={() => { setFb(ins.id, 'rejected', rejReason, ins.title); setRejId(null); setRejReason(''); }} style={{ fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 6, border: 'none', background: '#E53935', color: 'white', cursor: 'pointer' }}>반려 저장</button><button onClick={() => { setRejId(null); setRejReason(''); }} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer' }}>취소</button></div></div> : <div style={{ display: 'flex', gap: 6, marginTop: 8, alignItems: 'center' }}>{appr ? <span style={{ fontSize: 10.5, fontWeight: 700, color: '#1FA463' }}>✓ 승인됨</span> : <button onClick={() => setFb(ins.id, 'approved', '', ins.title)} style={{ fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 6, border: '1px solid #A7F3D0', background: '#ECFDF5', color: '#1FA463', cursor: 'pointer' }}>승인</button>}<button onClick={() => { setRejId(ins.id); setRejReason(''); }} style={{ fontSize: 11, fontWeight: 700, padding: '5px 12px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#E53935', cursor: 'pointer' }}>반려</button></div>}
@@ -3784,7 +3802,7 @@ function VisitPathSection({ vd, vc, meta, data, setData, mode, vIdx, range }) {
         <div style={{ flex: '1 1 130px', border: '1px solid #EDEBE7', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
           <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A8580', marginBottom: 6 }}>구매전환율</div>
           <div style={{ fontSize: 22, fontWeight: 800, color: G }}>{pctS(cur.conv)}</div>
-          <div style={{ fontSize: 10.5, marginTop: 2 }}>{hasPri ? (() => { const d = gd(cur.conv, pri.conv); return d == null ? null : <span style={{ fontWeight: 700, color: d >= 0 ? '#1FA463' : '#DC2626' }}>{d >= 0 ? '▲' : '▼'} {Math.abs(d)}% <span style={{ color: '#A29C95', fontWeight: 400 }}>vs {priCmp}</span></span>; })() : null}</div>
+          <div style={{ fontSize: 10.5, marginTop: 2 }}>{hasPri && !cmpSuppressed ? (() => { const d = gd(cur.conv, pri.conv); return d == null ? null : <span style={{ fontWeight: 700, color: d >= 0 ? '#1FA463' : '#DC2626' }}>{d >= 0 ? '▲' : '▼'} {Math.abs(d)}% <span style={{ color: '#A29C95', fontWeight: 400 }}>vs {priCmp}</span></span>; })() : (cmpSuppressed ? <span style={{ color: '#8A5A00', fontWeight: 700 }}>부분 구간</span> : null)}</div>
         </div>
       </div>
 
@@ -3820,7 +3838,7 @@ function VisitPathSection({ vd, vc, meta, data, setData, mode, vIdx, range }) {
 
       <Sub n="5" t="유입 성격 요약" d={'선택 기간(' + (curLabel || '전체') + ') · 6가지 성격 · ' + priCmp + ' 대비 증감'} />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 8, marginBottom: 16 }}>
-        {GROUPS.map(gr => { const c = cur.byGroup[gr[0]] || { v: 0, o: 0 }; const pv = (pri.byGroup[gr[0]] || { v: 0 }).v; const conv = c.v ? c.o / c.v * 100 : 0; const d = hasPri ? gd(c.v, pv) : null; return <div key={gr[0]} style={{ border: '1px solid #EDEBE7', borderLeft: '4px solid ' + gr[1], borderRadius: 9, padding: '9px 11px' }}><div style={{ fontSize: 12, fontWeight: 800, color: gr[1] }}>{gr[0]}</div><div style={{ fontSize: 9, color: '#A29C95', margin: '1px 0 5px', lineHeight: 1.35, minHeight: 22 }}>{gr[2]}</div><div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}><div style={{ fontSize: 15, fontWeight: 800, color: G }}>{num(c.v)}</div><div style={{ fontSize: 9, color: '#6E6863' }}>방문</div>{d == null ? null : <div style={{ fontSize: 10, fontWeight: 700, marginLeft: 'auto', color: d >= 0 ? '#1FA463' : '#DC2626' }}>{d >= 0 ? '▲' : '▼'}{Math.abs(d)}%</div>}</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>전환 {pctS(conv)} · 결제 {num(c.o)}</div></div>; })}
+        {GROUPS.map(gr => { const c = cur.byGroup[gr[0]] || { v: 0, o: 0 }; const pv = (pri.byGroup[gr[0]] || { v: 0 }).v; const conv = c.v ? c.o / c.v * 100 : 0; const d = (hasPri && !cmpSuppressed) ? gd(c.v, pv) : null; return <div key={gr[0]} style={{ border: '1px solid #EDEBE7', borderLeft: '4px solid ' + gr[1], borderRadius: 9, padding: '9px 11px' }}><div style={{ fontSize: 12, fontWeight: 800, color: gr[1] }}>{gr[0]}</div><div style={{ fontSize: 9, color: '#A29C95', margin: '1px 0 5px', lineHeight: 1.35, minHeight: 22 }}>{gr[2]}</div><div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}><div style={{ fontSize: 15, fontWeight: 800, color: G }}>{num(c.v)}</div><div style={{ fontSize: 9, color: '#6E6863' }}>방문</div>{d == null ? null : <div style={{ fontSize: 10, fontWeight: 700, marginLeft: 'auto', color: d >= 0 ? '#1FA463' : '#DC2626' }}>{d >= 0 ? '▲' : '▼'}{Math.abs(d)}%</div>}</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>전환 {pctS(conv)} · 결제 {num(c.o)}</div></div>; })}
       </div>
 
       {vcTot ? <React.Fragment>
@@ -4031,6 +4049,25 @@ function aggSalesRange(days, start, end) {
   return { key: start + '~' + end, label: start + ' ~ ' + end, periodStart: start, periodEnd: end, summary: summary, daily: daily, channels: channels, products: products, subscription: subscription, subscribers: subscribers };
 }
 
+const REP_SEED = [
+  { id: 'r_daily14', name: '라이프밀 데일리 14포', fulls: ['황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포'] },
+  { id: 'r_1saeng', name: '라이프밀 1일1생식 14포', fulls: ['황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g'] },
+  { id: 'r_young30', name: '영양식 30포', fulls: ['황성주박사의 영양식 황성주생식 식사대용 30포'] },
+  { id: 'r_ferment30', name: '발효건강식 30포', fulls: ['황성주박사의 발효건강식 황성주생식 식사대용 30포'] },
+  { id: 'r_nut30', name: '하루견과 30개입', fulls: ['갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입'] },
+  { id: 'r_pg21', name: '프로틴골드 21포', fulls: ['황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포', '황성주 박사의 프로틴 골드 HIGH5 식물성 단백질 21포'] },
+  { id: 'r_drsalad', name: '닥터샐러드 14포', fulls: ['황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포'] },
+  { id: 'r_dayup_ori', name: '데이업 프로틴오리지널7팩', fulls: ['황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 오리지널, 45g'] },
+  { id: 'r_dayup_hobak', name: '데이업프로틴 단호박고구마 7팩', fulls: ['황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 단호박 앤 고구마, 45g'] },
+  { id: 'r_dayup_banana', name: '데이업 프로틴 바나나 7팩', fulls: ['황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 바나나맛, 45g'] },
+  { id: 'r_granola', name: '그래놀라 7봉', fulls: ['홀그레인 저당 그래놀라 다이어트 간식(20g x 7봉)'] },
+  { id: 'r_crunch_grain', name: '크런치바 그레인 10개', fulls: ['황성주 박사의 데이크런치 프로틴바 그레인 단백질바(30g x 10개)'] },
+  { id: 'r_jelly_prune', name: '프룻젤리 푸룬 15포', fulls: ['라이프밀 유산균 푸룬 식이섬유 프룻 젤리 스틱 (20g x 15포)'] },
+  { id: 'r_crunch_choco', name: '크런치바 초코 10개', fulls: ['황성주 박사의 데이크런치 프로틴바 초코 단백질바(35g x 10개)'] }
+];
+const REP_DEFAULTS = REP_SEED.map(r => ({ id: r.id, name: r.name }));
+const REP_AUTO = (() => { const m = {}; REP_SEED.forEach(r => (r.fulls || []).forEach(f => { m[String(f).replace(/\s+/g, '').toLowerCase()] = r.id; })); return m; })();
+
 function TabSales({ data, setData }) {
   const [mode, setMode] = useState('month');
   const [full, setFull] = useState(null);
@@ -4041,6 +4078,11 @@ function TabSales({ data, setData }) {
   const [hoverDow, setHoverDow] = useState(null);
   const [idx, setIdx] = useState({ month: 0, week: 0, day: 0 });
   const [range, setRange] = useState({ start: '', end: '' });
+  const [copied, setCopied] = useState(false);
+  const [repModal, setRepModal] = useState(null);
+  const [linkModal, setLinkModal] = useState(null);
+  const [regOpen, setRegOpen] = useState(false);
+  const [regName, setRegName] = useState('');
   const BASE = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/';
 
   const normalize = j => {
@@ -4094,6 +4136,27 @@ function TabSales({ data, setData }) {
   const subMax = Math.max(1, ...subDaily.map(z => z.added || 0));
 
   const setMode2 = m => { setMode(m); setHoverBar(null); setHoverDow(null); if (m === 'custom' && !range.start && availKeys.length) { const e = availKeys[availKeys.length - 1]; const s = availKeys[Math.max(0, availKeys.length - 30)]; setRange({ start: s, end: e }); } };
+
+  const repN = s2 => String(s2 || '').replace(/\s+/g, '').toLowerCase();
+  const repProducts = (data && Array.isArray(data.repProducts) && data.repProducts.length) ? data.repProducts : REP_DEFAULTS;
+  const repNameById = {}; repProducts.forEach(r => { repNameById[r.id] = r.name; });
+  const nameToId = {}; repProducts.forEach(r => { nameToId[repN(r.name)] = r.id; });
+  const links = (data && data.repLinks) || {};
+  const parsePack = nm => { const mt = String(nm || '').match(/,\s*(\d+)\s*개\s*$/); return { pack: mt ? parseInt(mt[1], 10) : 1, base: mt ? String(nm).replace(/,\s*\d+\s*개\s*$/, '').trim() : String(nm || '') }; };
+  const resolveRepId = (pid, base) => { const lk = links[pid]; if (lk) { if (lk.repId && repNameById[lk.repId]) return lk.repId; if (lk.rep && nameToId[repN(lk.rep)]) return nameToId[repN(lk.rep)]; } const autoId = REP_AUTO[repN(base)]; if (autoId && repNameById[autoId]) return autoId; return null; };
+  const _repAgg = {}; const _unmapped = [];
+  (products || []).forEach(pp => { const pid = String(pp.productId || pp.name || ''); const pk = parsePack(pp.name); const rid = resolveRepId(pid, pk.base); const lk = links[pid]; const pack = (lk && lk.qty) ? lk.qty : pk.pack; const boxes = (pp.qty || 0) * pack; if (!rid) { _unmapped.push({ pid: pid, name: pp.name || pid, rev: pp.revenue || 0, qty: pp.qty || 0, pack: pk.pack }); return; } const g = _repAgg[rid] = _repAgg[rid] || { id: rid, label: repNameById[rid], rev: 0, boxes: 0, rawQty: 0, items: [] }; g.rev += pp.revenue || 0; g.boxes += boxes; g.rawQty += pp.qty || 0; g.items.push({ name: pp.name, pid: pid, pack: pack, qty: pp.qty || 0, boxes: boxes, linked: !!(lk && (lk.repId || lk.rep)) }); });
+  const unitGroups = Object.values(_repAgg).map(g => ({ id: g.id, label: g.label, rev: g.rev, boxes: g.boxes, rawQty: g.rawQty, items: g.items.sort((a, b) => a.pack - b.pack), unit: g.boxes > 0 ? Math.round(g.rev / g.boxes) : null })).sort((a, b) => b.rev - a.rev);
+  const unmappedSorted = _unmapped.slice().sort((a, b) => b.rev - a.rev);
+  const excelTSV = () => { const names = unitGroups.map(g => g.label); const prices = unitGroups.map(g => g.unit != null ? g.unit : ''); return names.join('\t') + '\n' + prices.join('\t'); };
+  const persistReps = arr => setData(d => ({ ...d, repProducts: arr.map(r => ({ id: r.id, name: r.name })) }));
+  const registerRep = nm => { const name = (nm || '').trim(); if (!name) { alert('대표상품 이름을 입력해주세요.'); return; } if (repProducts.some(r => repN(r.name) === repN(name))) { alert('이미 있는 대표상품이에요.'); return; } persistReps([...repProducts, { id: 'rep' + Date.now(), name: name }]); };
+  const renameRep = (id, nm) => { const name = (nm || '').trim(); if (!name) { alert('이름을 입력해주세요.'); return; } persistReps(repProducts.map(r => r.id === id ? { id: r.id, name: name } : r)); };
+  const deleteRep = id => { setData(d => { const nl = { ...((d && d.repLinks) || {}) }; Object.keys(nl).forEach(k => { if (nl[k] && nl[k].repId === id) delete nl[k]; }); const base = (d && Array.isArray(d.repProducts) && d.repProducts.length) ? d.repProducts : REP_DEFAULTS; return { ...d, repProducts: base.filter(r => r.id !== id).map(r => ({ id: r.id, name: r.name })), repLinks: nl }; }); };
+  const linkProduct = (pid, repId, qty) => { const q = parseInt(qty, 10); if (!pid || !repId || !q || q < 1) { alert('대표상품과 수량(1 이상)을 선택해주세요.'); return; } setData(d => ({ ...d, repLinks: { ...((d && d.repLinks) || {}), [pid]: { repId: repId, qty: q } } })); };
+  const unlinkProduct = pid => { setData(d => { const nl = { ...((d && d.repLinks) || {}) }; delete nl[pid]; return { ...d, repLinks: nl }; }); };
+  const fallbackCopy = (text, cb) => { try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.top = '-1000px'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); cb && cb(); } catch (e) { alert('복사에 실패했어요 — 표에서 직접 복사해주세요.'); } };
+  const copyExcel = () => { const tsv = excelTSV(); const done = () => { setCopied(true); setTimeout(() => setCopied(false), 1800); }; try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(tsv).then(done, () => fallbackCopy(tsv, done)); } else { fallbackCopy(tsv, done); } } catch (e) { fallbackCopy(tsv, done); } };
 
   return (
     <div style={{ padding: 20 }}>
@@ -4411,6 +4474,106 @@ function TabSales({ data, setData }) {
                 ))}</tbody>
               </table>
             </div>
+          </Card>
+        )}
+
+        {products.length > 0 && (
+          <Card style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📦 상품별 1개당 단가</div>
+              <span style={{ fontSize: 11, color: '#A29C95' }}>{modeLabel[mode]} · 대표상품 기준 · 옵션(N개)=N낱개 환산</span>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+                <button onClick={() => { setRegName(''); setRegOpen(true); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 8, border: '1px solid #D8D3CC', background: 'white', color: '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>+ 대표상품 등록</button>
+                <button onClick={copyExcel} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, border: '1px solid ' + (copied ? '#1FA463' : '#D8D3CC'), background: copied ? '#ECFDF5' : 'white', color: copied ? '#1FA463' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>{copied ? '✓ 복사됨' : '📋 엑셀 붙여넣기'}</button>
+              </div>
+            </div>
+            {unitGroups.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95', padding: '10px 2px 14px' }}>이 기간에 대표상품으로 연동된 판매가 없어요. 아래 '연동 안 된 상품'에서 연결하거나 '대표상품 등록'을 눌러주세요.</div> : <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 10, marginBottom: 14 }}>
+              {unitGroups.map((g, i) => (
+                <div key={g.id + '-c-' + i} onClick={() => setRepModal({ id: g.id, name: g.label })} title="클릭: 연동 상품 보기·이름 변경" style={{ border: '1px solid #E3E0DC', background: 'white', borderRadius: 12, padding: '12px 13px', display: 'flex', flexDirection: 'column', gap: 4, cursor: 'pointer' }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 800, color: G, lineHeight: 1.35, minHeight: 34 }}>{g.label}</div>
+                  <div style={{ fontSize: 21, fontWeight: 800, color: G }}>{g.unit != null ? won2(g.unit) : '-'}</div>
+                  <div style={{ fontSize: 10, color: '#A29C95', lineHeight: 1.5 }}>{g.boxes.toLocaleString()}낱개 · {won2(g.rev)}{g.items.length > 1 ? ' · ' + g.items.length + '개 구성' : ''}</div>
+                </div>
+              ))}
+            </div>}
+            {unmappedSorted.length > 0 ? <div style={{ marginBottom: 14, border: '1px solid #FDE68A', background: '#FFFBEB', borderRadius: 10, padding: '10px 12px' }}>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: '#B45309', marginBottom: 7 }}>🔗 연동 안 된 상품 {unmappedSorted.length}개 <span style={{ fontWeight: 400, color: '#A29C95' }}>· 클릭해서 대표상품에 연결</span></div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>{unmappedSorted.map(u => (
+                <div key={u.pid} onClick={() => setLinkModal({ pid: u.pid, name: u.name, repId: '', qty: String(u.pack || 1) })} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, maxWidth: 340, background: 'white', border: '1px solid #F0D9A0', borderRadius: 7, padding: '5px 9px', cursor: 'pointer', fontSize: 11 }}>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#6E6863' }}>{u.name}</span>
+                  <span style={{ fontWeight: 700, color: '#B45309', whiteSpace: 'nowrap' }}>+ 연동</span>
+                </div>
+              ))}</div>
+            </div> : null}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 520 }}>
+                <thead><tr style={{ background: '#FAFAFA' }}>{['대표상품', '구성', '총수량(낱개)', '총매출', '1개당 단가'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
+                <tbody>{unitGroups.map((g, i) => (
+                  <tr key={g.id + '-r-' + i} onClick={() => setRepModal({ id: g.id, name: g.label })} style={{ borderBottom: '1px solid #F5F4F2', cursor: 'pointer' }}>
+                    <td style={{ padding: '8px 10px', fontWeight: 600, maxWidth: 260, whiteSpace: 'normal', lineHeight: 1.4 }}>{g.label}{g.items.length > 1 ? <span style={{ marginLeft: 6, fontSize: 9.5, fontWeight: 700, color: '#1FA463', background: '#ECFDF5', borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap' }}>묶음 {g.items.length}</span> : null}</td>
+                    <td style={td}>{g.items.length > 1 ? g.items.map(o => o.pack + '개').join('·') : '단일'}</td>
+                    <td style={td}>{g.boxes.toLocaleString()}개</td>
+                    <td style={td}>{won2(g.rev)}</td>
+                    <td style={{ ...td, fontWeight: 800, color: G }}>{g.unit != null ? won2(g.unit) : '-'}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+            <div style={{ fontSize: 10, color: '#A29C95', padding: '8px 2px 0', lineHeight: 1.6 }}>1개당 단가 = 총매출 ÷ 총 낱개수량 · 옵션 'N개'=N낱개 환산 · <b>카드/행 클릭</b>: 연동 상품·이름 변경 · <b>연동 안 된 상품 클릭</b>: 대표상품에 연결. <b>📋 엑셀 붙여넣기</b>: 상품명 가로, 그 아래 1개당 단가(숫자).</div>
+
+            {regOpen ? <div onClick={() => setRegOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(20,18,15,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+              <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 14, padding: 20, width: 360, maxWidth: '90vw', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 12 }}>대표상품 등록</div>
+                <input value={regName} onChange={e => setRegName(e.target.value)} placeholder="대표상품 이름 (예: 라이프밀 데일리 14포)" style={{ width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 13, marginBottom: 12 }} />
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <button onClick={() => setRegOpen(false)} style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>취소</button>
+                  <button onClick={() => { registerRep(regName); setRegOpen(false); }} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: G, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>등록</button>
+                </div>
+              </div>
+            </div> : null}
+
+            {repModal ? (() => { const grp = unitGroups.find(g => g.id === repModal.id); const items = grp ? grp.items : []; return <div onClick={() => setRepModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(20,18,15,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+              <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 14, padding: 20, width: 480, maxWidth: '92vw', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 3 }}>대표상품 편집</div>
+                <div style={{ fontSize: 10.5, color: '#A29C95', marginBottom: 12 }}>이름을 바꾸거나 연동된 상품을 확인·해제하세요. (자동 인식된 상품은 '자동' 표시)</div>
+                <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
+                  <input value={repModal.name} onChange={e => setRepModal(m => ({ ...m, name: e.target.value }))} style={{ flex: 1, padding: '8px 10px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 13 }} />
+                  <button onClick={() => { renameRep(repModal.id, repModal.name); setRepModal(null); }} style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: G, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>이름 저장</button>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>연동된 상품 {items.length}개</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 240, overflowY: 'auto' }}>
+                  {items.length === 0 ? <div style={{ fontSize: 11, color: '#A29C95' }}>이 기간에 연동된 판매가 없어요.</div> : items.map(it => (
+                    <div key={it.pid} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, background: '#FAFAF9', border: '1px solid #F0EEEB', borderRadius: 7, padding: '6px 9px' }}>
+                      <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#3A3631' }}>{it.name}</span>
+                      <span style={{ color: '#6E6863', whiteSpace: 'nowrap' }}>1건={it.pack}낱개</span>
+                      {it.linked ? <span onClick={() => unlinkProduct(it.pid)} style={{ cursor: 'pointer', color: '#E53935', fontWeight: 700, whiteSpace: 'nowrap' }}>연동 해제</span> : <span style={{ color: '#A29C95', fontSize: 9.5, whiteSpace: 'nowrap' }}>자동</span>}
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16 }}>
+                  <button onClick={() => { if (window.confirm('이 대표상품을 삭제할까요? 연동도 함께 해제됩니다.')) { deleteRep(repModal.id); setRepModal(null); } }} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #FECACA', background: '#FEF2F2', color: '#E53935', cursor: 'pointer', fontSize: 11.5, fontWeight: 700 }}>삭제</button>
+                  <button onClick={() => setRepModal(null)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>닫기</button>
+                </div>
+              </div>
+            </div>; })() : null}
+
+            {linkModal ? <div onClick={() => setLinkModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(20,18,15,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+              <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 14, padding: 20, width: 430, maxWidth: '92vw', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: G, marginBottom: 4 }}>상품 연동</div>
+                <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 14, lineHeight: 1.5, wordBreak: 'break-all' }}>{linkModal.name}</div>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>대표상품</div>
+                <select value={linkModal.repId} onChange={e => setLinkModal(m => ({ ...m, repId: e.target.value }))} style={{ width: '100%', boxSizing: 'border-box', padding: '9px 10px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 13, background: 'white', marginBottom: 12 }}>
+                  <option value="">대표상품 선택</option>
+                  {repProducts.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </select>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>수량 (이 제품 1건 = 몇 낱개)</div>
+                <input type="number" min="1" value={linkModal.qty} onChange={e => setLinkModal(m => ({ ...m, qty: e.target.value }))} placeholder="낱개" style={{ width: '100%', boxSizing: 'border-box', padding: '9px 10px', border: '1px solid #D8D3CC', borderRadius: 8, fontSize: 13, marginBottom: 14 }} />
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <button onClick={() => setLinkModal(null)} style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>취소</button>
+                  <button onClick={() => { linkProduct(linkModal.pid, linkModal.repId, linkModal.qty); setLinkModal(null); }} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: G, color: 'white', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>연동</button>
+                </div>
+              </div>
+            </div> : null}
           </Card>
         )}
 
