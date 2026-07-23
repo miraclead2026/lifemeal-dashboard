@@ -4083,6 +4083,7 @@ function TabSales({ data, setData }) {
   const [linkModal, setLinkModal] = useState(null);
   const [regOpen, setRegOpen] = useState(false);
   const [regName, setRegName] = useState('');
+  const [dragId, setDragId] = useState(null);
   const BASE = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/';
 
   const normalize = j => {
@@ -4148,6 +4149,8 @@ function TabSales({ data, setData }) {
   (products || []).forEach(pp => { const pid = String(pp.productId || pp.name || ''); const pk = parsePack(pp.name); const rid = resolveRepId(pid, pk.base); const lk = links[pid]; const pack = (lk && lk.qty) ? lk.qty : pk.pack; const boxes = (pp.qty || 0) * pack; if (!rid) { _unmapped.push({ pid: pid, name: pp.name || pid, rev: pp.revenue || 0, qty: pp.qty || 0, pack: pk.pack }); return; } const g = _repAgg[rid] = _repAgg[rid] || { id: rid, label: repNameById[rid], rev: 0, boxes: 0, rawQty: 0, items: [] }; g.rev += pp.revenue || 0; g.boxes += boxes; g.rawQty += pp.qty || 0; g.items.push({ name: pp.name, pid: pid, pack: pack, qty: pp.qty || 0, boxes: boxes, linked: !!(lk && (lk.repId || lk.rep)) }); });
   const unitGroups = Object.values(_repAgg).map(g => ({ id: g.id, label: g.label, rev: g.rev, boxes: g.boxes, rawQty: g.rawQty, items: g.items.sort((a, b) => a.pack - b.pack), unit: g.boxes > 0 ? Math.round(g.rev / g.boxes) : null })).sort((a, b) => b.rev - a.rev);
   const unmappedSorted = _unmapped.slice().sort((a, b) => b.rev - a.rev);
+  const _repOrder = (data && data.repOrder) || [];
+  unitGroups.sort((a, b) => { const ia = _repOrder.indexOf(a.id), ib = _repOrder.indexOf(b.id); return (ia < 0 ? 100000 : ia) - (ib < 0 ? 100000 : ib); });
   const excelTSV = () => { const names = unitGroups.map(g => g.label); const prices = unitGroups.map(g => g.unit != null ? g.unit : ''); return names.join('\t') + '\n' + prices.join('\t'); };
   const persistReps = arr => setData(d => ({ ...d, repProducts: arr.map(r => ({ id: r.id, name: r.name })) }));
   const registerRep = nm => { const name = (nm || '').trim(); if (!name) { alert('대표상품 이름을 입력해주세요.'); return; } if (repProducts.some(r => repN(r.name) === repN(name))) { alert('이미 있는 대표상품이에요.'); return; } persistReps([...repProducts, { id: 'rep' + Date.now(), name: name }]); };
@@ -4155,6 +4158,7 @@ function TabSales({ data, setData }) {
   const deleteRep = id => { setData(d => { const nl = { ...((d && d.repLinks) || {}) }; Object.keys(nl).forEach(k => { if (nl[k] && nl[k].repId === id) delete nl[k]; }); const base = (d && Array.isArray(d.repProducts) && d.repProducts.length) ? d.repProducts : REP_DEFAULTS; return { ...d, repProducts: base.filter(r => r.id !== id).map(r => ({ id: r.id, name: r.name })), repLinks: nl }; }); };
   const linkProduct = (pid, repId, qty) => { const q = parseInt(qty, 10); if (!pid || !repId || !q || q < 1) { alert('대표상품과 수량(1 이상)을 선택해주세요.'); return; } setData(d => ({ ...d, repLinks: { ...((d && d.repLinks) || {}), [pid]: { repId: repId, qty: q } } })); };
   const unlinkProduct = pid => { setData(d => { const nl = { ...((d && d.repLinks) || {}) }; delete nl[pid]; return { ...d, repLinks: nl }; }); };
+  const moveCard = (fromId, toId) => { if (!fromId || fromId === toId) return; const ids = unitGroups.map(g => g.id); const from = ids.indexOf(fromId), to = ids.indexOf(toId); if (from < 0 || to < 0) return; ids.splice(from, 1); ids.splice(to, 0, fromId); setData(d => ({ ...d, repOrder: ids })); };
   const fallbackCopy = (text, cb) => { try { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.top = '-1000px'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); cb && cb(); } catch (e) { alert('복사에 실패했어요 — 표에서 직접 복사해주세요.'); } };
   const copyExcel = () => { const tsv = excelTSV(); const done = () => { setCopied(true); setTimeout(() => setCopied(false), 1800); }; try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(tsv).then(done, () => fallbackCopy(tsv, done)); } else { fallbackCopy(tsv, done); } } catch (e) { fallbackCopy(tsv, done); } };
 
@@ -4459,29 +4463,10 @@ function TabSales({ data, setData }) {
         )}
 
         {products.length > 0 && (
-          <Card style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
-            <div style={{ padding: '12px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7', fontSize: 13, fontWeight: 700, color: G }}>🏆 상품별 매출 순위</div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 460 }}>
-                <thead><tr style={{ background: '#FAFAFA' }}>{['#', '상품', '매출', '수량'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
-                <tbody>{products.map((p, i) => (
-                  <tr key={(p.productId || p.rank) + '-' + i} style={{ borderBottom: '1px solid #F5F4F2' }}>
-                    <td style={{ ...td, fontWeight: 700, color: G }}>{p.rank}</td>
-                    <td style={{ padding: '8px 10px', fontWeight: 600 }}>{p.name}</td>
-                    <td style={td}>{won2(p.revenue)} {deltaChip({ deltaValue: p.deltaValue })}</td>
-                    <td style={td}>{p.qty != null ? p.qty.toLocaleString() + '개' : '-'}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
-            </div>
-          </Card>
-        )}
-
-        {products.length > 0 && (
           <Card style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📦 상품별 1개당 단가</div>
-              <span style={{ fontSize: 11, color: '#A29C95' }}>{modeLabel[mode]} · 대표상품 기준 · 옵션(N개)=N낱개 환산</span>
+              <span style={{ fontSize: 11, color: '#A29C95' }}>{modeLabel[mode]} · 대표상품 기준 · 카드 드래그로 순서변경</span>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
                 <button onClick={() => { setRegName(''); setRegOpen(true); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 12px', borderRadius: 8, border: '1px solid #D8D3CC', background: 'white', color: '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>+ 대표상품 등록</button>
                 <button onClick={copyExcel} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 8, border: '1px solid ' + (copied ? '#1FA463' : '#D8D3CC'), background: copied ? '#ECFDF5' : 'white', color: copied ? '#1FA463' : '#3A3631', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>{copied ? '✓ 복사됨' : '📋 엑셀 붙여넣기'}</button>
@@ -4489,7 +4474,8 @@ function TabSales({ data, setData }) {
             </div>
             {unitGroups.length === 0 ? <div style={{ fontSize: 11.5, color: '#A29C95', padding: '10px 2px 14px' }}>이 기간에 대표상품으로 연동된 판매가 없어요. 아래 '연동 안 된 상품'에서 연결하거나 '대표상품 등록'을 눌러주세요.</div> : <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 10, marginBottom: 14 }}>
               {unitGroups.map((g, i) => (
-                <div key={g.id + '-c-' + i} onClick={() => setRepModal({ id: g.id, name: g.label })} title="클릭: 연동 상품 보기·이름 변경" style={{ border: '1px solid #E3E0DC', background: 'white', borderRadius: 12, padding: '12px 13px', display: 'flex', flexDirection: 'column', gap: 4, cursor: 'pointer' }}>
+                <div key={g.id + '-c-' + i} draggable onDragStart={() => setDragId(g.id)} onDragOver={e => e.preventDefault()} onDrop={() => { moveCard(dragId, g.id); setDragId(null); }} onDragEnd={() => setDragId(null)} onClick={() => setRepModal({ id: g.id, name: g.label })} title="드래그: 순서 변경 · 클릭: 편집" style={{ border: '1px solid ' + (dragId === g.id ? '#2D5FE0' : '#E3E0DC'), background: 'white', borderRadius: 12, padding: '9px 13px 12px', display: 'flex', flexDirection: 'column', gap: 3, cursor: 'grab', opacity: dragId === g.id ? 0.5 : 1 }}>
+                  <div style={{ fontSize: 9, color: '#C4BDB4', letterSpacing: 1 }}>⠿ 순서변경</div>
                   <div style={{ fontSize: 12.5, fontWeight: 800, color: G, lineHeight: 1.35, minHeight: 34 }}>{g.label}</div>
                   <div style={{ fontSize: 21, fontWeight: 800, color: G }}>{g.unit != null ? won2(g.unit) : '-'}</div>
                   <div style={{ fontSize: 10, color: '#A29C95', lineHeight: 1.5 }}>{g.boxes.toLocaleString()}낱개 · {won2(g.rev)}{g.items.length > 1 ? ' · ' + g.items.length + '개 구성' : ''}</div>
@@ -4519,7 +4505,7 @@ function TabSales({ data, setData }) {
                 ))}</tbody>
               </table>
             </div>
-            <div style={{ fontSize: 10, color: '#A29C95', padding: '8px 2px 0', lineHeight: 1.6 }}>1개당 단가 = 총매출 ÷ 총 낱개수량 · 옵션 'N개'=N낱개 환산 · <b>카드/행 클릭</b>: 연동 상품·이름 변경 · <b>연동 안 된 상품 클릭</b>: 대표상품에 연결. <b>📋 엑셀 붙여넣기</b>: 상품명 가로, 그 아래 1개당 단가(숫자).</div>
+            <div style={{ fontSize: 10, color: '#A29C95', padding: '8px 2px 0', lineHeight: 1.6 }}>1개당 단가 = 총매출 ÷ 총 낱개수량 · 옵션 'N개'=N낱개 환산 · <b>카드/행 클릭</b>: 연동 상품·이름 변경 · <b>연동 안 된 상품 클릭</b>: 대표상품에 연결 · <b>카드 드래그</b>로 순서 변경(표·엑셀에 그대로 반영). <b>📋 엑셀 붙여넣기</b>: 상품명 가로, 그 아래 1개당 단가(숫자).</div>
 
             {regOpen ? <div onClick={() => setRegOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(20,18,15,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
               <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 14, padding: 20, width: 360, maxWidth: '90vw', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
@@ -4574,6 +4560,25 @@ function TabSales({ data, setData }) {
                 </div>
               </div>
             </div> : null}
+          </Card>
+        )}
+
+        {products.length > 0 && (
+          <Card style={{ marginBottom: 16, padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '12px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7', fontSize: 13, fontWeight: 700, color: G }}>🏆 상품별 매출 순위</div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, minWidth: 460 }}>
+                <thead><tr style={{ background: '#FAFAFA' }}>{['#', '상품', '매출', '수량'].map(h => <th key={h} style={th}>{h}</th>)}</tr></thead>
+                <tbody>{products.map((p, i) => (
+                  <tr key={(p.productId || p.rank) + '-' + i} style={{ borderBottom: '1px solid #F5F4F2' }}>
+                    <td style={{ ...td, fontWeight: 700, color: G }}>{p.rank}</td>
+                    <td style={{ padding: '8px 10px', fontWeight: 600 }}>{p.name}</td>
+                    <td style={td}>{won2(p.revenue)} {deltaChip({ deltaValue: p.deltaValue })}</td>
+                    <td style={td}>{p.qty != null ? p.qty.toLocaleString() + '개' : '-'}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
           </Card>
         )}
 
