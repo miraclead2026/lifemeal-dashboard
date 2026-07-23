@@ -5832,6 +5832,7 @@ function App() {
   const pendingRef = useRef(null);
   const lastSavedRef = useRef(null);
   const initDoneRef = useRef(false);
+  const canSaveRef = useRef(false);
 
   useEffect(() => {
     const ref = db.ref(DB_PATH);
@@ -5840,18 +5841,19 @@ function App() {
       const remoteStr = remote ? JSON.stringify(remote) : null;
       if (!initDoneRef.current) {
         initDoneRef.current = true;
-        if (remote && remote.nid) { const m = migrateData(remote); setData(m); lastSavedRef.current = JSON.stringify(m); }
+        if (remote && remote.nid) { const m = migrateData(remote); setData(m); lastSavedRef.current = JSON.stringify(m); canSaveRef.current = true; }
+        else if (remote == null) { setData(INIT); lastSavedRef.current = null; canSaveRef.current = true; }
         else { setData(INIT); lastSavedRef.current = null; }
         setReady(true); setSync('ok');
       } else {
-        if (remote && remote.nid && remoteStr !== lastSavedRef.current) { const m = migrateData(remote); setData(m); lastSavedRef.current = JSON.stringify(m); }
+        if (remote && remote.nid && remoteStr !== lastSavedRef.current) { const m = migrateData(remote); setData(m); lastSavedRef.current = JSON.stringify(m); canSaveRef.current = true; }
       }
     }, err => { setSyncErr(err.message); setSync('error'); if (!initDoneRef.current) { initDoneRef.current = true; setData(INIT); setReady(true); } });
     return () => ref.off('value');
   }, []);
 
   useEffect(() => {
-    if (!ready || !data) return;
+    if (!ready || !data || !canSaveRef.current) return;
     const str = JSON.stringify(data);
     if (str === lastSavedRef.current) return;
     if (pendingRef.current) clearTimeout(pendingRef.current);
