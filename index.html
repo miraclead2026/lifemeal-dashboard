@@ -172,13 +172,14 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   outputs: (raw.outputs || []).map(o => ({ kpi: null, ...o })),
   plans: (raw.plans || []).map(p => { const b = { hold: false, desc: '', ...p }; if (!b.kpis) b.kpis = b.kpi ? [{ id: (b.kpi.id || ('k' + p.id)), name: b.kpi.name, unit: b.kpi.unit, target: b.kpi.target, targets: b.kpi.targets || {} }] : []; delete b.kpi; return b; }),
   subplans: (raw.subplans || []).map(s => { const ns = { files: [], perfRecorded: false, ...s }; if (ns.stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; return ns; }),
-  budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, kind: '일반', ...b })),
+  budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, kind: '일반', cardId: null, ...b })),
   trash: raw.trash || [],
   notices: raw.notices || [],
   updates: raw.updates !== undefined ? raw.updates : DEFAULT_UPDATES,
   meetings: raw.meetings || [],
   payments: raw.payments || [],
   vendors: raw.vendors || [],
+  cards: raw.cards || [],
   productGroups: raw.productGroups || [],
   adsLog: raw.adsLog || [],
   keywordApprovals: raw.keywordApprovals || [],
@@ -198,6 +199,9 @@ const itemTotal = b => b.vat === '별도' ? Math.round(b.amount * 1.1) : b.amoun
 const effDate = b => (b.status === '결제완료' && b.paidDate) ? b.paidDate : b.date;
 const effTotal = b => (b.status === '결제완료' && b.paidAmount != null && b.paidAmount !== '') ? Number(b.paidAmount) : itemTotal(b);
 const budgetNames = (data, b) => { const o = data.outputs.find(x => x.id === b.outputId); const p = b.planId ? data.plans.find(x => x.id === b.planId) : null; const s = b.subplanId ? data.subplans.find(x => x.id === b.subplanId) : null; const c = b.checklistId ? data.checklists.find(x => x.id === b.checklistId) : null; return { project: o ? outLabel(o) : '', plan: p ? p.name : '-', detail: c ? c.text : (s ? s.name : (p ? p.name : (o ? o.name : ''))) }; };
+const budgetOutId = (data, b) => { const o = (data.outputs || []).find(x => x.id === b.outputId); if (o) return String(o.id); if (b.planId) { const pl = (data.plans || []).find(p => p.id === b.planId); if (pl) { const o2 = (data.outputs || []).find(x => x.id === pl.outputId); if (o2) return String(o2.id); } } return '__none'; };
+const cardOf = (data, id) => (data.cards || []).find(c => String(c.id) === String(id)) || null;
+const cardLabel = (data, id) => { const c = cardOf(data, id); return c ? (c.name + (c.issuer ? ' (' + c.issuer + ')' : '')) : ''; };
 const fmtSize = n => n > 1024*1024 ? (n/(1024*1024)).toFixed(1)+'MB' : (n/1024).toFixed(0)+'KB';
 
 const moveToTrash = (d, type, id) => {
@@ -2669,28 +2673,74 @@ function TabBudget({ data, setData, goTab }) {
   const vendorLedger = (() => { const m = {}; monthBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료').forEach(b => { const v = b.vendor || '(미지정)'; if (!m[v]) m[v] = { appr: 0, paid: 0 }; m[v].appr += itemTotal(b); }); payments.filter(p => inMonth(p.paidDate)).forEach(p => { const v = p.vendor || '(미지정)'; if (!m[v]) m[v] = { appr: 0, paid: 0 }; m[v].paid += Number(p.amount) || 0; }); return Object.entries(m).map(([v, x]) => ({ vendor: v, appr: x.appr, paid: x.paid, left: x.appr - x.paid })).sort((a, b) => b.appr - a.appr || b.paid - a.paid); })();
   const del = id => setData(d => moveToTrash(d, 'budget', id));
   const [showVendorMgr, setShowVendorMgr] = useState(false);
+  const [showCardMgr, setShowCardMgr] = useState(false);
+  const [showCardUse, setShowCardUse] = useState(false);
+  const [fB, setFB] = useState({ q: '', proj: '', vendor: '', pay: '', card: '', status: '' });
+  const [fP, setFP] = useState({ q: '', proj: '', vendor: '', pay: '', card: '' });
+  const cards = data.cards || [];
   const delPay = id => { if (!confirm('이 실결제 기록을 삭제할까요? (드라이브 영수증 파일은 유지됩니다)')) return; setData(d => ({ ...d, payments: (d.payments || []).filter(p => p.id !== id) })); };
   const setPayProject = (payId, pid) => setData(d => ({ ...d, payments: (d.payments || []).map(p => p.id === payId ? { ...p, projectId: pid } : p) }));
-  const groups = {}; tableBudgets.forEach(b => { const k = view === 'week' ? weekKeyOf(b.date) : b.date; (groups[k] = groups[k] || []).push(b); });
+  const allVendorNames = (() => { const st = new Set(); (data.vendors || []).forEach(v => st.add(v)); budgets.forEach(b => { if (b.vendor) st.add(b.vendor); }); payments.forEach(p => { if (p.vendor) st.add(p.vendor); }); return [...st].sort(); })();
+  const projOpts = (data.outputs || []).map(o => ({ v: String(o.id), l: outLabel(o) }));
+  const vendorOpts = allVendorNames.map(v => ({ v: v, l: v }));
+  const cardOpts = cards.map(c => ({ v: String(c.id), l: c.name }));
+  const fSel = (val, set, opts, ph) => <select value={val} onChange={ev => set(ev.target.value)} style={{ padding: '6px 8px', borderRadius: 7, border: '1px solid ' + (val ? G : '#E3E0DC'), background: val ? '#F8F7F5' : 'white', color: val ? G : '#6E6863', fontSize: 11.5, fontWeight: val ? 700 : 500, cursor: 'pointer', maxWidth: 160 }}><option value="">{ph}</option>{opts.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}</select>;
+  const bMatch = b => {
+    if (fB.proj && budgetOutId(data, b) !== fB.proj) return false;
+    if (fB.vendor && (b.vendor || '') !== fB.vendor) return false;
+    if (fB.pay && (b.payMethod || '') !== fB.pay) return false;
+    if (fB.card && String(b.cardId || '') !== fB.card) return false;
+    if (fB.status && (b.status || '') !== fB.status) return false;
+    if (fB.q) { const q = fB.q.toLowerCase(); const n = budgetNames(data, b); const hay = [n.project, n.plan, n.detail, b.vendor, b.memo, b.account, String(b.amount)].join(' ').toLowerCase(); if (hay.indexOf(q) < 0) return false; }
+    return true;
+  };
+  const pMatch = p => {
+    if (fP.proj) { const pid = (p.projectId != null && p.projectId !== '') ? String(p.projectId) : '__none'; if (pid !== fP.proj) return false; }
+    if (fP.vendor && (p.vendor || '') !== fP.vendor) return false;
+    if (fP.pay && (p.payMethod || '') !== fP.pay) return false;
+    if (fP.card && String(p.cardId || '') !== fP.card) return false;
+    if (fP.q) { const q = fP.q.toLowerCase(); const po = (data.outputs || []).find(o => String(o.id) === String(p.projectId)); const hay = [p.vendor, p.memo, p.project, po ? outLabel(po) : '', cardLabel(data, p.cardId), String(p.amount)].join(' ').toLowerCase(); if (hay.indexOf(q) < 0) return false; }
+    return true;
+  };
+  const fBOn = !!(fB.q || fB.proj || fB.vendor || fB.pay || fB.card || fB.status);
+  const fPOn = !!(fP.q || fP.proj || fP.vendor || fP.pay || fP.card);
+  const shownBudgets = tableBudgets.filter(bMatch);
+  const shownPays = payments.filter(pMatch);
+  const filterBar = (f, setF, isPay) => (
+    <Card style={{ marginBottom: 12, padding: '10px 12px' }}>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+        <span style={{ fontSize: 11.5, fontWeight: 700, color: '#6E6863' }}>🔎 필터</span>
+        <input value={f.q} onChange={ev => setF(x => ({ ...x, q: ev.target.value }))} placeholder="검색 (항목·업체·메모·금액)" style={{ flex: 1, minWidth: 150, padding: '6px 9px', borderRadius: 7, border: '1px solid ' + (f.q ? G : '#E3E0DC'), fontSize: 11.5, boxSizing: 'border-box' }} />
+        {fSel(f.proj, v => setF(x => ({ ...x, proj: v })), [...projOpts, { v: '__none', l: '(프로젝트 미지정)' }], '프로젝트 전체')}
+        {fSel(f.vendor, v => setF(x => ({ ...x, vendor: v })), vendorOpts, '업체 전체')}
+        {fSel(f.pay, v => setF(x => ({ ...x, pay: v })), PAY_OPTS.map(o => ({ v: o, l: o })), '결제방법 전체')}
+        {cards.length > 0 ? fSel(f.card, v => setF(x => ({ ...x, card: v })), cardOpts, '카드 전체') : null}
+        {!isPay ? fSel(f.status, v => setF(x => ({ ...x, status: v })), BSTATUS.map(o => ({ v: o, l: o })), '상태 전체') : null}
+        {(isPay ? fPOn : fBOn) ? <button onClick={() => setF(isPay ? { q: '', proj: '', vendor: '', pay: '', card: '' } : { q: '', proj: '', vendor: '', pay: '', card: '', status: '' })} style={{ padding: '6px 11px', borderRadius: 7, border: '1px solid #FCA5A5', background: 'white', color: '#E53935', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>✕ 초기화</button> : null}
+      </div>
+      {(isPay ? fPOn : fBOn) ? <div style={{ fontSize: 11, color: G, fontWeight: 700, marginTop: 7 }}>필터 결과 {isPay ? shownPays.length : shownBudgets.length}건 · 합계 {won(isPay ? shownPays.reduce((a, p) => a + (Number(p.amount) || 0), 0) : shownBudgets.reduce((a, b) => a + itemTotal(b), 0))}</div> : null}
+    </Card>
+  );
+  const groups = {}; shownBudgets.forEach(b => { const k = view === 'week' ? weekKeyOf(b.date) : b.date; (groups[k] = groups[k] || []).push(b); });
   const keys = Object.keys(groups).sort().reverse();
-  const payGroups = {}; payments.forEach(p => { const k = p.paidDate || '미상'; (payGroups[k] = payGroups[k] || []).push(p); });
+  const payGroups = {}; shownPays.forEach(p => { const k = p.paidDate || '미상'; (payGroups[k] = payGroups[k] || []).push(p); });
   const apprItems = monthBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료').map(b => { const linked = payments.filter(p => (p.coveredBudgetIds || []).indexOf(b.id) >= 0); const paidAmt = linked.reduce((a, p) => a + (Number(p.amount) || 0), 0); const isPaid = b.status === '결제완료' || linked.length > 0; return { b, linked, paidAmt, isPaid, amt: itemTotal(b) }; }).sort((a, x) => (a.isPaid === x.isPaid ? (x.amt - a.amt) : (a.isPaid ? 1 : -1)));
   const apprUnpaidSum = apprItems.filter(x => !x.isPaid).reduce((a, x) => a + x.amt, 0);
   const projList = (() => {
     const apprB = monthBudgets.filter(b => b.status === '기안완료' || b.status === '결제완료');
     const pidOf = b => { const o = outOfBudget(b); return o ? String(o.id) : '__none'; };
     const nameOf = pid => { if (pid === '__none') return '(프로젝트 미지정)'; const o = data.outputs.find(x => String(x.id) === pid); return o ? outLabel(o) : '(프로젝트 미지정)'; };
-    const vAppr = {};
-    apprB.forEach(b => { const v = b.vendor || '(미지정)', pid = pidOf(b), t = itemTotal(b); (vAppr[v] = vAppr[v] || { total: 0, byProj: {} }); vAppr[v].total += t; vAppr[v].byProj[pid] = (vAppr[v].byProj[pid] || 0) + t; });
     const P = {};
     const ens = (pid, nm) => (P[pid] = P[pid] || { pid: pid, name: nm || nameOf(pid), appr: 0, paid: 0, vendors: {}, items: [], manualPays: [], payItems: [], noAppr: false });
-    apprB.forEach(b => { const pid = pidOf(b), v = b.vendor || '(미지정)', o = ens(pid); o.appr += itemTotal(b); (o.vendors[v] = o.vendors[v] || { appr: 0, paid: 0 }).appr += itemTotal(b); o.items.push(b); });
+    const ensV = (o, v) => (o.vendors[v] = o.vendors[v] || { appr: 0, paid: 0, pays: [] });
+    apprB.forEach(b => { const pid = pidOf(b), v = b.vendor || '(미지정)', o = ens(pid); o.appr += itemTotal(b); ensV(o, v).appr += itemTotal(b); o.items.push(b); });
     payments.filter(p => inMonth(p.paidDate)).forEach(p => {
       const v = p.vendor || '(미지정)', amt = Number(p.amount) || 0;
-      if (p.projectId != null && data.outputs.some(o => String(o.id) === String(p.projectId))) { const o = ens(String(p.projectId)); o.paid += amt; (o.vendors[v] = o.vendors[v] || { appr: 0, paid: 0 }).paid += amt; o.manualPays.push(p); }
-      else { const va = vAppr[v]; if (va && va.total > 0) { Object.keys(va.byProj).forEach(pid => { const share = amt * (va.byProj[pid] / va.total); const o = ens(pid); o.paid += share; (o.vendors[v] = o.vendors[v] || { appr: 0, paid: 0 }).paid += share; }); } else { const o = ens('__nobudget', '(기안 미연결 실결제)'); o.noAppr = true; o.paid += amt; (o.vendors[v] = o.vendors[v] || { appr: 0, paid: 0 }).paid += amt; o.payItems.push(p); } }
+      const valid = p.projectId != null && p.projectId !== '' && data.outputs.some(o => String(o.id) === String(p.projectId));
+      if (valid) { const o = ens(String(p.projectId)); o.paid += amt; const x = ensV(o, v); x.paid += amt; x.pays.push(p); o.manualPays.push(p); }
+      else { const o = ens('__noproj', '(프로젝트 미지정 실결제)'); o.noAppr = true; o.paid += amt; const x = ensV(o, v); x.paid += amt; x.pays.push(p); o.payItems.push(p); }
     });
-    return Object.values(P).sort((a, b) => (b.appr - a.appr) || (b.paid - a.paid));
+    return Object.values(P).sort((a, b) => (a.pid === '__noproj' ? 1 : b.pid === '__noproj' ? -1 : 0) || (b.appr - a.appr) || (b.paid - a.paid));
   })();
   const payKeys = Object.keys(payGroups).sort().reverse();
   const navBtn = { border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, cursor: 'pointer', padding: '3px 10px' };
@@ -2709,12 +2759,14 @@ function TabBudget({ data, setData, goTab }) {
         <div style={{ fontSize: 17, fontWeight: 700, color: G }}>예산 관리</div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <button onClick={() => setShowVendorMgr(true)} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid ' + G, cursor: 'pointer', fontSize: 12, fontWeight: 600, background: 'white', color: G }}>🏢 업체 관리</button>
+          <button onClick={() => setShowCardMgr(true)} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid ' + G, cursor: 'pointer', fontSize: 12, fontWeight: 600, background: 'white', color: G }}>💳 카드 관리</button>
           {subTab === 'plan' ? (<>
             <button onClick={() => setShowDraft(true)} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid ' + G, cursor: 'pointer', fontSize: 12, fontWeight: 600, background: 'white', color: G }}>📄 기안서 만들기</button>
             <button onClick={() => setShowAdd(true)} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: GO, color: 'white' }}>+ 예산 추가</button>
-          </>) : (
+          </>) : (<>
+            <button onClick={() => setShowCardUse(true)} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid #7C5CD6', cursor: 'pointer', fontSize: 12, fontWeight: 700, background: '#F6F2FD', color: '#7C5CD6' }}>📊 카드별 사용내역</button>
             <button onClick={() => setShowPay(true)} style={{ padding: '7px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: GO, color: 'white' }}>+ 실결제 추가</button>
-          )}
+          </>)}
         </div>
       </div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>{subBtn('pay', '실결제')}{subBtn('plan', '예상 / 기안')}</div>
@@ -2741,7 +2793,8 @@ function TabBudget({ data, setData, goTab }) {
           <span style={{ width: 1, height: 18, background: '#E3E0DC', margin: '0 2px' }} />
           <span style={{ fontSize: 11, color: '#A29C95' }}>목록:</span><button onClick={() => setMonthMode(!monthMode)} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: monthMode ? GO : '#E3E0DC', color: monthMode ? 'white' : '#3A3631' }}>{monthMode ? '📅 ' + monthKey + '만' : '📅 월별 보기'}</button>
         </div>
-        {!tableBudgets.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>💰</div><div>{monthMode ? monthKey + '에 등록된 예산이 없습니다' : '등록된 예산이 없습니다'}</div></Card>) :
+        {filterBar(fB, setFB, false)}
+        {!shownBudgets.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>💰</div><div>{fBOn ? '필터 조건에 맞는 예산이 없습니다' : (monthMode ? monthKey + '에 등록된 예산이 없습니다' : '등록된 예산이 없습니다')}</div>{fBOn ? <button onClick={() => setFB({ q: '', proj: '', vendor: '', pay: '', card: '', status: '' })} style={{ marginTop: 10, padding: '6px 14px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: G, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>필터 초기화</button> : null}</Card>) :
           keys.map(k => { const list = groups[k]; const sub = list.reduce((a, b) => a + itemTotal(b), 0); const head = view === 'week' ? (k.slice(5) + ' ~ ' + addDays(k, 6).slice(5) + ' 주간') : k; return (
             <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7' }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{head}</span><span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: G }}>{won(sub)}</span></div>
@@ -2754,7 +2807,7 @@ function TabBudget({ data, setData, goTab }) {
                       <td style={{ padding: '8px 10px', fontWeight: 600 }}>{(() => { const out = outOfBudget(b); return out ? <span onClick={ev => { ev.stopPropagation(); goTab && goTab('프로젝트 진행 상황'); }} title="진행 상황으로 이동" style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, color: txtOn(clsC(out.type, data.categories)), background: clsC(out.type, data.categories), padding: '1px 6px', borderRadius: 5, marginRight: 6, cursor: 'pointer' }}>{out.code}</span> : null; })()}{n.detail}{b.kind === '정기' ? <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, color: '#2D5FE0', background: '#EFF6FF', borderRadius: 5, padding: '1px 6px' }}>🔁 정기</span> : null}</td>
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{b.vendor}</td>
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{won(itemTotal(b))}</td>
-                      <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{b.payMethod}</td>
+                      <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>{b.payMethod}{b.cardId ? <span style={{ marginLeft: 4, fontSize: 9, fontWeight: 700, color: '#7C5CD6', background: '#F3EEFE', border: '1px solid #E4DAF7', borderRadius: 4, padding: '1px 5px' }}>💳 {cardLabel(data, b.cardId) || '카드'}</span> : null}</td>
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}><span onClick={() => togglePlanStatus(b.id)} style={{ cursor: 'pointer', fontSize: 11, padding: '2px 8px', borderRadius: 10, background: bStatusC(b.status), color: 'white', fontWeight: 600 }}>{b.status}</span>{isPaid ? <span style={{ marginLeft: 4, fontSize: 10, padding: '2px 6px', borderRadius: 10, background: '#ECFDF5', color: '#1FA463', fontWeight: 700 }}>✓ 결제됨</span> : null}</td>
                       <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}><button onClick={() => setEditB(b)} style={{ border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 10, padding: '2px 7px', fontWeight: 600, marginRight: 4 }}>수정</button><button onClick={() => del(b.id)} style={{ border: 'none', background: 'none', color: '#D1D5DB', cursor: 'pointer', fontSize: 15 }}>×</button></td>
                     </tr>); })}</tbody>
@@ -2775,7 +2828,7 @@ function TabBudget({ data, setData, goTab }) {
           <Card style={{ marginBottom: 16, padding: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: G }}>📁 프로젝트별 예산 현황</div>
-              <span style={{ fontSize: 11, color: '#A29C95' }}>기안완료 기준 사용가능 · 실결제 반영 · 업체별 내역 + 기안완료 항목 · 미연결 실결제 연결</span>
+              <span style={{ fontSize: 11, color: '#A29C95' }}>기안완료 기준 사용가능 · 실결제는 <b>프로젝트+업체가 모두 일치</b>할 때만 반영 · 미지정 실결제 연결</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {projList.map(P => {
@@ -2804,7 +2857,7 @@ function TabBudget({ data, setData, goTab }) {
                           <div key={v} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 11.5 }}>
                             <span style={{ fontWeight: 600, color: '#3A3631', minWidth: 78 }}>{v}</span>
                             <span style={{ color: '#6E6863' }}>사용 <b style={{ color: '#1FA463' }}>{won(vpaid)}</b></span>
-                            {x.appr > 0 ? <span style={{ color: '#A29C95' }}>/ 사용가능 {won(x.appr)}</span> : null}
+                            {x.appr > 0 ? <span style={{ color: '#A29C95' }}>/ 사용가능 {won(x.appr)}</span> : (x.paid > 0 && P.pid !== '__noproj' ? <span style={{ fontSize: 9.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '1px 6px' }}>이 프로젝트 기안 없음</span> : null)}
                             <span style={{ marginLeft: 'auto', color: vleft < 0 ? '#E53935' : '#A29C95' }}>잔여 {won(vleft)}</span>
                           </div>
                         ); })}
@@ -2812,7 +2865,7 @@ function TabBudget({ data, setData, goTab }) {
                     )}
                     {hasDetail && (
                       <div style={{ marginTop: 9 }}>
-                        <button onClick={() => setOpenProj(o => ({ ...o, [P.pid]: !o[P.pid] }))} style={{ fontSize: 11, fontWeight: 700, padding: '5px 10px', borderRadius: 7, border: '1px solid ' + (isUnattr ? '#C7B8F0' : '#E3E0DC'), background: open ? '#F5F4F2' : (isUnattr ? '#F6F2FD' : 'white'), color: isUnattr ? '#7C5CD6' : '#6E6863', cursor: 'pointer' }}>{open ? '▾' : '▸'} {isUnattr ? '실결제 내역 · 프로젝트 연결' : '기안완료 항목 보기'} ({isUnattr ? P.payItems.length : P.items.length}건)</button>
+                        <button onClick={() => setOpenProj(o => ({ ...o, [P.pid]: !o[P.pid] }))} style={{ fontSize: 11, fontWeight: 700, padding: '5px 10px', borderRadius: 7, border: '1px solid ' + (isUnattr ? '#C7B8F0' : '#E3E0DC'), background: open ? '#F5F4F2' : (isUnattr ? '#F6F2FD' : 'white'), color: isUnattr ? '#7C5CD6' : '#6E6863', cursor: 'pointer' }}>{open ? '▾' : '▸'} {isUnattr ? '실결제 내역 · 프로젝트 연결' : '기안·실결제 내역 보기'} ({isUnattr ? P.payItems.length : (P.items.length + P.manualPays.length)}건)</button>
                         {open && (<div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 5 }}>
                           {P.payItems.map(p => (
                             <div key={'u' + p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 11.5, background: '#F6F2FD', border: '1px solid #E4DAF7', borderRadius: 8, padding: '7px 9px' }}>
@@ -2830,10 +2883,11 @@ function TabBudget({ data, setData, goTab }) {
                               <span style={{ fontWeight: 800, color: '#1A1614' }}>{won(itemTotal(b))}</span>
                             </div>
                           ); })}
-                          {P.manualPays.length > 0 ? <div style={{ fontSize: 9.5, fontWeight: 700, color: '#7C5CD6', marginTop: 2 }}>🔗 수동 연결된 실결제</div> : null}
+                          {P.manualPays.length > 0 ? <div style={{ fontSize: 9.5, fontWeight: 700, color: '#7C5CD6', marginTop: 2 }}>💳 이 프로젝트 실결제 {P.manualPays.length}건</div> : null}
                           {P.manualPays.map(p => (
                             <div key={'m' + p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 11.5, background: '#F6F2FD', border: '1px solid #E4DAF7', borderRadius: 8, padding: '6px 9px' }}>
                               <span style={{ fontSize: 9, fontWeight: 700, color: '#6E6863', background: '#EDE7FA', borderRadius: 4, padding: '1px 5px' }}>{p.vendor || '(업체 미지정)'}</span>
+                              {p.cardId ? <span style={{ fontSize: 9, fontWeight: 700, color: '#7C5CD6', background: '#F3EEFE', border: '1px solid #E4DAF7', borderRadius: 4, padding: '1px 5px' }}>💳 {cardLabel(data, p.cardId) || '카드'}</span> : null}
                               <span style={{ flex: 1, minWidth: 90, color: '#3A3631' }}>{p.paidDate ? p.paidDate.slice(5) : ''}{p.memo ? ' · ' + p.memo : ''}</span>
                               <span style={{ fontWeight: 800, color: '#1A1614' }}>{won(Number(p.amount) || 0)}</span>
                               <button onClick={() => setPayProject(p.id, null)} style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#E53935', cursor: 'pointer' }}>연결 해제</button>
@@ -2846,10 +2900,11 @@ function TabBudget({ data, setData, goTab }) {
                 );
               })}
             </div>
-            <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>프로젝트 사용가능 = 이번 달 기안완료·결제완료 기안 합 · 사용 = 실결제(업체 기준 비례분배 + 수동 연결) · 잔여 = 사용가능 − 사용 · '기안 미연결 실결제'를 열어 항목별로 프로젝트에 연결할 수 있어요</div>
+            <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 8, lineHeight: 1.5 }}>프로젝트 사용가능 = 이번 달 기안완료·결제완료 기안 합 · 사용 = <b>그 프로젝트로 지정된 실결제만</b> 합산(같은 업체라도 다른 프로젝트로는 절대 넘어가지 않습니다) · 잔여 = 사용가능 − 사용 · 프로젝트가 없는 실결제는 '(프로젝트 미지정 실결제)'에 모이며 열어서 연결할 수 있어요</div>
           </Card>
         )}
-        {!payments.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>🧾</div><div>등록된 실결제 기록이 없습니다</div><div style={{ fontSize: 12, marginTop: 6 }}>업체를 선택하고 결제 금액을 입력해 기록하세요</div></Card>) :
+        {filterBar(fP, setFP, true)}
+        {!shownPays.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>🧾</div><div>{fPOn ? '필터 조건에 맞는 실결제가 없습니다' : '등록된 실결제 기록이 없습니다'}</div><div style={{ fontSize: 12, marginTop: 6 }}>{fPOn ? '조건을 바꾸거나 초기화해 보세요' : '프로젝트와 업체를 선택하고 결제 금액을 입력해 기록하세요'}</div>{fPOn ? <button onClick={() => setFP({ q: '', proj: '', vendor: '', pay: '', card: '' })} style={{ marginTop: 10, padding: '6px 14px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: G, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>필터 초기화</button> : null}</Card>) :
           payKeys.map(k => { const list = payGroups[k]; const sub = list.reduce((a, p) => a + (Number(p.amount) || 0), 0); return (
             <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '10px 14px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7' }}><span style={{ fontSize: 13, fontWeight: 700, color: G }}>{k}</span><span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: G }}>{won(sub)}</span></div>
@@ -2858,7 +2913,8 @@ function TabBudget({ data, setData, goTab }) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 14, fontWeight: 700 }}>{p.vendor}</span>
                     <span style={{ fontSize: 11, color: '#6E6863' }}>{p.payMethod}</span>
-                    {p.project ? <Badge label={p.project} color={G} /> : null}
+                    {p.cardId ? <span style={{ fontSize: 10, fontWeight: 700, color: '#7C5CD6', background: '#F3EEFE', border: '1px solid #E4DAF7', borderRadius: 5, padding: '2px 7px' }}>💳 {cardLabel(data, p.cardId) || '카드'}</span> : null}
+                    {(() => { const po = (data.outputs || []).find(o => String(o.id) === String(p.projectId)); return po ? <Badge label={outLabel(po)} color={G} /> : <span style={{ fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '2px 7px' }}>⚠ 프로젝트 미지정</span>; })()}
                     <span style={{ marginLeft: 'auto', fontSize: 15, fontWeight: 800, color: '#1FA463' }}>{won(Number(p.amount) || 0)}</span>
                   </div>
                   {items.length > 0 && <div style={{ fontSize: 11, color: '#6E6863', marginTop: 6 }}>기안 연결: {items.map(b => { const n = budgetNames(data, b); return n.detail; }).join(', ')}</div>}
@@ -2874,6 +2930,8 @@ function TabBudget({ data, setData, goTab }) {
 
       {showAdd && <BudgetFormModal data={data} setData={setData} onClose={() => setShowAdd(false)} />}
       {showVendorMgr && <VendorManagerModal data={data} setData={setData} onClose={() => setShowVendorMgr(false)} />}
+      {showCardMgr && <CardManagerModal data={data} setData={setData} onClose={() => setShowCardMgr(false)} />}
+      {showCardUse && <CardUsageModal data={data} monthKey={monthKey} onClose={() => setShowCardUse(false)} />}
       {showDraft && <DraftModal data={data} setData={setData} onClose={() => setShowDraft(false)} />}
       {editB && <BudgetFormModal data={data} setData={setData} edit={editB} onClose={() => setEditB(null)} />}
       {showPay && <PaymentModal data={data} setData={setData} onClose={() => setShowPay(false)} />}
@@ -2892,6 +2950,10 @@ function PaymentModal({ data, setData, edit, onClose }) {
   const [addingVendor, setAddingVendor] = useState(false);
   const [amount, setAmount] = useState(e.amount != null ? String(e.amount) : '');
   const [payMethod, setPayMethod] = useState(e.payMethod || '세금계산서');
+  const [projectId, setProjectId] = useState(e.projectId != null && e.projectId !== '' ? String(e.projectId) : '');
+  const [cardId, setCardId] = useState(e.cardId != null && e.cardId !== '' ? String(e.cardId) : '');
+  const [covered, setCovered] = useState(() => (e.coveredBudgetIds || []).slice());
+  const cards = data.cards || [];
   const [paidDate, setPaidDate] = useState(e.paidDate || TODAY);
   const [memo, setMemo] = useState(e.memo || '');
   const [receiptUrl, setReceiptUrl] = useState(e.receiptUrl || '');
@@ -2900,6 +2962,10 @@ function PaymentModal({ data, setData, edit, onClose }) {
   const [uploading, setUploading] = useState(false);
   const [upErr, setUpErr] = useState('');
   const projectName = vendor || '미지정';
+  const projOut = (data.outputs || []).find(o => String(o.id) === projectId) || null;
+  const matchB = (projectId && vendor) ? (data.budgets || []).filter(b => budgetOutId(data, b) === projectId && (b.vendor || '') === vendor).sort((a, b) => (b.date || '') < (a.date || '') ? -1 : 1) : [];
+  const toggleCov = id => setCovered(c => c.indexOf(id) >= 0 ? c.filter(x => x !== id) : [...c, id]);
+  const covSum = matchB.filter(b => covered.indexOf(b.id) >= 0).reduce((a, b) => a + itemTotal(b), 0);
   const confirmAddVendor = () => { const v = newVendor.trim(); if (!v) return; if (allVendors.indexOf(v) < 0) setData(d => ({ ...d, vendors: [...(d.vendors || []), v] })); setVendor(v); setNewVendor(''); setAddingVendor(false); };
   const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E3E0DC', color: val === o ? 'white' : '#3A3631' }}>{o}</button>)}</div>;
   const pickReceipt = async file => {
@@ -2912,9 +2978,12 @@ function PaymentModal({ data, setData, edit, onClose }) {
     } catch (err) { setUpErr(err.message || '업로드 실패'); } finally { setUploading(false); }
   };
   const save = () => {
+    if (!projectId) { alert('프로젝트를 선택하세요\n(프로젝트 + 업체가 모두 일치하는 기안에만 연결됩니다)'); return; }
     if (!vendor) { alert('업체를 선택하세요'); return; }
     if (!amount || Number(amount) <= 0) { alert('결제 금액을 입력하세요'); return; }
-    const fields = { vendor, amount: Number(amount), payMethod, paidDate, coveredBudgetIds: [], receiptUrl, receiptName, project: projectName, memo: memo.trim() };
+    if (payMethod === '카드결제' && cards.length > 0 && !cardId) { alert('결제 카드를 선택하세요'); return; }
+    const keepCov = matchB.filter(b => covered.indexOf(b.id) >= 0).map(b => b.id);
+    const fields = { vendor, amount: Number(amount), payMethod, paidDate, projectId: Number(projectId), cardId: payMethod === '카드결제' && cardId ? Number(cardId) : null, coveredBudgetIds: keepCov, receiptUrl, receiptName, project: projectName, memo: memo.trim() };
     if (edit) setData(d => ({ ...d, payments: (d.payments || []).map(p => p.id === edit.id ? { ...p, ...fields } : p) }));
     else setData(d => ({ ...d, payments: [{ id: Date.now(), createdAt: TODAY, ...fields }, ...(d.payments || [])] }));
     onClose();
@@ -2922,7 +2991,12 @@ function PaymentModal({ data, setData, edit, onClose }) {
   return (
     <ModalShell title={edit ? '실결제 수정' : '실결제 추가'} onClose={onClose}>
       <div>
-        <Lbl c="결제 업체" />
+        <Lbl c="프로젝트 (필수)" />
+        <Sel value={projectId} onChange={v => { setProjectId(v); setCovered([]); }} ph="프로젝트 선택..." opts={(data.outputs || []).map(o => ({ v: o.id, l: outLabel(o) }))} />
+        <div style={{ fontSize: 11, color: '#A29C95', marginTop: 5, lineHeight: 1.5 }}>프로젝트 + 업체가 <b>둘 다 일치</b>하는 기안에만 연결됩니다. 같은 업체라도 다른 프로젝트 예산에는 반영되지 않아요.</div>
+      </div>
+      <div>
+        <Lbl c="결제 업체 (필수)" />
         {addingVendor ? (
           <div style={{ display: 'flex', gap: 6 }}>
             <input value={newVendor} onChange={ev => setNewVendor(ev.target.value)} onKeyDown={ev => { if (ev.key === 'Enter') confirmAddVendor(); }} placeholder="새 업체명 입력" autoFocus style={{ flex: 1, padding: '9px 11px', borderRadius: 9, border: '1px solid #E3E0DC', fontSize: 13, boxSizing: 'border-box' }} />
@@ -2931,7 +3005,7 @@ function PaymentModal({ data, setData, edit, onClose }) {
           </div>
         ) : (
           <div style={{ display: 'flex', gap: 6 }}>
-            <div style={{ flex: 1 }}><Sel value={vendor} onChange={setVendor} ph="업체 선택..." opts={allVendors.map(v => ({ v, l: v }))} /></div>
+            <div style={{ flex: 1 }}><Sel value={vendor} onChange={v => { setVendor(v); setCovered([]); }} ph="업체 선택..." opts={allVendors.map(v => ({ v, l: v }))} /></div>
             <button onClick={() => setAddingVendor(true)} style={{ padding: '0 14px', borderRadius: 9, border: '1px dashed ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>+ 새 업체</button>
           </div>
         )}
@@ -2939,6 +3013,31 @@ function PaymentModal({ data, setData, edit, onClose }) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="실결제 금액 (원)" /><MoneyInput value={amount} onChange={setAmount} placeholder="실제 결제 금액" /></div><div><Lbl c="결제일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div></div>
       <div><Lbl c="결제방법" />{seg(payMethod, setPayMethod, PAY_OPTS)}</div>
+      {payMethod === '카드결제' && (
+        <div>
+          <Lbl c="결제 카드" />
+          {cards.length === 0 ? <div style={{ fontSize: 11.5, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 9, padding: '9px 11px' }}>등록된 카드가 없습니다. 예산 탭 상단 [💳 카드 관리]에서 먼저 카드를 추가하세요.</div>
+            : <Sel value={cardId} onChange={setCardId} ph="카드 선택..." opts={cards.map(c => ({ v: c.id, l: c.name + (c.issuer ? ' · ' + c.issuer : '') + (c.limit ? ' · 한도 ' + won(Number(c.limit)) : '') }))} />}
+        </div>
+      )}
+      {projectId && vendor ? (
+        <div style={{ background: '#FAFAF9', border: '1px solid #EDEBE7', borderRadius: 10, padding: 11 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: G, marginBottom: 4 }}>🔗 연결할 기안 ({matchB.length}건)</div>
+          <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 7, lineHeight: 1.5 }}>선택한 <b>프로젝트 + 업체가 모두 일치</b>하는 기안만 표시됩니다. 하나만 맞는 기안은 절대 나오지 않아요.</div>
+          {matchB.length === 0 ? <div style={{ fontSize: 11.5, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 8, padding: '8px 10px' }}>이 프로젝트 + 업체 조합의 기안이 없습니다. 그대로 저장하면 기안 연결 없이 실결제만 기록됩니다.</div> : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 180, overflowY: 'auto' }}>
+              {matchB.map(b => { const on = covered.indexOf(b.id) >= 0; const n = budgetNames(data, b); return (
+                <div key={b.id} onClick={() => toggleCov(b.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 9px', borderRadius: 8, border: '1px solid ' + (on ? '#A7F3D0' : '#EDEBE7'), background: on ? '#ECFDF5' : 'white', cursor: 'pointer', fontSize: 11.5 }}>
+                  <span style={{ fontSize: 13 }}>{on ? '☑' : '☐'}</span>
+                  <span style={{ flex: 1, minWidth: 0, color: '#3A3631' }}>{n.detail || '(항목명 없음)'}<span style={{ color: '#A29C95' }}> · {(b.date || '').slice(5)} · {b.status}</span></span>
+                  <span style={{ fontWeight: 800, color: '#1A1614' }}>{won(itemTotal(b))}</span>
+                </div>
+              ); })}
+            </div>
+          )}
+          {covered.length > 0 ? <div style={{ fontSize: 11, fontWeight: 700, color: '#1FA463', marginTop: 6 }}>선택한 기안 합계 {won(covSum)}</div> : null}
+        </div>
+      ) : null}
       <div>
         <Lbl c="영수증" />
         {receiptUrl ? (
@@ -3059,6 +3158,8 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
   const [vat, setVat] = useState(e.vat || '별도');
   const [pay, setPay] = useState(e.payMethod || '세금계산서');
   const [account, setAccount] = useState(e.account || '');
+  const [cardId, setCardId] = useState(e.cardId != null && e.cardId !== '' ? String(e.cardId) : '');
+  const cards = data.cards || [];
   const [status, setStatus] = useState(e.status || '기안전');
   const [date, setDate] = useState(e.date || TODAY);
   const [kind, setKind] = useState(e.kind || '일반');
@@ -3069,7 +3170,8 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
   const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E3E0DC', color: val === o ? 'white' : '#3A3631' }}>{o}</button>)}</div>;
   const submit = () => {
     if (!outId || !vendor.trim() || !amount || Number(amount) <= 0) { alert('필수 항목을 입력하세요'); return; }
-    const fields = { outputId: Number(outId), planId: planId ? Number(planId) : null, kind, vendor: vendor.trim(), amount: Number(amount), vat, payMethod: pay, account: account.trim(), status, date, paidDate: status === '결제완료' ? paidDate : (e.paidDate || ''), paidAmount: status === '결제완료' && paidAmount !== '' ? Number(paidAmount) : null };
+    if (pay === '카드결제' && cards.length > 0 && !cardId) { alert('결제 카드를 선택하세요'); return; }
+    const fields = { outputId: Number(outId), planId: planId ? Number(planId) : null, kind, vendor: vendor.trim(), amount: Number(amount), vat, payMethod: pay, cardId: pay === '카드결제' && cardId ? Number(cardId) : null, account: account.trim(), status, date, paidDate: status === '결제완료' ? paidDate : (e.paidDate || ''), paidAmount: status === '결제완료' && paidAmount !== '' ? Number(paidAmount) : null };
     if (edit) setData(d => ({ ...d, budgets: d.budgets.map(b => b.id === edit.id ? { ...b, ...fields } : b) }));
     else setData(d => ({ ...d, nid: d.nid + 1, budgets: [...(d.budgets || []), { id: d.nid + 1, subplanId: null, checklistId: null, memo: '', ...fields }] }));
     onClose();
@@ -3099,9 +3201,147 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
       <div><Lbl c="VAT" />{seg(vat, setVat, VAT_OPTS)}</div>
       <div><Lbl c="결제방법" />{seg(pay, setPay, PAY_OPTS)}</div>
       {pay === '세금계산서' && <div><Lbl c="입금 계좌 (선택)" /><Inp value={account} onChange={setAccount} placeholder="은행 / 계좌번호 / 예금주" /></div>}
+      {pay === '카드결제' && (
+        <div>
+          <Lbl c="결제 카드" />
+          {cards.length === 0 ? <div style={{ fontSize: 11.5, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 9, padding: '9px 11px' }}>등록된 카드가 없습니다. 예산 탭 상단 [💳 카드 관리]에서 먼저 카드를 추가하세요.</div>
+            : <Sel value={cardId} onChange={setCardId} ph="카드 선택..." opts={cards.map(c => ({ v: c.id, l: c.name + (c.issuer ? ' · ' + c.issuer : '') + (c.limit ? ' · 한도 ' + won(Number(c.limit)) : '') }))} />}
+        </div>
+      )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="상태" /><Sel value={status} onChange={setStatus} opts={BSTATUS} /></div><div><Lbl c="기안/등록 일자" /><Inp type="date" value={date} onChange={setDate} /></div></div>
       {status === '결제완료' && <div style={{ background: '#ECFDF5', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0' }}><div style={{ fontSize: 12, fontWeight: 700, color: '#1FA463', marginBottom: 8 }}>✓ 결제 완료 정보</div><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}><div><Lbl c="결제 완료일" /><Inp type="date" value={paidDate} onChange={setPaidDate} /></div><div><Lbl c="실결제 금액 (선택)" /><MoneyInput value={paidAmount} onChange={setPaidAmount} placeholder="비우면 예상금액 사용" /></div></div><div style={{ fontSize: 11, color: '#6E6863', marginTop: 6 }}>※ 결제완료일 기준으로 월 집계 및 날짜별 표시가 반영됩니다.</div></div>}
       <div style={{ display: 'flex', gap: 8 }}><Btn onClick={submit} style={{ flex: 1 }}>{edit ? '저장' : '추가'}</Btn><Btn v="secondary" onClick={onClose}>취소</Btn></div>
+    </ModalShell>
+  );
+}
+
+function CardManagerModal({ data, setData, onClose }) {
+  const cards = data.cards || [];
+  const budgets = data.budgets || [];
+  const payments = data.payments || [];
+  const [name, setName] = useState('');
+  const [issuer, setIssuer] = useState('');
+  const [limit, setLimit] = useState('');
+  const [editId, setEditId] = useState(null);
+  const usedCnt = id => payments.filter(p => String(p.cardId) === String(id)).length + budgets.filter(b => String(b.cardId) === String(id)).length;
+  const usedSum = id => payments.filter(p => String(p.cardId) === String(id)).reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  const reset = () => { setName(''); setIssuer(''); setLimit(''); setEditId(null); };
+  const submit = () => {
+    const nm = name.trim(); if (!nm) { alert('카드명을 입력하세요'); return; }
+    const lim = limit === '' ? null : Number(limit);
+    if (editId) { setData(d => ({ ...d, cards: (d.cards || []).map(c => c.id === editId ? { ...c, name: nm, issuer: issuer.trim(), limit: lim } : c) })); reset(); return; }
+    if (cards.some(c => c.name === nm)) { alert('이미 있는 카드명입니다'); return; }
+    setData(d => ({ ...d, cards: [...(d.cards || []), { id: Date.now(), name: nm, issuer: issuer.trim(), limit: lim }] }));
+    reset();
+  };
+  const startEdit = c => { setEditId(c.id); setName(c.name || ''); setIssuer(c.issuer || ''); setLimit(c.limit != null ? String(c.limit) : ''); };
+  const removeCard = c => { if (usedCnt(c.id) > 0) { alert('이 카드로 등록된 기안·실결제가 있어 삭제할 수 없습니다.\n먼저 해당 기록의 카드를 바꿔주세요.'); return; } if (!confirm('"' + c.name + '" 카드를 삭제할까요?')) return; setData(d => ({ ...d, cards: (d.cards || []).filter(x => x.id !== c.id) })); if (editId === c.id) reset(); };
+  return (
+    <ModalShell title="💳 카드 관리" onClose={onClose}>
+      <div style={{ fontSize: 12, color: '#6E6863', lineHeight: 1.5 }}>기안 작성·실결제에서 <b>카드결제</b>를 고르면 여기 등록한 카드를 선택할 수 있어요. 월 한도를 넣으면 [📊 카드별 사용내역]에서 <b>사용가능금액</b>이 계산됩니다.</div>
+      <div style={{ background: '#FAFAF9', border: '1px solid #EDEBE7', borderRadius: 10, padding: 11, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: G }}>{editId ? '✏️ 카드 수정' : '+ 새 카드 등록'}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div><Lbl c="카드명 (필수)" /><Inp value={name} onChange={setName} placeholder="예) 법인카드 1234" /></div>
+          <div><Lbl c="카드사 (선택)" /><Inp value={issuer} onChange={setIssuer} placeholder="예) 신한 / 하나" /></div>
+        </div>
+        <div><Lbl c="월 한도 (선택)" /><MoneyInput value={limit} onChange={setLimit} placeholder="비우면 한도 없음" /></div>
+        <div style={{ display: 'flex', gap: 8 }}><Btn onClick={submit} style={{ flex: 1 }}>{editId ? '저장' : '+ 추가'}</Btn>{editId ? <Btn v="secondary" onClick={reset}>취소</Btn> : null}</div>
+      </div>
+      {cards.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '16px 0', textAlign: 'center' }}>등록된 카드가 없습니다</div> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 320, overflowY: 'auto' }}>
+          {cards.map(c => { const cnt = usedCnt(c.id), sum = usedSum(c.id); return (
+            <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 11px', background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 9 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>💳 {c.name}</span>
+                  {c.issuer ? <span style={{ fontSize: 10, color: '#6E6863', background: '#EDEBE7', borderRadius: 5, padding: '1px 6px' }}>{c.issuer}</span> : null}
+                  {cnt === 0 ? <span style={{ fontSize: 9, fontWeight: 700, color: '#8A8580', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 6px' }}>사용 안 함</span> : null}
+                </div>
+                <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 2 }}>{c.limit ? '월 한도 ' + won(Number(c.limit)) : '한도 미설정'}{cnt > 0 ? ' · 사용 ' + cnt + '건 · 누적 ' + won(sum) : ''}</div>
+              </div>
+              <button onClick={() => startEdit(c)} style={{ border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', borderRadius: 6, cursor: 'pointer', fontSize: 10.5, fontWeight: 700, padding: '4px 9px' }}>수정</button>
+              <button onClick={() => removeCard(c)} style={{ border: '1px solid ' + (cnt > 0 ? '#E3E0DC' : '#FCA5A5'), background: 'white', color: cnt > 0 ? '#C4BFB9' : '#E53935', borderRadius: 6, cursor: 'pointer', fontSize: 10.5, fontWeight: 700, padding: '4px 9px' }}>🗑</button>
+            </div>
+          ); })}
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 8 }}><Btn v="secondary" onClick={onClose} style={{ flex: 1 }}>닫기</Btn></div>
+    </ModalShell>
+  );
+}
+
+function CardUsageModal({ data, monthKey, onClose }) {
+  const cards = data.cards || [];
+  const payments = data.payments || [];
+  const [allTime, setAllTime] = useState(false);
+  const [open, setOpen] = useState({});
+  const inRange = p => allTime ? true : ((p.paidDate || '').slice(0, 7) === monthKey);
+  const cardPays = payments.filter(p => inRange(p) && (p.payMethod === '카드결제' || p.cardId));
+  const rows = cards.map(c => {
+    const list = cardPays.filter(p => String(p.cardId) === String(c.id)).sort((a, b) => (b.paidDate || '') < (a.paidDate || '') ? -1 : 1);
+    const used = list.reduce((a, p) => a + (Number(p.amount) || 0), 0);
+    const lim = c.limit != null && c.limit !== '' ? Number(c.limit) : null;
+    return { c: c, list: list, used: used, lim: lim, left: lim != null ? lim - used : null, pct: lim ? Math.min(100, Math.round(used / lim * 100)) : (used > 0 ? 100 : 0) };
+  }).sort((a, b) => b.used - a.used);
+  const noCard = cardPays.filter(p => !p.cardId).sort((a, b) => (b.paidDate || '') < (a.paidDate || '') ? -1 : 1);
+  const noCardSum = noCard.reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  const totalUsed = rows.reduce((a, r) => a + r.used, 0) + noCardSum;
+  const totalLimit = rows.reduce((a, r) => a + (r.lim || 0), 0);
+  const payRow = p => { const po = (data.outputs || []).find(o => String(o.id) === String(p.projectId)); return (
+    <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', fontSize: 11.5, background: '#FAFAF9', border: '1px solid #F0EEEB', borderRadius: 8, padding: '6px 9px' }}>
+      <span style={{ color: '#A29C95', minWidth: 38 }}>{(p.paidDate || '').slice(5) || '-'}</span>
+      <span style={{ fontSize: 9, fontWeight: 700, color: '#6E6863', background: '#F0EEEB', borderRadius: 4, padding: '1px 5px' }}>{p.vendor || '(업체 미지정)'}</span>
+      {po ? <span style={{ fontSize: 9, fontWeight: 700, color: '#2D5FE0', background: '#EFF6FF', borderRadius: 4, padding: '1px 5px' }}>{po.code}</span> : <span style={{ fontSize: 9, fontWeight: 700, color: '#B45309', background: '#FFFBEB', borderRadius: 4, padding: '1px 5px' }}>프로젝트 미지정</span>}
+      <span style={{ flex: 1, minWidth: 60, color: '#3A3631' }}>{p.memo || ''}</span>
+      <span style={{ fontWeight: 800, color: '#1A1614' }}>{won(Number(p.amount) || 0)}</span>
+    </div>
+  ); };
+  return (
+    <ModalShell title="📊 카드별 사용내역" onClose={onClose}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 12.5, fontWeight: 700, color: G }}>{allTime ? '전체 기간' : monthKey}</span>
+        <button onClick={() => setAllTime(!allTime)} style={{ padding: '5px 12px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}>{allTime ? '📅 이 달만 보기' : '🗂 전체 기간 보기'}</button>
+        <span style={{ marginLeft: 'auto', fontSize: 11.5, color: '#6E6863' }}>총 사용 <b style={{ color: '#1FA463' }}>{won(totalUsed)}</b>{totalLimit > 0 ? <span style={{ color: '#A29C95' }}> / 한도합 {won(totalLimit)}</span> : null}</span>
+      </div>
+      {cards.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '18px 0', textAlign: 'center' }}>등록된 카드가 없습니다. [💳 카드 관리]에서 먼저 카드를 추가하세요.</div> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 9, maxHeight: 420, overflowY: 'auto' }}>
+          {rows.map(r => { const over = r.left != null && r.left < 0, barC = over ? '#E53935' : (r.pct >= 90 ? '#E08700' : '#1FA463'), isOpen = !!open[r.c.id]; return (
+            <div key={r.c.id} style={{ border: '1px solid ' + (over ? '#FCA5A5' : '#EDEBE7'), background: over ? '#FEF2F2' : 'white', borderRadius: 10, padding: '11px 13px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 7 }}>
+                <span style={{ fontSize: 13.5, fontWeight: 800, color: '#1A1614' }}>💳 {r.c.name}</span>
+                {r.c.issuer ? <span style={{ fontSize: 10, color: '#6E6863', background: '#F0EEEB', borderRadius: 5, padding: '1px 6px' }}>{r.c.issuer}</span> : null}
+                {over ? <span style={{ fontSize: 9.5, fontWeight: 800, color: '#E53935', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 5, padding: '1px 6px' }}>한도 초과</span> : null}
+                <span style={{ marginLeft: 'auto', fontSize: 11, color: '#6E6863' }}>{r.lim != null ? <>한도 <b style={{ color: '#2D5FE0' }}>{won(r.lim)}</b></> : <span style={{ color: '#A29C95' }}>한도 미설정</span>}</span>
+              </div>
+              <div style={{ height: 7, background: '#F0EEEB', borderRadius: 4, overflow: 'hidden' }}><div style={{ width: r.pct + '%', height: '100%', background: barC, borderRadius: 4 }} /></div>
+              <div style={{ display: 'flex', gap: 12, marginTop: 6, flexWrap: 'wrap', fontSize: 11.5 }}>
+                <span style={{ color: '#6E6863' }}>사용한금액 <b style={{ color: '#1FA463' }}>{won(r.used)}</b></span>
+                <span style={{ color: '#6E6863' }}>사용가능금액 <b style={{ color: over ? '#E53935' : '#E08700' }}>{r.left != null ? won(r.left) : '-'}</b></span>
+                <span style={{ marginLeft: 'auto', color: '#A29C95', fontWeight: 700 }}>{r.lim != null ? r.pct + '%' : r.list.length + '건'}</span>
+              </div>
+              {r.list.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <button onClick={() => setOpen(o => ({ ...o, [r.c.id]: !o[r.c.id] }))} style={{ fontSize: 11, fontWeight: 700, padding: '5px 10px', borderRadius: 7, border: '1px solid #E3E0DC', background: isOpen ? '#F5F4F2' : 'white', color: '#6E6863', cursor: 'pointer' }}>{isOpen ? '▾' : '▸'} 결제 내역 ({r.list.length}건)</button>
+                  {isOpen && <div style={{ marginTop: 7, display: 'flex', flexDirection: 'column', gap: 5 }}>{r.list.map(payRow)}</div>}
+                </div>
+              )}
+            </div>
+          ); })}
+          {noCard.length > 0 && (
+            <div style={{ border: '1px solid #FDE68A', background: '#FFFBEB', borderRadius: 10, padding: '11px 13px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: '#B45309' }}>⚠ 카드 미지정 결제</span>
+                <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 800, color: '#B45309' }}>{won(noCardSum)}</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#8A8580', marginBottom: 7 }}>결제방법이 카드결제인데 카드가 선택되지 않은 {noCard.length}건입니다. 실결제 [수정]에서 카드를 지정하면 위 집계에 반영됩니다.</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>{noCard.map(payRow)}</div>
+            </div>
+          )}
+        </div>
+      )}
+      <div style={{ fontSize: 10.5, color: '#A29C95', lineHeight: 1.5 }}>사용한금액 = {allTime ? '전체 기간' : monthKey} 실결제 중 해당 카드로 지정된 금액 합 · 사용가능금액 = 월 한도 − 사용한금액 (한도 미설정이면 표시되지 않습니다)</div>
+      <div style={{ display: 'flex', gap: 8 }}><Btn v="secondary" onClick={onClose} style={{ flex: 1 }}>닫기</Btn></div>
     </ModalShell>
   );
 }
