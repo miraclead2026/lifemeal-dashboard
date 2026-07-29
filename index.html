@@ -283,13 +283,14 @@ const reorderSiblings = (list, id, parentField, dir) => {
 };
 
 // 드래그로 형제 순서 바꾸기: fromId 를 toId 자리로 이동. 형제가 차지하던 전역 배열 슬롯은 그대로 유지.
-const moveSiblingTo = (list, fromId, toId, parentField) => {
+// keyOf(x) 가 같은 항목끼리만 형제로 본다(부모 필드 하나 또는 부모+날짜 같은 복합 기준 모두 가능).
+const moveSiblingToBy = (list, fromId, toId, keyOf) => {
   const arr = [...list];
   const fi = arr.findIndex(x => x.id === fromId), ti = arr.findIndex(x => x.id === toId);
   if (fi < 0 || ti < 0 || fromId === toId) return list;
-  const pv = arr[fi][parentField];
-  if (arr[ti][parentField] !== pv) return list;
-  const slots = arr.map((x, i) => (x[parentField] === pv ? i : -1)).filter(i => i >= 0);
+  const pv = keyOf(arr[fi]);
+  if (keyOf(arr[ti]) !== pv) return list;
+  const slots = arr.map((x, i) => (keyOf(x) === pv ? i : -1)).filter(i => i >= 0);
   const seq = slots.map(i => arr[i]);
   const a = seq.findIndex(x => x.id === fromId), b = seq.findIndex(x => x.id === toId);
   if (a < 0 || b < 0) return list;
@@ -298,24 +299,93 @@ const moveSiblingTo = (list, fromId, toId, parentField) => {
   slots.forEach((slot, k) => { arr[slot] = seq[k]; });
   return arr;
 };
+const moveSiblingTo = (list, fromId, toId, parentField) => moveSiblingToBy(list, fromId, toId, x => x[parentField]);
+
+// 체크리스트 표시 순서: 실행일 빠른 순, 실행일 미정은 맨 뒤. 같은 날짜면 저장된 순서(수동 순서) 그대로.
+const sortChksByDate = list => (list || []).map((x, i) => [x, i]).sort((a, b) => {
+  const ad = a[0].date || '', bd = b[0].date || '';
+  if (ad !== bd) { if (!ad) return 1; if (!bd) return -1; return ad < bd ? -1 : 1; }
+  return a[1] - b[1];
+}).map(p => p[0]);
+// 체크리스트 수동 순서 그룹: 같은 소속(세부계획) + 같은 실행일끼리만 순서를 바꿀 수 있다(드래그로 날짜가 바뀌는 사고 방지).
+const chkOrderKey = x => String(x.subplanId == null ? 'm' : x.subplanId) + '|' + (x.date || '');
+const sameChkGroup = (list, aId, bId) => { const x = (list || []).find(t => t.id === aId), y = (list || []).find(t => t.id === bId); return !!(x && y && chkOrderKey(x) === chkOrderKey(y)); };
+const moveChkInGroup = (d, fromId, toId) => ({ ...d, checklists: moveSiblingToBy(d.checklists, fromId, toId, chkOrderKey) });
+const WDNM = ['일', '월', '화', '수', '목', '금', '토'];
+const dateWd = date => { try { const w = WDNM[new Date(date + 'T00:00:00').getDay()]; return w || ''; } catch (e) { return ''; } };
 
 // 목록 안에서 행을 잡아 끌어 순서를 바꾸는 공용 훅. arm(id) 를 붙인 곳을 눌러야 그 행이 드래그된다(입력칸 텍스트 선택 보호).
-function useDragOrder(onMove) {
+// canDrop(from, to) 를 주면 그 조건을 만족하는 행에만 놓을 수 있다(조건 밖의 행은 강조도 안 되고 놓아도 무시).
+function useDragOrder(onMove, canDrop) {
   const [dragId, setDragId] = useState(null);
   const [overId, setOverId] = useState(null);
   const [armId, setArmId] = useState(null);
   const reset = () => { setDragId(null); setOverId(null); setArmId(null); };
+  const ok = (from, to) => from != null && from !== to && (!canDrop || canDrop(from, to) === true);
   const arm = id => ({ onMouseDown: () => setArmId(id), onMouseUp: () => setArmId(null), onTouchStart: () => setArmId(id) });
   const row = id => ({
     draggable: armId === id,
     onDragStart: e => { setDragId(id); try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(id)); } catch (err) {} },
-    onDragOver: e => { e.preventDefault(); if (dragId != null && dragId !== id && overId !== id) setOverId(id); },
+    onDragOver: e => { if (dragId == null) return; if (!ok(dragId, id)) { e.stopPropagation(); if (overId != null) setOverId(null); return; } e.preventDefault(); if (overId !== id) setOverId(id); },
     onDragLeave: () => setOverId(o => (o === id ? null : o)),
-    onDrop: e => { e.preventDefault(); e.stopPropagation(); const from = dragId; reset(); if (from != null && from !== id) onMove(from, id); },
+    onDrop: e => { e.preventDefault(); e.stopPropagation(); const from = dragId; reset(); if (ok(from, id)) onMove(from, id); },
     onDragEnd: reset
   });
-  const hl = id => (dragId === id ? { opacity: 0.4 } : (overId === id && dragId != null) ? { border: '1px solid ' + GO, boxShadow: 'inset 0 0 0 1px ' + GO } : null);
+  const hl = id => (dragId === id ? { opacity: 0.4 } : (overId === id && ok(dragId, id)) ? { border: '1px solid ' + GO, boxShadow: 'inset 0 0 0 1px ' + GO } : null);
   return { arm, row, hl, dragId, overId };
+}
+
+// 드래그 중에 화면(또는 모달) 위/아래 끝에 가까워지면 자동으로 스크롤한다.
+// 브라우저는 드래그 중 마우스 휠을 굴리면 드래그를 취소해 버리므로, 아래쪽 목록에서 위쪽 달력으로 끌어 올릴 때 반드시 필요하다.
+function useDragAutoScroll() {
+  useEffect(() => {
+    const EDGE = 130, MAX = 26;
+    let vy = 0, box = null, raf = 0, on = false;
+    const scrollableUnder = node => {
+      let n = node && node.nodeType === 3 ? node.parentElement : node;
+      while (n && n.nodeType === 1 && n !== document.body && n !== document.documentElement) {
+        let oy = '';
+        try { oy = window.getComputedStyle(n).overflowY; } catch (e) { oy = ''; }
+        if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 4) return n;
+        n = n.parentElement;
+      }
+      return null;
+    };
+    const step = () => {
+      raf = 0;
+      if (!on || !vy) return;
+      if (box) { const b4 = box.scrollTop; box.scrollTop = b4 + vy; if (box.scrollTop === b4) window.scrollBy(0, vy); }
+      else window.scrollBy(0, vy);
+      raf = requestAnimationFrame(step);
+    };
+    const kick = () => { if (!raf && on && vy) raf = requestAnimationFrame(step); };
+    const onOver = e => {
+      on = true;
+      const y = e.clientY;
+      if (typeof y !== 'number') return;
+      const el = scrollableUnder(e.target);
+      let top = 0, bot = window.innerHeight || 0;
+      if (el) { const r = el.getBoundingClientRect(); top = r.top; bot = r.bottom; }
+      box = el;
+      const dT = y - top, dB = bot - y;
+      if (dT < EDGE) vy = -Math.ceil(MAX * Math.min(1, Math.max(0, EDGE - dT) / EDGE));
+      else if (dB < EDGE) vy = Math.ceil(MAX * Math.min(1, Math.max(0, EDGE - dB) / EDGE));
+      else vy = 0;
+      kick();
+    };
+    const stop = () => { on = false; vy = 0; box = null; if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+    document.addEventListener('dragover', onOver, true);
+    document.addEventListener('drop', stop, true);
+    document.addEventListener('dragend', stop, true);
+    window.addEventListener('blur', stop);
+    return () => {
+      document.removeEventListener('dragover', onOver, true);
+      document.removeEventListener('drop', stop, true);
+      document.removeEventListener('dragend', stop, true);
+      window.removeEventListener('blur', stop);
+      stop();
+    };
+  }, []);
 }
 
 const pad = n => String(n).padStart(2, '0');
@@ -741,7 +811,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const [memoOpen, setMemoOpen] = useState(null);
   const [showReorder, setShowReorder] = useState(false);
   const [showChkReorder, setShowChkReorder] = useState(false);
-  const chkDrag = useDragOrder((from, to) => setData(d => ({ ...d, checklists: moveSiblingTo(d.checklists, from, to, 'subplanId') })));
+  const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
   const planDrag = useDragOrder((from, to) => setData(d => ({ ...d, plans: moveSiblingTo(d.plans, from, to, 'outputId') })));
   const subDrag = useDragOrder((from, to) => setData(d => ({ ...d, subplans: moveSiblingTo(d.subplans, from, to, 'planId') })));
   const [planKpis, setPlanKpis] = useState(() => kind === 'plan' ? ((item.kpis || []).map(k => ({ id: k.id || genKpiId(), name: k.name, unit: k.unit, target: String(k.target != null ? k.target : ''), targets: k.targets || {} }))) : []);
@@ -759,7 +829,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
   const childPlans = kind === 'output' ? data.plans.filter(p => p.outputId === item.id) : [];
   const childSubs = kind === 'plan' ? data.subplans.filter(s => s.planId === item.id) : [];
-  const subChks = kind === 'subplan' ? data.checklists.filter(c => c.subplanId === item.id) : [];
+  const subChks = kind === 'subplan' ? sortChksByDate(data.checklists.filter(c => c.subplanId === item.id)) : [];
 
   const mkKpi = () => kpiOn ? buildKpi(kpi, item.kpi) : null;
   const addPlanKpi = () => setPlanKpis(ks => [...ks, { id: genKpiId(), name: '', unit: '%', target: '', targets: {} }]);
@@ -852,7 +922,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
       {kind === 'subplan' && (
         <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #EDEBE7' }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}><div style={{ fontSize: 17, fontWeight: 700, color: G }}>☑ 체크리스트 ({subChks.length})</div>{subChks.length > 1 && <button onClick={() => setShowChkReorder(true)} title="드래그가 어려울 때: 목록에서 한 번에 순서 변경" style={{ marginLeft: 'auto', fontSize: 15, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서 변경</button>}</div>
-          {subChks.length > 0 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>항목명은 칸을 눌러 바로 수정하고, 왼쪽 ⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요.</div>}
+          {subChks.length > 0 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>실행일이 빠른 순으로 자동 정렬됩니다. 같은 날짜끼리는 왼쪽 ⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요(항목명은 칸을 눌러 바로 수정).</div>}
           {subChks.length === 0 ? <div style={{ fontSize: 16, color: '#A29C95', marginBottom: 8 }}>등록된 체크리스트가 없습니다</div> :
             subChks.map(c => (
               <div key={c.id} style={{ marginBottom: 5 }}>
@@ -948,7 +1018,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
       <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn>{confirmDel ? <Btn v="danger" onClick={del}>휴지통으로 이동</Btn> : <Btn v="secondary" onClick={() => setConfirmDel(true)} style={{ color: '#E53935' }}>삭제</Btn>}</div>
       {showFile && <FileModal subId={item.id} data={data} setData={setData} onClose={() => setShowFile(false)} />}
       {showReorder && kind === 'output' && <ReorderModal title="실행계획 순서" items={childPlans.map(p => ({ id: p.id, label: p.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.plans.find(p => p.id === x.id)).filter(Boolean); let k = 0; return { ...d, plans: d.plans.map(p => p.outputId === item.id ? q[k++] : p) }; })} />}
-      {showChkReorder && kind === 'subplan' && <ReorderModal title="체크리스트 순서" items={subChks.map(c => ({ id: c.id, label: (c.text || '').trim() || '(이름 없음)' }))} onClose={() => setShowChkReorder(false)} onSave={reorderSubChks} />}
+      {showChkReorder && kind === 'subplan' && <ReorderModal title="체크리스트 순서 (같은 날짜 안에서만 반영)" items={subChks.map(c => ({ id: c.id, label: (c.date ? c.date + ' · ' : '미정 · ') + ((c.text || '').trim() || '(이름 없음)') }))} onClose={() => setShowChkReorder(false)} onSave={reorderSubChks} />}
       {showReorder && kind === 'plan' && <ReorderModal title="세부 실행계획 순서" items={childSubs.map(s => ({ id: s.id, label: s.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.subplans.find(s => s.id === x.id)).filter(Boolean); let k = 0; return { ...d, subplans: d.subplans.map(s => s.planId === item.id ? q[k++] : s) }; })} />}
     </ModalShell>
   );
@@ -1072,7 +1142,8 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
   const sub = data.subplans.find(s => s.id === c.subplanId);
   const plan = sub ? data.plans.find(p => p.id === sub.planId) : null;
   const out = plan ? data.outputs.find(o => o.id === plan.outputId) : null;
-  const chks = (data.checklists || []).filter(x => x.subplanId === c.subplanId);
+  const chks = sortChksByDate((data.checklists || []).filter(x => x.subplanId === c.subplanId));
+  const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
   const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done } : x) }));
   const setText = (id, text) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, text } : x) }));
   const setOwner = (id, owner) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, owner } : x) }));
@@ -1097,12 +1168,25 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
       </div>
       <div style={{ marginTop: 14 }}>
         <div style={{ fontSize: 15, fontWeight: 700, color: G, marginBottom: 7 }}>체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({chks.filter(x => x.done).length}/{chks.length})</span></div>
-        {chks.map(x => {
+        {chks.length > 1 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>실행일이 빠른 순으로 자동 정렬됩니다(미정은 맨 뒤). 같은 날짜끼리는 왼쪽 ⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요.</div>}
+        {chks.map((x, xi) => {
           const over = !!(x.date && sub && sub.due && x.date > sub.due);
           const isCur = x.id === chkId;
+          const dk = x.date || '';
+          const newGrp = xi === 0 || (chks[xi - 1].date || '') !== dk;
+          const grpCnt = chks.filter(y => (y.date || '') === dk).length;
           return (
-            <div key={x.id} style={{ marginBottom: 6, border: '1px solid ' + (isCur ? G : '#E3E0DC'), borderRadius: 9, padding: 9, background: isCur ? '#FBFDFB' : 'white' }}>
+            <React.Fragment key={x.id}>
+            {newGrp && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, margin: xi === 0 ? '0 0 5px' : '12px 0 5px' }}>
+                <span style={{ fontSize: 15.5, fontWeight: 800, color: dk ? G : '#A29C95', flexShrink: 0 }}>{dk ? dk + ' (' + dateWd(dk) + ')' : '📥 실행일 미정'}</span>
+                <span style={{ fontSize: 14, color: '#A29C95', flexShrink: 0 }}>{grpCnt}건</span>
+                <span style={{ flex: 1, height: 1, background: '#EDEBE7' }} />
+              </div>
+            )}
+            <div {...chkDrag.row(x.id)} style={{ marginBottom: 6, border: '1px solid ' + (isCur ? G : '#E3E0DC'), borderRadius: 9, padding: 9, background: isCur ? '#FBFDFB' : 'white', ...chkDrag.hl(x.id) }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+                {grpCnt > 1 && <span {...chkDrag.arm(x.id)} title="여기를 잡고 끌어서 같은 날짜 안에서 순서 변경" style={{ cursor: 'grab', color: '#C4BDB4', fontSize: 18, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>}
                 <span onClick={() => toggleDone(x.id)} style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={x.done} /></span>
                 <input value={x.text} onChange={e => setText(x.id, e.target.value)} placeholder="체크리스트 명" style={{ flex: 1, minWidth: 110, fontSize: 17, fontWeight: 600, padding: '6px 8px', border: '1px solid #E3E0DC', borderRadius: 7, outline: 'none', color: x.done ? '#A29C95' : '#1A1614', textDecoration: x.done ? 'line-through' : 'none', fontFamily: 'inherit' }} />
                 <button onClick={() => setMemoOpen(o => o === x.id ? null : x.id)} title="메모" style={{ border: 'none', background: (x.memo || memoOpen === x.id) ? '#EEF4EC' : 'transparent', borderRadius: 6, cursor: 'pointer', fontSize: 17, padding: '3px 5px', lineHeight: 1, color: x.memo ? '#1FA463' : '#A29C95', flexShrink: 0 }}>📝</button>
@@ -1115,6 +1199,7 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
               </div>
               {memoOpen === x.id && <textarea value={x.memo || ''} onChange={e => setMemo(x.id, e.target.value)} placeholder="메모 입력" style={{ width: '100%', minHeight: 52, marginTop: 6, padding: '7px 9px', border: '1px solid #CDE3C6', borderRadius: 7, fontSize: 16, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5, color: '#3A3631' }} />}
             </div>
+            </React.Fragment>
           );
         })}
         <button onClick={addChk} style={{ width: '100%', marginTop: 4, padding: '9px', borderRadius: 8, border: '1.5px dashed ' + G, cursor: 'pointer', fontSize: 16.5, fontWeight: 700, background: 'white', color: G }}>+ 체크리스트 추가</button>
@@ -1132,9 +1217,10 @@ function DayDetailModal({ date, data, setData, onEdit, onClose }) {
   const subOf = id => (data.subplans || []).find(s => s.id === id);
   const planOf = id => (data.plans || []).find(p => p.id === id);
   const outOf = id => (data.outputs || []).find(o => o.id === id);
-  const dayChks = (data.checklists || []).filter(c => c.date === date);
+  const dayChks = sortChksByDate((data.checklists || []).filter(c => c.date === date));
   const manual = dayChks.filter(c => !c.subplanId);
   const linked = dayChks.filter(c => c.subplanId);
+  const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
   const mainIds = [];
   const push = id => { if (id && mainIds.indexOf(id) < 0) mainIds.push(id); };
   linked.forEach(c => push(c.subplanId));
@@ -1171,7 +1257,8 @@ function DayDetailModal({ date, data, setData, onEdit, onClose }) {
   const chkRow = c => {
     const s = subOf(c.subplanId); const over = !!(s && s.due && date > s.due);
     return (
-      <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 5, padding: '6px 9px', borderRadius: 8, background: over ? '#FEF2F2' : (c.done ? '#F5F4F2' : '#FBFDFB'), border: '1px solid ' + (over ? '#FCA5A5' : (c.done ? '#E3E0DC' : '#CDE3C6')) }}>
+      <div key={c.id} {...chkDrag.row(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 5, padding: '6px 9px', borderRadius: 8, background: over ? '#FEF2F2' : (c.done ? '#F5F4F2' : '#FBFDFB'), border: '1px solid ' + (over ? '#FCA5A5' : (c.done ? '#E3E0DC' : '#CDE3C6')), ...chkDrag.hl(c.id) }}>
+        <span {...chkDrag.arm(c.id)} title="여기를 잡고 끌어서 순서 변경" style={{ cursor: 'grab', color: '#C4BDB4', fontSize: 17, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>
         <span onClick={() => toggleDone(c.id)} title="완료 표시" style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={c.done} /></span>
         <span onClick={() => toggleDone(c.id)} style={{ flex: 1, minWidth: 0, cursor: 'pointer', fontSize: 16.5, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none', wordBreak: 'break-all' }}>{c.text}</span>
         {c.owner && <span style={{ fontSize: 15, color: '#6E6863', flexShrink: 0 }}>{AV[c.owner] || ''} {c.owner}</span>}
@@ -1333,7 +1420,7 @@ function TeamCalendar({ data, setData, onEdit }) {
     <Card style={{ marginTop: 18 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: G }}>📅 캘린더</div>
-        <span style={{ fontSize: 15, color: '#A29C95' }}>날짜 칸을 누르면 그날 상세 · 항목을 끌어 날짜 이동</span>
+        <span style={{ fontSize: 15, color: '#A29C95' }}>날짜 칸을 누르면 그날 상세 · 항목을 끌어 날짜 이동(끌고 화면 위·아래 끝으로 가면 자동 스크롤)</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' }}>
           <button onClick={() => shift(-1)} style={navBtnSmall}>‹</button>
           <span style={{ fontSize: 17.5, fontWeight: 700, minWidth: 84, textAlign: 'center' }}>{yy}년 {mm}월</span>
@@ -1364,7 +1451,7 @@ function TeamCalendar({ data, setData, onEdit }) {
       </div>
       <div onDragOver={e => { e.preventDefault(); setDragOver('un'); }} onDragLeave={() => setDragOver(o => o === 'un' ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, ''); setDragOver(null); }}
         style={{ marginTop: 10, border: '1px dashed ' + (dragOver === 'un' ? '#93C5FD' : '#D5D2CE'), background: dragOver === 'un' ? '#EAF0FE' : '#FAFAF9', borderRadius: 8, padding: 8 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>📥 미배정 체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({undated.length}) — 날짜 칸으로 끌어 놓으세요</span></div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>📥 미배정 체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({undated.length}) — 날짜 칸으로 끌어 놓으세요 · 끌어 올릴 땐 마우스를 화면 맨 위로 붙이면 자동으로 스크롤돼요(휠 금지)</span></div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 9, background: '#F6F2FD', border: '1px solid #E4DAF7', borderRadius: 8, padding: '7px 9px' }}>
           <span style={{ fontSize: 15, fontWeight: 700, color: '#8B5CF6', flexShrink: 0 }}>📌 수동 추가</span>
           <input value={newText} onChange={e => setNewText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addManual(); }} placeholder="세부계획·프로젝트 없이 체크리스트 추가" style={{ flex: 1, minWidth: 140, fontSize: 16, padding: '6px 8px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
@@ -6268,6 +6355,7 @@ function App() {
   const revRef = useRef(0);
   const serverSnapRef = useRef(null);
   const backupDayRef = useRef('');
+  useDragAutoScroll();
 
   useEffect(() => {
     const ref = db.ref(DB_PATH);
