@@ -170,8 +170,8 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   mainKpis: (raw.mainKpis || []).map(mk => ({ ...mk, linkedKpiIds: mk.linkedKpiIds || (mk.linkedPlanIds || []).map(pid => 'k' + pid) })),
   kpiLogs: (raw.kpiLogs || []).map(l => ({ kpiId: 'k' + l.planId, ...l })),
   outputs: (raw.outputs || []).map(o => ({ kpi: null, ...o })),
-  plans: (raw.plans || []).map(p => { const b = { hold: false, desc: '', ...p }; if (!b.kpis) b.kpis = b.kpi ? [{ id: (b.kpi.id || ('k' + p.id)), name: b.kpi.name, unit: b.kpi.unit, target: b.kpi.target, targets: b.kpi.targets || {} }] : []; delete b.kpi; return b; }),
-  subplans: (raw.subplans || []).map(s => { const ns = { files: [], perfRecorded: false, ...s }; if (ns.stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; return ns; }),
+  plans: (raw.plans || []).map(p => { const b = { hold: false, desc: '', extraOutputIds: [], ...p }; if (!b.kpis) b.kpis = b.kpi ? [{ id: (b.kpi.id || ('k' + p.id)), name: b.kpi.name, unit: b.kpi.unit, target: b.kpi.target, targets: b.kpi.targets || {} }] : []; delete b.kpi; b.extraOutputIds = (b.extraOutputIds || []).filter(x => x !== b.outputId); return b; }),
+  subplans: (raw.subplans || []).map(s => { const ns = { files: [], perfRecorded: false, extraPlanIds: [], ...s }; if (ns.stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; ns.extraPlanIds = (ns.extraPlanIds || []).filter(x => x !== ns.planId); return ns; }),
   budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, kind: '일반', cardId: null, ...b })),
   trash: raw.trash || [],
   notices: raw.notices || [],
@@ -204,6 +204,39 @@ const cardOf = (data, id) => (data.cards || []).find(c => String(c.id) === Strin
 const cardLabel = (data, id) => { const c = cardOf(data, id); return c ? (c.name + (c.issuer ? ' (' + c.issuer + ')' : '')) : ''; };
 const fmtSize = n => n > 1024*1024 ? (n/(1024*1024)).toFixed(1)+'MB' : (n/1024).toFixed(0)+'KB';
 
+// ===== 다중 연결 (index_132) =====
+// 실행계획은 여러 프로젝트에, 세부실행계획은 여러 실행계획에 연결될 수 있다.
+// 단, 집계(진행률·예산·KPI)는 언제나 "대표" 1곳에서만 한다 → outputId / planId 가 대표.
+const extraOuts = p => (p && p.extraOutputIds) || [];
+const extraPlans = s => (s && s.extraPlanIds) || [];
+const planLinkN = p => 1 + extraOuts(p).length;
+const subLinkN = s => 1 + extraPlans(s).length;
+const linkedOutIdsOf = p => p ? [p.outputId, ...extraOuts(p).filter(x => x !== p.outputId)] : [];
+const linkedPlanIdsOf = s => s ? [s.planId, ...extraPlans(s).filter(x => x !== s.planId)] : [];
+const isLinkedOut = (p, oid) => !!p && (p.outputId === oid || extraOuts(p).indexOf(oid) >= 0);
+const isLinkedPlan = (s, pid) => !!s && (s.planId === pid || extraPlans(s).indexOf(pid) >= 0);
+const plansOfOut = (data, oid) => (data.plans || []).filter(p => isLinkedOut(p, oid));
+const subsOfPlanAll = (data, pid) => (data.subplans || []).filter(s => isLinkedPlan(s, pid));
+const sameOutParent = (data, a, b) => { const x = (data.plans || []).find(p => p.id === a), y = (data.plans || []).find(p => p.id === b); return !!(x && y && x.outputId === y.outputId); };
+const samePlanParent = (data, a, b) => { const x = (data.subplans || []).find(s => s.id === a), y = (data.subplans || []).find(s => s.id === b); return !!(x && y && x.planId === y.planId); };
+// 한 곳에서만 연결 해제. 대표를 해제하면 남은 연결 중 첫번째가 새 대표가 된다.
+const unlinkPlanFrom = (d, planId, oid) => ({ ...d, plans: (d.plans || []).map(p => {
+  if (p.id !== planId) return p;
+  const ex = extraOuts(p).filter(x => x !== oid);
+  if (p.outputId !== oid) return { ...p, extraOutputIds: ex };
+  if (!ex.length) return p;
+  return { ...p, outputId: ex[0], extraOutputIds: ex.slice(1) };
+}) });
+const unlinkSubFrom = (d, subId, pid) => ({ ...d, subplans: (d.subplans || []).map(s => {
+  if (s.id !== subId) return s;
+  const ex = extraPlans(s).filter(x => x !== pid);
+  if (s.planId !== pid) return { ...s, extraPlanIds: ex };
+  if (!ex.length) return s;
+  return { ...s, planId: ex[0], extraPlanIds: ex.slice(1) };
+}) });
+// 실행계획 KPI 가 어느 프로젝트로 집계될지 (미지정/끊긴 값이면 대표 프로젝트)
+const kpiOutId = (p, k) => { if (!p) return null; const v = (k && k.outputId != null) ? Number(k.outputId) : null; return (v != null && isLinkedOut(p, v)) ? v : p.outputId; };
+
 const moveToTrash = (d, type, id) => {
   const trash = d.trash || [];
   const payload = { outputs: [], plans: [], subplans: [], checklists: [], budgets: [], kpiLogs: [], mainKpi: null };
@@ -212,32 +245,37 @@ const moveToTrash = (d, type, id) => {
   let label = '';
   if (type === 'output') {
     const o = outputs.find(x => x.id === id); if (!o) return d;
-    const pIds = plans.filter(p => p.outputId === id).map(p => p.id);
-    const sIds = subplans.filter(s => pIds.includes(s.planId)).map(s => s.id);
+    // 다중 연결: 다른 프로젝트에도 연결된 실행계획은 삭제하지 않고 그쪽으로 대표를 넘긴다.
+    const survP = {}; plans.forEach(p => { if (p.outputId === id) { const ex = extraOuts(p).filter(x => x !== id); if (ex.length) survP[p.id] = ex; } });
+    const pIds = plans.filter(p => p.outputId === id && !survP[p.id]).map(p => p.id);
+    const survS = {}; subplans.forEach(s => { if (pIds.includes(s.planId)) { const ex = extraPlans(s).filter(x => pIds.indexOf(x) < 0); if (ex.length) survS[s.id] = ex; } });
+    const sIds = subplans.filter(s => pIds.includes(s.planId) && !survS[s.id]).map(s => s.id);
     payload.outputs = outputs.filter(x => x.id === id);
-    payload.plans = plans.filter(p => p.outputId === id);
-    payload.subplans = subplans.filter(s => pIds.includes(s.planId));
+    payload.plans = plans.filter(p => pIds.includes(p.id));
+    payload.subplans = subplans.filter(s => sIds.includes(s.id));
     payload.checklists = checklists.filter(c => sIds.includes(c.subplanId));
     payload.kpiLogs = kpiLogs.filter(l => pIds.includes(l.planId));
     payload.budgets = budgets.filter(b => b.outputId === id || pIds.includes(b.planId) || sIds.includes(b.subplanId));
     label = '프로젝트 · ' + outLabel(o);
     outputs = outputs.filter(x => x.id !== id);
-    plans = plans.filter(p => p.outputId !== id);
-    subplans = subplans.filter(s => !pIds.includes(s.planId));
+    plans = plans.filter(p => !pIds.includes(p.id)).map(p => { const sv = survP[p.id]; if (sv) return { ...p, outputId: sv[0], extraOutputIds: sv.slice(1) }; return extraOuts(p).indexOf(id) >= 0 ? { ...p, extraOutputIds: extraOuts(p).filter(x => x !== id) } : p; });
+    subplans = subplans.filter(s => !sIds.includes(s.id)).map(s => { const sv = survS[s.id]; if (sv) return { ...s, planId: sv[0], extraPlanIds: sv.slice(1) }; const ex = extraPlans(s).filter(x => pIds.indexOf(x) < 0); return ex.length !== extraPlans(s).length ? { ...s, extraPlanIds: ex } : s; });
     checklists = checklists.filter(c => !sIds.includes(c.subplanId));
     kpiLogs = kpiLogs.filter(l => !pIds.includes(l.planId));
     budgets = budgets.filter(b => !(b.outputId === id || pIds.includes(b.planId) || sIds.includes(b.subplanId)));
   } else if (type === 'plan') {
     const p = plans.find(x => x.id === id); if (!p) return d;
-    const sIds = subplans.filter(s => s.planId === id).map(s => s.id);
+    // 다중 연결: 다른 실행계획에도 연결된 세부실행계획은 삭제하지 않고 그쪽으로 대표를 넘긴다.
+    const survS = {}; subplans.forEach(s => { if (s.planId === id) { const ex = extraPlans(s).filter(x => x !== id); if (ex.length) survS[s.id] = ex; } });
+    const sIds = subplans.filter(s => s.planId === id && !survS[s.id]).map(s => s.id);
     payload.plans = plans.filter(x => x.id === id);
-    payload.subplans = subplans.filter(s => s.planId === id);
+    payload.subplans = subplans.filter(s => sIds.includes(s.id));
     payload.checklists = checklists.filter(c => sIds.includes(c.subplanId));
     payload.kpiLogs = kpiLogs.filter(l => l.planId === id);
     payload.budgets = budgets.filter(b => b.planId === id || sIds.includes(b.subplanId));
     label = '실행계획 · ' + p.name;
     plans = plans.filter(x => x.id !== id);
-    subplans = subplans.filter(s => s.planId !== id);
+    subplans = subplans.filter(s => !sIds.includes(s.id)).map(s => { const sv = survS[s.id]; if (sv) return { ...s, planId: sv[0], extraPlanIds: sv.slice(1) }; return extraPlans(s).indexOf(id) >= 0 ? { ...s, extraPlanIds: extraPlans(s).filter(x => x !== id) } : s; });
     checklists = checklists.filter(c => !sIds.includes(c.subplanId));
     kpiLogs = kpiLogs.filter(l => l.planId !== id);
     budgets = budgets.filter(b => !(b.planId === id || sIds.includes(b.subplanId)));
@@ -722,8 +760,8 @@ function AddModal({ data, setData, onClose }) {
   const newCode = oMode === 'new' ? genCode(data.outputs, data.categories, oCls) : '';
   const catIdx = data.categories.findIndex(c => c.name === oCls);
   const catColor = catIdx >= 0 ? CAT_PALETTE[catIdx % CAT_PALETTE.length] : '#6E6863';
-  const availPlans = data.plans.filter(p => p.outputId === Number(oSel));
-  const availSubs = data.subplans.filter(s => s.planId === Number(pSel));
+  const availPlans = data.plans.filter(p => isLinkedOut(p, Number(oSel)));
+  const availSubs = data.subplans.filter(s => isLinkedPlan(s, Number(pSel)));
   const existingPlan = pMode === 'exist' ? data.plans.find(p => p.id === Number(pSel)) : null;
   const submit = () => {
     let id = data.nid; const next = () => ++id;
@@ -791,6 +829,35 @@ function AddModal({ data, setData, onClose }) {
   );
 }
 
+function LinkStatusModal({ kind, item, data, setData, onClose }) {
+  const isPlan = kind === 'plan';
+  const ids = isPlan ? linkedOutIdsOf(item) : linkedPlanIdsOf(item);
+  const rows = ids.map(id => {
+    if (isPlan) { const o = (data.outputs || []).find(x => x.id === id); return o ? { id: id, label: outLabel(o), sub: o.type || '' } : null; }
+    const p = (data.plans || []).find(x => x.id === id); if (!p) return null;
+    const po = (data.outputs || []).find(x => x.id === p.outputId);
+    return { id: id, label: p.name, sub: po ? outLabel(po) : '' };
+  }).filter(Boolean);
+  const unlink = id => { if (!confirm('이 연결만 해제할까요? (항목 자체는 삭제되지 않습니다)')) return; setData(d => isPlan ? unlinkPlanFrom(d, item.id, id) : unlinkSubFrom(d, item.id, id)); };
+  return (
+    <ModalShell title={(isPlan ? '실행계획' : '세부실행계획') + ' 연결 현황'} onClose={onClose}>
+      <div style={{ fontSize: 17, fontWeight: 700, color: G }}>{item.name}</div>
+      <div style={{ fontSize: 15, color: '#A29C95', lineHeight: 1.55 }}>{isPlan ? '이 실행계획이 연결된 프로젝트 목록입니다.' : '이 세부실행계획이 연결된 실행계획 목록입니다.'} 맨 위가 <b>대표</b>이고, 진행률·예산·KPI 집계는 대표 한 곳에서만 이뤄집니다.</div>
+      {rows.length === 0 ? <div style={{ fontSize: 16, color: '#A29C95' }}>연결된 곳이 없습니다.</div> : rows.map((r, i) => (
+        <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: i === 0 ? '#FBFDFB' : 'white', border: '1px solid ' + (i === 0 ? G : '#E3E0DC'), borderRadius: 9, padding: '9px 11px' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#3A3631' }}>{r.label}</div>
+            {r.sub ? <div style={{ fontSize: 14, color: '#A29C95' }}>{r.sub}</div> : null}
+          </div>
+          {i === 0 ? <Badge label="대표" color={G} /> : <Badge label="연결" color="#989088" />}
+          {rows.length > 1 && <button onClick={() => unlink(r.id)} style={{ border: '1px solid #E3E0DC', background: 'white', color: '#E53935', borderRadius: 7, padding: '4px 10px', fontSize: 15, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>해제</button>}
+        </div>
+      ))}
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={onClose} style={{ flex: 1 }}>닫기</Btn></div>
+    </ModalShell>
+  );
+}
+
 function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }) {
   const kind = target.kind;
   const item = kind === 'output' ? data.outputs.find(o => o.id === target.id)
@@ -812,27 +879,42 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const [showReorder, setShowReorder] = useState(false);
   const [showChkReorder, setShowChkReorder] = useState(false);
   const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
-  const planDrag = useDragOrder((from, to) => setData(d => ({ ...d, plans: moveSiblingTo(d.plans, from, to, 'outputId') })));
-  const subDrag = useDragOrder((from, to) => setData(d => ({ ...d, subplans: moveSiblingTo(d.subplans, from, to, 'planId') })));
-  const [planKpis, setPlanKpis] = useState(() => kind === 'plan' ? ((item.kpis || []).map(k => ({ id: k.id || genKpiId(), name: k.name, unit: k.unit, target: String(k.target != null ? k.target : ''), targets: k.targets || {} }))) : []);
+  const planDrag = useDragOrder((from, to) => setData(d => ({ ...d, plans: moveSiblingTo(d.plans, from, to, 'outputId') })), (from, to) => sameOutParent(data, from, to));
+  const subDrag = useDragOrder((from, to) => setData(d => ({ ...d, subplans: moveSiblingTo(d.subplans, from, to, 'planId') })), (from, to) => samePlanParent(data, from, to));
+  const [planKpis, setPlanKpis] = useState(() => kind === 'plan' ? ((item.kpis || []).map(k => ({ id: k.id || genKpiId(), name: k.name, unit: k.unit, target: String(k.target != null ? k.target : ''), targets: k.targets || {}, outputId: k.outputId != null ? k.outputId : null }))) : []);
 
   const currentPlan = kind === 'subplan' ? data.plans.find(p => p.id === item.planId) : null;
   const currentOutput = currentPlan ? data.outputs.find(o => o.id === currentPlan.outputId) : null;
   const [showOutputChg, setShowOutputChg] = useState(false);
-  const [newOutputId, setNewOutputId] = useState(currentOutput ? String(currentOutput.id) : '');
+  const [newOutputId, setNewOutputId] = useState(kind === 'plan' ? String(item.outputId) : (currentOutput ? String(currentOutput.id) : ''));
   const [newPlanId, setNewPlanId] = useState(currentPlan ? String(currentPlan.id) : '');
-  const chgPlans = data.plans.filter(p => p.outputId === Number(newOutputId));
+  const chgPlans = data.plans.filter(p => isLinkedOut(p, Number(newOutputId)));
+  // ===== 다중 연결 (index_132) =====
+  const [xOut, setXOut] = useState(() => kind === 'plan' ? extraOuts(item).slice() : []);
+  const [xPlan, setXPlan] = useState(() => kind === 'subplan' ? extraPlans(item).slice() : []);
+  const [linkStat, setLinkStat] = useState(null);
+  const toggleXOut = oid => setXOut(a => a.indexOf(oid) >= 0 ? a.filter(x => x !== oid) : [...a, oid]);
+  const toggleXPlan = pid => setXPlan(a => a.indexOf(pid) >= 0 ? a.filter(x => x !== pid) : [...a, pid]);
+  const planRepOut = kind === 'plan' ? ((showOutputChg && newOutputId) ? Number(newOutputId) : item.outputId) : null;
+  const planLinkOuts = kind === 'plan' ? [planRepOut, ...(showOutputChg ? xOut : extraOuts(item)).filter(x => x !== planRepOut)] : [];
 
   const [showFile, setShowFile] = useState(false);
   const currentFiles = kind === 'subplan' ? ((data.subplans.find(s => s.id === item.id) || {}).files || []) : [];
   const depOpts = buildDepOpts(data).filter(o => o.v !== (kind === 'plan' ? 'plan-' : 'sub-') + item.id);
 
-  const childPlans = kind === 'output' ? data.plans.filter(p => p.outputId === item.id) : [];
-  const childSubs = kind === 'plan' ? data.subplans.filter(s => s.planId === item.id) : [];
+  const ownPlans = kind === 'output' ? data.plans.filter(p => p.outputId === item.id) : [];
+  const ownSubs = kind === 'plan' ? data.subplans.filter(s => s.planId === item.id) : [];
+  const childPlans = kind === 'output' ? plansOfOut(data, item.id) : [];
+  const childSubs = kind === 'plan' ? subsOfPlanAll(data, item.id) : [];
+  const linkN = kind === 'plan' ? planLinkN(item) : kind === 'subplan' ? subLinkN(item) : 1;
+  const multiLinked = linkN > 1;
+  const hereId = kind === 'plan' ? (target.from != null ? Number(target.from) : item.outputId) : kind === 'subplan' ? (target.from != null ? Number(target.from) : item.planId) : null;
+  const hereLabel = kind === 'plan' ? (() => { const o = data.outputs.find(x => x.id === hereId); return o ? outLabel(o) : '현재 위치'; })() : kind === 'subplan' ? (() => { const p = data.plans.find(x => x.id === hereId); return p ? p.name : '현재 위치'; })() : '';
+  const delHereOnly = () => { setData(d => kind === 'plan' ? unlinkPlanFrom(d, item.id, hereId) : unlinkSubFrom(d, item.id, hereId)); onClose(); };
   const subChks = kind === 'subplan' ? sortChksByDate(data.checklists.filter(c => c.subplanId === item.id)) : [];
 
   const mkKpi = () => kpiOn ? buildKpi(kpi, item.kpi) : null;
-  const addPlanKpi = () => setPlanKpis(ks => [...ks, { id: genKpiId(), name: '', unit: '%', target: '', targets: {} }]);
+  const addPlanKpi = () => setPlanKpis(ks => [...ks, { id: genKpiId(), name: '', unit: '%', target: '', targets: {}, outputId: null }]);
   const updPlanKpi = (i, f2, v) => setPlanKpis(ks => ks.map((k, j) => j === i ? { ...k, [f2]: v } : k));
   const delPlanKpi = i => setPlanKpis(ks => ks.filter((_, j) => j !== i));
 
@@ -848,8 +930,9 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
       f.stage = stage;
       if (stage === '완료' && !item.completedAt) f.completedAt = TODAY;
       if (showOutputChg && newPlanId) f.planId = Number(newPlanId);
+      if (showOutputChg) { const rep0 = newPlanId ? Number(newPlanId) : item.planId; f.extraPlanIds = xPlan.filter(x => x !== rep0); }
     }
-    if (kind === 'plan') { f.kpis = planKpis.filter(k => (k.name || '').trim()).map(k => ({ id: k.id, name: k.name.trim(), unit: (k.unit || '').trim() || '%', target: Number(k.target) || 0, targets: k.targets || {} })); f.kpi = null; f.hold = hold; f.desc = desc; }
+    if (kind === 'plan') { f.kpis = planKpis.filter(k => (k.name || '').trim()).map(k => ({ id: k.id, name: k.name.trim(), unit: (k.unit || '').trim() || '%', target: Number(k.target) || 0, targets: k.targets || {}, outputId: k.outputId != null ? Number(k.outputId) : null })); f.kpi = null; f.hold = hold; f.desc = desc; if (showOutputChg) { const rep0 = newOutputId ? Number(newOutputId) : item.outputId; f.outputId = rep0; f.extraOutputIds = xOut.filter(x => x !== rep0); } }
     setData(d => resolveAll(kind === 'plan' ? { ...d, plans: d.plans.map(p => p.id === item.id ? { ...p, ...f } : p) } : { ...d, subplans: d.subplans.map(s => s.id === item.id ? { ...s, ...f } : s) }));
     onClose();
   };
@@ -887,6 +970,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
               <button onClick={() => delPlanKpi(i)} style={{ alignSelf: 'flex-end', border: 'none', background: '#FEE2E2', color: '#E53935', borderRadius: 8, width: 36, height: 38, cursor: 'pointer', fontSize: 20 }}>×</button>
             </div>
             <div><Lbl c="기본 목표값" /><Inp type="number" value={k.target} onChange={v => updPlanKpi(i, 'target', v)} placeholder="목표값 (월별 목표는 KPI 탭에서)" /></div>
+            {planLinkOuts.length > 1 && <div style={{ marginTop: 6 }}><Lbl c="집계 프로젝트" /><Sel value={String(k.outputId != null ? k.outputId : planRepOut)} onChange={v => updPlanKpi(i, 'outputId', Number(v))} opts={planLinkOuts.map(oid => { const oo = data.outputs.find(x => x.id === oid); return { v: String(oid), l: oo ? outLabel(oo) : ('#' + oid) }; })} /><div style={{ fontSize: 14, color: '#A29C95', marginTop: 3 }}>이 KPI 를 어느 프로젝트 KPI 로 합산할지 선택합니다.</div></div>}
           </div>
         ))}
       <div style={{ fontSize: 15, color: '#A29C95', marginTop: 6 }}>※ 달성값은 [업무 성과] 탭에서 KPI별로 기록하고, 월별 목표는 [KPI] 탭에서 설정합니다.</div>
@@ -898,6 +982,34 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
       <div><Lbl c="이름" /><Inp value={name} onChange={setName} /></div>
       {kind === 'plan' && <div><Lbl c="간략 설명" /><textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3} placeholder="이 실행계획의 목표·맥락을 간단히 (예: 쇼핑검색광고를 운영할 수 있는 시스템 구축이 최종 목표. 이후 이 시스템으로 반복 운영)" style={{ width: '100%', boxSizing: 'border-box', fontSize: 17, padding: '9px 11px', border: '1px solid #E3E0DC', borderRadius: 9, outline: 'none', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5 }} /></div>}
 
+      {kind === 'plan' && (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <Lbl c="연결된 프로젝트" />
+            <button onClick={() => setShowOutputChg(!showOutputChg)} style={{ fontSize: 15, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: showOutputChg ? G : 'white', color: showOutputChg ? 'white' : G, cursor: 'pointer', fontWeight: 600 }}>연결 변경</button>
+          </div>
+          {!showOutputChg ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, color: '#3A3631', background: '#F5F4F2', padding: '8px 10px', borderRadius: 8 }}>
+              <span style={{ flex: 1, minWidth: 0 }}>{(() => { const oo = data.outputs.find(x => x.id === item.outputId); return oo ? outLabel(oo) : '없음'; })()}</span>
+              {planLinkN(item) > 1 && <button onClick={() => setLinkStat({ kind: 'plan', id: item.id })} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 7, padding: '3px 9px', fontSize: 14, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🔗 다른 곳에도 연결됨 {planLinkN(item)}</button>}
+            </div>
+          ) : (
+            <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0' }}>
+              <div style={{ marginBottom: 8 }}><Lbl c="대표 프로젝트 (집계 기준)" /><Sel value={newOutputId} onChange={v => { setNewOutputId(v); setXOut(a => a.filter(x => x !== Number(v))); }} opts={data.outputs.map(o => ({ v: String(o.id), l: outLabel(o) }))} ph="선택..." /></div>
+              <Lbl c="추가 연결 (여러 곳 선택 가능)" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 190, overflowY: 'auto' }}>
+                {data.outputs.filter(o => o.id !== Number(newOutputId)).map(o => (
+                  <div key={o.id} onClick={() => toggleXOut(o.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid ' + (xOut.indexOf(o.id) >= 0 ? G : '#E3E0DC'), borderRadius: 8, padding: '6px 9px', cursor: 'pointer', fontSize: 16 }}>
+                    <Chk on={xOut.indexOf(o.id) >= 0} /><span style={{ flex: 1, minWidth: 0 }}>{outLabel(o)}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize: 15, color: '#A29C95', marginTop: 6, lineHeight: 1.5 }}>※ 진행률·예산·KPI 집계는 <b>대표 프로젝트</b> 한 곳에서만 이뤄지고, 추가 연결한 곳에는 목록에 함께 표시만 됩니다.</div>
+            </div>
+          )}
+        </div>
+      )}
+
       {kind === 'subplan' && (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -905,13 +1017,23 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
             <button onClick={() => setShowOutputChg(!showOutputChg)} style={{ fontSize: 15, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: showOutputChg ? G : 'white', color: showOutputChg ? 'white' : G, cursor: 'pointer', fontWeight: 600 }}>출력 연결 변경</button>
           </div>
           {!showOutputChg ? (
-            <div style={{ fontSize: 16, color: '#3A3631', background: '#F5F4F2', padding: '8px 10px', borderRadius: 8 }}>
-              {currentOutput ? outLabel(currentOutput) : '없음'} {currentPlan ? '▸ ' + currentPlan.name : ''}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, color: '#3A3631', background: '#F5F4F2', padding: '8px 10px', borderRadius: 8 }}>
+              <span style={{ flex: 1, minWidth: 0 }}>{currentOutput ? outLabel(currentOutput) : '없음'} {currentPlan ? '▸ ' + currentPlan.name : ''}</span>
+              {subLinkN(item) > 1 && <button onClick={() => setLinkStat({ kind: 'subplan', id: item.id })} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 7, padding: '3px 9px', fontSize: 14, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🔗 다른 곳에도 연결됨 {subLinkN(item)}</button>}
             </div>
           ) : (
             <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #A7F3D0' }}>
               <div style={{ marginBottom: 8 }}><Lbl c="출력 프로젝트" /><Sel value={newOutputId} onChange={v => { setNewOutputId(v); setNewPlanId(''); }} opts={data.outputs.map(o => ({ v: String(o.id), l: outLabel(o) }))} ph="선택..." /></div>
-              <div><Lbl c="실행계획" /><Sel value={newPlanId} onChange={setNewPlanId} opts={chgPlans.map(p => ({ v: String(p.id), l: p.name }))} ph="선택..." /></div>
+              <div style={{ marginBottom: 8 }}><Lbl c="대표 실행계획 (집계 기준)" /><Sel value={newPlanId} onChange={v => { setNewPlanId(v); setXPlan(a => a.filter(x => x !== Number(v))); }} opts={chgPlans.map(p => ({ v: String(p.id), l: p.name }))} ph="선택..." /></div>
+              <Lbl c="추가 연결 실행계획 (여러 곳 선택 가능)" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, maxHeight: 190, overflowY: 'auto' }}>
+                {data.plans.filter(p => p.id !== Number(newPlanId)).map(p => { const po = data.outputs.find(o => o.id === p.outputId); return (
+                  <div key={p.id} onClick={() => toggleXPlan(p.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid ' + (xPlan.indexOf(p.id) >= 0 ? G : '#E3E0DC'), borderRadius: 8, padding: '6px 9px', cursor: 'pointer', fontSize: 16 }}>
+                    <Chk on={xPlan.indexOf(p.id) >= 0} /><span style={{ flex: 1, minWidth: 0 }}>{p.name}<span style={{ color: '#A29C95', fontSize: 14 }}> · {po ? outLabel(po) : '-'}</span></span>
+                  </div>
+                ); })}
+              </div>
+              <div style={{ fontSize: 15, color: '#A29C95', marginTop: 6, lineHeight: 1.5 }}>※ 진행률·예산·KPI 집계는 <b>대표 실행계획</b> 한 곳에서만 이뤄지고, 추가 연결한 곳에는 목록에 함께 표시만 됩니다.</div>
             </div>
           )}
         </div>
@@ -975,14 +1097,15 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
       {kind === 'output' && (
         <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #EDEBE7' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}><div style={{ fontSize: 17, fontWeight: 700, color: G }}>📋 실행계획 ({childPlans.length})</div>{childPlans.length > 1 && <button onClick={() => setShowReorder(true)} title="드래그가 어려울 때: 목록에서 한 번에 순서 변경" style={{ marginLeft: 'auto', fontSize: 15, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서 변경</button>}</div>
-          {childPlans.length > 1 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요.</div>}
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}><div style={{ fontSize: 17, fontWeight: 700, color: G }}>📋 실행계획 ({childPlans.length})</div>{ownPlans.length > 1 && <button onClick={() => setShowReorder(true)} title="드래그가 어려울 때: 목록에서 한 번에 순서 변경" style={{ marginLeft: 'auto', fontSize: 15, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서 변경</button>}</div>
+          {ownPlans.length > 1 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요. 🔗 표시는 다른 곳에도 연결된 항목입니다.</div>}
           {childPlans.length === 0 ? <div style={{ fontSize: 16, color: '#A29C95', marginBottom: 8 }}>등록된 실행계획이 없습니다</div> :
-            childPlans.map(p => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; return (
-              <div key={p.id} {...planDrag.row(p.id)} {...planDrag.arm(p.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 8, padding: '8px 10px', marginBottom: 5, border: '1px solid #E3E0DC', cursor: childPlans.length > 1 ? 'grab' : 'default', ...planDrag.hl(p.id) }}>
-                {childPlans.length > 1 && <span title="여기를 잡고 끌어서 순서 변경" style={{ color: '#C4BDB4', fontSize: 18, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>}
-                <div style={{ flex: 1 }}><div style={{ fontSize: 16, fontWeight: 600 }}>{p.name}{(p.kpis && p.kpis.length) ? ' 🎯' : ''}{p.hold ? ' ⏸' : ''}</div><div style={{ fontSize: 14, color: '#A29C95' }}>{ownerAv(p)} {ownerNm(p)} · 세부 {done}/{subs.length}</div></div>
-                <EditBtn onClick={() => onSwitch && onSwitch({ kind: 'plan', id: p.id })} />
+            childPlans.map(p => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; const own = p.outputId === item.id; const dragOk = own && ownPlans.length > 1; return (
+              <div key={p.id} {...planDrag.row(p.id)} {...planDrag.arm(p.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: own ? 'white' : '#FDFBF4', borderRadius: 8, padding: '8px 10px', marginBottom: 5, border: '1px solid ' + (own ? '#E3E0DC' : '#EBD9A8'), cursor: dragOk ? 'grab' : 'default', ...planDrag.hl(p.id) }}>
+                {dragOk && <span title="여기를 잡고 끌어서 순서 변경" style={{ color: '#C4BDB4', fontSize: 18, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>}
+                <div style={{ flex: 1 }}><div style={{ fontSize: 16, fontWeight: 600 }}>{p.name}{(p.kpis && p.kpis.length) ? ' 🎯' : ''}{p.hold ? ' ⏸' : ''}</div><div style={{ fontSize: 14, color: '#A29C95' }}>{ownerAv(p)} {ownerNm(p)} · 세부 {done}/{subs.length}{own ? '' : ' · 다른 프로젝트가 대표'}</div></div>
+                {planLinkN(p) > 1 && <button onClick={e => { e.stopPropagation(); setLinkStat({ kind: 'plan', id: p.id }); }} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 7, padding: '3px 8px', fontSize: 14, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🔗 {planLinkN(p)}</button>}
+                <EditBtn onClick={() => onSwitch && onSwitch({ kind: 'plan', id: p.id, from: item.id })} />
               </div>
             ); })}
           <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
@@ -994,18 +1117,19 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
       {kind === 'plan' && (
         <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #EDEBE7' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}><div style={{ fontSize: 17, fontWeight: 700, color: G }}>📋 세부 실행계획 ({childSubs.length})</div>{childSubs.length > 1 && <button onClick={() => setShowReorder(true)} title="드래그가 어려울 때: 목록에서 한 번에 순서 변경" style={{ marginLeft: 'auto', fontSize: 15, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서 변경</button>}</div>
-          {childSubs.length > 1 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요.</div>}
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}><div style={{ fontSize: 17, fontWeight: 700, color: G }}>📋 세부 실행계획 ({childSubs.length})</div>{ownSubs.length > 1 && <button onClick={() => setShowReorder(true)} title="드래그가 어려울 때: 목록에서 한 번에 순서 변경" style={{ marginLeft: 'auto', fontSize: 15, padding: '3px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서 변경</button>}</div>
+          {ownSubs.length > 1 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요. 🔗 표시는 다른 곳에도 연결된 항목입니다.</div>}
           {childSubs.length === 0 ? <div style={{ fontSize: 16, color: '#A29C95', marginBottom: 8 }}>등록된 세부 실행계획이 없습니다</div> :
-            childSubs.map(s => (
-              <div key={s.id} {...subDrag.row(s.id)} {...subDrag.arm(s.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', borderRadius: 8, padding: '8px 10px', marginBottom: 5, border: '1px solid #E3E0DC', cursor: childSubs.length > 1 ? 'grab' : 'default', ...subDrag.hl(s.id) }}>
-                {childSubs.length > 1 && <span title="여기를 잡고 끌어서 순서 변경" style={{ color: '#C4BDB4', fontSize: 18, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>}
+            childSubs.map(s => { const own = s.planId === item.id; const dragOk = own && ownSubs.length > 1; return (
+              <div key={s.id} {...subDrag.row(s.id)} {...subDrag.arm(s.id)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: own ? 'white' : '#FDFBF4', borderRadius: 8, padding: '8px 10px', marginBottom: 5, border: '1px solid ' + (own ? '#E3E0DC' : '#EBD9A8'), cursor: dragOk ? 'grab' : 'default', ...subDrag.hl(s.id) }}>
+                {dragOk && <span title="여기를 잡고 끌어서 순서 변경" style={{ color: '#C4BDB4', fontSize: 18, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>}
                 <span style={{ fontSize: 14, padding: '1px 6px', borderRadius: 6, background: stC(s.stage), color: 'white' }}>{s.stage}</span>
-                <div style={{ flex: 1, fontSize: 16, fontWeight: 600 }}>{s.name}</div>
+                <div style={{ flex: 1, fontSize: 16, fontWeight: 600 }}>{s.name}{own ? '' : <span style={{ fontSize: 13, color: '#A29C95', fontWeight: 500 }}> · 다른 실행계획이 대표</span>}</div>
                 <span style={{ fontSize: 14, color: G }}>{ownerAv(s)}</span>
-                <EditBtn onClick={() => onSwitch && onSwitch({ kind: 'subplan', id: s.id })} />
+                {subLinkN(s) > 1 && <button onClick={e => { e.stopPropagation(); setLinkStat({ kind: 'subplan', id: s.id }); }} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 7, padding: '3px 8px', fontSize: 14, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🔗 {subLinkN(s)}</button>}
+                <EditBtn onClick={() => onSwitch && onSwitch({ kind: 'subplan', id: s.id, from: item.id })} />
               </div>
-            ))}
+            ); })}
           <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
             <input value={newChild} onChange={e => setNewChild(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addChildSub(); }} placeholder="새 세부 실행계획명" style={{ flex: 1, padding: '8px 9px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 17 }} />
             <Btn v="gold" onClick={addChildSub} style={{ padding: '8px 14px' }}>+ 추가</Btn>
@@ -1015,11 +1139,23 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
 
 
 
-      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn>{confirmDel ? <Btn v="danger" onClick={del}>휴지통으로 이동</Btn> : <Btn v="secondary" onClick={() => setConfirmDel(true)} style={{ color: '#E53935' }}>삭제</Btn>}</div>
+      {confirmDel && multiLinked && (
+        <div style={{ background: '#FFF7ED', border: '1px solid #F4C77B', borderRadius: 10, padding: 12 }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: '#8A5A12', marginBottom: 4 }}>⚠️ 이 {kind === 'plan' ? '실행계획' : '세부실행계획'}은 {linkN}곳에 연결되어 있습니다.</div>
+          <div style={{ fontSize: 15, color: '#6E6863', lineHeight: 1.55, marginBottom: 9 }}>연동된 곳에서도 삭제할까요?<br />‘아니오’를 누르면 <b>{hereLabel}</b> 에서만 빠지고 나머지 연결은 그대로 남습니다.</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Btn v="danger" onClick={del}>예 – 전부 삭제</Btn>
+            <Btn v="secondary" onClick={delHereOnly} style={{ color: '#8A5A12' }}>아니오 – 여기서만 빼기</Btn>
+            <Btn v="secondary" onClick={() => setConfirmDel(false)}>취소</Btn>
+          </div>
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 8 }}><Btn onClick={save} style={{ flex: 1 }}>저장</Btn><Btn v="secondary" onClick={onClose}>취소</Btn>{confirmDel ? (multiLinked ? null : <Btn v="danger" onClick={del}>휴지통으로 이동</Btn>) : <Btn v="secondary" onClick={() => setConfirmDel(true)} style={{ color: '#E53935' }}>삭제</Btn>}</div>
+      {linkStat && (() => { const it = linkStat.kind === 'plan' ? data.plans.find(x => x.id === linkStat.id) : data.subplans.find(x => x.id === linkStat.id); return it ? <LinkStatusModal kind={linkStat.kind} item={it} data={data} setData={setData} onClose={() => setLinkStat(null)} /> : null; })()}
       {showFile && <FileModal subId={item.id} data={data} setData={setData} onClose={() => setShowFile(false)} />}
-      {showReorder && kind === 'output' && <ReorderModal title="실행계획 순서" items={childPlans.map(p => ({ id: p.id, label: p.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.plans.find(p => p.id === x.id)).filter(Boolean); let k = 0; return { ...d, plans: d.plans.map(p => p.outputId === item.id ? q[k++] : p) }; })} />}
+      {showReorder && kind === 'output' && <ReorderModal title="실행계획 순서" items={ownPlans.map(p => ({ id: p.id, label: p.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.plans.find(p => p.id === x.id)).filter(Boolean); let k = 0; return { ...d, plans: d.plans.map(p => p.outputId === item.id ? q[k++] : p) }; })} />}
       {showChkReorder && kind === 'subplan' && <ReorderModal title="체크리스트 순서 (같은 날짜 안에서만 반영)" items={subChks.map(c => ({ id: c.id, label: (c.date ? c.date + ' · ' : '미정 · ') + ((c.text || '').trim() || '(이름 없음)') }))} onClose={() => setShowChkReorder(false)} onSave={reorderSubChks} />}
-      {showReorder && kind === 'plan' && <ReorderModal title="세부 실행계획 순서" items={childSubs.map(s => ({ id: s.id, label: s.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.subplans.find(s => s.id === x.id)).filter(Boolean); let k = 0; return { ...d, subplans: d.subplans.map(s => s.planId === item.id ? q[k++] : s) }; })} />}
+      {showReorder && kind === 'plan' && <ReorderModal title="세부 실행계획 순서" items={ownSubs.map(s => ({ id: s.id, label: s.name }))} onClose={() => setShowReorder(false)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.subplans.find(s => s.id === x.id)).filter(Boolean); let k = 0; return { ...d, subplans: d.subplans.map(s => s.planId === item.id ? q[k++] : s) }; })} />}
     </ModalShell>
   );
 }
@@ -1684,6 +1820,7 @@ function TabProgress({ data, setData, onEdit }) {
   const [showProjOrder, setShowProjOrder] = useState(false);
   const [orderPlansFor, setOrderPlansFor] = useState(null);
   const [expPlan, setExpPlan] = useState({});
+  const [linkFor, setLinkFor] = useState(null);
   const toggleHold = id => setData(d => ({ ...d, plans: d.plans.map(p => p.id === id ? { ...p, hold: !p.hold } : p) }));
   const movePlan = (id, dir) => setData(d => ({ ...d, plans: reorderSiblings(d.plans, id, 'outputId', dir) }));
   const catIdx = name => { const i = data.categories.findIndex(c => c.name === name); return i < 0 ? 999 : i; };
@@ -1699,11 +1836,12 @@ function TabProgress({ data, setData, onEdit }) {
       {showCatOrder && <CategoryOrderModal data={data} setData={setData} onClose={() => setShowCatOrder(false)} />}
       {showProjOrder && <ProjectOrderModal data={data} setData={setData} onClose={() => setShowProjOrder(false)} />}
       {orderPlansFor != null && (() => { const o = data.outputs.find(x => x.id === orderPlansFor); const ps = data.plans.filter(p => p.outputId === orderPlansFor); return <ReorderModal title={(o ? o.name + ' · ' : '') + '실행계획 순서'} items={ps.map(p => ({ id: p.id, label: p.name }))} onClose={() => setOrderPlansFor(null)} onSave={newOrder => setData(d => { const q = newOrder.map(x => d.plans.find(p => p.id === x.id)).filter(Boolean); let k = 0; return { ...d, plans: d.plans.map(p => p.outputId === orderPlansFor ? q[k++] : p) }; })} />; })()}
+      {linkFor && (() => { const it = linkFor.kind === 'plan' ? data.plans.find(x => x.id === linkFor.id) : data.subplans.find(x => x.id === linkFor.id); return it ? <LinkStatusModal kind={linkFor.kind} item={it} data={data} setData={setData} onClose={() => setLinkFor(null)} /> : null; })()}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {sortedOutputs.map(o => {
-          const plans = data.plans.filter(p => p.outputId === o.id && matchOwner(p, filter));
+          const plans = data.plans.filter(p => isLinkedOut(p, o.id) && matchOwner(p, filter));
           if (!plans.length) return null;
-          return (<Card key={o.id} style={{ padding: 0, overflow: 'hidden' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7' }}><Badge label={o.code} color={clsC(o.type, data.categories)} /><span style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</span>{o.kpi && <Badge label="KPI" color={GO} />}<span style={{ marginLeft: 'auto', fontSize: 15, color: '#A29C95' }}>{o.type}</span>{data.plans.filter(p => p.outputId === o.id).length > 1 && <button onClick={() => setOrderPlansFor(o.id)} style={{ fontSize: 15, padding: '3px 9px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서</button>}<EditBtn onClick={() => onEdit({ kind: 'output', id: o.id })} /></div><div style={{ padding: '12px 16px 16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 10 }}>{plans.map((p, pi) => { const subs = data.subplans.filter(s => s.planId === p.id); const done = subs.filter(s => s.stage === '완료').length; const prog = subs.length ? pct(done, subs.length) : 0; const open = !!expPlan[p.id]; return (<div key={p.id} style={{ border: '1px solid ' + (open ? G : '#EDEBE7'), borderRadius: 10, padding: 11, background: open ? '#FBFDFB' : 'white', opacity: p.hold ? 0.65 : 1, alignSelf: 'start' }}><div onClick={() => setExpPlan(m => ({ ...m, [p.id]: !m[p.id] }))} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}><span style={{ fontSize: 15, color: '#A29C95' }}>{open ? '▾' : '▸'}</span><span style={{ fontWeight: 700, fontSize: 17, flex: 1, minWidth: 0 }}>{p.name}</span>{p.hold && <Badge label="⏸" color="#989088" />}{(p.kpis && p.kpis.length > 0) && <Badge label={'KPI ' + p.kpis.length} color={GO} />}</div><div style={{ fontSize: 14, color: '#6E6863', marginBottom: 6 }}>{ownerAv(p)} {ownerNm(p)} · {p.start || '미정'}~{p.due || '미정'}</div><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={done} m={subs.length || 1} h={6} /></div><span style={{ fontSize: 15, fontWeight: 700, color: prog >= 100 ? '#1FA463' : '#6E6863' }}>{done}/{subs.length} ({prog}%)</span></div></div>{p.desc && <div style={{ fontSize: 15, color: '#6E6863', marginTop: 8, lineHeight: 1.45, whiteSpace: 'pre-wrap', background: '#F5F4F2', borderRadius: 7, padding: '6px 9px' }}>{p.desc}</div>}{open && (<div style={{ marginTop: 10, borderTop: '1px solid #F5F4F2', paddingTop: 10 }}>{subs.length === 0 ? <div style={{ fontSize: 15, color: '#A29C95' }}>세부 실행계획이 없습니다</div> : subs.map(s => { const chks = data.checklists.filter(c => c.subplanId === s.id); const cd = chks.filter(c => c.done).length; return (<div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 0' }}><Badge label={s.stage} color={stC(s.stage)} /><span style={{ fontSize: 16, flex: 1, minWidth: 0, color: s.stage === '완료' ? '#A29C95' : '#3A3631' }}>{s.name}</span>{chks.length > 0 && <span style={{ fontSize: 14, color: '#A29C95' }}>☑{cd}/{chks.length}</span>}<EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id })} /></div>); })}</div>)}<div style={{ display: 'flex', gap: 4, marginTop: 8, justifyContent: 'flex-end' }}><button onClick={() => toggleHold(p.id)} style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#A29C95', cursor: 'pointer', fontSize: 14 }}>{p.hold ? '⏸ 해제' : '⏸'}</button><EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id })} /></div></div>); })}</div></Card>);
+          return (<Card key={o.id} style={{ padding: 0, overflow: 'hidden' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: '#F8F7F5', borderBottom: '1px solid #EDEBE7' }}><Badge label={o.code} color={clsC(o.type, data.categories)} /><span style={{ fontWeight: 700, fontSize: 18 }}>{o.name}</span>{o.kpi && <Badge label="KPI" color={GO} />}<span style={{ marginLeft: 'auto', fontSize: 15, color: '#A29C95' }}>{o.type}</span>{data.plans.filter(p => p.outputId === o.id).length > 1 && <button onClick={() => setOrderPlansFor(o.id)} style={{ fontSize: 15, padding: '3px 9px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600 }}>⠿ 순서</button>}<EditBtn onClick={() => onEdit({ kind: 'output', id: o.id })} /></div><div style={{ padding: '12px 16px 16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 10 }}>{plans.map((p, pi) => { const subs = data.subplans.filter(s => s.planId === p.id); const subsAll = subsOfPlanAll(data, p.id); const done = subs.filter(s => s.stage === '완료').length; const prog = subs.length ? pct(done, subs.length) : 0; const open = !!expPlan[p.id]; return (<div key={p.id} style={{ border: '1px solid ' + (open ? G : '#EDEBE7'), borderRadius: 10, padding: 11, background: open ? '#FBFDFB' : 'white', opacity: p.hold ? 0.65 : 1, alignSelf: 'start' }}><div onClick={() => setExpPlan(m => ({ ...m, [p.id]: !m[p.id] }))} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}><span style={{ fontSize: 15, color: '#A29C95' }}>{open ? '▾' : '▸'}</span><span style={{ fontWeight: 700, fontSize: 17, flex: 1, minWidth: 120 }}>{p.name}</span>{p.hold && <Badge label="⏸" color="#989088" />}{(p.kpis && p.kpis.length > 0) && <Badge label={'KPI ' + p.kpis.length} color={GO} />}{planLinkN(p) > 1 && <button onClick={e => { e.stopPropagation(); setLinkFor({ kind: 'plan', id: p.id }); }} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 6, padding: '1px 7px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>🔗 {planLinkN(p)}</button>}</div><div style={{ fontSize: 14, color: '#6E6863', marginBottom: 6 }}>{ownerAv(p)} {ownerNm(p)} · {p.start || '미정'}~{p.due || '미정'}{p.outputId === o.id ? '' : ' · 🔗 연결됨'}</div><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><div style={{ flex: 1 }}><Bar v={done} m={subs.length || 1} h={6} /></div><span style={{ fontSize: 15, fontWeight: 700, color: prog >= 100 ? '#1FA463' : '#6E6863' }}>{done}/{subs.length} ({prog}%)</span></div></div>{p.desc && <div style={{ fontSize: 15, color: '#6E6863', marginTop: 8, lineHeight: 1.45, whiteSpace: 'pre-wrap', background: '#F5F4F2', borderRadius: 7, padding: '6px 9px' }}>{p.desc}</div>}{open && (<div style={{ marginTop: 10, borderTop: '1px solid #F5F4F2', paddingTop: 10 }}>{subsAll.length === 0 ? <div style={{ fontSize: 15, color: '#A29C95' }}>세부 실행계획이 없습니다</div> : subsAll.map(s => { const chks = data.checklists.filter(c => c.subplanId === s.id); const cd = chks.filter(c => c.done).length; return (<div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 0', flexWrap: 'wrap' }}><Badge label={s.stage} color={stC(s.stage)} /><span style={{ fontSize: 16, flex: 1, minWidth: 104, color: s.stage === '완료' ? '#A29C95' : '#3A3631' }}>{s.name}</span>{subLinkN(s) > 1 && <button onClick={e => { e.stopPropagation(); setLinkFor({ kind: 'subplan', id: s.id }); }} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 6, padding: '1px 6px', fontSize: 13, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🔗 {subLinkN(s)}</button>}{chks.length > 0 && <span style={{ fontSize: 14, color: '#A29C95' }}>☑{cd}/{chks.length}</span>}<EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id, from: p.id })} /></div>); })}</div>)}<div style={{ display: 'flex', gap: 4, marginTop: 8, justifyContent: 'flex-end' }}><button onClick={() => toggleHold(p.id)} style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', color: '#A29C95', cursor: 'pointer', fontSize: 14 }}>{p.hold ? '⏸ 해제' : '⏸'}</button><EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id, from: o.id })} /></div></div>); })}</div></Card>);
         })}
       </div>
     </div>
@@ -1713,6 +1851,7 @@ function TabProgress({ data, setData, onEdit }) {
 function TabKanban({ data, setData, onEdit }) {
   const [expPlan, setExpPlan] = useState(null);
   const [expSub, setExpSub] = useState(null);
+  const [linkFor, setLinkFor] = useState(null);
   const [filter, setFilter] = useState('전체');
   const outOf = id => data.outputs.find(o => o.id === id);
   const move = (sid, dir) => setData(d => resolveAll({ ...d, subplans: d.subplans.map(s => {
@@ -1732,6 +1871,7 @@ function TabKanban({ data, setData, onEdit }) {
       <div style={{ fontSize: 21, fontWeight: 700, color: G, marginBottom: 6 }}>칸반 보드</div>
       <div style={{ fontSize: 16, color: '#A29C95', marginBottom: 14 }}>실행계획 단위 · 카드를 클릭하면 세부 실행계획과 진행도가 열립니다 (상태는 세부 진행에 따라 자동 분류)</div>
       <FilterBar value={filter} onChange={setFilter} />
+      {linkFor && (() => { const it = linkFor.kind === 'plan' ? data.plans.find(x => x.id === linkFor.id) : data.subplans.find(x => x.id === linkFor.id); return it ? <LinkStatusModal kind={linkFor.kind} item={it} data={data} setData={setData} onClose={() => setLinkFor(null)} /> : null; })()}
       <div style={{ overflowX: 'auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 12, minWidth: 1080 }}>
           {STAGES.map(stage => {
@@ -1742,6 +1882,7 @@ function TabKanban({ data, setData, onEdit }) {
               {plans.map(p => {
                 const o = outOf(p.outputId);
                 const subs = data.subplans.filter(s => s.planId === p.id);
+                const subsAll = subsOfPlanAll(data, p.id);
                 const done = subs.filter(s => s.stage === '완료').length;
                 const open = expPlan === p.id;
                 return (<Card key={p.id} style={{ marginBottom: 10, padding: 0, overflow: 'hidden' }}>
@@ -1749,15 +1890,16 @@ function TabKanban({ data, setData, onEdit }) {
                   <div style={{ padding: 11 }}>
                     <div style={{ display: 'flex', gap: 4, alignItems: 'flex-start' }}>
                       <div style={{ fontWeight: 700, fontSize: 17, flex: 1, cursor: 'pointer' }} onClick={() => setExpPlan(open ? null : p.id)}>{open ? '▾ ' : '▸ '}{p.name}{(p.kpis && p.kpis.length) ? ' 🎯' : ''}</div>
+                      {planLinkN(p) > 1 && <button onClick={e => { e.stopPropagation(); setLinkFor({ kind: 'plan', id: p.id }); }} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 6, padding: '1px 7px', fontSize: 13, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🔗 {planLinkN(p)}</button>}
                       <EditBtn onClick={() => onEdit({ kind: 'plan', id: p.id })} />
                     </div>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '6px 0', alignItems: 'center' }}><span style={{ fontSize: 14, color: G }}>{ownerAv(p)} {ownerNm(p)}</span><span style={{ fontSize: 14, color: '#6E6863' }}>세부 {done}/{subs.length}</span>{p.due && <span style={{ fontSize: 14, color: '#A29C95', marginLeft: 'auto' }}>~{p.due.slice(5)}</span>}</div>
                     <Bar v={done} m={subs.length || 1} h={5} />
                     {open && (<div style={{ marginTop: 10, borderTop: '1px solid #F5F4F2', paddingTop: 8 }}>
-                      {subs.length === 0 ? <div style={{ fontSize: 15, color: '#A29C95' }}>세부 실행계획이 없습니다</div> : subs.map(s => {
+                      {subsAll.length === 0 ? <div style={{ fontSize: 15, color: '#A29C95' }}>세부 실행계획이 없습니다</div> : subsAll.map(s => {
                         const chks = data.checklists.filter(c => c.subplanId === s.id); const cd = chks.filter(c => c.done).length; const sOpen = expSub === s.id; const sHold = s.stage === '보류';
                         return (<div key={s.id} style={{ background: '#F5F4F2', borderRadius: 8, padding: 8, marginBottom: 6 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 13, padding: '1px 6px', borderRadius: 5, background: stC(s.stage), color: 'white', fontWeight: 700 }}>{s.stage}</span><span onClick={() => setExpSub(sOpen ? null : s.id)} style={{ fontSize: 16, fontWeight: 600, flex: 1, minWidth: 0, cursor: 'pointer' }}>{s.name}</span><EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id })} /></div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ fontSize: 13, padding: '1px 6px', borderRadius: 5, background: stC(s.stage), color: 'white', fontWeight: 700 }}>{s.stage}</span><span onClick={() => setExpSub(sOpen ? null : s.id)} style={{ fontSize: 16, fontWeight: 600, flex: 1, minWidth: 0, cursor: 'pointer' }}>{s.name}</span>{subLinkN(s) > 1 && <button onClick={e => { e.stopPropagation(); setLinkFor({ kind: 'subplan', id: s.id }); }} title="다른 곳에도 연결됨 — 연결 현황 보기" style={{ border: '1px solid #C8A24A', background: '#FFF9E8', color: '#8A6A12', borderRadius: 6, padding: '1px 6px', fontSize: 13, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>🔗 {subLinkN(s)}</button>}<EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id, from: p.id })} /></div>
                           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '5px 0', alignItems: 'center' }}><span style={{ fontSize: 14, color: G }}>{ownerAv(s)}</span>{chks.length > 0 && <span style={{ fontSize: 14, color: '#6E6863' }}>☑ {cd}/{chks.length}</span>}{(s.files || []).length > 0 && <span style={{ fontSize: 14, color: '#2D5FE0' }}>📎 {(s.files || []).length}</span>}</div>
                           {sOpen && chks.length > 0 && <div style={{ background: 'white', borderRadius: 6, padding: 6, marginBottom: 6 }}>{chks.map(c => <div key={c.id} onClick={() => toggleChk(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '3px 2px', cursor: 'pointer' }}><Chk on={c.done} /><span style={{ fontSize: 16, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span></div>)}</div>}
                           {sHold ? <button onClick={() => move(s.id, '예정')} style={{ width: '100%', padding: '4px 0', fontSize: 14, border: '1px solid #989088', borderRadius: 6, cursor: 'pointer', background: 'white', color: '#64748B', fontWeight: 600 }}>▶ 보류 해제</button> : <div style={{ display: 'flex', gap: 4 }}><button onClick={() => move(s.id, -1)} disabled={s.stage === '예정'} style={{ flex: 1, padding: '3px 0', fontSize: 14, border: '1px solid #E3E0DC', borderRadius: 6, cursor: 'pointer', background: 'white' }}>◀</button><button onClick={() => move(s.id, 1)} disabled={s.stage === '완료'} style={{ flex: 1, padding: '3px 0', fontSize: 14, border: '1px solid #E3E0DC', borderRadius: 6, cursor: 'pointer', background: 'white' }}>▶</button></div>}
@@ -2606,8 +2748,10 @@ function TabKpi({ data, setData }) {
   const setSubKpiField = (subId, ckId, patch) => setData(d => ({ ...d, subplans: d.subplans.map(s => s.id === subId ? { ...s, kpis: (s.kpis || []).map(ck => ck.id === ckId ? { ...ck, ...patch } : ck) } : s) }));
   const setSubKpiLink = (subId, ckId, link) => setSubKpiField(subId, ckId, { link: link || null });
   const removeChildKpi = (subId, ckId) => setData(d => ({ ...d, subplans: d.subplans.map(s => s.id === subId ? { ...s, kpis: (s.kpis || []).filter(ck => ck.id !== ckId) } : s) }));
-  const plansOfOutput = oid => data.plans.filter(p => p.outputId === oid);
-  const sumForOutput = oid => plansOfOutput(oid).reduce((a, p) => a + ((p.kpis && p.kpis.length) ? p.kpis.reduce((x, k) => x + kpiAchieved(k), 0) : sumForPlan(p.id)), 0);
+  const plansOfOutput = oid => data.plans.filter(p => isLinkedOut(p, oid));
+  // 다중 연결: KPI 는 kpiOutId 로 정해진 "한" 프로젝트에서만 집계된다(이중 집계 방지).
+  const kpisHere = (p, oid) => (p.kpis || []).filter(k => kpiOutId(p, k) === oid);
+  const sumForOutput = oid => plansOfOutput(oid).reduce((a, p) => a + ((p.kpis && p.kpis.length) ? kpisHere(p, oid).reduce((x, k) => x + kpiAchieved(k), 0) : (p.outputId === oid ? sumForPlan(p.id) : 0)), 0);
   const outOf = pid => { const p = data.plans.find(x => x.id === pid); return p ? data.outputs.find(o => o.id === p.outputId) : null; };
   const effTarget = kpi => { const t = (kpi && kpi.targets) || {}; const keys = Object.keys(t); if (keys.length) { return rangeMonths.reduce((acc, mo) => { const v = t[mo.key] || 0; return isSingleMonth ? v : acc + (mo.totalDays ? v / mo.totalDays * mo.days : 0); }, 0); } if (kpi && kpi.parentKpiId != null) return Number(kpi.baseTarget) || 0; return Number(kpi && kpi.target) || 0; };
 
@@ -2625,7 +2769,7 @@ function TabKpi({ data, setData }) {
 
   const allPlanKpis = []; data.plans.forEach(p => (p.kpis || []).forEach(k => allPlanKpis.push({ plan: p, kpi: k })));
   const findKpi = kid => { for (const p of data.plans) { const k = (p.kpis || []).find(x => x.id === kid); if (k) return { plan: p, kpi: k }; } return null; };
-  const kpiOutputs = data.outputs.filter(o => o.kpi || data.plans.some(p => p.outputId === o.id && (p.kpis && p.kpis.length))).sort((a, b) => { const ci = n => { const i = data.categories.findIndex(c => c.name === n); return i < 0 ? 999 : i; }; return ci(a.type) - ci(b.type); });
+  const kpiOutputs = data.outputs.filter(o => o.kpi || data.plans.some(p => isLinkedOut(p, o.id) && kpisHere(p, o.id).length)).sort((a, b) => { const ci = n => { const i = data.categories.findIndex(c => c.name === n); return i < 0 ? 999 : i; }; return ci(a.type) - ci(b.type); });
 
 
   const KpiHeader = ({ title, achieved, target, unit, openKey, accent, sub }) => {
@@ -2772,8 +2916,8 @@ function TabKpi({ data, setData }) {
         </div>
         {kpiOutputs.length === 0 && <div style={{ color: '#A29C95', textAlign: 'center', padding: 40 }}>등록된 프로젝트/실행계획 KPI가 없습니다. 진행상황 탭에서 프로젝트·실행계획 수정으로 KPI를 등록하세요.</div>}
         {kpiOutputs.map(o => {
-          const plansW = data.plans.filter(p => p.outputId === o.id && (p.kpis || []).some(kpiActive));
-          const kpiCount = plansW.reduce((a, p) => a + p.kpis.filter(kpiActive).length, 0);
+          const plansW = data.plans.filter(p => isLinkedOut(p, o.id) && kpisHere(p, o.id).some(kpiActive));
+          const kpiCount = plansW.reduce((a, p) => a + kpisHere(p, o.id).filter(kpiActive).length, 0);
           const oAch = sumForOutput(o.id);
           const oTarget = o.kpi ? effTarget(o.kpi) : 0;
           return (
@@ -2795,7 +2939,7 @@ function TabKpi({ data, setData }) {
               <div style={{ marginTop: 4 }}>
                 {plansW.length === 0 ? <div style={{ fontSize: 12, color: '#A29C95', padding: '6px 0' }}>이 기간에 적용되는 실행계획 KPI가 없습니다</div> : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'stretch' }}>
-                    {plansW.flatMap(p => p.kpis.filter(kpiActive).map(k0 => { const k = { ...k0, _planId: p.id }; const achieved = kpiAchieved(k); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; const lk = k.link; const lkStyle = lk ? (lk.type === 'manual' ? { border: '1px solid #2D5FE0', color: '#2D5FE0' } : { border: '1px solid #1FA463', color: '#1FA463' }) : { border: '1px solid #E3E0DC', color: '#A29C95' }; const childs = childKpisOf(p.id, k.id); const hasChild = childs.length > 0; const cTgtSum = childTargetSum(p.id, k.id); const tgtMismatch = hasChild && Math.round(cTgtSum) !== Math.round(target); return (
+                    {plansW.flatMap(p => kpisHere(p, o.id).filter(kpiActive).map(k0 => { const k = { ...k0, _planId: p.id }; const achieved = kpiAchieved(k); const target = effTarget(k); const klogs = logsForKpi(k.id); const open = expanded === 'kpi-' + k.id; const pr = target > 0 ? pct(achieved, target) : 0; const done = target > 0 && pr >= 100; const lk = k.link; const lkStyle = lk ? (lk.type === 'manual' ? { border: '1px solid #2D5FE0', color: '#2D5FE0' } : { border: '1px solid #1FA463', color: '#1FA463' }) : { border: '1px solid #E3E0DC', color: '#A29C95' }; const childs = childKpisOf(p.id, k.id); const hasChild = childs.length > 0; const cTgtSum = childTargetSum(p.id, k.id); const tgtMismatch = hasChild && Math.round(cTgtSum) !== Math.round(target); return (
                       <Card key={k.id} style={{ flex: '1 1 auto', minWidth: 210, maxWidth: 480, boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
                           <div onClick={() => setExpanded(open ? null : 'kpi-' + k.id)} style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}>
@@ -3407,7 +3551,7 @@ function BudgetFormModal({ data, setData, onClose, edit }) {
   const [paidDate, setPaidDate] = useState(e.paidDate || TODAY);
   const [paidAmount, setPaidAmount] = useState(e.paidAmount != null && e.paidAmount !== '' ? String(e.paidAmount) : '');
   const confirmAddVendor = () => { const v = newVendor.trim(); if (!v) return; if (allVendors.indexOf(v) < 0) setData(d => ({ ...d, vendors: [...(d.vendors || []), v] })); setVendor(v); setNewVendor(''); setAddingVendor(false); };
-  const plans = data.plans.filter(p => p.outputId === Number(outId));
+  const plans = data.plans.filter(p => isLinkedOut(p, Number(outId)));
   const seg = (val, set, opts) => <div style={{ display: 'flex', gap: 6 }}>{opts.map(o => <button key={o} onClick={() => set(o)} style={{ flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: val === o ? G : '#E3E0DC', color: val === o ? 'white' : '#3A3631' }}>{o}</button>)}</div>;
   const submit = () => {
     if (!outId || !vendor.trim() || !amount || Number(amount) <= 0) { alert('필수 항목을 입력하세요'); return; }
