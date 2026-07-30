@@ -15343,5 +15343,957 @@
         "reason": "search_shop 도구 이 세션 미노출 — intentType 은 검색광고 compIdx/adDepth+형태규칙 휴리스틱으로 판정."
       }
     ]
+  },
+  {
+    "date": "2026-07-31",
+    "schemaVersion": 2,
+    "generatedAt": "2026-07-31T07:10:28+09:00",
+    "digest": "# 📰 키워드트렌드 데일리 — 2026-07-31 (금)\n\n## 오늘의 핵심\n- **단백질 RTD 대전 격화** — 매일유업 '퓨어틴' 출시·남양 '테이크핏 몬스터' 47g 리뉴얼(7/30), GS25선 단백질음료가 음료 매출 **1위**(7/29). 단백질쉐이크(월 11.5만)·단백질음료(월 3.2만) 수요가 구조적으로 커지는 구간.\n- **CJ 얼티브 '저당두유' 출시**(7/30) — ★신규 워치 [저당두유](월 3.1천·comp 중간): 대기업 광고비가 카테고리를 키우기 전 선점 검토 후보.\n- **★천연위고비 규제 경보** — 식약처가 '천연위고비·먹는 위고비' 표방 부당광고 26개소 적발. 검색수요(월 1.8만)는 유지되나 **광고 소재에서 위고비·GLP-1 연상 표현 절대 금지**. 파워링크는 현재 일시중지(paused) 상태 — 재개 전 소재 문안 점검 필수.\n- **저속노화·헬시플레저 유통 확산** — GS25 저당 양념육 등 기사 10여 건. 생식·마시는샐러드의 '저속노화 식단' 콘텐츠 연결 적기.\n- **2030 아침 결식 확대** — 저당·고단백 식사대용식 수요 보고서(7/29) + 모닝플레이션(7/30). 아침식사대용 키워드 강화 근거.\n\n## 🔥 바이럴 (YouTube)\n- [천연 위고비 식단 리뷰 — 닥터프렌즈(142만)](https://www.youtube.com/watch?v=GwYSwPpv3R4) 7.7만뷰·댓글 412 — 원리·한계 정리(중립, 과장 경계 톤)\n- [아침 공복 계란+올리브유 — 건강의 신(46만)](https://www.youtube.com/watch?v=2xTxOLpdkPI) **52만뷰** — 천연위고비 레시피 확산의 진원\n- 서인영·조혜련·동결건조 등 나머지 시드는 30일 내 신규 영상 없음. 채널A '공복 샐러드 병원행'(7/13) 클립은 스코어 미달이나 콘텐츠 소재로 활용(아이디어 3번).\n\n## 📋 워치리스트 변화\n- ★신규 제안: **저당두유**(proposed) — CJ 신제품발 수요 형성 초기\n- 등록 키워드 추적 유지: 마시는샐러드·생식(registered)·천연위고비(paused)·저당그래놀라 — 재추천 게이트 적용, 검색량 변화 없음(keywordstool 월간치 동일)\n- 브랜드 방어: 황성주생식·라이프밀 침입 신호 없음 ✅\n\n## ⚙️ 시스템\n- **adKeywordInventory 분포 관측 동일 3일차** — **stale=true 전환**(staleDays 3 도달) — 광고 removed 정합 job 정지 가능성, 허브 점검 요청. removed 급증 없음(alert 없음).\n- intentType은 이번 런 휴리스틱 판정(search_shop 도구 미노출) — 다음 런 실검증 예정.",
+    "digestKakao": "[키워드트렌드 7/31] ①단백질RTD 대전(퓨어틴 출시·테이크핏 리뉴얼·GS25 1위) ②★신규워치 저당두유(CJ 얼티브 신제품) ③★천연위고비 부당광고 26곳 적발 — 광고문안 위고비 연상표현 금지 ④저속노화 유통 확산 ⑤2030 아침결식↑. 바이럴: 닥터프렌즈 천연위고비 리뷰 7.7만뷰·건강의신 52만뷰. 신규 시드후보 없음. ★광고 인벤토리 3일째 무변동(stale) — 허브 점검요망.",
+    "signals": [
+      {
+        "id": "protein-rtd-competition",
+        "keyword": "단백질음료",
+        "vertical": "식물성 프로틴",
+        "targets": [
+          "운동헬스",
+          "다이어터"
+        ],
+        "heat": 5,
+        "newsVolume": 8,
+        "matchType": null,
+        "source": "news",
+        "summary": "단백질 RTD 대전 — 매일유업 '퓨어틴' 신규 출시, 남양 '테이크핏 몬스터' 단백질 47g 리뉴얼(각 7/30), GS25에선 단백질 음료가 바나나우유 제치고 음료 매출 1위(7/29)",
+        "whyNow": "대기업 신제품·리뉴얼이 같은 주에 몰리며 단백질 음료·쉐이크 검색 수요가 구조적으로 커지는 구간 — 데이업·프로틴골드 노출 방어 필요",
+        "sources": [
+          {
+            "outlet": "서울신문",
+            "url": "https://n.news.naver.com/mnews/article/081/0003665989?sid=101"
+          },
+          {
+            "outlet": "전자신문",
+            "url": "https://n.news.naver.com/mnews/article/030/0003452717?sid=103"
+          },
+          {
+            "outlet": "메트로서울",
+            "url": "http://www.metroseoul.co.kr/article/20260729500383"
+          }
+        ]
+      },
+      {
+        "id": "cj-ultiv-plant-drink",
+        "keyword": "저당두유",
+        "vertical": "식물성 프로틴",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "heat": 4,
+        "newsVolume": 6,
+        "matchType": null,
+        "source": "news",
+        "summary": "CJ제일제당 '얼티브' 리브랜딩 + 저당두유(파로·아몬드) 신제품 출시(7/30) — 고단백·고식이섬유 소구로 식물성 음료 시장 확전",
+        "whyNow": "'저당두유' 검색 수요 형성 초기(월 3.1천·comp 중간). 대기업 마케팅이 카테고리를 키우기 전 인접 선점 검토 타이밍",
+        "sources": [
+          {
+            "outlet": "아이뉴스24",
+            "url": "https://n.news.naver.com/mnews/article/031/0001046100?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "natural-wegovy-regulation",
+        "keyword": "천연위고비",
+        "vertical": "다이어트 간식",
+        "targets": [
+          "다이어터"
+        ],
+        "heat": 4,
+        "newsVolume": 10,
+        "matchType": null,
+        "source": "news",
+        "summary": "식약처, '올레샷·천연위고비·먹는 위고비' 표방 부당광고 26개소 적발(7/24-28 보도 지속) + 'GLP-1발 소비시장 변화' 분석 기사(7/30)",
+        "whyNow": "★규제 리스크 경보: 검색 수요는 월 1.8만로 유지되나 위고비·GLP-1 연상 표현은 광고·상세페이지에서 절대 금지. 파워링크는 현재 paused — 재개 전 소재 문안 점검 필수",
+        "sources": [
+          {
+            "outlet": "비즈워치",
+            "url": "https://n.news.naver.com/mnews/article/648/0000049256?sid=101"
+          },
+          {
+            "outlet": "KBS",
+            "url": "https://n.news.naver.com/mnews/article/056/0012224386?sid=103"
+          }
+        ]
+      },
+      {
+        "id": "slow-aging-healthy-pleasure",
+        "keyword": "저속노화",
+        "vertical": "생식·식사대용",
+        "targets": [
+          "시니어건강",
+          "다이어터"
+        ],
+        "heat": 3,
+        "newsVolume": 10,
+        "matchType": null,
+        "source": "news",
+        "summary": "GS25 '저당 양념육' 최초 출시 등 편의점·식품업계가 저속노화·헬시플레저를 전면 소구(7/29-30 기사 10여 건)",
+        "whyNow": "저속노화가 유통 전반의 마케팅 표준어로 확산 — 생식·마시는샐러드의 '저속노화 식단' 콘텐츠 연결 적기",
+        "sources": [
+          {
+            "outlet": "한국경제",
+            "url": "https://n.news.naver.com/mnews/article/015/0005315018?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "breakfast-skip-2030",
+        "keyword": "아침식사대용",
+        "vertical": "생식·식사대용",
+        "targets": [
+          "다이어터",
+          "운동헬스"
+        ],
+        "heat": 3,
+        "newsVolume": 4,
+        "matchType": null,
+        "source": "news",
+        "summary": "2030 아침 결식률 증가로 '저당·고단백 식사대용식 개발 필요' 보고서(농민신문 7/29) + 출근길 '모닝플레이션'으로 저가 간편 아침 수요 확대(7/30)",
+        "whyNow": "아침 대용식이 가격·건강 두 축에서 동시에 수요 확대 — 1일1생식·라이프밀 데일리의 핵심 용도 키워드 강화 근거",
+        "sources": [
+          {
+            "outlet": "농민신문",
+            "url": "https://n.news.naver.com/mnews/article/662/0000100673?sid=102"
+          },
+          {
+            "outlet": "디지털타임스",
+            "url": "https://n.news.naver.com/mnews/article/029/0003039939?sid=101"
+          }
+        ]
+      }
+    ],
+    "watchlist": [
+      {
+        "keyword": "단백질쉐이크",
+        "targets": [
+          "운동헬스",
+          "다이어터"
+        ],
+        "relatedSignal": "protein-rtd-competition",
+        "reason": "월 11.5만 검색 최대 볼륨. 남양 테이크핏 리뉴얼·매일유업 퓨어틴 출시로 카테고리 관심 급등 구간 — 데이업 쉐이크 방어·노출 필수",
+        "monthlyPc": 19000,
+        "monthlyMobile": 96200,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentReason": "상품형 키워드 + comp 중간·depth 8. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "단백질쉐이크는 데이업 프로틴 쉐이크 카테고리 직결(별칭표 매핑)",
+        "priorityScore": 9.2,
+        "status": "proposed",
+        "relatedKeywords": [
+          {
+            "keyword": "프로틴",
+            "monthlyPc": 6620,
+            "monthlyMobile": 33600,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질보충제",
+            "monthlyPc": 6030,
+            "monthlyMobile": 28500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질음료",
+            "monthlyPc": 5480,
+            "monthlyMobile": 26700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질많은음식",
+            "monthlyPc": 2620,
+            "monthlyMobile": 24800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "마이밀뉴프로틴",
+            "monthlyPc": 1400,
+            "monthlyMobile": 13500,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "산양유단백질",
+            "monthlyPc": 1140,
+            "monthlyMobile": 10300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트간식",
+            "monthlyPc": 4370,
+            "monthlyMobile": 11700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "mixed"
+          }
+        ]
+      },
+      {
+        "keyword": "단백질음료",
+        "targets": [
+          "운동헬스",
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "protein-rtd-competition",
+        "reason": "GS25 음료 매출 1위 등극 보도(7/29) — RTD 단백질이 편의점 대세 음료로. 월 3.2만 검색, comp 중간으로 볼륨 대비 진입 여지",
+        "monthlyPc": 5480,
+        "monthlyMobile": 26700,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentReason": "상품형 키워드 + comp 중간·depth 8. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "단백질 RTD/쉐이크 카테고리 인접(자사 RTD 미취급이나 쉐이크가 동일 수요 흡수)",
+        "priorityScore": 8.8,
+        "status": "proposed",
+        "relatedKeywords": [
+          {
+            "keyword": "단백질쉐이크",
+            "monthlyPc": 19000,
+            "monthlyMobile": 96200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "무가당두유",
+            "monthlyPc": 2470,
+            "monthlyMobile": 10800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "검은콩두유",
+            "monthlyPc": 3140,
+            "monthlyMobile": 22400,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "아침식사",
+            "monthlyPc": 800,
+            "monthlyMobile": 18700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "마이밀뉴프로틴",
+            "monthlyPc": 1400,
+            "monthlyMobile": 13500,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "단백질보충제",
+        "targets": [
+          "운동헬스"
+        ],
+        "relatedSignal": "protein-rtd-competition",
+        "reason": "월 3.5만 검색 고볼륨 축. RTD 경쟁 격화의 배후 수요 — 프로틴골드 HIGH5 연결 축",
+        "monthlyPc": 6030,
+        "monthlyMobile": 28500,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentReason": "상품형 키워드 + comp 중간·depth 8. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "proteingold-high5",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "프로틴골드 HIGH5 별칭표에 '단백질보충제' 명시",
+        "priorityScore": 8.5,
+        "status": "proposed",
+        "relatedKeywords": [
+          {
+            "keyword": "프로틴",
+            "monthlyPc": 6620,
+            "monthlyMobile": 33600,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "WPI프로틴",
+            "monthlyPc": 2020,
+            "monthlyMobile": 9290,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질쉐이크추천",
+            "monthlyPc": 1850,
+            "monthlyMobile": 7530,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질파우더",
+            "monthlyPc": 1650,
+            "monthlyMobile": 6220,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "산양유단백질",
+            "monthlyPc": 1140,
+            "monthlyMobile": 10300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "식물성단백질",
+        "targets": [
+          "다이어터",
+          "이너뷰티",
+          "시니어건강"
+        ],
+        "relatedSignal": "cj-ultiv-plant-drink",
+        "reason": "CJ 얼티브 리뉴얼·저당두유 출시(7/30)로 식물성 단백질 카테고리 미디어 노출 확대 — 자사 식물성 쉐이크 차별화 축",
+        "monthlyPc": 710,
+        "monthlyMobile": 3950,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "mixed",
+        "intentReason": "성분어(정보 수요)이면서 comp 중간·depth 8로 광고도 활성. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "medium"
+          },
+          {
+            "group": "proteingold-high5",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "성분어 — 프로틴 계열 확정 형제 그룹 복수 매핑(가이드: 프로틴→dayup+proteingold)",
+        "priorityScore": 7.8,
+        "status": "proposed",
+        "relatedKeywords": [
+          {
+            "keyword": "검은콩두유",
+            "monthlyPc": 3140,
+            "monthlyMobile": 22400,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "서리태콩물두유",
+            "monthlyPc": 2320,
+            "monthlyMobile": 22900,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "무가당두유",
+            "monthlyPc": 2470,
+            "monthlyMobile": 10800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질음료",
+            "monthlyPc": 5480,
+            "monthlyMobile": 26700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "저당두유",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "cj-ultiv-plant-drink",
+        "reason": "★신규: CJ 얼티브 '저당두유' 신제품 출시(7/30)로 검색 수요 형성 초기 — 대기업 광고비가 카테고리 검색량을 키우기 전 선점 후보. comp 중간",
+        "monthlyPc": 560,
+        "monthlyMobile": 2560,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentReason": "상품형(저당+제품명) + comp 중간·depth 8. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "low"
+          }
+        ],
+        "productHintBasis": "자사 두유 미취급 — 식물성 RTD 인접 수요로 low 후보만 제시(억지 매핑 회피)",
+        "priorityScore": 7.5,
+        "status": "proposed",
+        "relatedKeywords": [
+          {
+            "keyword": "무가당두유",
+            "monthlyPc": 2470,
+            "monthlyMobile": 10800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "검은콩두유",
+            "monthlyPc": 3140,
+            "monthlyMobile": 22400,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "콩물",
+            "monthlyPc": 2990,
+            "monthlyMobile": 16400,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "mixed"
+          },
+          {
+            "keyword": "단백질음료",
+            "monthlyPc": 5480,
+            "monthlyMobile": 26700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "아침식사대용",
+        "targets": [
+          "다이어터",
+          "운동헬스"
+        ],
+        "relatedSignal": "breakfast-skip-2030",
+        "reason": "2030 아침 결식률 보고서(7/29)·모닝플레이션 기사(7/30) — 간편 아침 대용식 수요 구조적 증가. 1일1생식 핵심 용도 키워드",
+        "monthlyPc": 660,
+        "monthlyMobile": 2590,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "mixed",
+        "intentReason": "용도어(정보·구매 혼재) + comp 중간·depth 8. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "ilsaeng-lifemeal-420g",
+            "confidence": "medium"
+          },
+          {
+            "group": "lifemeal-daily-30g",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "'식사대용'은 1일1생식 별칭 — 아침 1포 용법의 데일리 30g도 동일 용도라 형제 복수 매핑",
+        "priorityScore": 7.2,
+        "status": "proposed",
+        "relatedKeywords": [
+          {
+            "keyword": "아침간편식",
+            "monthlyPc": 1030,
+            "monthlyMobile": 5610,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "아침식사",
+            "monthlyPc": 800,
+            "monthlyMobile": 18700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "아침메뉴추천",
+            "monthlyPc": 1120,
+            "monthlyMobile": 19700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "검은콩두유",
+            "monthlyPc": 3140,
+            "monthlyMobile": 22400,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "식사대용선식",
+            "monthlyPc": 350,
+            "monthlyMobile": 5140,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "저속노화",
+        "targets": [
+          "시니어건강",
+          "다이어터"
+        ],
+        "relatedSignal": "slow-aging-healthy-pleasure",
+        "reason": "GS25 저당 양념육 등 유통 전반 '저속노화' 마케팅 확산(7/29-30) — 개념어 트래픽 지속 성장, 콘텐츠 선점 가치",
+        "monthlyPc": 680,
+        "monthlyMobile": 1990,
+        "competition": "높음",
+        "adDepth": 7,
+        "avgBid": null,
+        "intentType": "mixed",
+        "intentReason": "개념어(정보 수요 중심)이나 comp 높음·depth 7로 광고 시장도 형성. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "ilsaeng-lifemeal-420g",
+            "confidence": "low"
+          },
+          {
+            "group": "doctorsalad-14po",
+            "confidence": "low"
+          }
+        ],
+        "productHintBasis": "트렌드 개념어 — 특정 곤란, 저속노화 식단 소재로 쓰이는 생식·채소 제품군을 low 후보 나열",
+        "priorityScore": 6.8,
+        "status": "proposed",
+        "relatedKeywords": [
+          {
+            "keyword": "저속노화식단",
+            "monthlyPc": 310,
+            "monthlyMobile": 1070,
+            "competition": "높음",
+            "adDepth": 7,
+            "intentType": "info"
+          },
+          {
+            "keyword": "다이어트식단",
+            "monthlyPc": 12200,
+            "monthlyMobile": 38900,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "선식",
+            "monthlyPc": 1320,
+            "monthlyMobile": 6280,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "귀리밥",
+            "monthlyPc": 750,
+            "monthlyMobile": 4080,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "info"
+          }
+        ]
+      },
+      {
+        "keyword": "생식",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "protein-rtd-competition",
+        "reason": "코어 카테고리 상시 추적(등록 키워드). 이번 주 신규 이슈 없음 — 검색량 전주 동일",
+        "monthlyPc": 1040,
+        "monthlyMobile": 7590,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "mixed",
+        "intentReason": "동음이의 혼재 + comp 중간·depth 8. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "ilsaeng-lifemeal-420g",
+            "confidence": "medium"
+          },
+          {
+            "group": "lifemeal-daily-30g",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "확정 형제쌍: '생식'→ilsaeng+lifemeal-daily 복수 매핑",
+        "priorityScore": 6.5,
+        "status": "tracking",
+        "relatedKeywords": [
+          {
+            "keyword": "아침간편식",
+            "monthlyPc": 1030,
+            "monthlyMobile": 5610,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "식사대용선식",
+            "monthlyPc": 350,
+            "monthlyMobile": 5140,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "하루야채",
+            "monthlyPc": 950,
+            "monthlyMobile": 4450,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "오트밀크",
+            "monthlyPc": 1160,
+            "monthlyMobile": 5920,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ],
+        "adStatus": "registered",
+        "adProduct": "power_link",
+        "adRegisteredAt": "2026-07-18T23:49:15.000Z",
+        "adUpdatedAt": "2026-07-18T23:49:21.000Z",
+        "adRefs": [
+          {
+            "keywordRef": "nkw-a001-01-000008409403962",
+            "campaignRef": "cmp-a001-01-000000010875409",
+            "adGroupName": null,
+            "biddingPrice": 70,
+            "adStatus": "registered",
+            "registeredAt": "2026-07-18T23:49:15.000Z"
+          }
+        ],
+        "adRefCount": 1,
+        "gateNote": "adKeywordInventory registered — 재추천 게이트로 신규 추천 제외(추적 유지)"
+      },
+      {
+        "keyword": "마시는샐러드",
+        "targets": [
+          "다이어터",
+          "이너뷰티"
+        ],
+        "relatedSignal": "salad-empty-stomach-caution",
+        "reason": "등록 키워드 추적. 공복 생채소 부정 클립(채널A, 7/13) 돌면서 '갈아 마시는 형태' 소구 역이용 여지",
+        "monthlyPc": 1150,
+        "monthlyMobile": 5960,
+        "competition": "높음",
+        "adDepth": 7,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentReason": "제품형 카테고리어 + comp 높음·depth 7. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [
+          {
+            "group": "doctorsalad-14po",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "닥터샐러드 별칭표에 '마시는샐러드' 명시(카테고리어 medium)",
+        "priorityScore": 6.3,
+        "status": "tracking",
+        "relatedKeywords": [
+          {
+            "keyword": "다이어트식단",
+            "monthlyPc": 12200,
+            "monthlyMobile": 38900,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "디톡스다이어트",
+            "monthlyPc": 440,
+            "monthlyMobile": 2850,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "클렌즈다이어트",
+            "monthlyPc": 320,
+            "monthlyMobile": 1490,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "info"
+          },
+          {
+            "keyword": "풀무원마시는샐러드",
+            "monthlyPc": 10,
+            "monthlyMobile": 10,
+            "competition": "중간",
+            "adDepth": 3,
+            "intentType": "shopping"
+          }
+        ],
+        "adStatus": "registered",
+        "adProduct": "power_link",
+        "adRegisteredAt": "2026-07-18T23:46:57.000Z",
+        "adUpdatedAt": "2026-07-18T23:47:00.000Z",
+        "adRefs": [
+          {
+            "keywordRef": "nkw-a001-01-000008409403024",
+            "campaignRef": "cmp-a001-01-000000010875409",
+            "adGroupName": null,
+            "biddingPrice": 70,
+            "adStatus": "registered",
+            "registeredAt": "2026-07-18T23:46:57.000Z"
+          }
+        ],
+        "adRefCount": 1,
+        "gateNote": "adKeywordInventory registered — 재추천 게이트로 신규 추천 제외(추적 유지)"
+      },
+      {
+        "keyword": "천연위고비",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": "natural-wegovy-regulation",
+        "reason": "등록(현재 paused) 키워드 추적. 월 1.8만 검색·comp 낮음·depth 1(광고 공백) 유지 중이나 ★식약처 부당광고 26개소 적발 — 소재 표현 규제 리스크 최상, 광고 문안에서 위고비·GLP-1 연상 표현 절대 금지",
+        "monthlyPc": 2880,
+        "monthlyMobile": 15400,
+        "competition": "낮음",
+        "adDepth": 1,
+        "avgBid": null,
+        "intentType": "info",
+        "intentReason": "comp 낮음·depth 1로 광고 시장 미형성 + 뉴스·원리 정보 수요 중심. search_shop MCP 도구 미노출로 실검증 불가 — compIdx+adDepth+형태규칙 휴리스틱 판정(다음 런 실검증 권장)",
+        "productHints": [],
+        "productHintBasis": "트렌드 신조어 — 특정 제품군 매핑 곤란(가이드 예시 그대로 빈 배열)",
+        "priorityScore": 6.0,
+        "status": "tracking",
+        "relatedKeywords": [
+          {
+            "keyword": "올레샷",
+            "monthlyPc": 0,
+            "monthlyMobile": 0,
+            "competition": "낮음",
+            "adDepth": 0,
+            "intentType": "info"
+          }
+        ],
+        "adStatus": "paused",
+        "adProduct": "power_link",
+        "adRegisteredAt": "2026-07-18T23:49:15.000Z",
+        "adUpdatedAt": "2026-07-19T00:08:48.000Z",
+        "adRefs": [
+          {
+            "keywordRef": "nkw-a001-01-000008409403975",
+            "campaignRef": "cmp-a001-01-000000010875409",
+            "adGroupName": null,
+            "biddingPrice": 500,
+            "adStatus": "paused",
+            "registeredAt": "2026-07-18T23:49:15.000Z"
+          }
+        ],
+        "adRefCount": 1,
+        "gateNote": "adKeywordInventory paused — 재추천 게이트로 신규 추천 제외(추적 유지)"
+      }
+    ],
+    "contentIdeas": [
+      {
+        "title": "'천연위고비' 열풍 팩트체크 — 유행 레시피 대신 든든한 아침 한 끼",
+        "body": "닥터프렌즈(142만)·박용우 교수 콘텐츠로 천연위고비 원리·한계가 재조명되고 식약처 단속 보도까지 겹친 시점. '살 빠지는 마법' 프레임을 피해 '공복 아침을 제대로 채우는 균형 한 끼'로 생식·쉐이크를 포지셔닝하는 블로그/숏폼.",
+        "caution": "체중감량 효능 단정, 위고비·마운자로·GLP-1 연상 표현, 의약품 오인 표현 절대 금지(식약처 단속 진행 중). '식사 대용의 균형 영양' 범위로 한정."
+      },
+      {
+        "title": "출근길 커피값보다 싼 아침 — 2030 아침 결식 데이터로 여는 1포 루틴",
+        "body": "모닝플레이션(토스트+아아도 부담)·2030 아침 결식률 기사를 후킹으로, 라이프밀 데일리 1포·데이업 쉐이크의 '1분 아침' 루틴 콘텐츠. 편의점 단백질 음료 1위 기사와 묶어 '이왕이면 식물성으로' 비교 구도.",
+        "caution": "타사 제품 비방 금지, 가격 비교는 자사 기준 실측 가격만 사용."
+      },
+      {
+        "title": "공복에 생샐러드 드시다 속 쓰렸다면 — '갈아 마시는' 순한 샐러드 루틴",
+        "body": "채널A '공복 샐러드 병원행' 클립(7/13)으로 생채소 공복 섭취 부담이 화제 — 닥터샐러드의 '마시는 형태·부드러운 섭취' 소구를 방어적으로 역이용하는 Q&A형 콘텐츠.",
+        "caution": "위장 질환 개선 등 의학적 효능 단정 금지. '부담 없이 즐기는' 수준의 관능 표현으로 한정."
+      }
+    ],
+    "viral": [
+      {
+        "id": "https://www.youtube.com/watch?v=2xTxOLpdkPI",
+        "platform": "youtube",
+        "title": "“계란과 함께 '이것' 드세요!” 아침 공복에 의사들도 매일 챙겨 먹는 음식! 내장지방 쏙 빠지고 혈당·식욕까지 잡힙니다 (비만연구 35년 박용우 교수)",
+        "url": "https://www.youtube.com/watch?v=2xTxOLpdkPI",
+        "thumbnail": "https://i.ytimg.com/vi/2xTxOLpdkPI/maxresdefault.jpg",
+        "creator": "건강의 신",
+        "creatorHandle": "thegodofhealth",
+        "followers": 459000,
+        "views": 520901,
+        "likes": 7300,
+        "comments": 263,
+        "publishedAt": "2026-07-10T10:15:39.000Z",
+        "viralScore": 65,
+        "matchType": "trend",
+        "seedMatched": "천연위고비",
+        "seedTier": "learning",
+        "catchReason": "'천연위고비' 승인 트렌드 시드 매칭 — 박용우 교수가 공복 계란+올리브유(천연위고비 레시피) 식단 원리 소개, 52만뷰 고확산",
+        "relatedProduct": "다이어트 식단 카테고리(생식·마시는샐러드 인접)",
+        "sentiment": "중립",
+        "source": "youtube",
+        "_debug": {
+          "hoursSince": 491.9,
+          "velocity": 1059.1,
+          "engagement": 0.0145,
+          "overperf": 1.13
+        }
+      },
+      {
+        "id": "https://www.youtube.com/watch?v=GwYSwPpv3R4",
+        "platform": "youtube",
+        "title": "천연 위고비 식단 리뷰 | 원리를 다시 한번 정리합시다",
+        "url": "https://www.youtube.com/watch?v=GwYSwPpv3R4",
+        "thumbnail": "https://i.ytimg.com/vi/GwYSwPpv3R4/maxresdefault.jpg",
+        "creator": "DOCTORFRIENDS",
+        "creatorHandle": "닥터프렌즈",
+        "followers": 1420000,
+        "views": 76866,
+        "likes": 1400,
+        "comments": 412,
+        "publishedAt": "2026-07-14T12:00:14.000Z",
+        "viralScore": 52,
+        "matchType": "trend",
+        "seedMatched": "천연위고비",
+        "seedTier": "learning",
+        "catchReason": "'천연위고비' 승인 트렌드 시드 매칭 — 142만 구독 의사 채널이 천연위고비 식단 원리·한계 리뷰(댓글 412개 활발)",
+        "relatedProduct": "다이어트 식단 카테고리",
+        "sentiment": "중립(효과 과장 경계 톤)",
+        "source": "youtube",
+        "_debug": {
+          "hoursSince": 394.1,
+          "velocity": 195.0,
+          "engagement": 0.0236,
+          "overperf": 0.05
+        }
+      }
+    ],
+    "seedCandidates": [],
+    "registeredKeywordTrends": [
+      {
+        "keyword": "마시는샐러드",
+        "monthlyPc": 1150,
+        "monthlyMobile": 5960,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": {
+          "monthlyPc": 0,
+          "monthlyMobile": 0
+        },
+        "registeredAt": "2026-07-18T23:46:57.000Z"
+      },
+      {
+        "keyword": "천연위고비",
+        "monthlyPc": 2880,
+        "monthlyMobile": 15400,
+        "competition": "낮음",
+        "adDepth": 1,
+        "delta": {
+          "monthlyPc": 0,
+          "monthlyMobile": 0
+        },
+        "registeredAt": "2026-07-18T23:49:15.000Z"
+      },
+      {
+        "keyword": "생식",
+        "monthlyPc": 1040,
+        "monthlyMobile": 7590,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": {
+          "monthlyPc": 0,
+          "monthlyMobile": 0
+        },
+        "registeredAt": "2026-07-18T23:49:15.000Z"
+      },
+      {
+        "keyword": "저당그래놀라",
+        "monthlyPc": 620,
+        "monthlyMobile": 3100,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": {
+          "monthlyPc": 0,
+          "monthlyMobile": 0
+        },
+        "registeredAt": "2026-07-21T09:45:52.000Z"
+      }
+    ],
+    "adRegistryMeta": {
+      "fetchedAt": "2026-07-31T07:10:28+09:00",
+      "source": "/dashboard/adKeywordInventory",
+      "total": 79,
+      "statusDist": {
+        "registered": 76,
+        "paused": 3
+      },
+      "deltaVsPrev": {
+        "paused": 0,
+        "registered": 0
+      },
+      "staleStreak": 3,
+      "stale": true,
+      "alert": false,
+      "note": "분포가 7/28·7/29·7/30에 이어 완전 동일(delta 0) — 관측 동일 3일차로 staleDays(3) 도달, stale=true 전환. 광고 쪽 자동 removed 정합 job이 조용히 멈췄을 가능성 — 허브에 점검 요청 필요(레지스트리 추종은 유지하되 표시 신선도 주의). removed 급증 없음 → alert false."
+    },
+    "notes": {
+      "intentVerification": "search_shop MCP 도구 미노출(PlayMCP 서버에 search_shop 없음) — intentType은 compIdx+adDepth+형태규칙 휴리스틱. 다음 런에서 도구 복구 시 실검증 필요",
+      "seedCandidates": "이번 런 신규 pending 시드 캐치 없음 — 동결건조·선식·저분자콜라겐 유튜브 결과 전부 30일 윈도우 밖, 인물 안테나 신규 발견 없음",
+      "brandDefense": "황성주생식·라이프밀 최근 2일 경쟁 침입·부정 기사 없음(라이프밀 동명 다단계 기사는 4월 구문·무관사)"
+    }
   }
 ]
