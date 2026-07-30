@@ -172,6 +172,7 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   outputs: (raw.outputs || []).map(o => ({ kpi: null, ...o })),
   plans: (raw.plans || []).map(p => { const b = { hold: false, desc: '', extraOutputIds: [], ...p }; if (!b.kpis) b.kpis = b.kpi ? [{ id: (b.kpi.id || ('k' + p.id)), name: b.kpi.name, unit: b.kpi.unit, target: b.kpi.target, targets: b.kpi.targets || {} }] : []; delete b.kpi; b.extraOutputIds = (b.extraOutputIds || []).filter(x => x !== b.outputId); return b; }),
   subplans: (raw.subplans || []).map(s => { const ns = { files: [], perfRecorded: false, extraPlanIds: [], ...s }; if (ns.stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; ns.extraPlanIds = (ns.extraPlanIds || []).filter(x => x !== ns.planId); return ns; }),
+  checklists: (raw.checklists || []).map(c => { const nc = { memo: '', ...c }; nc.owner = Array.isArray(c.owner) ? c.owner.filter(Boolean) : (c.owner ? [c.owner] : []); return nc; }),
   budgets: (raw.budgets || []).map(b => ({ paidDate: '', paidAmount: null, kind: '일반', cardId: null, ...b })),
   trash: raw.trash || [],
   notices: raw.notices || [],
@@ -236,6 +237,19 @@ const unlinkSubFrom = (d, subId, pid) => ({ ...d, subplans: (d.subplans || []).m
 }) });
 // 실행계획 KPI 가 어느 프로젝트로 집계될지 (미지정/끊긴 값이면 대표 프로젝트)
 const kpiOutId = (p, k) => { if (!p) return null; const v = (k && k.outputId != null) ? Number(k.outputId) : null; return (v != null && isLinkedOut(p, v)) ? v : p.outputId; };
+
+// ===== 체크리스트 종류(수동/회의) · 담당자 다중 (index_134) =====
+const chkKind = c => (c && c.kind === 'meeting') ? 'meeting' : 'task';
+const isMeetingChk = c => chkKind(c) === 'meeting';
+const CHK_TONE = { task: { name: '수동', icon: '📌', fg: '#8B5CF6', bg: '#F1ECFB', bd: '#D3C4EF', soft: '#F6F2FD', line: '#E4DAF7' }, meeting: { name: '회의', icon: '🗓', fg: '#0E7490', bg: '#E2F5FA', bd: '#A7DCE6', soft: '#EFFAFC', line: '#CBEAF2' } };
+const chkTone = c => CHK_TONE[chkKind(c)];
+// 세부실행계획에 붙지 않은 낱개 항목(수동/회의) — 모달에서 그 항목만 단독으로 다룬다
+const isSoloChk = c => !!c && (c.standalone === true || !c.subplanId || isMeetingChk(c));
+const toggleIn = (arr, v) => { const a = (arr || []).slice(); const i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); return a; };
+// 기간(ps~pe)과 항목의 start~due 가 겹치는가
+const inPeriod = (x, ps, pe) => { const s = (x && x.start) || '', e = (x && x.due) || ''; if (!s && !e) return false; const a = s || e, b = e || s; return a <= pe && b >= ps; };
+// 체크리스트 담당자 — 없으면 소속 세부실행계획의 담당자를 물려받는다(모아보기 분류용)
+const chkOwners = (data, c) => { const own = ownersOf(c); if (own.length) return own; const s = c && c.subplanId ? (data.subplans || []).find(x => x.id === c.subplanId) : null; return s ? ownersOf(s) : []; };
 
 const moveToTrash = (d, type, id) => {
   const trash = d.trash || [];
@@ -672,6 +686,20 @@ const MemberMulti = ({ selected, onToggle }) => (
   </div>
 );
 
+// 체크리스트 담당자 다중 선택 칩 (index_134)
+const OwnerChips = ({ selected, onToggle, sm }) => {
+  const sel = selected || [];
+  return (
+    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+      <span style={{ fontSize: sm ? 13.5 : 14.5, color: '#A29C95', flexShrink: 0 }}>담당</span>
+      {MEMBERS.map(m => { const on = sel.indexOf(m) >= 0; return (
+        <button key={m} type="button" onClick={e => { e.stopPropagation(); onToggle(m); }} title={'담당자 ' + m + (on ? ' 해제' : ' 추가')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 2, padding: sm ? '2px 7px' : '3px 9px', borderRadius: 13, cursor: 'pointer', fontFamily: 'inherit', fontSize: sm ? 13.5 : 14.5, fontWeight: 700, border: '1px solid ' + (on ? G : '#E3E0DC'), background: on ? G : 'white', color: on ? 'white' : '#A29C95' }}>
+          <span style={{ fontSize: sm ? 14 : 15 }}>{AV[m]}</span>{m}</button>); })}
+    </div>
+  );
+};
+
 const MONTH_OPTS = (() => { const arr = []; const d = new Date(TODAY + 'T00:00:00'); for (let i = -2; i <= 9; i++) { const x = new Date(d.getFullYear(), d.getMonth() + i, 1); arr.push(`${x.getFullYear()}-${pad(x.getMonth() + 1)}`); } return arr; })();
 
 const KpiInput = ({ value, onChange, existingTargets }) => {
@@ -775,7 +803,7 @@ function AddModal({ data, setData, onClose }) {
     let subId = null;
     if (sMode === 'new') { if (!sName.trim()) { alert('세부실행계획명 입력'); return; } subId = next(); const dep = parseDep(sDate); nd.subplans.push({ id: subId, planId, name: sName.trim(), stage: '예정', start: dep ? '' : sDate.start, due: dep ? addDays(TODAY, dep.days) : sDate.due, owner, support: support.slice(), dep, resolved: false, files: [], perfRecorded: false }); }
     else if (sMode === 'exist') { subId = Number(sSel); }
-    if (subId) checks.filter(c => c.trim()).forEach(c => nd.checklists.push({ id: next(), subplanId: subId, text: c.trim(), done: false, date: '', owner: '', memo: '' }));
+    if (subId) checks.filter(c => c.trim()).forEach(c => nd.checklists.push({ id: next(), subplanId: subId, text: c.trim(), done: false, date: '', owner: [], memo: '' }));
     nd.nid = id; setData(resolveAll(nd)); onClose();
   };
   const Toggle = ({ mode, setMode, opts }) => (
@@ -945,9 +973,9 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const toggleSubChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
   const delSubChk = id => setData(d => ({ ...d, checklists: d.checklists.filter(c => c.id !== id) }));
   const setSubChkDate = (id, date) => setData(d => applyChklDate(d, id, date));
-  const setSubChkOwner = (id, owner) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, owner } : c) }));
+  const setSubChkOwner = (id, m) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, owner: toggleIn(ownersOf(c), m) } : c) }));
   const setSubChkMemo = (id, memo) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, memo } : c) }));
-  const addSubChk = () => { if (!newSubChk.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: item.id, text: newSubChk.trim(), done: false, date: '', owner: '', memo: '' }] })); setNewSubChk(''); };
+  const addSubChk = () => { if (!newSubChk.trim()) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: item.id, text: newSubChk.trim(), done: false, date: '', owner: [], memo: '' }] })); setNewSubChk(''); };
   const setSubChkText = (id, text) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, text } : c) }));
   const reorderSubChks = newOrder => setData(d => { const cur = d.checklists.filter(c => c.subplanId === item.id); const q = newOrder.map(x => cur.find(c => c.id === x.id)).filter(Boolean); if (q.length !== cur.length) return d; let k = 0; return { ...d, checklists: d.checklists.map(c => c.subplanId === item.id ? q[k++] : c) }; });
   const moveSubChild = (id, dir) => setData(d => ({ ...d, subplans: reorderSiblings(d.subplans, id, 'planId', dir) }));
@@ -1053,10 +1081,10 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
                   <span onClick={() => toggleSubChk(c.id)} style={{ cursor: 'pointer', display: 'flex' }}><Chk on={c.done} /></span>
                   <input value={c.text || ''} onChange={e => setSubChkText(c.id, e.target.value)} placeholder="체크리스트 명" title="클릭해서 이름 수정" style={{ flex: 1, minWidth: 90, fontSize: 16, fontWeight: 600, padding: '5px 7px', border: '1px solid #E3E0DC', borderRadius: 6, outline: 'none', background: 'white', boxSizing: 'border-box', fontFamily: 'inherit', color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }} />
                   <button onClick={() => setMemoOpen(o => o === c.id ? null : c.id)} title="메모" style={{ border: 'none', background: (c.memo || memoOpen === c.id) ? '#EEF4EC' : 'transparent', borderRadius: 6, cursor: 'pointer', fontSize: 17, padding: '2px 5px', lineHeight: 1, color: c.memo ? '#1FA463' : '#A29C95', flexShrink: 0 }}>📝</button>
-                  <select value={c.owner || ''} onChange={e => setSubChkOwner(c.id, e.target.value)} title="담당자" style={{ fontSize: 14.5, padding: '3px 4px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.owner ? '#3A3631' : '#A29C95', background: 'white', maxWidth: 88 }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
                   <input type="date" value={c.date || ''} onChange={e => setSubChkDate(c.id, e.target.value)} title="실행일" style={{ fontSize: 15, padding: '3px 5px', border: '1px solid #E3E0DC', borderRadius: 6, color: c.date ? '#3A3631' : '#A29C95', flexShrink: 0, maxWidth: 130 }} />
                   <button onClick={() => delSubChk(c.id)} style={{ border: 'none', background: 'none', color: '#E53935', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
                 </div>
+                <div style={{ marginTop: 4, marginLeft: 26 }}><OwnerChips selected={ownersOf(c)} onToggle={m => setSubChkOwner(c.id, m)} sm /></div>
                 {memoOpen === c.id && <textarea value={c.memo || ''} onChange={e => setSubChkMemo(c.id, e.target.value)} placeholder="메모 입력" autoFocus style={{ width: '100%', minHeight: 52, marginTop: 4, padding: '7px 9px', border: '1px solid #CDE3C6', borderRadius: 7, fontSize: 16, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5, color: '#3A3631' }} />}
               </div>
             ))}
@@ -1278,19 +1306,21 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
   const sub = data.subplans.find(s => s.id === c.subplanId);
   const plan = sub ? data.plans.find(p => p.id === sub.planId) : null;
   const out = plan ? data.outputs.find(o => o.id === plan.outputId) : null;
-  const chks = sortChksByDate((data.checklists || []).filter(x => x.subplanId === c.subplanId));
+  const solo = isSoloChk(c);
+  const tone = chkTone(c);
+  const chks = solo ? [c] : sortChksByDate((data.checklists || []).filter(x => x.subplanId === c.subplanId));
   const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
   const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done } : x) }));
   const setText = (id, text) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, text } : x) }));
-  const setOwner = (id, owner) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, owner } : x) }));
+  const setOwner = (id, m) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, owner: toggleIn(ownersOf(x), m) } : x) }));
   const setDate = (id, date) => setData(d => applyChklDate(d, id, date));
   const setMemo = (id, memo) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, memo } : x) }));
   const del = id => { if (!confirm('이 체크리스트를 삭제할까요?')) return; setData(d => ({ ...d, checklists: d.checklists.filter(x => x.id !== id) })); if (id === chkId) onClose && onClose(); };
-  const addChk = () => setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: c.subplanId, text: '', done: false, date: c.date || '', owner: '', memo: '' }] }));
+  const addChk = () => setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: c.subplanId, text: '', done: false, date: c.date || '', owner: [], memo: '' }] }));
   return (
-    <ModalShell title="체크리스트" onClose={onClose}>
+    <ModalShell title={solo ? (tone.icon + ' ' + tone.name + ' 항목') : '체크리스트'} onClose={onClose}>
       <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 12, border: '1px solid #EDEBE7' }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: G, marginBottom: 6 }}>소속 세부실행계획</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: solo ? tone.fg : G, marginBottom: 6 }}>{solo ? (tone.icon + ' ' + tone.name + ' 체크리스트') : '소속 세부실행계획'}</div>
         {sub ? (
           <div>
             <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 6 }}>{out ? outLabel(out) : ''}{plan ? ' ▸ ' + plan.name : ''}</div>
@@ -1300,10 +1330,10 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
             </div>
             <div style={{ fontSize: 16, color: '#6E6863', marginTop: 6 }}>마감일: {sub.due || '미정'}</div>
           </div>
-        ) : <div style={{ fontSize: 16.5, color: '#A29C95' }}>연결된 세부실행계획이 없습니다</div>}
+        ) : <div style={{ fontSize: 16.5, color: '#A29C95', lineHeight: 1.5 }}>{solo ? '세부실행계획에 연결되지 않은 개별 항목입니다. 이 창에서는 이 항목만 수정합니다.' : '연결된 세부실행계획이 없습니다'}</div>}
       </div>
       <div style={{ marginTop: 14 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: G, marginBottom: 7 }}>체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({chks.filter(x => x.done).length}/{chks.length})</span></div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: solo ? tone.fg : G, marginBottom: 7 }}>{solo ? (tone.icon + ' ' + tone.name) : '체크리스트'} <span style={{ color: '#A29C95', fontWeight: 400 }}>({chks.filter(x => x.done).length}/{chks.length})</span></div>
         {chks.length > 1 && <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 8, lineHeight: 1.5 }}>실행일이 빠른 순으로 자동 정렬됩니다(미정은 맨 뒤). 같은 날짜끼리는 왼쪽 ⠿ 를 잡고 끌어서 순서를 바꿀 수 있어요.</div>}
         {chks.map((x, xi) => {
           const over = !!(x.date && sub && sub.due && x.date > sub.due);
@@ -1313,14 +1343,14 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
           const grpCnt = chks.filter(y => (y.date || '') === dk).length;
           return (
             <React.Fragment key={x.id}>
-            {newGrp && (
+            {newGrp && !solo && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, margin: xi === 0 ? '0 0 5px' : '12px 0 5px' }}>
                 <span style={{ fontSize: 15.5, fontWeight: 800, color: dk ? G : '#A29C95', flexShrink: 0 }}>{dk ? dk + ' (' + dateWd(dk) + ')' : '📥 실행일 미정'}</span>
                 <span style={{ fontSize: 14, color: '#A29C95', flexShrink: 0 }}>{grpCnt}건</span>
                 <span style={{ flex: 1, height: 1, background: '#EDEBE7' }} />
               </div>
             )}
-            <div {...chkDrag.row(x.id)} style={{ marginBottom: 6, border: '1px solid ' + (isCur ? G : '#E3E0DC'), borderRadius: 9, padding: 9, background: isCur ? '#FBFDFB' : 'white', ...chkDrag.hl(x.id) }}>
+            <div {...chkDrag.row(x.id)} style={{ marginBottom: 6, border: '1px solid ' + (isCur ? (solo ? tone.fg : G) : '#E3E0DC'), borderRadius: 9, padding: 9, background: isCur ? (solo ? tone.soft : '#FBFDFB') : 'white', ...chkDrag.hl(x.id) }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
                 {grpCnt > 1 && <span {...chkDrag.arm(x.id)} title="여기를 잡고 끌어서 같은 날짜 안에서 순서 변경" style={{ cursor: 'grab', color: '#C4BDB4', fontSize: 18, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>}
                 <span onClick={() => toggleDone(x.id)} style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={x.done} /></span>
@@ -1329,7 +1359,7 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
                 <button onClick={() => del(x.id)} style={{ border: 'none', background: 'none', color: '#E53935', cursor: 'pointer', fontSize: 19, lineHeight: 1, flexShrink: 0 }}>×</button>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                <select value={x.owner || ''} onChange={e => setOwner(x.id, e.target.value)} title="담당자" style={{ fontSize: 15, padding: '4px 6px', border: '1px solid #E3E0DC', borderRadius: 6, color: x.owner ? '#3A3631' : '#A29C95', background: 'white' }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
+                <OwnerChips selected={ownersOf(x)} onToggle={m => setOwner(x.id, m)} sm />
                 <input type="date" value={x.date || ''} onChange={e => setDate(x.id, e.target.value)} title="실행일" style={{ fontSize: 15, padding: '4px 6px', border: '1px solid ' + (over ? '#FCA5A5' : '#E3E0DC'), borderRadius: 6, color: x.date ? '#3A3631' : '#A29C95' }} />
                 {over ? <span style={{ fontSize: 14, color: '#DC2626', fontWeight: 700 }}>⚠ 마감초과</span> : null}
               </div>
@@ -1338,39 +1368,42 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
             </React.Fragment>
           );
         })}
-        <button onClick={addChk} style={{ width: '100%', marginTop: 4, padding: '9px', borderRadius: 8, border: '1.5px dashed ' + G, cursor: 'pointer', fontSize: 16.5, fontWeight: 700, background: 'white', color: G }}>+ 체크리스트 추가</button>
+        {!solo && <button onClick={addChk} style={{ width: '100%', marginTop: 4, padding: '9px', borderRadius: 8, border: '1.5px dashed ' + G, cursor: 'pointer', fontSize: 16.5, fontWeight: 700, background: 'white', color: G }}>+ 체크리스트 추가</button>}
       </div>
       <Btn v="secondary" onClick={onClose} style={{ width: '100%', marginTop: 14 }}>닫기</Btn>
     </ModalShell>
   );
 }
 
-function DayDetailModal({ date, data, setData, onEdit, onClose }) {
+function DayDetailModal({ date, data, setData, onEdit, onClose, owner }) {
   const [newText, setNewText] = useState('');
-  const [newOwner, setNewOwner] = useState('');
+  const [newOwners, setNewOwners] = useState([]);
   const [newSub, setNewSub] = useState('');
   const [showOther, setShowOther] = useState(false);
   const subOf = id => (data.subplans || []).find(s => s.id === id);
   const planOf = id => (data.plans || []).find(p => p.id === id);
   const outOf = id => (data.outputs || []).find(o => o.id === id);
-  const dayChks = sortChksByDate((data.checklists || []).filter(c => c.date === date));
-  const manual = dayChks.filter(c => !c.subplanId);
-  const linked = dayChks.filter(c => c.subplanId);
+  const okOwner = x => !owner || ownersOf(x).indexOf(owner) >= 0;
+  const okChk = c => !owner || chkOwners(data, c).indexOf(owner) >= 0;
+  const dayChks = sortChksByDate((data.checklists || []).filter(c => c.date === date && okChk(c)));
+  const manual = dayChks.filter(isSoloChk);
+  const linked = dayChks.filter(c => !isSoloChk(c));
   const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
   const mainIds = [];
   const push = id => { if (id && mainIds.indexOf(id) < 0) mainIds.push(id); };
   linked.forEach(c => push(c.subplanId));
-  (data.subplans || []).forEach(s => { if (s.start === date || s.due === date) push(s.id); });
-  const others = (data.subplans || []).filter(s => mainIds.indexOf(s.id) < 0 && s.start && s.due && s.start < date && date < s.due);
+  (data.subplans || []).forEach(s => { if ((s.start === date || s.due === date) && okOwner(s)) push(s.id); });
+  const others = (data.subplans || []).filter(s => mainIds.indexOf(s.id) < 0 && s.start && s.due && s.start < date && date < s.due && okOwner(s));
   const doneCnt = dayChks.filter(c => c.done).length;
   const WDN = ['일', '월', '화', '수', '목', '금', '토'];
   const wd = WDN[new Date(date + 'T00:00:00').getDay()] || '';
   const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done } : x) }));
-  const addChk = () => {
+  const addChk = kind => {
     const t = newText.trim(); if (!t) return;
-    const sid = newSub ? Number(newSub) : null;
-    setData(d => { const id = d.nid + 1; return applyChklDate({ ...d, nid: id, checklists: [...d.checklists, { id, subplanId: sid, standalone: !sid, text: t, done: false, date: '', owner: newOwner, memo: '' }] }, id, date); });
-    setNewText(''); setNewOwner('');
+    const meet = kind === 'meeting';
+    const sid = (!meet && newSub) ? Number(newSub) : null;
+    setData(d => { const id = d.nid + 1; return applyChklDate({ ...d, nid: id, checklists: [...d.checklists, { id, subplanId: sid, standalone: !sid, kind: meet ? 'meeting' : 'task', text: t, done: false, date: '', owner: newOwners.slice(), memo: '' }] }, id, date); });
+    setNewText(''); setNewOwners([]);
   };
   const jump = t => { onClose && onClose(); onEdit && onEdit(t); };
   const miniBtn = { border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 14.5, padding: '2px 8px', fontWeight: 600, flexShrink: 0, fontFamily: 'inherit' };
@@ -1390,14 +1423,17 @@ function DayDetailModal({ date, data, setData, onEdit, onClose }) {
   const subOpts = (data.subplans || []).map(s => { const p = planOf(s.planId); const o = p ? outOf(p.outputId) : null; return { id: s.id, label: (o ? o.code + ' ' : '') + (p ? p.name + ' ▸ ' : '') + s.name }; });
   const rank = id => mainIds.indexOf(id) >= 0 ? 0 : 1;
   subOpts.sort((a, b) => rank(a.id) - rank(b.id));
-  const chkRow = c => {
-    const s = subOf(c.subplanId); const over = !!(s && s.due && date > s.due);
+  const chkRow = (c, showKind) => {
+    const s = subOf(c.subplanId); const over = !!(s && s.due && date > s.due); const tn = chkTone(c);
+    const bd = over ? '#FCA5A5' : (c.done ? '#E3E0DC' : (showKind ? tn.bd : '#CDE3C6'));
+    const dg = chkDrag.overId === c.id ? GO : null;
     return (
-      <div key={c.id} {...chkDrag.row(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 5, padding: '6px 9px', borderRadius: 8, background: over ? '#FEF2F2' : (c.done ? '#F5F4F2' : '#FBFDFB'), border: '1px solid ' + (over ? '#FCA5A5' : (c.done ? '#E3E0DC' : '#CDE3C6')), ...chkDrag.hl(c.id) }}>
+      <div key={c.id} {...chkDrag.row(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 5, padding: '6px 9px', borderRadius: 8, background: over ? '#FEF2F2' : (c.done ? '#F5F4F2' : (showKind ? tn.bg : '#FBFDFB')), borderStyle: 'solid', borderWidth: showKind ? '1px 1px 1px 3px' : '1px', borderColor: dg ? dg : (showKind ? [bd, bd, bd, tn.fg].join(' ') : bd), opacity: chkDrag.dragId === c.id ? 0.4 : 1 }}>
         <span {...chkDrag.arm(c.id)} title="여기를 잡고 끌어서 순서 변경" style={{ cursor: 'grab', color: '#C4BDB4', fontSize: 17, lineHeight: 1, flexShrink: 0, userSelect: 'none' }}>⠿</span>
         <span onClick={() => toggleDone(c.id)} title="완료 표시" style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={c.done} /></span>
+        {showKind && <span style={{ fontSize: 14.5, fontWeight: 800, color: tn.fg, flexShrink: 0 }}>{tn.icon} {tn.name}</span>}
         <span onClick={() => toggleDone(c.id)} style={{ flex: 1, minWidth: 0, cursor: 'pointer', fontSize: 16.5, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none', wordBreak: 'break-all' }}>{c.text}</span>
-        {c.owner && <span style={{ fontSize: 15, color: '#6E6863', flexShrink: 0 }}>{AV[c.owner] || ''} {c.owner}</span>}
+        {ownersOf(c).length > 0 && <span style={{ fontSize: 15, color: '#6E6863', flexShrink: 0 }}>{ownerAv(c)} {ownerNm(c)}</span>}
         {c.memo && <span style={{ fontSize: 15, flexShrink: 0 }} title={c.memo}>📝</span>}
         {over && <span style={{ fontSize: 14.5, color: '#DC2626', fontWeight: 700, flexShrink: 0 }} title={'마감일(' + s.due + ') 초과'}>⚠</span>}
       </div>
@@ -1438,19 +1474,14 @@ function DayDetailModal({ date, data, setData, onEdit, onClose }) {
     </div>
   ));
   return (
-    <ModalShell title={date + ' (' + wd + ') 상세'} onClose={onClose}>
+    <ModalShell title={date + ' (' + wd + ') ' + (owner ? (AV[owner] || '') + ' ' + owner + ' 금일 업무' : '상세')} onClose={onClose}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: '#F5F4F2', borderRadius: 10, padding: '10px 13px', border: '1px solid #EDEBE7' }}>
         <span style={{ fontSize: 16.5, fontWeight: 700, color: G }}>☑ 이 날 체크리스트 {doneCnt}/{dayChks.length}</span>
         <span style={{ fontSize: 15.5, color: '#6E6863' }}>· 세부 실행계획 {mainIds.length}건</span>
         {others.length > 0 && <span style={{ fontSize: 15.5, color: '#A29C95' }}>· 기간 중 {others.length}건</span>}
       </div>
       <div>
-        {manual.length > 0 && (
-          <div style={{ marginTop: 4 }}>
-            <div style={{ fontSize: 17, fontWeight: 800, color: '#8B5CF6' }}>📌 수동 체크리스트</div>
-            {manual.map(c => chkRow(c))}
-          </div>
-        )}
+        {manual.length > 0 && <div style={{ marginTop: 4 }}>{manual.map(c => chkRow(c, true))}</div>}
         {renderTree(tree(mainIds))}
         {mainIds.length === 0 && manual.length === 0 && <div style={{ fontSize: 16, color: '#A29C95', textAlign: 'center', padding: '14px 0' }}>이 날 예정된 작업이 없습니다. 아래에서 바로 추가할 수 있어요.</div>}
       </div>
@@ -1460,15 +1491,152 @@ function DayDetailModal({ date, data, setData, onEdit, onClose }) {
           {showOther && <div style={{ opacity: 0.85 }}>{renderTree(tree(others.map(s => s.id)))}</div>}
         </div>
       )}
-      <div style={{ background: '#F6F2FD', border: '1px solid #E4DAF7', borderRadius: 10, padding: '10px 12px' }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: '#8B5CF6', marginBottom: 7 }}>＋ 이 날짜({date})에 체크리스트 추가</div>
+      <div style={{ background: CHK_TONE.task.soft, border: '1px solid ' + CHK_TONE.task.line, borderRadius: 10, padding: '10px 12px' }}>
+        <div style={{ fontSize: 16, fontWeight: 700, color: CHK_TONE.task.fg, marginBottom: 7 }}>＋ 이 날짜({date})에 체크리스트 · 회의 추가</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-          <input value={newText} onChange={e => setNewText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addChk(); }} placeholder="할 일 입력" style={{ flex: 1, minWidth: 160, fontSize: 16, padding: '7px 9px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
-          <select value={newOwner} onChange={e => setNewOwner(e.target.value)} title="담당자" style={selSt}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
-          <select value={newSub} onChange={e => setNewSub(e.target.value)} title="연결할 세부 실행계획" style={{ ...selSt, maxWidth: 260 }}><option value="">📌 수동(연결 없음)</option>{subOpts.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select>
-          <button onClick={addChk} style={{ fontSize: 16, fontWeight: 700, padding: '7px 15px', borderRadius: 7, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>+ 추가</button>
+          <input value={newText} onChange={e => setNewText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addChk('task'); }} placeholder="할 일 · 회의 제목 입력" style={{ flex: 1, minWidth: 160, fontSize: 16, padding: '7px 9px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
+          <select value={newSub} onChange={e => setNewSub(e.target.value)} title="연결할 세부 실행계획 (회의 추가에는 적용되지 않습니다)" style={{ ...selSt, maxWidth: 260 }}><option value="">📌 수동(연결 없음)</option>{subOpts.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select>
+          <button onClick={() => addChk('task')} title="수동 체크리스트로 추가" style={{ fontSize: 16, fontWeight: 700, padding: '7px 15px', borderRadius: 7, border: 'none', background: CHK_TONE.task.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>📌 추가</button>
+          <button onClick={() => addChk('meeting')} title="회의 항목으로 추가 (색상이 다르게 표시됩니다)" style={{ fontSize: 16, fontWeight: 700, padding: '7px 15px', borderRadius: 7, border: 'none', background: CHK_TONE.meeting.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>🗓 회의 추가</button>
         </div>
+        <div style={{ marginTop: 7 }}><OwnerChips selected={newOwners} onToggle={m => setNewOwners(o => toggleIn(o, m))} /></div>
       </div>
+      <Btn v="secondary" onClick={onClose} style={{ width: '100%' }}>닫기</Btn>
+    </ModalShell>
+  );
+}
+
+// 주간 / 월간 주요 업무 모아보기 — 담당자별 (index_134)
+function RoundupModal({ data, start, end, label, initialOwner, onEdit, onClose }) {
+  const NOOWN = '담당 없음';
+  const [only, setOnly] = useState(initialOwner || '');
+  const jump = t => { onClose && onClose(); onEdit && onEdit(t); };
+  const miniBtn = { border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 14, padding: '1px 7px', fontWeight: 600, flexShrink: 0, fontFamily: 'inherit' };
+  const subOf = id => (data.subplans || []).find(s => s.id === id);
+  const planOf = id => (data.plans || []).find(p => p.id === id);
+  const outOf = id => (data.outputs || []).find(o => o.id === id);
+
+  const rSubs = (data.subplans || []).filter(s => inPeriod(s, start, end));
+  const rChks = (data.checklists || []).filter(c => c.date && c.date >= start && c.date <= end);
+  const rPlans = (data.plans || []).filter(p => inPeriod(p, start, end) || rSubs.some(s => isLinkedPlan(s, p.id)));
+
+  const names = MEMBERS.concat([NOOWN]);
+  const B = {}; names.forEach(n => { B[n] = { plans: [], subs: [], chks: [] }; });
+  const put = (k, it, own) => { const list = (own && own.length) ? own.filter(m => B[m]) : []; (list.length ? list : [NOOWN]).forEach(m => B[m][k].push(it)); };
+  rPlans.forEach(p => put('plans', p, ownersOf(p)));
+  rSubs.forEach(s => put('subs', s, ownersOf(s)));
+  rChks.forEach(c => put('chks', c, chkOwners(data, c)));
+
+  const cnt = b => b.plans.length + b.subs.length + b.chks.length;
+  const shown = names.filter(n => (!only || n === only) && cnt(B[n]) > 0);
+
+  const chkLine = c => {
+    const tn = chkTone(c); const solo = isSoloChk(c);
+    return (
+      <div key={'c' + c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, padding: '5px 8px', borderRadius: 7, background: c.done ? '#F5F4F2' : (solo ? tn.bg : '#FBFDFB'), borderStyle: 'solid', borderWidth: solo ? '1px 1px 1px 3px' : '1px', borderColor: (() => { const b = c.done ? '#E3E0DC' : (solo ? tn.bd : '#CDE3C6'); return solo ? [b, b, b, tn.fg].join(' ') : b; })() }}>
+        <span style={{ flexShrink: 0, width: 10, height: 10, borderRadius: '50%', border: '1.5px solid ' + (c.done ? '#1FA463' : '#B8B2AA'), background: c.done ? '#1FA463' : 'transparent' }} />
+        <span style={{ fontSize: 14, color: '#A29C95', flexShrink: 0 }}>{c.date}</span>
+        {solo && <span style={{ fontSize: 14, fontWeight: 800, color: tn.fg, flexShrink: 0 }}>{tn.icon} {tn.name}</span>}
+        <span style={{ flex: 1, minWidth: 0, fontSize: 16, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none', wordBreak: 'break-all' }}>{c.text}</span>
+        {ownersOf(c).length > 1 && <span style={{ fontSize: 14, color: '#6E6863', flexShrink: 0 }} title={'공동 담당 ' + ownerNm(c)}>👥 {ownersOf(c).length}</span>}
+        {c.memo && <span style={{ fontSize: 14, flexShrink: 0 }} title={c.memo}>📝</span>}
+      </div>
+    );
+  };
+
+  const bucketBody = b => {
+    // 이 담당자 몫의 세부 + (기간 밖이라도) 체크리스트가 붙어있는 세부를 모아 프로젝트▸실행계획▸세부 트리로
+    const subIds = [];
+    b.subs.forEach(s => { if (subIds.indexOf(s.id) < 0) subIds.push(s.id); });
+    b.chks.forEach(c => { if (c.subplanId && subIds.indexOf(c.subplanId) < 0) subIds.push(c.subplanId); });
+    const tree = [];
+    subIds.forEach(id => {
+      const s = subOf(id); if (!s) return;
+      const p = planOf(s.planId); const o = p ? outOf(p.outputId) : null;
+      const oK = o ? o.id : 0, pK = p ? p.id : 0;
+      let go = tree.find(x => x.key === oK); if (!go) { go = { key: oK, out: o, plans: [] }; tree.push(go); }
+      let gp = go.plans.find(x => x.key === pK); if (!gp) { gp = { key: pK, plan: p, subs: [] }; go.plans.push(gp); }
+      gp.subs.push(s);
+    });
+    // 기간 안에 걸린 실행계획 중 위 트리에 안 뜬 것(세부 없이 본인이 담당)
+    const planIdsInTree = []; tree.forEach(go => go.plans.forEach(gp => { if (gp.plan) planIdsInTree.push(gp.plan.id); }));
+    const lonePlans = b.plans.filter(p => planIdsInTree.indexOf(p.id) < 0);
+    const soloChks = b.chks.filter(isSoloChk);
+    return (
+      <div>
+        {tree.map(go => (
+          <div key={'o' + go.key} style={{ marginTop: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 16, fontWeight: 800, color: G }}>📁 {go.out ? outLabel(go.out) : '연결된 출력 프로젝트 없음'}</span>
+              {go.out && <button onClick={() => jump({ kind: 'output', id: go.out.id })} style={miniBtn}>수정</button>}
+            </div>
+            {go.plans.map(gp => (
+              <div key={'p' + gp.key} style={{ marginLeft: 6, marginTop: 5 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 15.5, fontWeight: 700, color: '#6E6863' }}>▸ {gp.plan ? gp.plan.name : '연결된 실행계획 없음'}</span>
+                  {gp.plan && <button onClick={() => jump({ kind: 'plan', id: gp.plan.id })} style={miniBtn}>수정</button>}
+                </div>
+                {gp.subs.map(s => (
+                  <div key={'s' + s.id} style={{ marginLeft: 6, marginTop: 5, paddingLeft: 9, borderLeft: '2px solid #EDEBE7' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <Badge label={s.stage} color={stC(s.stage)} />
+                      <span style={{ fontSize: 16.5, fontWeight: 700, color: s.stage === '완료' ? '#A29C95' : '#1A1614' }}>{s.name}</span>
+                      <span style={{ fontSize: 14, color: '#A29C95' }}>{(s.start || '미정') + ' ~ ' + (s.due || '미정')}</span>
+                      <button onClick={() => jump({ kind: 'subplan', id: s.id })} style={{ ...miniBtn, marginLeft: 'auto' }}>수정</button>
+                    </div>
+                    {b.chks.filter(c => c.subplanId === s.id).map(c => chkLine(c))}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+        {lonePlans.length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#6E6863', marginBottom: 3 }}>▸ 이 기간 진행 실행계획</div>
+            {lonePlans.map(p => { const o = outOf(p.outputId); return (
+              <div key={'lp' + p.id} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, padding: '5px 8px', borderRadius: 7, background: '#FAFAF9', border: '1px solid #EDEBE7', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 14, color: '#A29C95' }}>{o ? o.code : ''}</span>
+                <span style={{ fontSize: 16, fontWeight: 700 }}>{p.name}</span>
+                <span style={{ fontSize: 14, color: '#A29C95' }}>{(p.start || '미정') + ' ~ ' + (p.due || '미정')}</span>
+                <button onClick={() => jump({ kind: 'plan', id: p.id })} style={{ ...miniBtn, marginLeft: 'auto' }}>수정</button>
+              </div>); })}
+          </div>
+        )}
+        {soloChks.length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#6E6863', marginBottom: 3 }}>· 세부계획 없는 개별 항목</div>
+            {soloChks.map(c => chkLine(c))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const filterBtn = active => ({ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 15, fontSize: 15, fontWeight: 600, cursor: 'pointer', border: '1px solid ' + (active ? G : '#E3E0DC'), background: active ? G : 'white', color: active ? 'white' : '#6E6863', fontFamily: 'inherit' });
+  return (
+    <ModalShell title={label} onClose={onClose}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: '#F5F4F2', borderRadius: 10, padding: '10px 13px', border: '1px solid #EDEBE7' }}>
+        <span style={{ fontSize: 16.5, fontWeight: 700, color: G }}>{start} ~ {end}</span>
+        <span style={{ fontSize: 15.5, color: '#6E6863' }}>· 실행계획 {rPlans.length}건 · 세부 {rSubs.length}건 · 체크리스트 {rChks.length}건</span>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 15, color: '#6E6863', fontWeight: 600, marginRight: 2 }}>담당자별</span>
+        <button onClick={() => setOnly('')} style={filterBtn(!only)}>전체</button>
+        {MEMBERS.map(m => <button key={m} onClick={() => setOnly(only === m ? '' : m)} style={filterBtn(only === m)}><span style={{ fontSize: 16 }}>{AV[m]}</span> {m}</button>)}
+        <button onClick={() => setOnly(only === NOOWN ? '' : NOOWN)} style={filterBtn(only === NOOWN)}>{NOOWN}</button>
+      </div>
+      <div style={{ fontSize: 14.5, color: '#A29C95', lineHeight: 1.5 }}>담당자가 여러 명이면 각 담당자 밑에 모두 표시됩니다. 체크리스트에 담당자가 없으면 소속 세부실행계획의 담당자로 분류돼요.</div>
+      {shown.length === 0 ? <div style={{ fontSize: 16, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 기간에 진행하는 업무가 없습니다.</div> :
+        shown.map(n => { const b = B[n]; return (
+          <div key={n} style={{ border: '1px solid #E3E0DC', borderRadius: 10, padding: '11px 13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', paddingBottom: 7, borderBottom: '1.5px solid #EDEBE7' }}>
+              <span style={{ fontSize: 22 }}>{n === NOOWN ? '❔' : (AV[n] || '')}</span>
+              <span style={{ fontSize: 18, fontWeight: 800, color: G }}>{n}</span>
+              <span style={{ fontSize: 15, color: '#6E6863' }}>실행계획 {b.plans.length} · 세부 {b.subs.length} · 체크리스트 {b.chks.filter(c => c.done).length}/{b.chks.length}</span>
+            </div>
+            {bucketBody(b)}
+          </div>); })}
       <Btn v="secondary" onClick={onClose} style={{ width: '100%' }}>닫기</Btn>
     </ModalShell>
   );
@@ -1481,10 +1649,15 @@ function TeamCalendar({ data, setData, onEdit }) {
   const [openDay, setOpenDay] = useState(null);
   const [ownerFilter, setOwnerFilter] = useState('');
   const setDate = (id, date) => setData(d => applyChklDate(d, id, date));
-  const isManual = c => c.standalone === true || !c.subplanId;
+  const isManual = isSoloChk;
   const [newText, setNewText] = useState('');
-  const [newOwner, setNewOwner] = useState('');
-  const addManual = () => { const t = newText.trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: null, standalone: true, text: t, done: false, date: '', owner: newOwner, memo: '' }] })); setNewText(''); setNewOwner(''); };
+  const [newOwners, setNewOwners] = useState([]);
+  const [newMeet, setNewMeet] = useState('');
+  const [newMeetOwners, setNewMeetOwners] = useState([]);
+  const [roundup, setRoundup] = useState(null);
+  const addSolo = (kind, text, owners, reset) => { const t = (text || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: null, standalone: true, kind, text: t, done: false, date: '', owner: (owners || []).slice(), memo: '' }] })); reset(); };
+  const addManual = () => addSolo('task', newText, newOwners, () => { setNewText(''); setNewOwners([]); });
+  const addMeeting = () => addSolo('meeting', newMeet, newMeetOwners, () => { setNewMeet(''); setNewMeetOwners([]); });
   const navBtnSmall = { width: 28, height: 28, borderRadius: 6, border: '1px solid #E3E0DC', background: 'white', cursor: 'pointer', fontSize: 18, color: '#3A3631', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' };
   const filterBtn = active => ({ display: 'inline-flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 15, fontSize: 15, fontWeight: 600, cursor: 'pointer', border: '1px solid ' + (active ? G : '#E3E0DC'), background: active ? G : 'white', color: active ? 'white' : '#6E6863' });
   const [yy, mm] = ym.split('-').map(Number);
@@ -1494,7 +1667,7 @@ function TeamCalendar({ data, setData, onEdit }) {
   for (let i = 0; i < firstDow; i++) cells.push(null);
   for (let dd = 1; dd <= dim; dd++) cells.push(ym + '-' + String(dd).padStart(2, '0'));
   while (cells.length % 7 !== 0) cells.push(null);
-  const visible = c => !ownerFilter || c.owner === ownerFilter;
+  const visible = c => !ownerFilter || ownersOf(c).indexOf(ownerFilter) >= 0;
   const chksByDate = {};
   (data.checklists || []).forEach(c => { if (c.date && visible(c)) (chksByDate[c.date] = chksByDate[c.date] || []).push(c); });
   const subOf = id => data.subplans.find(s => s.id === id);
@@ -1504,14 +1677,14 @@ function TeamCalendar({ data, setData, onEdit }) {
   const isOver = c => { const s = subOf(c.subplanId); return !!(c.date && s && s.due && c.date > s.due); };
   const warnCnt = (data.checklists || []).filter(c => visible(c) && isOver(c)).length;
   const chip = (c, hideSub) => {
-    const s = subOf(c.subplanId); const over = isOver(c); const av = c.owner ? AV[c.owner] : ''; const man = isManual(c);
-    const bg = over ? '#FEF2F2' : (c.done ? '#F1F0ED' : (man ? '#F1ECFB' : '#EEF4EC'));
-    const bd = over ? '#FCA5A5' : (c.done ? '#E3E0DC' : (man ? '#D3C4EF' : '#CDE3C6'));
+    const s = subOf(c.subplanId); const over = isOver(c); const av = ownerAv(c); const man = isManual(c); const tn = chkTone(c);
+    const bg = over ? '#FEF2F2' : (c.done ? '#F1F0ED' : (man ? tn.bg : '#EEF4EC'));
+    const bd = over ? '#FCA5A5' : (c.done ? '#E3E0DC' : (man ? tn.bd : '#CDE3C6'));
     return (
       <div key={c.id} draggable onDragStart={e => { e.stopPropagation(); e.dataTransfer.setData('chk-id', String(c.id)); }} onClick={e => { e.stopPropagation(); setOpenChk(c.id); }}
-        title={(man ? '수동 체크리스트' : (s ? s.name : '')) + (c.owner ? ' · ' + c.owner : '') + (over && s ? ' · 마감일(' + s.due + ') 초과' : '')}
-        style={{ padding: '4px 7px', marginBottom: 4, borderRadius: 7, cursor: 'pointer', lineHeight: 1.3, background: bg, border: '1px solid ' + bd, borderLeft: man ? '3px solid #8B5CF6' : '1px solid ' + bd }}>
-        {man && !hideSub ? <div style={{ fontSize: 14.5, color: '#8B5CF6', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📌 수동</div> : (s && !hideSub && <div style={{ fontSize: 14.5, color: '#A29C95', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</div>)}
+        title={(man ? tn.name + ' 항목' : (s ? s.name : '')) + (ownersOf(c).length ? ' · ' + ownerNm(c) : '') + (over && s ? ' · 마감일(' + s.due + ') 초과' : '')}
+        style={{ padding: '4px 7px', marginBottom: 4, borderRadius: 7, cursor: 'pointer', lineHeight: 1.3, background: bg, borderStyle: 'solid', borderWidth: man ? '1px 1px 1px 3px' : '1px', borderColor: man ? [bd, bd, bd, tn.fg].join(' ') : bd }}>
+        {man ? <div style={{ fontSize: 14.5, color: tn.fg, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tn.icon} {tn.name}</div> : (s && !hideSub && <div style={{ fontSize: 14.5, color: '#A29C95', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</div>)}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 17 }}>
           {over && <span style={{ color: '#DC2626', fontWeight: 800, flexShrink: 0 }}>⚠</span>}
           <span style={{ flexShrink: 0, width: 11, height: 11, borderRadius: '50%', border: '1.5px solid ' + (c.done ? '#1FA463' : '#B8B2AA'), background: c.done ? '#1FA463' : 'transparent' }} />
@@ -1528,12 +1701,7 @@ function TeamCalendar({ data, setData, onEdit }) {
     const manual = list.filter(isManual); const linked = list.filter(c => !isManual(c));
     const g = groupChks(linked);
     return (<React.Fragment>
-      {manual.length > 0 && (
-      <div style={{ marginBottom: 7 }}>
-        <div style={{ fontSize: 14, fontWeight: 800, color: '#8B5CF6', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📌 수동 체크리스트</div>
-        <div style={{ marginLeft: 5, marginTop: 3 }}>{manual.map(c => chip(c, true))}</div>
-      </div>
-      )}
+      {manual.length > 0 && <div style={{ marginBottom: 7 }}>{manual.map(c => chip(c))}</div>}
       {Object.keys(g).map(oK => (
       <div key={oK} style={{ marginBottom: 7 }}>
         <div style={{ fontSize: 14, fontWeight: 800, color: G, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>📁 {oK}</div>
@@ -1552,6 +1720,20 @@ function TeamCalendar({ data, setData, onEdit }) {
       ))}
     </React.Fragment>);
   };
+  const gridDate = i => { const d = new Date(yy, mm - 1, 1 - firstDow + i); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  const weeks = []; for (let wi = 0; wi < cells.length; wi += 7) weeks.push(cells.slice(wi, wi + 7));
+  const dayCell = (date, i) => {
+    if (!date) return <div key={'e' + i} style={{ minHeight: 132, background: '#FAFAF9', borderRadius: 7 }} />;
+    const dd = Number(date.slice(8)); const isToday = date === TODAY; const chks = chksByDate[date] || []; const dow = i % 7;
+    return (
+      <div key={date} onClick={() => setOpenDay(date)} title="누르면 이 날짜의 프로젝트별 상세가 열립니다" onDragOver={e => { e.preventDefault(); setDragOver(date); }} onDragLeave={() => setDragOver(o => o === date ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, date); setDragOver(null); }}
+        style={{ minHeight: 132, background: dragOver === date ? '#EAF0FE' : 'white', border: '1px solid ' + (isToday ? G : (dragOver === date ? '#93C5FD' : '#EDEBE7')), borderRadius: 7, padding: 5, overflow: 'hidden', cursor: 'pointer' }}>
+        <div style={{ fontSize: 19, fontWeight: isToday ? 800 : 600, color: isToday ? G : (dow === 0 ? '#DC2626' : (dow === 6 ? '#2563EB' : '#6E6863')), marginBottom: 4, textAlign: 'right', paddingRight: 3 }}>{dd}</div>
+        {chks.slice(0, 3).map(c => chip(c))}
+        {chks.length > 3 && <div style={{ fontSize: 14.5, fontWeight: 700, color: '#6E6863', textAlign: 'center', padding: '2px 0', borderRadius: 6, background: '#F5F4F2' }}>+{chks.length - 3}건 더보기</div>}
+      </div>
+    );
+  };
   return (
     <Card style={{ marginTop: 18 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -1562,6 +1744,7 @@ function TeamCalendar({ data, setData, onEdit }) {
           <span style={{ fontSize: 17.5, fontWeight: 700, minWidth: 84, textAlign: 'center' }}>{yy}년 {mm}월</span>
           <button onClick={() => shift(1)} style={navBtnSmall}>›</button>
           <button onClick={() => setYm(TODAY.slice(0, 7))} style={{ ...navBtnSmall, width: 'auto', padding: '0 9px', fontSize: 15, fontWeight: 700 }}>오늘</button>
+          <button onClick={() => setRoundup({ start: ym + '-01', end: ym + '-' + pad(dim), label: yy + '년 ' + mm + '월 월간 주요 업무' })} title="이 달에 진행하는 프로젝트·실행계획·체크리스트를 담당자별로 모아 봅니다" style={{ ...navBtnSmall, width: 'auto', padding: '0 11px', fontSize: 15, fontWeight: 700, border: '1px solid ' + G, background: G, color: 'white' }}>🗂 월간 주요 업무 모아보기</button>
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', marginBottom: 9 }}>
@@ -1570,29 +1753,34 @@ function TeamCalendar({ data, setData, onEdit }) {
         {MEMBERS.map(m => <button key={m} onClick={() => setOwnerFilter(ownerFilter === m ? '' : m)} style={filterBtn(ownerFilter === m)}><span style={{ fontSize: 16 }}>{AV[m]}</span> {m}</button>)}
       </div>
       {warnCnt > 0 && <div style={{ fontSize: 15, color: '#B91C1C', marginBottom: 8, background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 7, padding: '6px 10px' }}>⚠ 마감일을 넘긴 체크리스트 {warnCnt}건 — 빨간 항목의 날짜나 세부계획 마감일을 조정하세요.</div>}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr))', gap: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,minmax(0,1fr)) 66px', gap: 6 }}>
         {WD.map((w, i) => <div key={w} style={{ textAlign: 'center', fontSize: 18, fontWeight: 700, color: i === 0 ? '#DC2626' : (i === 6 ? '#2563EB' : '#6E6863'), padding: '5px 0' }}>{w}</div>)}
-        {cells.map((date, i) => {
-          if (!date) return <div key={'e' + i} style={{ minHeight: 132, background: '#FAFAF9', borderRadius: 7 }} />;
-          const dd = Number(date.slice(8)); const isToday = date === TODAY; const chks = chksByDate[date] || []; const dow = i % 7;
-          return (
-            <div key={date} onClick={() => setOpenDay(date)} title="누르면 이 날짜의 프로젝트별 상세가 열립니다" onDragOver={e => { e.preventDefault(); setDragOver(date); }} onDragLeave={() => setDragOver(o => o === date ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, date); setDragOver(null); }}
-              style={{ minHeight: 132, background: dragOver === date ? '#EAF0FE' : 'white', border: '1px solid ' + (isToday ? G : (dragOver === date ? '#93C5FD' : '#EDEBE7')), borderRadius: 7, padding: 5, overflow: 'hidden', cursor: 'pointer' }}>
-              <div style={{ fontSize: 19, fontWeight: isToday ? 800 : 600, color: isToday ? G : (dow === 0 ? '#DC2626' : (dow === 6 ? '#2563EB' : '#6E6863')), marginBottom: 4, textAlign: 'right', paddingRight: 3 }}>{dd}</div>
-              {chks.slice(0, 3).map(c => chip(c))}
-              {chks.length > 3 && <div style={{ fontSize: 14.5, fontWeight: 700, color: '#6E6863', textAlign: 'center', padding: '2px 0', borderRadius: 6, background: '#F5F4F2' }}>+{chks.length - 3}건 더보기</div>}
+        <div style={{ textAlign: 'center', fontSize: 13.5, fontWeight: 700, color: '#6E6863', padding: '3px 0', lineHeight: 1.25 }}>주간<br />모아보기</div>
+        {weeks.map((wk, wi) => (
+          <React.Fragment key={'wk' + wi}>
+            {wk.map((date, j) => dayCell(date, wi * 7 + j))}
+            <div style={{ display: 'flex', alignItems: 'stretch' }}>
+              <button onClick={() => setRoundup({ start: gridDate(wi * 7), end: gridDate(wi * 7 + 6), label: '주간 주요 업무 (' + gridDate(wi * 7) + ' ~ ' + gridDate(wi * 7 + 6) + ')' })}
+                title={gridDate(wi * 7) + ' ~ ' + gridDate(wi * 7 + 6) + ' 주에 진행하는 프로젝트·실행계획·체크리스트를 담당자별로 모아 봅니다'}
+                style={{ width: '100%', borderRadius: 7, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 13, fontWeight: 700, lineHeight: 1.3, padding: '4px 2px', fontFamily: 'inherit' }}>주간<br />주요업무<br />모아보기</button>
             </div>
-          );
-        })}
+          </React.Fragment>
+        ))}
       </div>
       <div onDragOver={e => { e.preventDefault(); setDragOver('un'); }} onDragLeave={() => setDragOver(o => o === 'un' ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, ''); setDragOver(null); }}
         style={{ marginTop: 10, border: '1px dashed ' + (dragOver === 'un' ? '#93C5FD' : '#D5D2CE'), background: dragOver === 'un' ? '#EAF0FE' : '#FAFAF9', borderRadius: 8, padding: 8 }}>
         <div style={{ fontSize: 15, fontWeight: 700, color: '#6E6863', marginBottom: 6 }}>📥 미배정 체크리스트 <span style={{ color: '#A29C95', fontWeight: 400 }}>({undated.length}) — 날짜 칸으로 끌어 놓으세요 · 끌어 올릴 땐 마우스를 화면 맨 위로 붙이면 자동으로 스크롤돼요(휠 금지)</span></div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 9, background: '#F6F2FD', border: '1px solid #E4DAF7', borderRadius: 8, padding: '7px 9px' }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#8B5CF6', flexShrink: 0 }}>📌 수동 추가</span>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 7, background: CHK_TONE.task.soft, border: '1px solid ' + CHK_TONE.task.line, borderRadius: 8, padding: '7px 9px' }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: CHK_TONE.task.fg, flexShrink: 0 }}>📌 수동 추가</span>
           <input value={newText} onChange={e => setNewText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addManual(); }} placeholder="세부계획·프로젝트 없이 체크리스트 추가" style={{ flex: 1, minWidth: 140, fontSize: 16, padding: '6px 8px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
-          <select value={newOwner} onChange={e => setNewOwner(e.target.value)} title="담당자" style={{ fontSize: 15, padding: '5px 7px', border: '1px solid #D8D3CC', borderRadius: 6, color: newOwner ? '#3A3631' : '#A29C95', background: 'white' }}><option value="">담당 없음</option>{MEMBERS.map(m => <option key={m} value={m}>{m}</option>)}</select>
-          <button onClick={addManual} style={{ fontSize: 16, fontWeight: 700, padding: '6px 12px', borderRadius: 7, border: 'none', background: '#8B5CF6', color: 'white', cursor: 'pointer', flexShrink: 0 }}>+ 추가</button>
+          <OwnerChips selected={newOwners} onToggle={m => setNewOwners(o => toggleIn(o, m))} sm />
+          <button onClick={addManual} style={{ fontSize: 16, fontWeight: 700, padding: '6px 12px', borderRadius: 7, border: 'none', background: CHK_TONE.task.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>+ 추가</button>
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 9, background: CHK_TONE.meeting.soft, border: '1px solid ' + CHK_TONE.meeting.line, borderRadius: 8, padding: '7px 9px' }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: CHK_TONE.meeting.fg, flexShrink: 0 }}>🗓 회의 추가</span>
+          <input value={newMeet} onChange={e => setNewMeet(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addMeeting(); }} placeholder="회의 제목 입력 (색상이 다르게 표시됩니다)" style={{ flex: 1, minWidth: 140, fontSize: 16, padding: '6px 8px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
+          <OwnerChips selected={newMeetOwners} onToggle={m => setNewMeetOwners(o => toggleIn(o, m))} sm />
+          <button onClick={addMeeting} style={{ fontSize: 16, fontWeight: 700, padding: '6px 12px', borderRadius: 7, border: 'none', background: CHK_TONE.meeting.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>+ 회의</button>
         </div>
         {undated.length === 0 ? <div style={{ fontSize: 14.5, color: '#A29C95' }}>모든 체크리스트에 실행일이 지정되었습니다.</div> :
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -1608,6 +1796,7 @@ function TeamCalendar({ data, setData, onEdit }) {
       </div>
       {openChk && <ChecklistModal chkId={openChk} data={data} setData={setData} onClose={() => setOpenChk(null)} />}
       {openDay && <DayDetailModal date={openDay} data={data} setData={setData} onEdit={onEdit} onClose={() => setOpenDay(null)} />}
+      {roundup && <RoundupModal data={data} start={roundup.start} end={roundup.end} label={roundup.label} initialOwner={ownerFilter} onEdit={onEdit} onClose={() => setRoundup(null)} />}
     </Card>
   );
 }
@@ -1617,6 +1806,7 @@ function TabTeam({ data, setData, goTab, onEdit }) {
   const heldTotal = data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length;
   const [showMem, setShowMem] = useState(false);
   const [profileMem, setProfileMem] = useState(null);
+  const [todayFor, setTodayFor] = useState(null);
   const photoOf = n => { const mm = (data.members || []).find(x => x.name === n); return (mm && mm.photo) || ''; };
   return (
     <div style={{ padding: 20 }}>
@@ -1626,14 +1816,15 @@ function TabTeam({ data, setData, goTab, onEdit }) {
       </div>
       {showMem && <MemberModal data={data} setData={setData} onClose={() => setShowMem(false)} />}
       {profileMem && <ProfileModal name={profileMem} data={data} onClose={() => setProfileMem(null)} />}
-      <div style={{ fontSize: 16, color: '#6E6863', marginBottom: 16 }}>{TODAY} 기준 <span style={{ color: '#A29C95' }}>· 팀원 카드를 누르면 프로필이 열립니다</span></div>
+      {todayFor && <DayDetailModal date={TODAY} owner={todayFor} data={data} setData={setData} onEdit={onEdit} onClose={() => setTodayFor(null)} />}
+      <div style={{ fontSize: 16, color: '#6E6863', marginBottom: 16 }}>{TODAY} 기준 <span style={{ color: '#A29C95' }}>· 팀원 카드를 누르면 프로필이 열립니다 · 📆 금일 업무보기로 그 사람의 오늘 업무만 볼 수 있어요</span></div>
       <div>
         <div style={{ minWidth: 0 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 12 }}>
         {MEMBERS.map(m => {
           const owned = all.filter(x => ownersOf(x).includes(m)); const supp = all.filter(x => x.support && x.support.some(s => s.m === m));
           const subCnt = data.subplans.filter(s => ownersOf(s).includes(m)).length; const done = data.subplans.filter(s => ownersOf(s).includes(m) && s.stage === '완료').length;
-          return (<Card key={m} onClick={() => setProfileMem(m)} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 19 }}>{m}</div><div style={{ fontSize: 15, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 15, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 20, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>서포트</div></div></div></Card>);
+          return (<Card key={m} onClick={() => setProfileMem(m)} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 19 }}>{m}</div><div style={{ fontSize: 15, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 15, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 20, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><button onClick={e => { e.stopPropagation(); setTodayFor(m); }} title={TODAY + ' 기준 ' + m + ' 담당 업무를 모아 봅니다'} style={{ width: '100%', marginBottom: 9, padding: '7px 0', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 15.5, fontWeight: 700, fontFamily: 'inherit' }}>📆 금일 업무보기</button><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>서포트</div></div></div></Card>);
         })}
           </div>
           <TeamCalendar data={data} setData={setData} onEdit={onEdit} />
@@ -1925,7 +2116,7 @@ function TabWeekly({ data, setData, onEdit }) {
   const weekDates = DAYS.map((_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); return x.toISOString().slice(0, 10); });
   const diffDays = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
   const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
-  const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false, date: '', owner: '', memo: '' }] })); setNewChk(n => ({ ...n, [id]: '' })); };
+  const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false, date: '', owner: [], memo: '' }] })); setNewChk(n => ({ ...n, [id]: '' })); };
   const planName = id => { const p = data.plans.find(x => x.id === id); return p ? p.name : ''; };
   const onDragStart = (e, s, isSpan) => {
     e.stopPropagation();
