@@ -1510,6 +1510,7 @@ function DayDetailModal({ date, data, setData, onEdit, onClose, owner }) {
 function RoundupModal({ data, start, end, label, initialOwner, onEdit, onClose }) {
   const NOOWN = '담당 없음';
   const [only, setOnly] = useState(initialOwner || '');
+  const [proj, setProj] = useState('');
   const jump = t => { onClose && onClose(); onEdit && onEdit(t); };
   const miniBtn = { border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 14, padding: '1px 7px', fontWeight: 600, flexShrink: 0, fontFamily: 'inherit' };
   const subOf = id => (data.subplans || []).find(s => s.id === id);
@@ -1530,6 +1531,23 @@ function RoundupModal({ data, start, end, label, initialOwner, onEdit, onClose }
   const cnt = b => b.plans.length + b.subs.length + b.chks.length;
   const shown = names.filter(n => (!only || n === only) && cnt(B[n]) > 0);
 
+  // ── 프로젝트별 분류 (index_135) — 다중연결(extraOutputIds / extraPlanIds)까지 포함해 프로젝트마다 담는다
+  const NOOUT = '0';
+  const outIdsOfPlan = p => { if (!p) return []; const a = []; if (p.outputId) a.push(p.outputId); extraOuts(p).forEach(x => { if (x && a.indexOf(x) < 0) a.push(x); }); return a; };
+  const outIdsOfSub = s => { const a = []; const add = pid => outIdsOfPlan(planOf(pid)).forEach(x => { if (a.indexOf(x) < 0) a.push(x); }); add(s.planId); extraPlans(s).forEach(add); return a; };
+  const outIdsOfChk = c => { const s = c.subplanId ? subOf(c.subplanId) : null; return s ? outIdsOfSub(s) : []; };
+  const PJ = {}; const pKeys = [];
+  const pput = (oid, k, it) => { const kk = String(oid); if (!PJ[kk]) { PJ[kk] = { plans: [], subs: [], chks: [] }; pKeys.push(kk); } PJ[kk][k].push(it); };
+  const spreadP = (ids, k, it) => { (ids.length ? ids : [NOOUT]).forEach(oid => pput(oid, k, it)); };
+  rPlans.forEach(p => spreadP(outIdsOfPlan(p), 'plans', p));
+  rSubs.forEach(s => spreadP(outIdsOfSub(s), 'subs', s));
+  rChks.forEach(c => spreadP(outIdsOfChk(c), 'chks', c));
+  const pShown = []; (data.outputs || []).forEach(o => { if (PJ[String(o.id)]) pShown.push(String(o.id)); }); pKeys.forEach(k => { if (pShown.indexOf(k) < 0) pShown.push(k); });
+  // 담당자 칩이 눌려 있으면 프로젝트 카드 안에서도 그 담당자 몫만 남긴다(교차 필터)
+  const ownOK = (it, isChk) => { if (!only) return true; const own = (isChk ? chkOwners(data, it) : ownersOf(it)).filter(m => MEMBERS.indexOf(m) >= 0); return only === NOOWN ? own.length === 0 : own.indexOf(only) >= 0; };
+  const filtOwn = b => ({ plans: b.plans.filter(x => ownOK(x)), subs: b.subs.filter(x => ownOK(x)), chks: b.chks.filter(x => ownOK(x, true)) });
+  const ALL = { plans: rPlans, subs: rSubs, chks: rChks };
+
   const chkLine = c => {
     const tn = chkTone(c); const solo = isSoloChk(c);
     return (
@@ -1544,15 +1562,16 @@ function RoundupModal({ data, start, end, label, initialOwner, onEdit, onClose }
     );
   };
 
-  const bucketBody = b => {
+  const bucketBody = (b, pin) => {
     // 이 담당자 몫의 세부 + (기간 밖이라도) 체크리스트가 붙어있는 세부를 모아 프로젝트▸실행계획▸세부 트리로
+    // pin 이 있으면(프로젝트별 보기) 트리를 그 프로젝트 하나로 고정하고 📁 헤더는 카드 제목이 대신하므로 생략
     const subIds = [];
     b.subs.forEach(s => { if (subIds.indexOf(s.id) < 0) subIds.push(s.id); });
     b.chks.forEach(c => { if (c.subplanId && subIds.indexOf(c.subplanId) < 0) subIds.push(c.subplanId); });
     const tree = [];
     subIds.forEach(id => {
       const s = subOf(id); if (!s) return;
-      const p = planOf(s.planId); const o = p ? outOf(p.outputId) : null;
+      const p = planOf(s.planId); const o = pin ? pin.out : (p ? outOf(p.outputId) : null);
       const oK = o ? o.id : 0, pK = p ? p.id : 0;
       let go = tree.find(x => x.key === oK); if (!go) { go = { key: oK, out: o, plans: [] }; tree.push(go); }
       let gp = go.plans.find(x => x.key === pK); if (!gp) { gp = { key: pK, plan: p, subs: [] }; go.plans.push(gp); }
@@ -1566,10 +1585,11 @@ function RoundupModal({ data, start, end, label, initialOwner, onEdit, onClose }
       <div>
         {tree.map(go => (
           <div key={'o' + go.key} style={{ marginTop: 8 }}>
+            {!pin && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 16, fontWeight: 800, color: G }}>📁 {go.out ? outLabel(go.out) : '연결된 출력 프로젝트 없음'}</span>
               {go.out && <button onClick={() => jump({ kind: 'output', id: go.out.id })} style={miniBtn}>수정</button>}
-            </div>
+            </div>)}
             {go.plans.map(gp => (
               <div key={'p' + gp.key} style={{ marginLeft: 6, marginTop: 5 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -1626,8 +1646,30 @@ function RoundupModal({ data, start, end, label, initialOwner, onEdit, onClose }
         {MEMBERS.map(m => <button key={m} onClick={() => setOnly(only === m ? '' : m)} style={filterBtn(only === m)}><span style={{ fontSize: 16 }}>{AV[m]}</span> {m}</button>)}
         <button onClick={() => setOnly(only === NOOWN ? '' : NOOWN)} style={filterBtn(only === NOOWN)}>{NOOWN}</button>
       </div>
-      <div style={{ fontSize: 14.5, color: '#A29C95', lineHeight: 1.5 }}>담당자가 여러 명이면 각 담당자 밑에 모두 표시됩니다. 체크리스트에 담당자가 없으면 소속 세부실행계획의 담당자로 분류돼요.</div>
-      {shown.length === 0 ? <div style={{ fontSize: 16, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 기간에 진행하는 업무가 없습니다.</div> :
+      {pShown.length > 0 && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 15, color: '#6E6863', fontWeight: 600, marginRight: 2 }}>프로젝트별</span>
+        <button onClick={() => setProj('')} style={filterBtn(!proj)}>전체</button>
+        {pShown.map(k => { const o = k === NOOUT ? null : outOf(Number(k)); const b = PJ[k]; const nm = o ? outLabel(o) : '프로젝트 미연결';
+          return <button key={'pf' + k} onClick={() => setProj(proj === k ? '' : k)} title={nm + ' — 실행계획 ' + b.plans.length + ' · 세부 ' + b.subs.length + ' · 체크리스트 ' + b.chks.length} style={filterBtn(proj === k)}>📁 {nm} <span style={{ fontSize: 13.5, opacity: 0.72 }}>{cnt(b)}</span></button>; })}
+      </div>)}
+      <div style={{ fontSize: 14.5, color: '#A29C95', lineHeight: 1.5 }}>{(!only && !proj) ? '전체 보기에서는 기간에 걸친 프로젝트·실행계획·체크리스트를 그대로 보여줍니다. 위에서 담당자나 프로젝트를 누르면 그 분류로 묶어 봅니다.' : '담당자가 여러 명이면 각 담당자 밑에 모두 표시됩니다. 체크리스트에 담당자가 없으면 소속 세부실행계획의 담당자로 분류돼요. 담당자와 프로젝트를 함께 누르면 교차(그 프로젝트 안의 그 담당자 몫)로 보입니다.'}</div>
+      {proj ? (() => {
+        const o = proj === NOOUT ? null : outOf(Number(proj)); const b = filtOwn(PJ[proj] || { plans: [], subs: [], chks: [] });
+        if (cnt(b) === 0) return <div style={{ fontSize: 16, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 프로젝트에 해당하는 업무가 없습니다.</div>;
+        return (
+          <div style={{ border: '1px solid #E3E0DC', borderRadius: 10, padding: '11px 13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', paddingBottom: 7, borderBottom: '1.5px solid #EDEBE7' }}>
+              <span style={{ fontSize: 22 }}>📁</span>
+              <span style={{ fontSize: 18, fontWeight: 800, color: G }}>{o ? outLabel(o) : '프로젝트 미연결'}</span>
+              {only && <span style={{ fontSize: 15.5, fontWeight: 700, color: '#6E6863' }}>· {only === NOOWN ? '❔' : (AV[only] || '')} {only} 담당</span>}
+              <span style={{ fontSize: 15, color: '#6E6863' }}>실행계획 {b.plans.length} · 세부 {b.subs.length} · 체크리스트 {b.chks.filter(c => c.done).length}/{b.chks.length}</span>
+              {o && <button onClick={() => jump({ kind: 'output', id: o.id })} style={{ ...miniBtn, marginLeft: 'auto' }}>수정</button>}
+            </div>
+            {bucketBody(b, { out: o })}
+          </div>);
+      })() : only ? (
+        shown.length === 0 ? <div style={{ fontSize: 16, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 기간에 진행하는 업무가 없습니다.</div> :
         shown.map(n => { const b = B[n]; return (
           <div key={n} style={{ border: '1px solid #E3E0DC', borderRadius: 10, padding: '11px 13px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', paddingBottom: 7, borderBottom: '1.5px solid #EDEBE7' }}>
@@ -1636,7 +1678,11 @@ function RoundupModal({ data, start, end, label, initialOwner, onEdit, onClose }
               <span style={{ fontSize: 15, color: '#6E6863' }}>실행계획 {b.plans.length} · 세부 {b.subs.length} · 체크리스트 {b.chks.filter(c => c.done).length}/{b.chks.length}</span>
             </div>
             {bucketBody(b)}
-          </div>); })}
+          </div>); })
+      ) : (
+        cnt(ALL) === 0 ? <div style={{ fontSize: 16, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 기간에 진행하는 업무가 없습니다.</div> :
+        <div style={{ border: '1px solid #E3E0DC', borderRadius: 10, padding: '11px 13px' }}>{bucketBody(ALL)}</div>
+      )}
       <Btn v="secondary" onClick={onClose} style={{ width: '100%' }}>닫기</Btn>
     </ModalShell>
   );
