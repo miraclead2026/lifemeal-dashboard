@@ -48,7 +48,8 @@
       "2026-07-31",
       "2026-08-01"
     ],
-    "visit_daily_range": "2026-06-22~2026-08-01"
+    "visit_daily_range": "2026-06-22~2026-08-01",
+    "visit_coverage_note": "일별 방문 발생 매출(=경로별 합)의 총매출 대비 커버리지. visit_revenue=경로합=방문분석'전체'(방문 발생 주문만). non_visit=총매출-방문발생(정기구독 재결제·직접 등). ★방문 발생 매출을 '총매출'로 부르지 말 것(판매성과 gross와 다른 축)."
   },
   "reports": {
     "full_channel": [
@@ -32439,6 +32440,336 @@
         "conversion_rate_customer": 0.0,
         "revenue": 0,
         "aov": 0
+      }
+    ],
+    "visit_coverage": [
+      {
+        "date": "2026-06-22",
+        "gross": 1969030,
+        "visit_revenue": 1969030,
+        "coverage_pct": 100.0,
+        "non_visit": 0,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-06-23",
+        "gross": 2174100,
+        "visit_revenue": 2118100,
+        "coverage_pct": 97.4,
+        "non_visit": 56000,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-06-24",
+        "gross": 2226780,
+        "visit_revenue": 1510930,
+        "coverage_pct": 67.9,
+        "non_visit": 715850,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-06-25",
+        "gross": 2563280,
+        "visit_revenue": 1937770,
+        "coverage_pct": 75.6,
+        "non_visit": 625510,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-06-26",
+        "gross": 3724640,
+        "visit_revenue": 3285210,
+        "coverage_pct": 88.2,
+        "non_visit": 439430,
+        "subscription_revenue": 106900
+      },
+      {
+        "date": "2026-06-27",
+        "gross": 1124440,
+        "visit_revenue": 795940,
+        "coverage_pct": 70.8,
+        "non_visit": 328500,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-06-28",
+        "gross": 2581530,
+        "visit_revenue": 1445110,
+        "coverage_pct": 56.0,
+        "non_visit": 1136420,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-06-29",
+        "gross": 2728650,
+        "visit_revenue": 2137790,
+        "coverage_pct": 78.3,
+        "non_visit": 590860,
+        "subscription_revenue": 180200
+      },
+      {
+        "date": "2026-06-30",
+        "gross": 4291970,
+        "visit_revenue": 2936350,
+        "coverage_pct": 68.4,
+        "non_visit": 1355620,
+        "subscription_revenue": 90100
+      },
+      {
+        "date": "2026-07-01",
+        "gross": 3874110,
+        "visit_revenue": 2382830,
+        "coverage_pct": 61.5,
+        "non_visit": 1491280,
+        "subscription_revenue": 200100
+      },
+      {
+        "date": "2026-07-02",
+        "gross": 6236940,
+        "visit_revenue": 4811870,
+        "coverage_pct": 77.2,
+        "non_visit": 1425070,
+        "subscription_revenue": 90100
+      },
+      {
+        "date": "2026-07-03",
+        "gross": 2068920,
+        "visit_revenue": 1505540,
+        "coverage_pct": 72.8,
+        "non_visit": 563380,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-04",
+        "gross": 4278010,
+        "visit_revenue": 3277920,
+        "coverage_pct": 76.6,
+        "non_visit": 1000090,
+        "subscription_revenue": 125000
+      },
+      {
+        "date": "2026-07-05",
+        "gross": 3259770,
+        "visit_revenue": 2444840,
+        "coverage_pct": 75.0,
+        "non_visit": 814930,
+        "subscription_revenue": 189100
+      },
+      {
+        "date": "2026-07-06",
+        "gross": 4768070,
+        "visit_revenue": 3575830,
+        "coverage_pct": 75.0,
+        "non_visit": 1192240,
+        "subscription_revenue": 90100
+      },
+      {
+        "date": "2026-07-07",
+        "gross": 2915370,
+        "visit_revenue": 1540880,
+        "coverage_pct": 52.9,
+        "non_visit": 1374490,
+        "subscription_revenue": 198000
+      },
+      {
+        "date": "2026-07-08",
+        "gross": 3267570,
+        "visit_revenue": 2917580,
+        "coverage_pct": 89.3,
+        "non_visit": 349990,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-09",
+        "gross": 3533150,
+        "visit_revenue": 2825130,
+        "coverage_pct": 80.0,
+        "non_visit": 708020,
+        "subscription_revenue": 99000
+      },
+      {
+        "date": "2026-07-10",
+        "gross": 2467830,
+        "visit_revenue": 1835880,
+        "coverage_pct": 74.4,
+        "non_visit": 631950,
+        "subscription_revenue": 99000
+      },
+      {
+        "date": "2026-07-11",
+        "gross": 4485210,
+        "visit_revenue": 3910290,
+        "coverage_pct": 87.2,
+        "non_visit": 574920,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-12",
+        "gross": 3000220,
+        "visit_revenue": 2668840,
+        "coverage_pct": 89.0,
+        "non_visit": 331380,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-13",
+        "gross": 3644760,
+        "visit_revenue": 2941560,
+        "coverage_pct": 80.7,
+        "non_visit": 703200,
+        "subscription_revenue": 200200
+      },
+      {
+        "date": "2026-07-14",
+        "gross": 3402450,
+        "visit_revenue": 2622600,
+        "coverage_pct": 77.1,
+        "non_visit": 779850,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-15",
+        "gross": 2725970,
+        "visit_revenue": 1980010,
+        "coverage_pct": 72.6,
+        "non_visit": 745960,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-16",
+        "gross": 1979020,
+        "visit_revenue": 1707270,
+        "coverage_pct": 86.3,
+        "non_visit": 271750,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-17",
+        "gross": 3040020,
+        "visit_revenue": 2264350,
+        "coverage_pct": 74.5,
+        "non_visit": 775670,
+        "subscription_revenue": 90100
+      },
+      {
+        "date": "2026-07-18",
+        "gross": 2545570,
+        "visit_revenue": 2186970,
+        "coverage_pct": 85.9,
+        "non_visit": 358600,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-19",
+        "gross": 2873530,
+        "visit_revenue": 2295540,
+        "coverage_pct": 79.9,
+        "non_visit": 577990,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-20",
+        "gross": 4323950,
+        "visit_revenue": 2834380,
+        "coverage_pct": 65.6,
+        "non_visit": 1489570,
+        "subscription_revenue": 99000
+      },
+      {
+        "date": "2026-07-21",
+        "gross": 5306520,
+        "visit_revenue": 4670310,
+        "coverage_pct": 88.0,
+        "non_visit": 636210,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-22",
+        "gross": 5305170,
+        "visit_revenue": 3615380,
+        "coverage_pct": 68.1,
+        "non_visit": 1689790,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-23",
+        "gross": 6014830,
+        "visit_revenue": 5000010,
+        "coverage_pct": 83.1,
+        "non_visit": 1014820,
+        "subscription_revenue": 90100
+      },
+      {
+        "date": "2026-07-24",
+        "gross": 3134290,
+        "visit_revenue": 2887150,
+        "coverage_pct": 92.1,
+        "non_visit": 247140,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-07-25",
+        "gross": 2382820,
+        "visit_revenue": 1272570,
+        "coverage_pct": 53.4,
+        "non_visit": 1110250,
+        "subscription_revenue": 300700
+      },
+      {
+        "date": "2026-07-26",
+        "gross": 2803430,
+        "visit_revenue": 2333070,
+        "coverage_pct": 83.2,
+        "non_visit": 470360,
+        "subscription_revenue": 90100
+      },
+      {
+        "date": "2026-07-27",
+        "gross": 5489570,
+        "visit_revenue": 4452780,
+        "coverage_pct": 81.1,
+        "non_visit": 1036790,
+        "subscription_revenue": 190000
+      },
+      {
+        "date": "2026-07-28",
+        "gross": 3996100,
+        "visit_revenue": 3402130,
+        "coverage_pct": 85.1,
+        "non_visit": 593970,
+        "subscription_revenue": 112500
+      },
+      {
+        "date": "2026-07-29",
+        "gross": 2608880,
+        "visit_revenue": 1893100,
+        "coverage_pct": 72.6,
+        "non_visit": 715780,
+        "subscription_revenue": 190200
+      },
+      {
+        "date": "2026-07-30",
+        "gross": 5396370,
+        "visit_revenue": 4147270,
+        "coverage_pct": 76.9,
+        "non_visit": 1249100,
+        "subscription_revenue": 171100
+      },
+      {
+        "date": "2026-07-31",
+        "gross": 3216200,
+        "visit_revenue": 2334870,
+        "coverage_pct": 72.6,
+        "non_visit": 881330,
+        "subscription_revenue": 0
+      },
+      {
+        "date": "2026-08-01",
+        "gross": 2219570,
+        "visit_revenue": 1870820,
+        "coverage_pct": 84.3,
+        "non_visit": 348750,
+        "subscription_revenue": 99000
       }
     ]
   }
