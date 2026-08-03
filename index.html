@@ -37,6 +37,49 @@ firebase.auth().signInAnonymously().catch(e => console.warn('익명 로그인 �
 const DB_PATH = '/dashboard';   // 운영
 const { useState, useEffect, useRef } = React;
 
+// ── GitHub 데이터 파일 공통 로더 (index_137, 2026-08-03) ─────────────────────
+// [배경] raw.githubusercontent.com/<repo>/main/... 은 CDN 캐시가 심하게 묵는다.
+//   2026-08-03 실측: raw(main) = updatedAt "2026-07-23 10:29" (11일 스탈)
+//                    GitHub Pages 동일경로 = updatedAt "2026-08-03 10:09" (정상)
+//   ?t=Date.now() 를 붙여도 raw 는 안 뚫렸다. 그래서 raw 를 1순위에서 내렸다.
+// [해법] 대시보드는 GitHub Pages 위에서 돌아가므로 data/ 를 '동일 출처'로 읽는다.
+//   순서: 동일출처(상대경로) → github.io 절대경로 → raw(main) 폴백.
+//   file:// 로 로컬 확인할 땐 동일출처가 없으므로 raw 만 쓴다(CORS 에러 방지).
+//   api.github.com 으로 커밋 SHA 를 받아 경로에 박는 방식은 채택하지 않았다 —
+//   비인증 60회/시간 레이트리밋이 있어 팀이 새로고침하면 데이터가 통째로 안 뜬다.
+const GH_REPO = 'miraclead2026/lifemeal-dashboard';
+const GH_PAGES = 'https://miraclead2026.github.io/lifemeal-dashboard/';
+const GH_RAW = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/';
+const GH_BASES = () => {
+  try {
+    if (/^https?:$/.test(window.location.protocol)) {
+      const self = new URL('./', window.location.href).href;
+      return self === GH_PAGES ? [GH_PAGES, GH_RAW] : [self, GH_PAGES, GH_RAW];
+    }
+  } catch (e) { }
+  return [GH_RAW];
+};
+let GH_SRC = '';           // 마지막으로 성공한 출처(전역 진단용)
+const GH_SRC_MAP = {};     // 파일 경로별 실제 성공 출처 — 파일마다 다를 수 있어 따로 남긴다
+const ghSrcOf = p => GH_SRC_MAP[p] || '';
+// [index_138] 마지막 후보(raw)까지 떨어져서 성공했다 = 지금 보는 데이터가 며칠 묵었을 수 있다.
+//   허브 요청: 이 경우 툴팁만으로는 아무도 못 알아채니 '갱신' 라벨 자체를 경고색으로.
+//   후보가 1개뿐인 file:// 로컬 확인은 '폴백'이 아니므로 경고하지 않는다.
+const ghStale = p => GH_SRC_MAP[p] === GH_RAW && GH_BASES().length > 1;
+const SALES_SRC = 'data/naver-sales.json';   // 매출탭 '갱신' 라벨이 진단할 대상 파일
+// fetch() 와 동일하게 Promise<Response> 를 돌려준다 → 호출부 로직은 그대로 둔다.
+const ghFetch = path => {
+  const q = (path.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
+  const bases = GH_BASES();
+  const dead = { ok: false, status: 504, statusText: 'all-sources-failed', json: () => Promise.resolve(null) };
+  const step = i => {
+    if (i >= bases.length) return Promise.resolve(dead);
+    return fetch(bases[i] + path + q, { cache: 'no-store' })
+      .then(r => { if (!r.ok) return step(i + 1); GH_SRC = bases[i]; GH_SRC_MAP[path] = bases[i]; return r; }, () => step(i + 1));
+  };
+  return step(0);
+};
+
 const G = '#1A1614', GO = '#1A1614', BG = '#FFFFFF';
 const DEFAULT_MEMBERS = [{ name: '윤희', role: '마케팅 팀장', av: '🌿' }, { name: '현수', role: 'MD', av: '📦' }];
 let MEMBERS = DEFAULT_MEMBERS.map(m => m.name);
@@ -163,6 +206,19 @@ const DEFAULT_MAIN_KPIS = [
   { id: 'm2', name: '신규고객', unit: '명', linkedPlanIds: [], targets: {}, manuals: [] },
   { id: 'm3', name: '전환율', unit: '%', linkedPlanIds: [], targets: {}, manuals: [] },
 ];
+const DEFAULT_GOAL_FORMULA = {
+  month: '',
+  revenue: 160000000,
+  aov: 78000,
+  orders: 2051,
+  visitors: 28481,
+  conversion: 6.5,
+  assetCount: 2000,
+  repeatRate: 10,
+  roas: 330,
+  driver: 'revenue',
+  linked: { revenue: '', aov: '', orders: '', visitors: '', conversion: '', assetCount: '', repeatRate: '', roas: '' },
+};
 const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? raw.members : DEFAULT_MEMBERS; syncMembers(_mem); return ({
   ...raw,
   rev: (typeof raw.rev === 'number') ? raw.rev : 0,
@@ -190,6 +246,9 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   powerlinkApprovals: raw.powerlinkApprovals || {},
   adKeywordRegistry: raw.adKeywordRegistry || {},
   messageSchedules: raw.messageSchedules || {},
+  routines: (raw.routines || []).map(r => ({ freq: 'weekly', days: [], dom: 1, everyN: 1, start: '', end: '', memo: '', owner: [], active: true, ...r, owner: Array.isArray(r.owner) ? r.owner.filter(Boolean) : (r.owner ? [r.owner] : []) })),
+  routineLogs: raw.routineLogs || {},
+  goalFormula: { ...DEFAULT_GOAL_FORMULA, ...(raw.goalFormula || {}) },
   members: (raw.members && raw.members.length) ? raw.members : DEFAULT_MEMBERS,
 }); };
 const won = n => (n || 0).toLocaleString() + '원';
@@ -246,6 +305,15 @@ const chkTone = c => CHK_TONE[chkKind(c)];
 // 세부실행계획에 붙지 않은 낱개 항목(수동/회의) — 모달에서 그 항목만 단독으로 다룬다
 const isSoloChk = c => !!c && (c.standalone === true || !c.subplanId || isMeetingChk(c));
 const toggleIn = (arr, v) => { const a = (arr || []).slice(); const i = a.indexOf(v); if (i >= 0) a.splice(i, 1); else a.push(v); return a; };
+// 회의 → 수동 → 연결된 체크리스트 순으로 항상 최상단 정렬 (index_136)
+const chkTopRank = c => isMeetingChk(c) ? 0 : (isSoloChk(c) ? 1 : 2);
+const topFirst = list => (list || []).map((x, i) => [x, i]).sort((a, b) => (chkTopRank(a[0]) - chkTopRank(b[0])) || (a[1] - b[1])).map(p => p[0]);
+const escHtml = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const stripHtml = s => String(s == null ? '' : s).replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|h\d)>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').trim();
+// 회의 체크리스트에 연결된 회의록 (없으면 null)
+const meetingNoteOf = (data, c) => (c && c.meetingId) ? ((data.meetings || []).find(m => m.id === c.meetingId) || null) : null;
+// 이미 지난(또는 오늘) 회의인데 회의록이 아직 없는 것들 — 업무날짜 상단 알림용
+const pendingMeetingNotes = (data, owner, upto) => (data.checklists || []).filter(c => isMeetingChk(c) && c.date && c.date <= (upto || TODAY) && !meetingNoteOf(data, c) && (!owner || chkOwners(data, c).indexOf(owner) >= 0)).sort((a, b) => a.date < b.date ? 1 : -1);
 // 기간(ps~pe)과 항목의 start~due 가 겹치는가
 const inPeriod = (x, ps, pe) => { const s = (x && x.start) || '', e = (x && x.due) || ''; if (!s && !e) return false; const a = s || e, b = e || s; return a <= pe && b >= ps; };
 // 체크리스트 담당자 — 없으면 소속 세부실행계획의 담당자를 물려받는다(모아보기 분류용)
@@ -366,6 +434,45 @@ const moveChkInGroup = (d, fromId, toId) => ({ ...d, checklists: moveSiblingToBy
 const WDNM = ['일', '월', '화', '수', '목', '금', '토'];
 const dateWd = date => { try { const w = WDNM[new Date(date + 'T00:00:00').getDay()]; return w || ''; } catch (e) { return ''; } };
 
+// ── 반복업무(루틴) ────────────────────────────────────────────────
+// freq: daily(매일) | weekly(매주 요일) | biweekly(격주 요일) | monthly(매월 n일) | everyN(N일마다)
+const FREQ_OPTS = [['daily', '매일'], ['weekly', '매주 (요일 지정)'], ['biweekly', '격주 (2주에 한 번)'], ['monthly', '매월 (날짜 지정)'], ['everyN', 'N일마다']];
+const routineDesc = r => {
+  if (!r) return '';
+  const ds = (r.days || []).slice().sort((a, b) => a - b).map(i => WDNM[i]).join('·');
+  if (r.freq === 'daily') return '매일';
+  if (r.freq === 'weekly') return '매주 ' + (ds ? ds + '요일' : '(요일 미지정)');
+  if (r.freq === 'biweekly') return '격주 ' + (ds ? ds + '요일' : '(요일 미지정)');
+  if (r.freq === 'monthly') return '매월 ' + (Number(r.dom) || 1) + '일';
+  if (r.freq === 'everyN') return (Math.max(1, Number(r.everyN) || 1)) + '일마다';
+  return '';
+};
+const dayGap = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+const routineHits = (r, date) => {
+  if (!r || r.active === false || !date) return false;
+  if (r.start && date < r.start) return false;
+  if (r.end && date > r.end) return false;
+  const base = r.start || date;
+  let wd = 0; try { wd = new Date(date + 'T00:00:00').getDay(); } catch (e) { return false; }
+  if (r.freq === 'daily') return true;
+  if (r.freq === 'weekly') return (r.days || []).indexOf(wd) >= 0;
+  if (r.freq === 'biweekly') { if ((r.days || []).indexOf(wd) < 0) return false; return (Math.abs(Math.round(dayGap(weekKeyOf(base), weekKeyOf(date)) / 7)) % 2) === 0; }
+  if (r.freq === 'monthly') return Number(date.slice(8, 10)) === (Number(r.dom) || 1);
+  if (r.freq === 'everyN') { const n = Math.max(1, Number(r.everyN) || 1); const g = dayGap(base, date); return g >= 0 && g % n === 0; }
+  return false;
+};
+const rlKey = (rid, date) => 'r' + rid + '_' + date;
+const routineDone = (data, rid, date) => !!((data.routineLogs || {})[rlKey(rid, date)]);
+const toggleRoutineDone = (d, rid, date, who) => { const k = rlKey(rid, date); const logs = { ...(d.routineLogs || {}) }; if (logs[k]) delete logs[k]; else logs[k] = { by: who || '', at: TODAY }; return { ...d, routineLogs: logs }; };
+const routineOwned = (r, owner) => !owner || ownersOf(r).length === 0 || ownersOf(r).indexOf(owner) >= 0;
+const routinesFor = (data, owner, date) => (data.routines || []).filter(r => routineHits(r, date) && routineOwned(r, owner));
+// 기한(해당 날짜)이 지났는데 완료 체크가 안 된 반복업무 목록. upto 이전 span일을 훑는다.
+const routineMisses = (data, owner, upto, span) => {
+  const out = []; const end = addDays(upto || TODAY, -1); const n = span || 30;
+  for (let i = 0; i < n; i++) { const dt = addDays(end, -i); routinesFor(data, owner, dt).forEach(r => { if (!routineDone(data, r.id, dt)) out.push({ r: r, date: dt }); }); }
+  return out.sort((a, b) => a.date < b.date ? 1 : -1);
+};
+
 // 목록 안에서 행을 잡아 끌어 순서를 바꾸는 공용 훅. arm(id) 를 붙인 곳을 눌러야 그 행이 드래그된다(입력칸 텍스트 선택 보호).
 // canDrop(from, to) 를 주면 그 조건을 만족하는 행에만 놓을 수 있다(조건 밖의 행은 강조도 안 되고 놓아도 무시).
 function useDragOrder(onMove, canDrop) {
@@ -467,6 +574,9 @@ const INIT = {
   notices: [],
   updates: DEFAULT_UPDATES,
   payments: [],
+  routines: [],
+  routineLogs: {},
+  goalFormula: DEFAULT_GOAL_FORMULA,
   outputs: [
     { id: 1, code: 'MD-1', type: 'MD출력', name: '쿠팡 광고 운영' }, { id: 2, code: 'MD-2', type: 'MD출력', name: '네이버 대용량 할인제품 & 정기배송' },
     { id: 3, code: 'MD-3', type: 'MD출력', name: '네이버 검색광고 & 키워드 최적화' }, { id: 4, code: 'MD-4', type: 'MD출력', name: '외부채널(톡딜)' },
@@ -768,7 +878,125 @@ const ModalShell = ({ title, onClose, onBack, children }) => (
 
 const blankDate = { start: '', due: '', useDep: false, depId: '', depDays: '' };
 
+// ── 반복업무 등록/수정 (index_136) : 프로젝트·실행계획과 연결하지 않는 단독 업무 ──
+function RoutineModal({ data, setData, onClose, editing, onBack }) {
+  const ed = editing || null;
+  const [name, setName] = useState(ed ? (ed.name || '') : '');
+  const [owner, setOwner] = useState(ed ? ownersOf(ed) : []);
+  const [freq, setFreq] = useState(ed ? (ed.freq || 'weekly') : 'weekly');
+  const [days, setDays] = useState(ed ? (ed.days || []).slice() : []);
+  const [dom, setDom] = useState(ed ? String(ed.dom || 1) : '1');
+  const [everyN, setEveryN] = useState(ed ? String(ed.everyN || 2) : '2');
+  const [start, setStart] = useState(ed ? (ed.start || TODAY) : TODAY);
+  const [end, setEnd] = useState(ed ? (ed.end || '') : '');
+  const [memo, setMemo] = useState(ed ? (ed.memo || '') : '');
+  const toggleDay = i => setDays(days.indexOf(i) >= 0 ? days.filter(x => x !== i) : days.concat([i]).sort((a, b) => a - b));
+  const draft = { freq, days, dom: Number(dom) || 1, everyN: Math.max(1, Number(everyN) || 1), start: start || TODAY, end, active: true };
+  const preview = (() => { const out = []; for (let i = 0; i < 120 && out.length < 5; i++) { const dt = addDays(start || TODAY, i); if (routineHits(draft, dt)) out.push(dt.slice(5) + '(' + dateWd(dt) + ')'); } return out; })();
+  const save = () => {
+    if (!name.trim()) { alert('반복업무명을 입력하세요'); return; }
+    if ((freq === 'weekly' || freq === 'biweekly') && !days.length) { alert('반복할 요일을 하나 이상 선택하세요'); return; }
+    const base = { name: name.trim(), owner: owner.slice(), freq, days: days.slice(), dom: Number(dom) || 1, everyN: Math.max(1, Number(everyN) || 1), start: start || TODAY, end: end || '', memo: memo.trim(), active: true };
+    setData(d => {
+      if (ed) return { ...d, routines: (d.routines || []).map(r => r.id === ed.id ? { ...r, ...base } : r) };
+      const id = d.nid + 1;
+      return { ...d, nid: id, routines: [...(d.routines || []), { id: id, ...base }] };
+    });
+    onClose();
+  };
+  const del = () => { if (!ed) return; if (!confirm('이 반복업무를 삭제할까요? (지난 완료 기록도 함께 사라집니다)')) return; setData(d => ({ ...d, routines: (d.routines || []).filter(r => r.id !== ed.id) })); onClose(); };
+  return (
+    <ModalShell title={(ed ? '🔁 반복업무 수정' : '🔁 반복업무 추가하기')} onClose={onClose} onBack={onBack}>
+      <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 10, padding: '9px 12px', fontSize: 15, color: '#9A3412', fontWeight: 600 }}>
+        반복업무는 프로젝트·실행계획과 연결하지 않고 단독으로 등록됩니다. 등록하면 담당자의 <b>금일 업무보기 맨 위</b>에 체크리스트로 나타나요.
+      </div>
+      <div>
+        <Lbl c="반복업무명" />
+        <Inp value={name} onChange={setName} placeholder="예: 일일 광고 지표 확인" />
+      </div>
+      <div>
+        <Lbl c="담당자 (다중 선택 · 비워두면 전원)" />
+        <div style={{ marginTop: 4 }}><OwnerChips selected={owner} onToggle={m => setOwner(owner.indexOf(m) >= 0 ? owner.filter(x => x !== m) : owner.concat([m]))} /></div>
+      </div>
+      <div>
+        <Lbl c="반복 주기" />
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          {FREQ_OPTS.map(f => <button key={f[0]} onClick={() => setFreq(f[0])} style={{ padding: '7px 13px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 700, background: freq === f[0] ? G : '#E3E0DC', color: freq === f[0] ? 'white' : '#3A3631' }}>{f[1]}</button>)}
+        </div>
+        {(freq === 'weekly' || freq === 'biweekly') && (
+          <div style={{ background: '#F5F4F2', borderRadius: 10, padding: 10, border: '1px solid #EDEBE7' }}>
+            <div style={{ fontSize: 15, color: '#6E6863', marginBottom: 6 }}>{freq === 'weekly' ? '매주 어떤 요일에 하나요? (복수 선택 가능)' : '2주에 한 번, 어떤 요일에 하나요? (시작일이 속한 주 기준으로 격주)'}</div>
+            <div style={{ display: 'flex', gap: 5 }}>
+              {WDNM.map((w, i) => { const on = days.indexOf(i) >= 0; return <button key={w} onClick={() => toggleDay(i)} style={{ flex: 1, padding: '9px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 800, background: on ? G : 'white', color: on ? 'white' : (i === 0 ? '#D9483B' : (i === 6 ? '#2D5FE0' : '#3A3631')) }}>{w}</button>; })}
+            </div>
+          </div>
+        )}
+        {freq === 'monthly' && <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ fontSize: 16, color: '#3A3631' }}>매월</span><div style={{ width: 90 }}><Inp type="number" value={dom} onChange={setDom} placeholder="1" /></div><span style={{ fontSize: 16, color: '#3A3631' }}>일</span></div>}
+        {freq === 'everyN' && <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ fontSize: 16, color: '#3A3631' }}>시작일부터</span><div style={{ width: 90 }}><Inp type="number" value={everyN} onChange={setEveryN} placeholder="2" /></div><span style={{ fontSize: 16, color: '#3A3631' }}>일마다</span></div>}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <div><Lbl c="시작일" /><input type="date" value={start} onChange={e => setStart(e.target.value)} style={{ width: '100%', padding: '8px 9px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 17, fontFamily: 'inherit' }} /></div>
+        <div><Lbl c="종료일 (선택 · 비우면 계속 반복)" /><input type="date" value={end} onChange={e => setEnd(e.target.value)} style={{ width: '100%', padding: '8px 9px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 17, fontFamily: 'inherit' }} /></div>
+      </div>
+      <div><Lbl c="메모 (선택)" /><Inp value={memo} onChange={setMemo} placeholder="확인할 항목·링크 등" /></div>
+      <div style={{ background: '#F0FDF4', border: '1px solid #A7F3D0', borderRadius: 10, padding: '9px 12px' }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: '#1FA463', marginBottom: 3 }}>🔁 {routineDesc(draft)}</div>
+        <div style={{ fontSize: 15, color: '#3A3631' }}>다음 실행일: {preview.length ? preview.join(' · ') : '조건에 맞는 날짜가 없어요 (요일/날짜를 확인하세요)'}</div>
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <Btn onClick={save} style={{ flex: 1 }}>{ed ? '수정 저장' : '반복업무 등록'}</Btn>
+        {ed && <Btn v="secondary" onClick={del} style={{ color: '#D9483B' }}>삭제</Btn>}
+        <Btn v="secondary" onClick={onClose}>취소</Btn>
+      </div>
+    </ModalShell>
+  );
+}
+
+// 반복업무 목록 패널 (프로젝트 진행 상황 탭 상단 · 홈 등에서 재사용)
+function RoutineListPanel({ data, setData, compact }) {
+  const [open, setOpen] = useState(false);
+  const [add, setAdd] = useState(false);
+  const [edit, setEdit] = useState(null);
+  const list = (data.routines || []);
+  const todayList = list.filter(r => routineHits(r, TODAY));
+  const missCnt = routineMisses(data, null, TODAY, 14).length;
+  return (
+    <div style={{ background: 'white', border: '1px solid #EDEBE7', borderRadius: 12, marginBottom: 14, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', cursor: 'pointer', background: open ? '#FFF7ED' : 'white' }} onClick={() => setOpen(!open)}>
+        <span style={{ fontSize: 16, fontWeight: 800, color: '#9A3412' }}>🔁 반복업무 보기</span>
+        <span style={{ fontSize: 14.5, color: '#A29C95' }}>등록 {list.length}건 · 오늘 {todayList.length}건</span>
+        {missCnt > 0 && <span style={{ fontSize: 14, fontWeight: 800, color: 'white', background: '#D9483B', borderRadius: 11, padding: '1px 8px' }}>❗ 미완료 {missCnt}</span>}
+        <span style={{ marginLeft: 'auto', fontSize: 16, color: '#6E6863', fontWeight: 700 }}>{open ? '▾ 접기' : '▸ 펼치기'}</span>
+      </div>
+      {open && (
+        <div style={{ padding: '4px 14px 12px' }}>
+          {!list.length && <div style={{ fontSize: 15, color: '#A29C95', padding: '10px 0' }}>등록된 반복업무가 없습니다. 아래 버튼으로 추가하세요.</div>}
+          {list.map(r => {
+            const done = routineDone(data, r.id, TODAY);
+            const today = routineHits(r, TODAY);
+            const miss = routineMisses(data, null, TODAY, 14).filter(x => x.r.id === r.id);
+            return (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 9, marginBottom: 5, background: today ? '#FFF7ED' : '#FAFAF9', border: '1px solid ' + (today ? '#FED7AA' : '#EDEBE7') }}>
+                {today && <input type="checkbox" checked={done} onChange={() => setData(d => toggleRoutineDone(d, r.id, TODAY, ''))} style={{ width: 17, height: 17, cursor: 'pointer' }} />}
+                <span style={{ fontSize: 16, fontWeight: 700, color: done ? '#A29C95' : '#1A1614', textDecoration: done ? 'line-through' : 'none' }}>{r.name}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#9A3412', background: '#FFEDD5', borderRadius: 10, padding: '1px 8px' }}>{routineDesc(r)}</span>
+                {ownersOf(r).length > 0 && <span style={{ fontSize: 14, color: '#6E6863' }}>{ownersOf(r).map(o => (AV[o] || '') + o).join(' ')}</span>}
+                {miss.length > 0 && <span style={{ fontSize: 13.5, fontWeight: 800, color: '#D9483B' }}>❗미완료 {miss.length}건 ({miss[0].date.slice(5)}…)</span>}
+                <button onClick={() => setEdit(r)} style={{ marginLeft: 'auto', border: '1px solid #E3E0DC', background: 'white', borderRadius: 7, padding: '3px 10px', fontSize: 14, fontWeight: 700, color: '#6E6863', cursor: 'pointer', fontFamily: 'inherit' }}>수정</button>
+              </div>
+            );
+          })}
+          <button onClick={() => setAdd(true)} style={{ marginTop: 6, border: '1px dashed #9A3412', background: 'white', borderRadius: 9, padding: '7px 14px', fontSize: 15, fontWeight: 800, color: '#9A3412', cursor: 'pointer', fontFamily: 'inherit' }}>+ 반복업무 추가하기</button>
+        </div>
+      )}
+      {add && <RoutineModal data={data} setData={setData} onClose={() => setAdd(false)} />}
+      {edit && <RoutineModal data={data} setData={setData} editing={edit} onClose={() => setEdit(null)} />}
+    </div>
+  );
+}
+
 function AddModal({ data, setData, onClose }) {
+  const [addMode, setAddMode] = useState('task');
   const [oMode, setOMode] = useState('exist'), [oSel, setOSel] = useState(''), [oCls, setOCls] = useState(data.categories[0]?.name || 'MD출력'), [oName, setOName] = useState('');
   const [showNewCat, setShowNewCat] = useState(false), [newCatName, setNewCatName] = useState(''), [newCatPrefix, setNewCatPrefix] = useState('');
   const addCategory = () => {
@@ -811,8 +1039,13 @@ function AddModal({ data, setData, onClose }) {
       {opts.map(o => <button key={o.v} onClick={() => setMode(o.v)} style={{ padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 600, background: mode === o.v ? G : '#E3E0DC', color: mode === o.v ? 'white' : '#3A3631' }}>{o.l}</button>)}
     </div>
   );
+  if (addMode === 'routine') return <RoutineModal data={data} setData={setData} onClose={onClose} onBack={() => setAddMode('task')} />;
   return (
     <ModalShell title="업무 추가하기" onClose={onClose}>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={() => setAddMode('task')} style={{ flex: 1, padding: '11px 0', borderRadius: 10, border: '2px solid ' + G, cursor: 'pointer', fontFamily: 'inherit', fontSize: 16.5, fontWeight: 800, background: G, color: 'white' }}>📋 일반 업무 추가하기</button>
+        <button onClick={() => setAddMode('routine')} style={{ flex: 1, padding: '11px 0', borderRadius: 10, border: '2px solid #FED7AA', cursor: 'pointer', fontFamily: 'inherit', fontSize: 16.5, fontWeight: 800, background: '#FFF7ED', color: '#9A3412' }}>🔁 반복업무 추가하기</button>
+      </div>
       <div>
         <div style={{ fontWeight: 700, fontSize: 17, color: G, marginBottom: 7 }}>1. 출력 프로젝트</div>
         <Toggle mode={oMode} setMode={setOMode} opts={[{ v: 'exist', l: '기존 선택' }, { v: 'new', l: '+ 새로 추가' }]} />
@@ -1375,19 +1608,109 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
   );
 }
 
+// ── 회의 추가 (회의명 · 참석자 · 시간) index_136 ──────────────────
+function MeetingAddModal({ data, setData, date, onClose, editing }) {
+  const ed = editing || null;
+  const [title, setTitle] = useState(ed ? (ed.text || '') : '');
+  const [att, setAtt] = useState(ed ? ownersOf(ed) : []);
+  const [guests, setGuests] = useState(ed ? (ed.meetGuests || '') : '');
+  const [time, setTime] = useState(ed ? (ed.meetTime || '') : '10:00');
+  const [mdate, setMdate] = useState((ed && ed.date) || date || TODAY);
+  const [place, setPlace] = useState(ed ? (ed.meetPlace || '') : '');
+  const save = () => {
+    if (!title.trim()) { alert('회의명을 입력하세요'); return; }
+    if (!att.length && !guests.trim()) { alert('참석자를 선택하거나 외부 참석자를 입력하세요'); return; }
+    if (!mdate) { alert('회의 날짜를 선택하세요'); return; }
+    const patch = { text: title.trim(), owner: att.slice(), meetGuests: guests.trim(), meetTime: time, meetPlace: place.trim(), date: mdate, kind: 'meeting' };
+    setData(d => {
+      if (ed) return { ...d, checklists: d.checklists.map(c => c.id === ed.id ? { ...c, ...patch } : c) };
+      const id = d.nid + 1;
+      return { ...d, nid: id, checklists: [...d.checklists, { id: id, subplanId: null, standalone: true, done: false, memo: '', meetingId: '', ...patch }] };
+    });
+    onClose();
+  };
+  const inSt = { width: '100%', padding: '8px 9px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 17, fontFamily: 'inherit', color: '#1A1614' };
+  return (
+    <ModalShell title={ed ? '🗓 회의 수정' : '🗓 회의 추가'} onClose={onClose}>
+      <div style={{ background: CHK_TONE.meeting.soft, border: '1px solid ' + CHK_TONE.meeting.line, borderRadius: 10, padding: '9px 12px', fontSize: 15, color: CHK_TONE.meeting.fg, fontWeight: 600 }}>
+        회의명 · 참석자 · 시간을 적어두면, 회의가 지난 뒤 <b>회의록이 등록되지 않았을 때</b> 업무날짜 상단에 알림으로 떠요.
+      </div>
+      <div><Lbl c="회의명" /><Inp value={title} onChange={setTitle} placeholder="예: 8월 KPI 목표 점검 회의" /></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+        <div><Lbl c="날짜" /><input type="date" value={mdate} onChange={e => setMdate(e.target.value)} style={inSt} /></div>
+        <div><Lbl c="시간" /><input type="time" value={time} onChange={e => setTime(e.target.value)} style={inSt} /></div>
+        <div><Lbl c="장소 (선택)" /><Inp value={place} onChange={setPlace} placeholder="회의실 · 화상 등" /></div>
+      </div>
+      <div>
+        <Lbl c="참석자 (내부 멤버)" />
+        <div style={{ marginTop: 4 }}><OwnerChips selected={att} onToggle={m => setAtt(toggleIn(att, m))} /></div>
+      </div>
+      <div><Lbl c="외부 참석자 (선택 · 쉼표로 구분)" /><Inp value={guests} onChange={setGuests} placeholder="예: 뿌리깊은 김팀장, 대행사 이과장" /></div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <Btn onClick={save} style={{ flex: 1 }}>{ed ? '수정 저장' : '회의 추가'}</Btn>
+        <Btn v="secondary" onClick={onClose}>취소</Btn>
+      </div>
+    </ModalShell>
+  );
+}
+
+// ── 회의록 등록 (회의 체크리스트 ↔ 회의 탭 연동) index_136 ─────────
+function MeetingNoteModal({ data, setData, chk, onClose }) {
+  const existing = meetingNoteOf(data, chk);
+  const [title, setTitle] = useState(existing ? (existing.title || '') : (chk.text || ''));
+  const [mdate, setMdate] = useState(existing ? (existing.date || '') : (chk.date || TODAY));
+  const [att, setAtt] = useState(existing ? (existing.attendees || []).join(', ') : ownersOf(chk).concat(chk.meetGuests ? chk.meetGuests.split(',').map(s => s.trim()).filter(Boolean) : []).join(', '));
+  const [body, setBody] = useState(existing ? stripHtml(existing.summaryHtml) : '');
+  const save = () => {
+    if (!body.trim()) { alert('회의 내용을 입력하세요'); return; }
+    const html = body.split('\n').map(l => '<p>' + (escHtml(l) || '&nbsp;') + '</p>').join('');
+    const mid = chk.meetingId || ('mtg' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36));
+    const rec = { id: mid, date: mdate || chk.date || TODAY, title: title.trim() || '회의', attendees: att.split(',').map(s => s.trim()).filter(Boolean), summaryHtml: html, appliedActions: [], source: 'dashboard' };
+    setData(d => ({ ...d, meetings: [...(d.meetings || []).filter(m => m.id !== mid), rec], checklists: d.checklists.map(c => c.id === chk.id ? { ...c, meetingId: mid, done: true } : c) }));
+    onClose();
+  };
+  return (
+    <ModalShell title="📝 회의록 등록" onClose={onClose}>
+      <div style={{ background: CHK_TONE.meeting.soft, border: '1px solid ' + CHK_TONE.meeting.line, borderRadius: 10, padding: '9px 12px', fontSize: 15, color: CHK_TONE.meeting.fg, fontWeight: 600 }}>
+        등록하면 [🗓 회의] 탭 목록에 바로 올라가고, 이 회의 항목은 완료 처리됩니다.
+      </div>
+      <div><Lbl c="회의명" /><Inp value={title} onChange={setTitle} placeholder="회의명" /></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 8 }}>
+        <div><Lbl c="날짜" /><input type="date" value={mdate} onChange={e => setMdate(e.target.value)} style={{ width: '100%', padding: '8px 9px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 17, fontFamily: 'inherit' }} /></div>
+        <div><Lbl c="참석자 (쉼표로 구분)" /><Inp value={att} onChange={setAtt} placeholder="윤희, 현수" /></div>
+      </div>
+      <div>
+        <Lbl c="회의 내용 · 결정사항" />
+        <textarea value={body} onChange={e => setBody(e.target.value)} placeholder={'논의 내용과 결정사항을 줄바꿈으로 적어주세요.\n예) 8월 목표 1.6억 확정\n예) 브랜드검색광고 예산 증액 검토'} style={{ width: '100%', minHeight: 180, padding: '10px 11px', borderRadius: 9, border: '1px solid #E3E0DC', fontSize: 16.5, lineHeight: 1.6, fontFamily: 'inherit', color: '#1A1614', resize: 'vertical' }} />
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <Btn onClick={save} style={{ flex: 1 }}>회의록 등록</Btn>
+        <Btn v="secondary" onClick={onClose}>취소</Btn>
+      </div>
+    </ModalShell>
+  );
+}
+
 function DayDetailModal({ date, data, setData, onEdit, onClose, owner }) {
   const [newText, setNewText] = useState('');
   const [newOwners, setNewOwners] = useState([]);
   const [newSub, setNewSub] = useState('');
   const [showOther, setShowOther] = useState(false);
+  const [addMeet, setAddMeet] = useState(false);
+  const [noteFor, setNoteFor] = useState(null);
+  const [editMeet, setEditMeet] = useState(null);
   const subOf = id => (data.subplans || []).find(s => s.id === id);
   const planOf = id => (data.plans || []).find(p => p.id === id);
   const outOf = id => (data.outputs || []).find(o => o.id === id);
   const okOwner = x => !owner || ownersOf(x).indexOf(owner) >= 0;
   const okChk = c => !owner || chkOwners(data, c).indexOf(owner) >= 0;
   const dayChks = sortChksByDate((data.checklists || []).filter(c => c.date === date && okChk(c)));
-  const manual = dayChks.filter(isSoloChk);
+  const manual = topFirst(dayChks.filter(isSoloChk));
   const linked = dayChks.filter(c => !isSoloChk(c));
+  // 반복업무 (index_136) — 이 날짜에 해당하는 반복업무 + 지난 미완료
+  const dayRoutines = routinesFor(data, owner, date);
+  const missedRoutines = routineMisses(data, owner, date, 30);
+  const needNotes = pendingMeetingNotes(data, owner, date);
   const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
   const mainIds = [];
   const push = id => { if (id && mainIds.indexOf(id) < 0) mainIds.push(id); };
@@ -1433,8 +1756,14 @@ function DayDetailModal({ date, data, setData, onEdit, onClose, owner }) {
         <span onClick={() => toggleDone(c.id)} title="완료 표시" style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={c.done} /></span>
         {showKind && <span style={{ fontSize: 14.5, fontWeight: 800, color: tn.fg, flexShrink: 0 }}>{tn.icon} {tn.name}</span>}
         <span onClick={() => toggleDone(c.id)} style={{ flex: 1, minWidth: 0, cursor: 'pointer', fontSize: 16.5, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none', wordBreak: 'break-all' }}>{c.text}</span>
+        {isMeetingChk(c) && c.meetTime && <span style={{ fontSize: 14.5, fontWeight: 700, color: CHK_TONE.meeting.fg, flexShrink: 0 }}>⏰ {c.meetTime}</span>}
         {ownersOf(c).length > 0 && <span style={{ fontSize: 15, color: '#6E6863', flexShrink: 0 }}>{ownerAv(c)} {ownerNm(c)}</span>}
+        {isMeetingChk(c) && c.meetGuests && <span style={{ fontSize: 14.5, color: '#6E6863', flexShrink: 0 }} title={'외부 참석자: ' + c.meetGuests}>+{c.meetGuests.split(',').length}명</span>}
         {c.memo && <span style={{ fontSize: 15, flexShrink: 0 }} title={c.memo}>📝</span>}
+        {isMeetingChk(c) && <button onClick={e => { e.stopPropagation(); setEditMeet(c); }} title="회의 정보 수정" style={{ ...miniBtn, flexShrink: 0 }}>수정</button>}
+        {isMeetingChk(c) && (meetingNoteOf(data, c)
+          ? <span style={{ fontSize: 14, fontWeight: 800, color: '#1FA463', background: '#F0FDF4', border: '1px solid #A7F3D0', borderRadius: 6, padding: '2px 8px', flexShrink: 0 }}>📝 회의록 등록됨</span>
+          : <button onClick={e => { e.stopPropagation(); setNoteFor(c); }} style={{ border: 'none', background: '#B91C1C', color: 'white', borderRadius: 6, padding: '3px 10px', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>📝 회의록 등록</button>)}
         {over && <span style={{ fontSize: 14.5, color: '#DC2626', fontWeight: 700, flexShrink: 0 }} title={'마감일(' + s.due + ') 초과'}>⚠</span>}
       </div>
     );
@@ -1479,7 +1808,57 @@ function DayDetailModal({ date, data, setData, onEdit, onClose, owner }) {
         <span style={{ fontSize: 16.5, fontWeight: 700, color: G }}>☑ 이 날 체크리스트 {doneCnt}/{dayChks.length}</span>
         <span style={{ fontSize: 15.5, color: '#6E6863' }}>· 세부 실행계획 {mainIds.length}건</span>
         {others.length > 0 && <span style={{ fontSize: 15.5, color: '#A29C95' }}>· 기간 중 {others.length}건</span>}
+        {dayRoutines.length > 0 && <span style={{ fontSize: 15.5, fontWeight: 700, color: '#9A3412' }}>· 🔁 반복업무 {dayRoutines.filter(r => routineDone(data, r.id, date)).length}/{dayRoutines.length}</span>}
       </div>
+      {needNotes.length > 0 && (
+        <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10, padding: '10px 13px' }}>
+          <div style={{ fontSize: 16.5, fontWeight: 800, color: '#B91C1C', marginBottom: 6 }}>📝 회의록을 추가하세요 ({needNotes.length}건)</div>
+          <div style={{ fontSize: 14.5, color: '#9A3412', marginBottom: 7 }}>아래 회의는 진행 날짜가 지났는데 회의록이 아직 등록되지 않았어요.</div>
+          {needNotes.slice(0, 6).map(c => (
+            <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #FECACA', borderRadius: 8, padding: '6px 10px', marginBottom: 5, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 14.5, fontWeight: 800, color: '#B91C1C', flexShrink: 0 }}>{c.date}{c.meetTime ? ' ' + c.meetTime : ''}</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#1A1614' }}>🗓 {c.text}</span>
+              {(ownersOf(c).length > 0 || c.meetGuests) && <span style={{ fontSize: 14.5, color: '#6E6863' }}>참석 {ownersOf(c).map(o => (AV[o] || '') + o).concat(c.meetGuests ? [c.meetGuests] : []).join(', ')}</span>}
+              <button onClick={() => setNoteFor(c)} style={{ marginLeft: 'auto', border: 'none', background: '#B91C1C', color: 'white', borderRadius: 7, padding: '5px 13px', fontSize: 14.5, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', flexShrink: 0 }}>📝 회의록 등록</button>
+            </div>
+          ))}
+          {needNotes.length > 6 && <div style={{ fontSize: 14, color: '#9A3412' }}>외 {needNotes.length - 6}건 더 있습니다.</div>}
+        </div>
+      )}
+      {(dayRoutines.length > 0 || missedRoutines.length > 0) && (
+        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 10, padding: '10px 13px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 16.5, fontWeight: 800, color: '#9A3412' }}>🔁 반복업무</span>
+            <span style={{ fontSize: 14.5, color: '#B45309' }}>프로젝트와 무관하게 주기적으로 하는 일이에요.</span>
+          </div>
+          {dayRoutines.map(r => {
+            const on = routineDone(data, r.id, date);
+            return (
+              <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid ' + (on ? '#E3E0DC' : '#FED7AA'), borderRadius: 8, padding: '7px 10px', marginBottom: 5, flexWrap: 'wrap' }}>
+                <span onClick={() => setData(d => toggleRoutineDone(d, r.id, date, owner || ''))} title="완료 표시" style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={on} /></span>
+                <span onClick={() => setData(d => toggleRoutineDone(d, r.id, date, owner || ''))} style={{ flex: 1, minWidth: 0, cursor: 'pointer', fontSize: 16.5, fontWeight: 700, color: on ? '#A29C95' : '#1A1614', textDecoration: on ? 'line-through' : 'none' }}>{r.name}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#9A3412', background: '#FFEDD5', borderRadius: 10, padding: '1px 8px', flexShrink: 0 }}>{routineDesc(r)}</span>
+                {ownersOf(r).length > 0 && <span style={{ fontSize: 14.5, color: '#6E6863', flexShrink: 0 }}>{ownersOf(r).map(o => (AV[o] || '') + o).join(' ')}</span>}
+                {r.memo && <span style={{ fontSize: 15, flexShrink: 0 }} title={r.memo}>📝</span>}
+              </div>
+            );
+          })}
+          {dayRoutines.length === 0 && <div style={{ fontSize: 15, color: '#B45309', marginBottom: 5 }}>이 날짜에 해당하는 반복업무는 없어요.</div>}
+          {missedRoutines.length > 0 && (
+            <div style={{ marginTop: 6, borderTop: '1px dashed #FDBA74', paddingTop: 7 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#D9483B', marginBottom: 4 }}>❗ 기간이 지났는데 완료 체크가 안 된 반복업무 {missedRoutines.length}건</div>
+              {missedRoutines.slice(0, 8).map(x => (
+                <div key={x.r.id + x.date} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, padding: '5px 10px', marginBottom: 4, flexWrap: 'wrap' }}>
+                  <span onClick={() => setData(d => toggleRoutineDone(d, x.r.id, x.date, owner || ''))} title="지금이라도 완료 처리" style={{ cursor: 'pointer', display: 'flex', flexShrink: 0 }}><Chk on={false} /></span>
+                  <span style={{ fontSize: 14.5, fontWeight: 800, color: '#B91C1C', flexShrink: 0 }}>{x.date.slice(5)}({dateWd(x.date)})</span>
+                  <span style={{ fontSize: 16, color: '#3A3631' }}>{x.r.name}</span>
+                </div>
+              ))}
+              {missedRoutines.length > 8 && <div style={{ fontSize: 14, color: '#9A3412' }}>외 {missedRoutines.length - 8}건</div>}
+            </div>
+          )}
+        </div>
+      )}
       <div>
         {manual.length > 0 && <div style={{ marginTop: 4 }}>{manual.map(c => chkRow(c, true))}</div>}
         {renderTree(tree(mainIds))}
@@ -1497,11 +1876,15 @@ function DayDetailModal({ date, data, setData, onEdit, onClose, owner }) {
           <input value={newText} onChange={e => setNewText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addChk('task'); }} placeholder="할 일 · 회의 제목 입력" style={{ flex: 1, minWidth: 160, fontSize: 16, padding: '7px 9px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
           <select value={newSub} onChange={e => setNewSub(e.target.value)} title="연결할 세부 실행계획 (회의 추가에는 적용되지 않습니다)" style={{ ...selSt, maxWidth: 260 }}><option value="">📌 수동(연결 없음)</option>{subOpts.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select>
           <button onClick={() => addChk('task')} title="수동 체크리스트로 추가" style={{ fontSize: 16, fontWeight: 700, padding: '7px 15px', borderRadius: 7, border: 'none', background: CHK_TONE.task.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>📌 추가</button>
-          <button onClick={() => addChk('meeting')} title="회의 항목으로 추가 (색상이 다르게 표시됩니다)" style={{ fontSize: 16, fontWeight: 700, padding: '7px 15px', borderRadius: 7, border: 'none', background: CHK_TONE.meeting.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>🗓 회의 추가</button>
+          <button onClick={() => setAddMeet(true)} title="회의명 · 참석자 · 시간을 적어 회의를 추가합니다" style={{ fontSize: 16, fontWeight: 700, padding: '7px 15px', borderRadius: 7, border: 'none', background: CHK_TONE.meeting.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>🗓 회의 추가</button>
         </div>
         <div style={{ marginTop: 7 }}><OwnerChips selected={newOwners} onToggle={m => setNewOwners(o => toggleIn(o, m))} /></div>
+        <div style={{ marginTop: 6, fontSize: 14.5, color: '#6E6863' }}>※ 회의는 <b>회의명 · 참석자 · 시간</b>을 입력하는 전용 창으로 추가됩니다.</div>
       </div>
       <Btn v="secondary" onClick={onClose} style={{ width: '100%' }}>닫기</Btn>
+      {addMeet && <MeetingAddModal data={data} setData={setData} date={date} onClose={() => setAddMeet(false)} />}
+      {editMeet && <MeetingAddModal data={data} setData={setData} date={date} editing={editMeet} onClose={() => setEditMeet(null)} />}
+      {noteFor && <MeetingNoteModal data={data} setData={setData} chk={noteFor} onClose={() => setNoteFor(null)} />}
     </ModalShell>
   );
 }
@@ -1701,6 +2084,9 @@ function TeamCalendar({ data, setData, onEdit }) {
   const [newMeet, setNewMeet] = useState('');
   const [newMeetOwners, setNewMeetOwners] = useState([]);
   const [roundup, setRoundup] = useState(null);
+  const [expDays, setExpDays] = useState({});
+  const [meetDay, setMeetDay] = useState(null);
+  const toggleExp = date => setExpDays(o => ({ ...o, [date]: !o[date] }));
   const addSolo = (kind, text, owners, reset) => { const t = (text || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: null, standalone: true, kind, text: t, done: false, date: '', owner: (owners || []).slice(), memo: '' }] })); reset(); };
   const addManual = () => addSolo('task', newText, newOwners, () => { setNewText(''); setNewOwners([]); });
   const addMeeting = () => addSolo('meeting', newMeet, newMeetOwners, () => { setNewMeet(''); setNewMeetOwners([]); });
@@ -1770,13 +2156,19 @@ function TeamCalendar({ data, setData, onEdit }) {
   const weeks = []; for (let wi = 0; wi < cells.length; wi += 7) weeks.push(cells.slice(wi, wi + 7));
   const dayCell = (date, i) => {
     if (!date) return <div key={'e' + i} style={{ minHeight: 132, background: '#FAFAF9', borderRadius: 7 }} />;
-    const dd = Number(date.slice(8)); const isToday = date === TODAY; const chks = chksByDate[date] || []; const dow = i % 7;
+    const dd = Number(date.slice(8)); const isToday = date === TODAY; const chks = topFirst(chksByDate[date] || []); const dow = i % 7;
+    const exp = !!expDays[date];
+    const rts = routinesFor(data, ownerFilter, date);
+    const rMiss = rts.filter(r => !routineDone(data, r.id, date)).length;
     return (
       <div key={date} onClick={() => setOpenDay(date)} title="누르면 이 날짜의 프로젝트별 상세가 열립니다" onDragOver={e => { e.preventDefault(); setDragOver(date); }} onDragLeave={() => setDragOver(o => o === date ? null : o)} onDrop={e => { e.preventDefault(); const id = Number(e.dataTransfer.getData('chk-id')); if (id) setDate(id, date); setDragOver(null); }}
-        style={{ minHeight: 132, background: dragOver === date ? '#EAF0FE' : 'white', border: '1px solid ' + (isToday ? G : (dragOver === date ? '#93C5FD' : '#EDEBE7')), borderRadius: 7, padding: 5, overflow: 'hidden', cursor: 'pointer' }}>
-        <div style={{ fontSize: 19, fontWeight: isToday ? 800 : 600, color: isToday ? G : (dow === 0 ? '#DC2626' : (dow === 6 ? '#2563EB' : '#6E6863')), marginBottom: 4, textAlign: 'right', paddingRight: 3 }}>{dd}</div>
-        {chks.slice(0, 3).map(c => chip(c))}
-        {chks.length > 3 && <div style={{ fontSize: 14.5, fontWeight: 700, color: '#6E6863', textAlign: 'center', padding: '2px 0', borderRadius: 6, background: '#F5F4F2' }}>+{chks.length - 3}건 더보기</div>}
+        style={{ minHeight: 132, background: dragOver === date ? '#EAF0FE' : 'white', border: '1px solid ' + (isToday ? G : (dragOver === date ? '#93C5FD' : '#EDEBE7')), borderRadius: 7, padding: 5, overflow: exp ? 'visible' : 'hidden', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 4 }}>
+          {rts.length > 0 && <span title={'반복업무 ' + rts.length + '건' + (rMiss ? ' · 미완료 ' + rMiss + '건' : '')} style={{ fontSize: 13, fontWeight: 700, padding: '0 5px', borderRadius: 8, background: rMiss ? '#FEF2F2' : '#FFF7ED', color: rMiss ? '#DC2626' : '#9A3412', border: '1px solid ' + (rMiss ? '#FCA5A5' : '#FED7AA') }}>🔁 {rts.length - rMiss}/{rts.length}</span>}
+          <div style={{ flex: 1, fontSize: 19, fontWeight: isToday ? 800 : 600, color: isToday ? G : (dow === 0 ? '#DC2626' : (dow === 6 ? '#2563EB' : '#6E6863')), textAlign: 'right', paddingRight: 3 }}>{dd}</div>
+        </div>
+        {(exp ? chks : chks.slice(0, 3)).map(c => chip(c))}
+        {chks.length > 3 && <div onClick={e => { e.stopPropagation(); toggleExp(date); }} title={exp ? '접기' : '이 날짜의 나머지 항목을 아래에 펼쳐서 보기'} style={{ fontSize: 14.5, fontWeight: 700, color: exp ? G : '#6E6863', textAlign: 'center', padding: '2px 0', borderRadius: 6, background: '#F5F4F2', cursor: 'pointer' }}>{exp ? '▲ 접기' : '+' + (chks.length - 3) + '건 더보기'}</div>}
       </div>
     );
   };
@@ -1824,9 +2216,8 @@ function TeamCalendar({ data, setData, onEdit }) {
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 9, background: CHK_TONE.meeting.soft, border: '1px solid ' + CHK_TONE.meeting.line, borderRadius: 8, padding: '7px 9px' }}>
           <span style={{ fontSize: 15, fontWeight: 700, color: CHK_TONE.meeting.fg, flexShrink: 0 }}>🗓 회의 추가</span>
-          <input value={newMeet} onChange={e => setNewMeet(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') addMeeting(); }} placeholder="회의 제목 입력 (색상이 다르게 표시됩니다)" style={{ flex: 1, minWidth: 140, fontSize: 16, padding: '6px 8px', border: '1px solid #D8D3CC', borderRadius: 7, outline: 'none', fontFamily: 'inherit', color: '#1A1614' }} />
-          <OwnerChips selected={newMeetOwners} onToggle={m => setNewMeetOwners(o => toggleIn(o, m))} sm />
-          <button onClick={addMeeting} style={{ fontSize: 16, fontWeight: 700, padding: '6px 12px', borderRadius: 7, border: 'none', background: CHK_TONE.meeting.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>+ 회의</button>
+          <span style={{ flex: 1, minWidth: 140, fontSize: 14.5, color: '#6E6863' }}>회의명 · 참석자 · 시간을 입력해 등록하면, 회의록 등록까지 이어집니다.</span>
+          <button onClick={() => setMeetDay(TODAY)} style={{ fontSize: 16, fontWeight: 700, padding: '6px 12px', borderRadius: 7, border: 'none', background: CHK_TONE.meeting.fg, color: 'white', cursor: 'pointer', flexShrink: 0, fontFamily: 'inherit' }}>+ 회의 등록</button>
         </div>
         {undated.length === 0 ? <div style={{ fontSize: 14.5, color: '#A29C95' }}>모든 체크리스트에 실행일이 지정되었습니다.</div> :
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -1841,6 +2232,7 @@ function TeamCalendar({ data, setData, onEdit }) {
           </div>}
       </div>
       {openChk && <ChecklistModal chkId={openChk} data={data} setData={setData} onClose={() => setOpenChk(null)} />}
+      {meetDay && <MeetingAddModal data={data} setData={setData} date={meetDay} onClose={() => setMeetDay(null)} />}
       {openDay && <DayDetailModal date={openDay} data={data} setData={setData} onEdit={onEdit} onClose={() => setOpenDay(null)} />}
       {roundup && <RoundupModal data={data} start={roundup.start} end={roundup.end} label={roundup.label} initialOwner={ownerFilter} onEdit={onEdit} onClose={() => setRoundup(null)} />}
     </Card>
@@ -1857,7 +2249,7 @@ function TabTeam({ data, setData, goTab, onEdit }) {
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <div style={{ fontSize: 21, fontWeight: 700, color: G }}>팀 현황</div>
+        <div style={{ fontSize: 21, fontWeight: 700, color: G }}>홈</div>
         <button onClick={() => setShowMem(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 16, fontWeight: 600 }}>👥 팀원 관리</button>
       </div>
       {showMem && <MemberModal data={data} setData={setData} onClose={() => setShowMem(false)} />}
@@ -1870,7 +2262,9 @@ function TabTeam({ data, setData, goTab, onEdit }) {
         {MEMBERS.map(m => {
           const owned = all.filter(x => ownersOf(x).includes(m)); const supp = all.filter(x => x.support && x.support.some(s => s.m === m));
           const subCnt = data.subplans.filter(s => ownersOf(s).includes(m)).length; const done = data.subplans.filter(s => ownersOf(s).includes(m) && s.stage === '완료').length;
-          return (<Card key={m} onClick={() => setProfileMem(m)} style={{ cursor: 'pointer' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 19 }}>{m}</div><div style={{ fontSize: 15, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 15, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 20, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div><button onClick={e => { e.stopPropagation(); setTodayFor(m); }} title={TODAY + ' 기준 ' + m + ' 담당 업무를 모아 봅니다'} style={{ width: '100%', marginBottom: 9, padding: '7px 0', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 15.5, fontWeight: 700, fontFamily: 'inherit' }}>📆 금일 업무보기</button><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>서포트</div></div></div></Card>);
+          const rMiss = routineMisses(data, m, TODAY, 30); const rToday = routinesFor(data, m, TODAY); const rDone = rToday.filter(r => routineDone(data, r.id, TODAY)).length; const mNote = pendingMeetingNotes(data, m, TODAY);
+          const alertMsg = [rMiss.length ? '반복업무 미완료 ' + rMiss.length + '건 (' + rMiss[0].date + ' ' + rMiss[0].r.name + ' 등)' : '', mNote.length ? '회의록 미등록 ' + mNote.length + '건' : ''].filter(Boolean).join(' · ');
+          return (<Card key={m} onClick={() => setProfileMem(m)} style={{ cursor: 'pointer', border: rMiss.length ? '1px solid #FCA5A5' : undefined }}><div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}><div style={{ width: 44, height: 44, borderRadius: '50%', background: photoOf(m) ? 'transparent' : G, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, flexShrink: 0 }}>{photoOf(m) ? <img src={photoOf(m)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : AV[m]}</div><div><div style={{ fontWeight: 700, fontSize: 19, display: 'flex', alignItems: 'center', gap: 5 }}>{m}{alertMsg && <span onClick={e => { e.stopPropagation(); setTodayFor(m); }} title={alertMsg} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: '#D9483B', color: 'white', fontSize: 14, fontWeight: 900, cursor: 'pointer' }}>!</span>}</div><div style={{ fontSize: 15, color: '#6E6863' }}>{ROLES[m]}</div></div><div style={{ marginLeft: 'auto', textAlign: 'right' }}><div style={{ fontSize: 15, color: '#6E6863' }}>완료율</div><div style={{ fontSize: 20, fontWeight: 700, color: G }}>{subCnt ? pct(done, subCnt) : 0}%</div></div></div>{alertMsg && <div onClick={e => { e.stopPropagation(); setTodayFor(m); }} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '5px 9px', marginBottom: 8, cursor: 'pointer' }}><span style={{ fontSize: 15, fontWeight: 900, color: '#D9483B' }}>❗</span><span style={{ fontSize: 14, fontWeight: 700, color: '#B91C1C', lineHeight: 1.35 }}>{alertMsg}</span></div>}{rToday.length > 0 && <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8, padding: '5px 9px', marginBottom: 8 }}><span style={{ fontSize: 14, fontWeight: 800, color: '#9A3412' }}>🔁 오늘 반복업무 {rDone}/{rToday.length}</span><span style={{ fontSize: 13.5, color: '#B45309', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{rToday.filter(r => !routineDone(data, r.id, TODAY)).map(r => r.name).join(', ')}</span></div>}<button onClick={e => { e.stopPropagation(); setTodayFor(m); }} title={TODAY + ' 기준 ' + m + ' 담당 업무를 모아 봅니다'} style={{ width: '100%', marginBottom: 9, padding: '7px 0', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 15.5, fontWeight: 700, fontFamily: 'inherit' }}>📆 금일 업무보기</button><Bar v={done} m={subCnt || 1} h={5} /><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}><div style={{ textAlign: 'center', background: '#F5F4F2', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: G }}>{owned.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>담당</div></div><div style={{ textAlign: 'center', background: '#FAF6EE', borderRadius: 8, padding: '8px 4px' }}><div style={{ fontSize: 22, fontWeight: 700, color: GO }}>{supp.length}</div><div style={{ fontSize: 14, color: '#6E6863' }}>서포트</div></div></div></Card>);
         })}
           </div>
           <TeamCalendar data={data} setData={setData} onEdit={onEdit} />
@@ -2069,6 +2463,7 @@ function TabProgress({ data, setData, onEdit }) {
         <button onClick={() => setShowProjOrder(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 16, fontWeight: 600 }}>⠿ 프로젝트 순서</button>
         <button onClick={() => setShowCatOrder(true)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 16, fontWeight: 600 }}>⠿ 분류 순서 변경</button>
       </div>
+      <RoutineListPanel data={data} setData={setData} />
       <FilterBar value={filter} onChange={setFilter} />
       {showCatOrder && <CategoryOrderModal data={data} setData={setData} onClose={() => setShowCatOrder(false)} />}
       {showProjOrder && <ProjectOrderModal data={data} setData={setData} onClose={() => setShowProjOrder(false)} />}
@@ -2624,12 +3019,13 @@ function MainKpiModal({ data, setData, onClose, edit }) {
   const [roasAuto, setRoasAuto] = useState(edit ? !!edit.roasAuto : false);
   const [startMonth, setStartMonth] = useState(edit ? (edit.startMonth || '') : '');
   const [endMonth, setEndMonth] = useState(edit ? (edit.endMonth || '') : '');
+  const [salesMetric, setSalesMetric] = useState(edit ? (edit.salesMetric || '') : '');
   const save = () => {
     if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
     const u = roasAuto ? '%' : (unit.trim() || '개');
     if (startMonth && endMonth && startMonth > endMonth) { alert('적용 시작월이 종료월보다 늦습니다'); return; }
-    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto, kakaoAuto, roasAuto, startMonth, endMonth } : mk) }));
-    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto, roasAuto, startMonth, endMonth }] }));
+    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto, kakaoAuto, roasAuto, salesMetric, startMonth, endMonth } : mk) }));
+    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto, roasAuto, salesMetric, startMonth, endMonth }] }));
     onClose();
   };
   return (
@@ -2644,6 +3040,11 @@ function MainKpiModal({ data, setData, onClose, edit }) {
         <div style={{ fontSize: 10, color: '#A29C95', marginTop: 6, lineHeight: 1.5 }}>집계 기간이 이 범위와 겹치는 달에만 이 KPI가 표시됩니다. 시작월만 넣으면 그 달부터 계속, 비워두면 모든 기간에 표시돼요.</div>
       </div>
       <div style={{ background: '#ECFDF5', borderRadius: 10, padding: '10px 12px', fontSize: 11, color: '#1FA463', lineHeight: 1.5 }}>📡 KPI 이름에 "매출"이 들어가면 네이버 매출이 <b>자동 연동</b>됩니다. 집계기간에 해당하는 일별 매출이 달성값에 합산돼요.</div>
+      <div style={{ background: '#ECFDF5', borderRadius: 10, padding: '10px 12px' }}>
+        <Lbl c="📡 네이버 매출탭 지표 연동 (선택)" />
+        <Sel value={salesMetric} onChange={setSalesMetric} opts={[{ v: '', l: '자동 판별 (이름으로: 방문·객단가·전환율·결제건수)' }, { v: 'visitors', l: '총 방문수 (기간 합산)' }, { v: 'aov', l: '객단가 (기간 매출 ÷ 결제건수)' }, { v: 'orders', l: '결제건수 (기간 합산)' }, { v: 'conversion', l: '전환율 (결제건수 ÷ 방문자수)' }, { v: 'none', l: '연동 안 함' }]} />
+        <div style={{ fontSize: 10, color: '#1FA463', marginTop: 6, lineHeight: 1.5 }}>연동하면 이 KPI의 달성값은 <b>네이버 매출탭 일별 데이터</b>에서 자동으로 계산됩니다(연결 KPI·수동 입력값은 무시). 목표값은 아래 월별 목표에 그대로 입력하세요.</div>
+      </div>
       <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, background: '#FEF9E7', borderRadius: 10, padding: '10px 12px', cursor: 'pointer' }}>
         <input type="checkbox" checked={kakaoAuto} onChange={e => setKakaoAuto(e.target.checked)} style={{ marginTop: 2 }} />
         <span style={{ fontSize: 11, color: '#B8860B', lineHeight: 1.5 }}>💬 <b>카카오 친구 연동</b> — 켜면 카카오 채널 누적 친구수(기간 종료일 시점)가 달성값에 합산됩니다. 누적 고객·전체 회원 같은 KPI에 사용하세요.</span>
@@ -2724,7 +3125,7 @@ function KpiLinkPanel({ kpi, days, kakaoCoupons, adsDays, data, setData, onSave,
   const coverage = (() => { const ds = (days || []).map(d => d.date).sort(); return ds.length ? ds[0] + ' ~ ' + ds[ds.length - 1] : '없음'; })();
   const SALES_METRICS = [['productRevenue', '상품별 매출'], ['productRevenueShare', '상품 매출 비중(%)'], ['productQtyShare', '판매 점유율(%)'], ['conversion', '전환율'], ['visitors', '방문자수'], ['orders', '결제건수'], ['aov', '객단가'], ['subRevenue', '정기구독 매출'], ['subActive', '정기구독자 수(활성)'], ['subNew', '신규 구독']];
   const KAKAO_METRICS = [['kakaoTotal', '누적 친구수'], ['kakaoNew', '신규 친구'], ['kakaoNet', '순증감'], ['couponWin', '쿠폰 당첨수(유입 근사)'], ['couponUse', '쿠폰 사용수']];
-  const ADS_METRICS = [['adRoas', '광고 ROAS(%) · 통합'], ['adRoasShop', '쇼핑검색광고 ROAS(%)'], ['adRoasBoost', '애드부스트 ROAS(%)'], ['adRevenue', '광고 전환매출'], ['adSpend', '광고비'], ['adConv', '광고 구매전환수']];
+  const ADS_METRICS = [['adRoas', '광고 ROAS(%) · 통합'], ['adRoasShop', '쇼핑검색광고 ROAS(%)'], ['adRoasBoost', '애드부스트 ROAS(%)'], ['adRevenue', '광고 전환매출'], ['adSpend', '광고비'], ['adConv', '광고 구매전환수'], ['adCtr', '전체 클릭률 CTR(%)'], ['adBrandCtr', '⭐ 브랜드검색 클릭률 CTR(%)'], ['adBrandClicks', '브랜드검색 클릭수'], ['adBrandImp', '브랜드검색 노출수'], ['adBrandSpend', '브랜드검색 광고비'], ['adBrandRoas', '브랜드검색 ROAS(%)']];
   const isCouponMetric = m => ['couponApply', 'couponWin', 'couponUse'].indexOf(m) >= 0;
   const METRICS = srcTab === 'kakao' ? KAKAO_METRICS : srcTab === 'ads' ? ADS_METRICS : SALES_METRICS;
   const pickTab = t => { setSrcTab(t); setMetric(t === 'kakao' ? ((L && L.type === 'kakao' && L.metric) || 'kakaoNew') : t === 'ads' ? ((L && L.type === 'ads' && L.metric) || 'adRoas') : ((L && L.type === 'sales' && L.metric) || 'productRevenue')); };
@@ -2873,6 +3274,131 @@ function KpiLinkPanel({ kpi, days, kakaoCoupons, adsDays, data, setData, onSave,
   );
 }
 
+// ── 목표 공식 카드 (index_136) ───────────────────────────────────
+// 월매출 = 결제건수 × 객단가 / 결제건수 = (방문자수 × 전환율) + (고객자산수 × 재구매율)
+const GF_ROWS = [
+  ['revenue', '월 매출', '원', 0, '#B45309'],
+  ['orders', '월 결제 건수', '건', 0, '#B45309'],
+  ['aov', '평균 객단가(AOV)', '원', 0, '#B45309'],
+  ['visitors', '월간 방문자 수', '명', 0, '#2D5FE0'],
+  ['conversion', '본품 전환율', '%', 2, '#2D5FE0'],
+  ['assetCount', '고객자산 수(알림받기)', '명', 0, '#7C3AED'],
+  ['repeatRate', '재구매율', '%', 2, '#7C3AED'],
+  ['roas', '목표 ROAS', '%', 0, '#1FA463'],
+];
+const gfNum = (v, dec) => { const x = Number(v) || 0; return dec ? (Math.round(x * 100) / 100).toLocaleString() : Math.round(x).toLocaleString(); };
+const gfEok = v => { const x = Number(v) || 0; return x >= 100000000 ? (Math.round(x / 1000000) / 100) + '억' : (x >= 10000 ? Math.round(x / 10000).toLocaleString() + '만' : x.toLocaleString()); };
+function GoalFormulaCard({ data, setData, mainKpis, cur, mkTarget, mkAchieved, period }) {
+  const [open, setOpen] = useState(true);
+  const [edit, setEdit] = useState(false);
+  const gf = { ...DEFAULT_GOAL_FORMULA, ...(data.goalFormula || {}) };
+  const L = { ...DEFAULT_GOAL_FORMULA.linked, ...(gf.linked || {}) };
+  const setGF = patch => setData(d => ({ ...d, goalFormula: { ...DEFAULT_GOAL_FORMULA, ...(d.goalFormula || {}), ...patch } }));
+  const setLink = (k, v) => setData(d => { const g = { ...DEFAULT_GOAL_FORMULA, ...(d.goalFormula || {}) }; return { ...d, goalFormula: { ...g, linked: { ...DEFAULT_GOAL_FORMULA.linked, ...(g.linked || {}), [k]: v } } }; });
+  const N = v => Number(v) || 0;
+  const aov = N(gf.aov), conv = N(gf.conversion), asset = N(gf.assetCount), rep = N(gf.repeatRate), roasT = N(gf.roas);
+  const repeatOrders = Math.round(asset * rep / 100);
+  let revenue = N(gf.revenue), orders = N(gf.orders), visitors = N(gf.visitors), newOrders = 0;
+  if (gf.driver === 'visitors') { newOrders = Math.round(visitors * conv / 100); orders = newOrders + repeatOrders; revenue = orders * aov; }
+  else if (gf.driver === 'orders') { revenue = orders * aov; newOrders = Math.max(0, orders - repeatOrders); visitors = conv ? Math.round(newOrders / (conv / 100)) : 0; }
+  else { orders = aov ? Math.round(revenue / aov) : 0; newOrders = Math.max(0, orders - repeatOrders); visitors = conv ? Math.round(newOrders / (conv / 100)) : 0; }
+  const ym = gf.month || TODAY.slice(0, 7);
+  const dim = (() => { const [y, m] = ym.split('-').map(Number); return (y && m) ? new Date(y, m, 0).getDate() : 30; })();
+  const perDay = dim ? Math.round(orders / dim) : 0;
+  const adBudget = roasT ? Math.round(revenue / (roasT / 100)) : 0;
+  const need = { revenue: revenue, orders: orders, aov: aov, visitors: visitors, conversion: conv, assetCount: asset, repeatRate: rep, roas: roasT };
+  const DRIVERS = [['revenue', '월 매출부터'], ['orders', '결제 건수부터'], ['visitors', '방문자 수부터']];
+  const mkOf = id => (mainKpis || []).find(m => String(m.id) === String(id)) || null;
+  const box = { background: 'white', border: '1px solid #FDE68A', borderRadius: 10, padding: '8px 10px', minWidth: 120, flex: '1 1 120px' };
+  const opBig = { fontSize: 19, fontWeight: 800, color: '#B45309', alignSelf: 'center', flexShrink: 0 };
+  const numIn = { width: '100%', padding: '7px 8px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 14, boxSizing: 'border-box' };
+  return (
+    <Card style={{ marginBottom: 16, borderLeft: '4px solid #F59E0B', background: '#FFFBEB' }}>
+      <div onClick={() => setOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: 15, fontWeight: 800, color: '#B45309' }}>🎯 목표 공식 (KPI 싱크)</span>
+        <span style={{ fontSize: 11, color: '#92400E' }}>{ym} · 월 매출 {gfEok(revenue)} = 결제 {gfNum(orders)}건 × 객단가 {gfNum(aov)}원</span>
+        <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{open ? '▲ 접기' : '▼ 펼치기'}</span>
+      </div>
+      {open && (<div style={{ marginTop: 12 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'stretch', marginBottom: 10 }}>
+          <div style={box}><div style={{ fontSize: 10, color: '#92400E' }}>월 결제 건수</div><div style={{ fontSize: 18, fontWeight: 800, color: '#B45309' }}>{gfNum(orders)}건</div><div style={{ fontSize: 10, color: '#A29C95' }}>하루 {gfNum(perDay)}건</div></div>
+          <span style={opBig}>×</span>
+          <div style={box}><div style={{ fontSize: 10, color: '#92400E' }}>평균 객단가 (AOV)</div><div style={{ fontSize: 18, fontWeight: 800, color: '#B45309' }}>{gfNum(aov)}원</div><div style={{ fontSize: 10, color: '#A29C95' }}>{gfEok(aov)}</div></div>
+          <span style={opBig}>=</span>
+          <div style={{ ...box, background: '#FEF3C7' }}><div style={{ fontSize: 10, color: '#92400E' }}>월 매출</div><div style={{ fontSize: 18, fontWeight: 800, color: '#B45309' }}>{gfEok(revenue)}</div><div style={{ fontSize: 10, color: '#A29C95' }}>{gfNum(revenue)}원</div></div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'stretch', marginBottom: 12 }}>
+          <div style={{ ...box, borderColor: '#BFDBFE' }}><div style={{ fontSize: 10, color: '#2D5FE0' }}>01 월간 방문자 수</div><div style={{ fontSize: 16, fontWeight: 800, color: '#2D5FE0' }}>{gfNum(visitors)}명</div></div>
+          <span style={{ ...opBig, color: '#2D5FE0' }}>×</span>
+          <div style={{ ...box, borderColor: '#BFDBFE' }}><div style={{ fontSize: 10, color: '#2D5FE0' }}>02 본품 전환 엔진</div><div style={{ fontSize: 16, fontWeight: 800, color: '#2D5FE0' }}>{gfNum(conv, 1)}% 전환</div><div style={{ fontSize: 10, color: '#A29C95' }}>신규 {gfNum(newOrders)}건</div></div>
+          <span style={{ ...opBig, color: '#7C3AED' }}>+</span>
+          <div style={{ ...box, borderColor: '#DDD6FE' }}><div style={{ fontSize: 10, color: '#7C3AED' }}>03 LTV 극대화 엔진</div><div style={{ fontSize: 16, fontWeight: 800, color: '#7C3AED' }}>{gfNum(asset)}명 자산</div></div>
+          <span style={{ ...opBig, color: '#7C3AED' }}>×</span>
+          <div style={{ ...box, borderColor: '#DDD6FE' }}><div style={{ fontSize: 10, color: '#7C3AED' }}>재구매율</div><div style={{ fontSize: 16, fontWeight: 800, color: '#7C3AED' }}>{gfNum(rep, 1)}%</div><div style={{ fontSize: 10, color: '#A29C95' }}>기존 {gfNum(repeatOrders)}건</div></div>
+          <span style={{ ...opBig, color: '#1FA463' }}>▶</span>
+          <div style={{ ...box, borderColor: '#A7F3D0', background: '#ECFDF5' }}><div style={{ fontSize: 10, color: '#1FA463' }}>04 목표 ROAS</div><div style={{ fontSize: 16, fontWeight: 800, color: '#1FA463' }}>{gfNum(roasT)}%</div><div style={{ fontSize: 10, color: '#A29C95' }}>허용 광고비 {gfEok(adBudget)}</div></div>
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 10 }}>
+          <span style={{ fontSize: 11, color: '#92400E', fontWeight: 700 }}>기준값</span>
+          {DRIVERS.map(([v, l]) => <button key={v} onClick={() => setGF({ driver: v })} style={{ padding: '4px 10px', borderRadius: 20, border: '1px solid ' + (gf.driver === v ? '#B45309' : '#FDE68A'), background: gf.driver === v ? '#B45309' : 'white', color: gf.driver === v ? 'white' : '#92400E', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{l}</button>)}
+          <button onClick={() => setEdit(e => !e)} style={{ marginLeft: 'auto', padding: '4px 12px', borderRadius: 7, border: 'none', background: edit ? '#92400E' : '#F59E0B', color: 'white', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{edit ? '입력 닫기' : '✏️ 목표 수정'}</button>
+        </div>
+        {edit && (
+          <div style={{ background: 'white', border: '1px solid #FDE68A', borderRadius: 10, padding: 12, marginBottom: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
+              <div><Lbl c="목표 월" />{inp(gf.month || TODAY.slice(0, 7), v => setGF({ month: v }), 'month')}</div>
+              {GF_ROWS.map(([k, label, unit]) => {
+                const derived = (gf.driver === 'revenue' && (k === 'orders' || k === 'visitors')) || (gf.driver === 'orders' && (k === 'revenue' || k === 'visitors')) || (gf.driver === 'visitors' && (k === 'revenue' || k === 'orders'));
+                return (
+                  <div key={k}>
+                    <Lbl c={label + ' (' + unit + ')' + (derived ? ' · 자동' : '')} />
+                    {derived ? <div style={{ ...numIn, background: '#F5F4F2', color: '#6E6863' }}>{gfNum(need[k], k === 'conversion' || k === 'repeatRate' ? 1 : 0)}</div>
+                      : <NumInput value={gf[k]} onCommit={v => setGF({ [k]: Number(v) || 0 })} style={numIn} />}
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ fontSize: 10, color: '#92400E', marginTop: 8, lineHeight: 1.6 }}>공식 · <b>월 매출 = 결제건수 × 객단가</b> / <b>결제건수 = (방문자수 × 전환율) + (고객자산수 × 재구매율)</b> / <b>허용 광고비 = 월 매출 ÷ 목표 ROAS</b>. 기준값으로 고른 항목만 직접 입력하고 나머지는 자동 계산됩니다.</div>
+          </div>
+        )}
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#92400E', marginBottom: 6 }}>📊 지표별 목표 · 현재 · 메인 KPI 연동</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 8 }}>
+          {GF_ROWS.map(([k, label, unit, dec, color]) => {
+            const mk = mkOf(L[k]);
+            const tgt = mk ? mkTarget(mk) : need[k];
+            const now = mk ? mkAchieved(mk) : (cur[k] == null ? null : cur[k]);
+            const gap = (mk && need[k]) ? Math.abs(tgt - need[k]) / need[k] : 0;
+            const sync = mk ? (gap <= 0.02 ? 'ok' : 'off') : '';
+            const p = tgt > 0 && now != null ? pct(now, tgt) : 0;
+            const hit = tgt > 0 && now != null && now >= tgt;
+            return (
+              <div key={k} style={{ background: 'white', border: '1px solid ' + (sync === 'off' ? '#FCA5A5' : '#FDE68A'), borderRadius: 10, padding: '9px 11px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 800, color: color }}>{label}</span>
+                  {mk && <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 8, background: sync === 'ok' ? '#ECFDF5' : '#FEF2F2', color: sync === 'ok' ? '#1FA463' : '#DC2626', fontWeight: 700 }}>{sync === 'ok' ? '✓ 공식 일치' : '⚠ 공식 불일치'}</span>}
+                  {hit && <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 8, background: '#ECFDF5', color: '#1FA463', fontWeight: 700 }}>달성</span>}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: now == null ? '#C4BEB6' : (hit ? '#1FA463' : '#3A3631') }}>{now == null ? '—' : gfNum(now, dec)}</span>
+                  <span style={{ fontSize: 10.5, color: '#A29C95' }}>/ 목표 {gfNum(tgt, dec)} {unit}</span>
+                </div>
+                <Bar v={now || 0} m={tgt || 1} h={5} />
+                <div style={{ fontSize: 9.5, color: '#A29C95', marginTop: 4, lineHeight: 1.5 }}>
+                  공식 필요값 {gfNum(need[k], dec)} {unit}{mk ? ' · 연동 KPI 목표 ' + gfNum(tgt, dec) : ''} · {p}%
+                </div>
+                <div style={{ marginTop: 5 }}>
+                  <Sel value={L[k] == null ? '' : String(L[k])} onChange={v => setLink(k, v)} opts={[{ v: '', l: '메인 KPI 연동 안 함 (공식/실적 사용)' }].concat((mainKpis || []).map(m => ({ v: String(m.id), l: '⭐ ' + m.name })))} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ fontSize: 10, color: '#92400E', marginTop: 8, lineHeight: 1.6 }}>연동한 지표는 <b>메인 KPI의 목표·달성값</b>을 그대로 씁니다. 연동 안 한 지표는 <b>공식 자동 계산값</b>을 목표로, <b>네이버 매출탭 실적</b>({period})을 현재값으로 보여줍니다. 연동 KPI의 목표가 공식이 요구하는 값과 2% 넘게 벌어지면 <b style={{ color: '#DC2626' }}>⚠ 공식 불일치</b>로 표시돼요.</div>
+      </div>)}
+    </Card>
+  );
+}
+
 function TabKpi({ data, setData }) {
   const [pStart, setPStart] = useState(monthRange(0).start);
   const [pEnd, setPEnd] = useState(monthRange(0).end);
@@ -2889,9 +3415,9 @@ function TabKpi({ data, setData }) {
   const [adsDays, setAdsDays] = useState([]);
   const [linkCfg, setLinkCfg] = useState(null);
   const [naverInfo, setNaverInfo] = useState(null);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-sales.json?t=' + Date.now()).then(res => res.ok ? res.json() : null).then(j => { if (!alive || !j) return; const months = Array.isArray(j.months) ? j.months : (j.month ? [j.month] : []); const all = []; months.forEach(m => (m.daily || []).forEach(d => { if (d && d.date) all.push({ date: d.date, revenue: d.revenue || 0 }); })); setNaverDaily(all); const subAll = []; (Array.isArray(j.days) ? j.days : []).forEach(d => { if (d && d.key) { const n = (d.subscribers && d.subscribers.notify) || {}; subAll.push({ date: d.key, total: n.total || 0, added: n.added || 0 }); } }); setNaverSubDays(subAll); setNaverDays((Array.isArray(j.days) ? j.days : []).map(dd => ({ date: dd.key, summary: dd.summary || {}, products: dd.products || [], subscription: dd.subscription || null })).filter(dd => dd.date)); const ym = (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })(); const cur = months.find(m => (m.key || '').slice(0, 7) === ym) || months[0]; if (cur && cur.summary && cur.summary.revenue) setNaverRev(cur.summary.revenue.value || 0); setNaverInfo({ label: cur ? (cur.label || '') : '', updatedAt: j.updatedAt || '' }); }).catch(() => {}); return () => { alive = false; }; }, []);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); setKakaoCoupons(((j.coupons && j.coupons.list) || []).filter(x => x.couponId != null && x.stats).map(x => ({ id: String(x.couponId), title: x.title || '', status: x.status || '', period: ((x.startDate || '') + '~' + (x.expireDate || '')).replace(/\./g, '/'), sd: (x.startDate || '').replace(/\./g, '-'), ed: (x.expireDate || '9999.12.31').replace(/\./g, '-'), apply: x.stats['응모수'] || 0, win: x.stats['당첨수'] || 0, use: x.stats['사용수'] || 0, daily: (x.daily || []).filter(dd => dd && dd.date).map(dd => ({ date: dd.date, win: dd['당첨수'] || 0, use: dd['사용수'] || 0 })) }))); }).catch(() => {}); return () => { alive = false; }; }, []);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-ads.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !Array.isArray(j.days)) return; setAdsDays(j.days.map(x => { let sp = 0, rv = 0, pc = 0, cl = 0; let spS = 0, rvS = 0, spB = 0, rvB = 0; (x.groups || []).forEach(g => { const s = g.spend || 0, r = g.convRevenue || 0; sp += s; rv += r; pc += g.purchaseConv || 0; cl += g.clicks || 0; const cn = g.campaignName || ''; if (/advoost|애드부스트/i.test(cn)) { spB += s; rvB += r; } else if (/쇼핑\s*검색|쇼핑검색/.test(cn)) { spS += s; rvS += r; } }); return { date: x.date, spend: sp, rev: rv, conv: pc, clicks: cl, spendShop: spS, revShop: rvS, spendBoost: spB, revBoost: rvB }; }).filter(x => x.date).sort((a, b) => a.date < b.date ? -1 : 1)); }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; ghFetch('data/naver-sales.json').then(res => res.ok ? res.json() : null).then(j => { if (!alive || !j) return; const months = Array.isArray(j.months) ? j.months : (j.month ? [j.month] : []); const all = []; months.forEach(m => (m.daily || []).forEach(d => { if (d && d.date) all.push({ date: d.date, revenue: d.revenue || 0 }); })); setNaverDaily(all); const subAll = []; (Array.isArray(j.days) ? j.days : []).forEach(d => { if (d && d.key) { const n = (d.subscribers && d.subscribers.notify) || {}; subAll.push({ date: d.key, total: n.total || 0, added: n.added || 0 }); } }); setNaverSubDays(subAll); setNaverDays((Array.isArray(j.days) ? j.days : []).map(dd => ({ date: dd.key, summary: dd.summary || {}, products: dd.products || [], subscription: dd.subscription || null })).filter(dd => dd.date)); const ym = (() => { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })(); const cur = months.find(m => (m.key || '').slice(0, 7) === ym) || months[0]; if (cur && cur.summary && cur.summary.revenue) setNaverRev(cur.summary.revenue.value || 0); setNaverInfo({ label: cur ? (cur.label || '') : '', updatedAt: j.updatedAt || '' }); }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; ghFetch('data/kakao-stats.json').then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !j.friends) return; setKakaoDaily((j.friends.daily || []).map(x => ({ date: x.date, cum: x.cumulativeFriends || 0, add: x.newFriends || 0, net: x.netChange == null ? 0 : x.netChange })).sort((a, b) => a.date < b.date ? -1 : 1)); setKakaoCoupons(((j.coupons && j.coupons.list) || []).filter(x => x.couponId != null && x.stats).map(x => ({ id: String(x.couponId), title: x.title || '', status: x.status || '', period: ((x.startDate || '') + '~' + (x.expireDate || '')).replace(/\./g, '/'), sd: (x.startDate || '').replace(/\./g, '-'), ed: (x.expireDate || '9999.12.31').replace(/\./g, '-'), apply: x.stats['응모수'] || 0, win: x.stats['당첨수'] || 0, use: x.stats['사용수'] || 0, daily: (x.daily || []).filter(dd => dd && dd.date).map(dd => ({ date: dd.date, win: dd['당첨수'] || 0, use: dd['사용수'] || 0 })) }))); }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; ghFetch('data/naver-ads.json').then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !Array.isArray(j.days)) return; setAdsDays(j.days.map(x => { let sp = 0, rv = 0, pc = 0, cl = 0, im = 0; let spS = 0, rvS = 0, spB = 0, rvB = 0; let spR = 0, rvR = 0, clR = 0, imR = 0, pcR = 0; (x.groups || []).forEach(g => { const s = g.spend || 0, r = g.convRevenue || 0, c = g.clicks || 0, ip = g.impressions || 0, pv = g.purchaseConv || 0; sp += s; rv += r; pc += pv; cl += c; im += ip; const cn = (g.campaignName || '') + ' ' + (g.adGroupName || '') + ' ' + (g.campaignType || ''); if (/브랜드\s*검색|브랜드검색|brand\s*search|brandsearch|BRAND_SEARCH/i.test(cn)) { spR += s; rvR += r; clR += c; imR += ip; pcR += pv; } else if (/advoost|애드부스트/i.test(cn)) { spB += s; rvB += r; } else if (/쇼핑\s*검색|쇼핑검색/.test(cn)) { spS += s; rvS += r; } }); return { date: x.date, spend: sp, rev: rv, conv: pc, clicks: cl, imp: im, spendShop: spS, revShop: rvS, spendBoost: spB, revBoost: rvB, spendBrand: spR, revBrand: rvR, clicksBrand: clR, impBrand: imR, convBrand: pcR }; }).filter(x => x.date).sort((a, b) => a.date < b.date ? -1 : 1)); }).catch(() => {}); return () => { alive = false; }; }, []);
   const logs = data.kpiLogs || [];
   const mainKpis = data.mainKpis || [];
   const naverInRange = naverDaily.filter(d => d.date && d.date >= pStart && d.date <= pEnd).reduce((a, d) => a + (d.revenue || 0), 0);
@@ -2902,6 +3428,25 @@ function TabKpi({ data, setData }) {
   const isSubKpi = mk => { const n = mk.name || ''; return n.indexOf('구독') >= 0 || n.indexOf('알림') >= 0 || n.indexOf('고객') >= 0; };
   const kakaoTotalAtEnd = (() => { const le = kakaoDaily.filter(d => d.date && d.date <= pEnd); if (!le.length) return 0; le.sort((a, b) => a.date < b.date ? -1 : 1); return le[le.length - 1].cum || 0; })();
   const mktCostInRange = (data.payments || []).filter(p => p.paidDate && p.paidDate >= pStart && p.paidDate <= pEnd).reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  // ── 네이버 매출탭 지표 자동 연동 (index_136) ─────────────────────
+  const nAgg = (() => {
+    const rows = naverDays.filter(d => d.date >= pStart && d.date <= pEnd);
+    const sf = f => rows.reduce((a, r) => a + (((r.summary || {})[f] || {}).value || 0), 0);
+    const rv = sf('revenue'), o = sf('orders'), v = sf('visitors');
+    return { days: rows.length, revenue: rv, orders: o, visitors: v, aov: o ? Math.round(rv / o) : 0, conversion: v ? Math.round(o / v * 10000) / 100 : 0 };
+  })();
+  const SALES_AUTO_LABEL = { visitors: '방문자수', orders: '결제건수', aov: '객단가', conversion: '전환율', revenue: '매출' };
+  const autoMetricOf = mk => {
+    if (!mk) return '';
+    if (mk.salesMetric === 'none') return '';
+    if (mk.salesMetric) return mk.salesMetric;
+    const n = mk.name || '';
+    if (/객단가|AOV/i.test(n)) return 'aov';
+    if (/방문/.test(n)) return 'visitors';
+    if (/전환율/.test(n)) return 'conversion';
+    if (/결제\s*건수|주문\s*건수/.test(n)) return 'orders';
+    return '';
+  };
   const rangeMonths = monthsInRange(pStart, pEnd);
   const isSingleMonth = rangeMonths.length === 1;
   const kpiActive = k => { if (!k) return true; if (k.startMonth && (k.startMonth + '-01') > pEnd) return false; if (k.endMonth && (k.endMonth + '-31') < pStart) return false; return true; };
@@ -2909,7 +3454,7 @@ function TabKpi({ data, setData }) {
   const sumForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart).reduce((a, l) => a + l.value, 0);
   const logsForKpi = kid => logs.filter(l => l.kpiId === kid && l.periodStart <= pEnd && l.periodEnd >= pStart);
   const logsForPlan = planId => logs.filter(l => l.planId === planId && l.periodStart <= pEnd && l.periodEnd >= pStart);
-  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가', subRevenue: '정기구독 매출', subActive: '정기구독자 수(활성)', subNew: '신규 구독', kakaoTotal: '누적 친구수', kakaoNew: '신규 친구', kakaoNet: '순증감', couponApply: '쿠폰 응모수', couponWin: '쿠폰 당첨수(유입 근사)', couponUse: '쿠폰 사용수', adRoas: '광고 ROAS(통합)', adRoasShop: '쇼핑검색광고 ROAS', adRoasBoost: '애드부스트 ROAS', adSpend: '광고비', adRevenue: '광고 전환매출', adConv: '광고 구매전환수' };
+  const METRIC_DEF = { productRevenue: '상품별 매출', productRevenueShare: '상품 매출 비중', productQtyShare: '판매 점유율', conversion: '전환율', visitors: '방문자수', orders: '결제건수', aov: '객단가', subRevenue: '정기구독 매출', subActive: '정기구독자 수(활성)', subNew: '신규 구독', kakaoTotal: '누적 친구수', kakaoNew: '신규 친구', kakaoNet: '순증감', couponApply: '쿠폰 응모수', couponWin: '쿠폰 당첨수(유입 근사)', couponUse: '쿠폰 사용수', adRoas: '광고 ROAS(통합)', adRoasShop: '쇼핑검색광고 ROAS', adRoasBoost: '애드부스트 ROAS', adSpend: '광고비', adRevenue: '광고 전환매출', adConv: '광고 구매전환수', adCtr: '전체 클릭률 CTR', adBrandCtr: '브랜드검색 클릭률 CTR', adBrandClicks: '브랜드검색 클릭수', adBrandImp: '브랜드검색 노출수', adBrandSpend: '브랜드검색 광고비', adBrandRoas: '브랜드검색 ROAS' };
   const resolveProdIds = L => { const gs = data.productGroups || []; const ids = ((L && L.productIds) || []).map(String); ((L && L.groupIds) || []).forEach(gid => { const gr = gs.find(x => String(x.id) === String(gid)); if (gr) (gr.productIds || []).forEach(pid => { const s = String(pid); if (ids.indexOf(s) < 0) ids.push(s); }); }); return ids; };
   const linkValue = k => {
     const L = k && k.link; if (!L || !L.type) return null;
@@ -2942,6 +3487,12 @@ function TabKpi({ data, setData }) {
       if (L.metric === 'adRoas') return spend ? Math.round(rev / spend * 100) : 0;
       if (L.metric === 'adRoasShop') { const sS = arows.reduce((a, r) => a + (r.spendShop || 0), 0); return sS ? Math.round(arows.reduce((a, r) => a + (r.revShop || 0), 0) / sS * 100) : 0; }
       if (L.metric === 'adRoasBoost') { const sB = arows.reduce((a, r) => a + (r.spendBoost || 0), 0); return sB ? Math.round(arows.reduce((a, r) => a + (r.revBoost || 0), 0) / sB * 100) : 0; }
+      if (L.metric === 'adCtr') { const ip = arows.reduce((a, r) => a + (r.imp || 0), 0); return ip ? Math.round(arows.reduce((a, r) => a + (r.clicks || 0), 0) / ip * 10000) / 100 : 0; }
+      if (L.metric === 'adBrandImp') return arows.reduce((a, r) => a + (r.impBrand || 0), 0);
+      if (L.metric === 'adBrandClicks') return arows.reduce((a, r) => a + (r.clicksBrand || 0), 0);
+      if (L.metric === 'adBrandSpend') return arows.reduce((a, r) => a + (r.spendBrand || 0), 0);
+      if (L.metric === 'adBrandCtr') { const ip = arows.reduce((a, r) => a + (r.impBrand || 0), 0); return ip ? Math.round(arows.reduce((a, r) => a + (r.clicksBrand || 0), 0) / ip * 10000) / 100 : 0; }
+      if (L.metric === 'adBrandRoas') { const sR = arows.reduce((a, r) => a + (r.spendBrand || 0), 0); return sR ? Math.round(arows.reduce((a, r) => a + (r.revBrand || 0), 0) / sR * 100) : 0; }
       return 0;
     }
     if (from > to) return 0;
@@ -2991,6 +3542,17 @@ function TabKpi({ data, setData }) {
   const sumForOutput = oid => plansOfOutput(oid).reduce((a, p) => a + ((p.kpis && p.kpis.length) ? kpisHere(p, oid).reduce((x, k) => x + kpiAchieved(k), 0) : (p.outputId === oid ? sumForPlan(p.id) : 0)), 0);
   const outOf = pid => { const p = data.plans.find(x => x.id === pid); return p ? data.outputs.find(o => o.id === p.outputId) : null; };
   const effTarget = kpi => { const t = (kpi && kpi.targets) || {}; const keys = Object.keys(t); if (keys.length) { return rangeMonths.reduce((acc, mo) => { const v = t[mo.key] || 0; return isSingleMonth ? v : acc + (mo.totalDays ? v / mo.totalDays * mo.days : 0); }, 0); } if (kpi && kpi.parentKpiId != null) return Number(kpi.baseTarget) || 0; return Number(kpi && kpi.target) || 0; };
+
+  const mainAchieved = mk => {
+    if (!mk) return 0;
+    if (mk.roasAuto) return mktCostInRange ? Math.round(naverInRange / mktCostInRange * 100) : 0;
+    const mKey = autoMetricOf(mk);
+    if (mKey) return nAgg[mKey] || 0;
+    return (mk.linkedKpiIds || []).reduce((a, kid) => a + sumForKpi(kid), 0)
+      + (mk.manuals || []).reduce((a, m) => a + (m.value || 0), 0)
+      + (isSalesKpi(mk) ? naverInRange : 0) + (isSubKpi(mk) ? subTotalAtEnd : 0) + (mk.kakaoAuto ? kakaoTotalAtEnd : 0);
+  };
+  const gfCur = { revenue: nAgg.days ? nAgg.revenue : naverInRange, orders: nAgg.days ? nAgg.orders : null, visitors: nAgg.days ? nAgg.visitors : null, aov: nAgg.days ? nAgg.aov : null, conversion: nAgg.days ? nAgg.conversion : null, assetCount: subTotalAtEnd || null, repeatRate: null, roas: mktCostInRange ? Math.round(naverInRange / mktCostInRange * 100) : null };
 
   const presetDays = days => { setPStart(addDay(TODAY, -days)); setPEnd(TODAY); };
   const presetMonth = offset => { const r = monthRange(offset); setPStart(r.start); setPEnd(r.end); };
@@ -3052,6 +3614,12 @@ function TabKpi({ data, setData }) {
         </div>
       </Card>
 
+      {/* 목표 공식 카드 — 2026-08-03 사용자 요청으로 화면에서만 숨김(index_137).
+          GoalFormulaCard / GF_ROWS / gfNum / gfEok / DEFAULT_GOAL_FORMULA / data.goalFormula 는 그대로 살려둠.
+          다시 켤 때는 아래 한 줄의 주석만 풀면 된다. 저장된 목표 공식 값은 전혀 삭제되지 않았다.
+      <GoalFormulaCard data={data} setData={setData} mainKpis={mainKpis.filter(kpiActive)} cur={gfCur} mkTarget={effTarget} mkAchieved={mainAchieved} period={pStart + '~' + pEnd} />
+      */}
+
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <span style={{ fontSize: 14, fontWeight: 800, color: GO }}>⭐ 메인 KPI</span>
@@ -3070,12 +3638,13 @@ function TabKpi({ data, setData }) {
           const salesVal = isSalesKpi(mk) ? naverInRange : 0;
           const subVal = isSubKpi(mk) ? subTotalAtEnd : 0;
           const kakaoVal = mk.kakaoAuto ? kakaoTotalAtEnd : 0;
-          const achieved = mk.roasAuto ? (mktCostInRange ? Math.round(naverInRange / mktCostInRange * 100) : 0) : (linkedSum + manualSum + salesVal + subVal + kakaoVal);
+          const mKey = autoMetricOf(mk);
+          const achieved = mk.roasAuto ? (mktCostInRange ? Math.round(naverInRange / mktCostInRange * 100) : 0) : (mKey ? (nAgg[mKey] || 0) : (linkedSum + manualSum + salesVal + subVal + kakaoVal));
           const target = effTarget(mk);
           const linking = editLink === mk.id;
           return (
             <Card key={mk.id} style={{ marginBottom: 10, borderLeft: '4px solid ' + GO }}>
-              <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={mk.roasAuto ? `📊 마케팅 ROAS · 매출 ÷ 실결제 비용` : `연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}${isSalesKpi(mk) ? ' · 📡 네이버 매출 연동' : ''}${isSubKpi(mk) ? ' · 📡 네이버 구독자 연동' : ''}${mk.kakaoAuto ? ' · 💬 카카오 친구 연동' : ''}`} />
+              <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={mk.roasAuto ? `📊 마케팅 ROAS · 매출 ÷ 실결제 비용` : (mKey ? `📡 네이버 매출탭 ${SALES_AUTO_LABEL[mKey]} 자동 연동 (기간 합산)` : `연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}${isSalesKpi(mk) ? ' · 📡 네이버 매출 연동' : ''}${isSubKpi(mk) ? ' · 📡 네이버 구독자 연동' : ''}${mk.kakaoAuto ? ' · 💬 카카오 친구 연동' : ''}`)} />
               {expanded === 'main-' + mk.id && (
                 <div style={{ marginTop: 12, borderTop: '1px solid #F5F4F2', paddingTop: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginBottom: 10 }}><button onClick={() => setMkEdit(mk)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✏️ 수정</button><button onClick={() => setData(d => moveToTrash(d, 'mainKpi', mk.id))} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #E53935', background: 'white', color: '#E53935', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🗑 삭제 (휴지통)</button></div>
@@ -3086,6 +3655,11 @@ function TabKpi({ data, setData }) {
                     {isSalesKpi(mk) && <div style={{ flex: 1, minWidth: 130, background: '#ECFDF5', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#1FA463' }}>📡 네이버 매출 (이 기간)</div><div style={{ fontSize: 15, fontWeight: 700, color: '#1FA463' }}>{naverInRange.toLocaleString()}</div>{naverInfo && naverInfo.updatedAt && <div style={{ fontSize: 9, color: '#A29C95', marginTop: 2 }}>{naverInfo.updatedAt} · 일별 합산</div>}</div>}
                     {isSubKpi(mk) && <div style={{ flex: 1, minWidth: 130, background: '#EFF6FF', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#2D5FE0' }}>📡 알림 구독자 (기간 끝 누적)</div><div style={{ fontSize: 15, fontWeight: 700, color: '#2D5FE0' }}>{subTotalAtEnd.toLocaleString()}명</div><div style={{ fontSize: 9, color: '#A29C95', marginTop: 2 }}>기간 순증 +{subAddedInRange.toLocaleString()}명</div></div>}
                     {mk.kakaoAuto && <div style={{ flex: 1, minWidth: 130, background: '#FEF9E7', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#B8860B' }}>💬 카카오 친구 (기간 끝 누적)</div><div style={{ fontSize: 15, fontWeight: 700, color: '#B8860B' }}>{kakaoTotalAtEnd.toLocaleString()}명</div><div style={{ fontSize: 9, color: '#A29C95', marginTop: 2 }}>카카오 채널 누적 친구수</div></div>}
+                    {mKey && <div style={{ flex: 1, minWidth: 240, background: '#ECFDF5', borderRadius: 8, padding: '8px 12px' }}>
+                      <div style={{ fontSize: 10, color: '#1FA463', fontWeight: 700 }}>📡 네이버 매출탭 · {SALES_AUTO_LABEL[mKey]} 자동 연동</div>
+                      <div style={{ fontSize: 17, fontWeight: 800, color: '#1FA463' }}>{achieved.toLocaleString()}{mKey === 'conversion' ? '%' : (mKey === 'aov' ? '원' : '')}</div>
+                      <div style={{ fontSize: 9, color: '#6E6863', marginTop: 3, lineHeight: 1.5 }}>기간 {pStart}~{pEnd} · 일별 데이터 {nAgg.days}일 · 방문 {nAgg.visitors.toLocaleString()} · 결제 {nAgg.orders.toLocaleString()} · 객단가 {nAgg.aov.toLocaleString()}원 · 전환율 {nAgg.conversion}%<br />{mKey === 'aov' ? '객단가 = 기간 매출 ÷ 기간 결제건수' : (mKey === 'conversion' ? '전환율 = 결제건수 ÷ 방문자수' : '기간 내 일별 값 합산')} · 이 KPI는 연결·수동값 대신 이 값으로 계산돼요.</div>
+                    </div>}
                     {mk.roasAuto && <div style={{ flex: 1, minWidth: 260, background: '#F0F5FF', borderRadius: 8, padding: '10px 12px' }}>
                       <div style={{ fontSize: 10, color: '#2D5FE0', fontWeight: 700, marginBottom: 6 }}>📊 마케팅 ROAS 계산 (이 기간)</div>
                       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -4017,7 +4591,7 @@ function TabAds({ data, setData }) {
   const [chF, setChF] = useState('all');
   const [openG, setOpenG] = useState({});
   const [hoverBar, setHoverBar] = useState(null);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/naver-ads.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && Array.isArray(j.days)) { setRaw(j); setStatus('ok'); } else setStatus('error'); }).catch(() => { if (alive) setStatus('error'); }); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; ghFetch('data/naver-ads.json').then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && Array.isArray(j.days)) { setRaw(j); setStatus('ok'); } else setStatus('error'); }).catch(() => { if (alive) setStatus('error'); }); return () => { alive = false; }; }, []);
   if (status === 'loading') return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>광고 데이터를 불러오는 중…</Card></div>;
   if (status === 'error' || !raw) return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>광고 데이터를 불러오지 못했습니다.<br /><span style={{ fontSize: 11 }}>data/naver-ads.json 이 아직 없거나 형식이 다릅니다.</span></Card></div>;
   const daysAll = raw.days.slice().sort((a, b) => a.date < b.date ? -1 : 1);
@@ -4047,7 +4621,18 @@ function TabAds({ data, setData }) {
     { l: '구매완료 전환수', v: cur.conv.toLocaleString() + '건', c: chip(cur.conv, prev.conv, false, '건') },
     { l: 'CVR (구매완료/클릭)', v: cvr + '%', c: chip(cvr, prev.clicks ? Math.round(prev.conv / prev.clicks * 1000) / 10 : null, false, '%p') },
     { l: 'CPC', v: cpc.toLocaleString() + '원', c: chip(cpc, prev.clicks ? Math.round(prev.spend / prev.clicks) : null, true, '원') },
+    { l: 'CTR (클릭/노출)', v: (cur.imp ? Math.round(cur.clicks / cur.imp * 10000) / 100 : 0) + '%', c: chip(cur.imp ? Math.round(cur.clicks / cur.imp * 10000) / 100 : 0, prev.imp ? Math.round(prev.clicks / prev.imp * 10000) / 100 : null, false, '%p') },
   ];
+  // ── 브랜드 검색광고 전용 집계 (index_136) ─────────────────────────
+  const BRAND_RE = /브랜드\s*검색|브랜드검색|brand\s*search|brandsearch|BRAND_SEARCH/i;
+  const bAgg = rs => { const t = { spend: 0, rev: 0, conv: 0, clicks: 0, imp: 0, names: {} }; rs.forEach(x => (x.groups || []).forEach(g => { const cn = (g.campaignName || '') + ' ' + (g.adGroupName || '') + ' ' + (g.campaignType || ''); if (!BRAND_RE.test(cn)) return; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.purchaseConv || 0; t.clicks += g.clicks || 0; t.imp += g.impressions || 0; const k = g.campaignName || g.adGroupName || '브랜드검색'; if (!t.names[k]) t.names[k] = { spend: 0, clicks: 0, imp: 0, rev: 0 }; t.names[k].spend += g.spend || 0; t.names[k].clicks += g.clicks || 0; t.names[k].imp += g.impressions || 0; t.names[k].rev += g.convRevenue || 0; })); return t; };
+  const bCur = bAgg(rows), bPrev = bAgg(prevRows);
+  const bCtr = bCur.imp ? Math.round(bCur.clicks / bCur.imp * 10000) / 100 : 0;
+  const bPrevCtr = bPrev.imp ? Math.round(bPrev.clicks / bPrev.imp * 10000) / 100 : null;
+  const bRoas = bCur.spend ? Math.round(bCur.rev / bCur.spend * 100) : 0;
+  const bCpc = bCur.clicks ? Math.round(bCur.spend / bCur.clicks) : 0;
+  const bHas = bCur.imp > 0 || bCur.clicks > 0 || bCur.spend > 0;
+  const bRows = Object.keys(bCur.names).map(k => ({ name: k, ...bCur.names[k] })).sort((a, b) => b.imp - a.imp);
   const maxRev = Math.max(1, ...rows.map(x => (x.groups || []).reduce((a, g) => a + ((chF !== 'all' && chOf(g) !== chF) ? 0 : (g.convRevenue || 0)), 0)));
   const gAgg = (() => { const m = {}; rows.forEach(x => (x.groups || []).forEach(g => { if (chF !== 'all' && chOf(g) !== chF) return; const k = String(g.adGroupId || g.campaignId); if (!m[k]) m[k] = { camp: g.campaignName || '', name: g.adGroupName || '', ch: chOf(g), spend: 0, rev: 0, conv: 0, tconv: 0, clicks: 0 }; const t = m[k]; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.purchaseConv || 0; t.tconv += g.totalConv || 0; t.clicks += g.clicks || 0; })); return Object.values(m).sort((a, b) => b.spend - a.spend); })();
   const pAgg = (() => { const m = {}; rows.forEach(x => (x.products || []).forEach(p => { if (chF !== 'all' && (p.channel || 'display') !== chF) return; const k = String(p.productId); if (!m[k]) m[k] = { id: k, name: p.name || k, groupId: p.groupId || null, groupName: p.groupName || null, spend: 0, rev: 0, conv: 0, tconv: 0 }; const t = m[k]; if (p.groupId) { t.groupId = p.groupId; t.groupName = p.groupName || t.groupName; } t.spend += p.spend || 0; t.rev += p.convRevenue || 0; t.conv += p.purchaseConv || 0; t.tconv += p.totalConv || 0; })); return Object.values(m).filter(p => p.spend > 0 || p.tconv > 0).sort((a, b) => b.spend - a.spend); })();
@@ -4076,6 +4661,35 @@ function TabAds({ data, setData }) {
           </div>
         ))}
       </div>
+      <Card style={{ marginBottom: 16, background: bHas ? '#FFFBEB' : 'white', border: '1px solid ' + (bHas ? '#FDE68A' : '#E3E0DC') }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: bHas ? '#B45309' : '#A29C95' }}>🔎 브랜드 검색광고</div>
+          <span style={{ fontSize: 11, color: '#6E6863' }}>클릭률(CTR)은 KPI에 연결해서 목표 관리할 수 있어요 — KPI 탭 · 지표 연결에서 <b>브랜드검색 클릭률</b> 선택</span>
+        </div>
+        {bHas ? <div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: 8, marginBottom: 10 }}>
+            {[['노출수', bCur.imp.toLocaleString() + '회', null], ['클릭수', bCur.clicks.toLocaleString() + '회', null], ['클릭률 CTR', bCtr + '%', chip(bCtr, bPrevCtr, false, '%p')], ['광고비', won2(bCur.spend), null], ['CPC', bCpc.toLocaleString() + '원', null], ['전환매출', won2(bCur.rev), null], ['ROAS', bRoas + '%', null]].map(t => (
+              <div key={t[0]} style={{ background: 'white', border: '1px solid #FDE68A', borderRadius: 10, padding: '9px 11px' }}>
+                <div style={{ fontSize: 10, color: '#B45309', fontWeight: 700, marginBottom: 3 }}>{t[0]}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: G }}>{t[1]}</div>
+                {t[2] && <div style={{ marginTop: 3 }}>{t[2]}</div>}
+              </div>
+            ))}
+          </div>
+          {bRows.length > 1 && <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {bRows.map(r => <div key={r.name} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 11.5, color: '#3A3631', background: 'white', border: '1px solid #FDE68A', borderRadius: 7, padding: '5px 9px' }}>
+              <span style={{ flex: 1, minWidth: 100, fontWeight: 700 }}>{r.name}</span>
+              <span style={{ color: '#6E6863' }}>노출 {r.imp.toLocaleString()}</span>
+              <span style={{ color: '#6E6863' }}>클릭 {r.clicks.toLocaleString()}</span>
+              <span style={{ fontWeight: 800, color: '#B45309' }}>CTR {r.imp ? Math.round(r.clicks / r.imp * 10000) / 100 : 0}%</span>
+              <span style={{ color: '#6E6863' }}>{won2(r.spend)}</span>
+            </div>)}
+          </div>}
+        </div> : <div style={{ fontSize: 12, color: '#A29C95', lineHeight: 1.7 }}>
+          이 기간에 브랜드 검색광고 데이터가 없습니다.<br />
+          <span style={{ fontSize: 11 }}>네이버 광고 에이전트가 <b>data/naver-ads.json</b> 의 <code>days[].groups[]</code> 에 캠페인명이 「브랜드검색」인 항목을 <code>impressions</code>·<code>clicks</code> 와 함께 올려주면 여기와 KPI에 자동 반영됩니다.</span>
+        </div>}
+      </Card>
       {mode !== 'day' && <Card style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: G }}>📊 일별 전환매출 · ROAS</div>
@@ -4273,7 +4887,7 @@ function AdsStrategyPanel({ data, setData, prodNames }) {
   const [rej, setRej] = useState(null); // { id, mode: 'done'|'dismissed'|'question', text }
   useEffect(() => {
     let alive = true;
-    fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/ads-strategy.json?t=' + Date.now())
+    ghFetch('data/ads-strategy.json')
       .then(r => r.ok ? r.json() : null)
       .then(j => { if (!alive) return; if (j && Array.isArray(j.items)) { setStrat(j); setStatus('ok'); } else setStatus('none'); })
       .catch(() => { if (alive) setStatus('none'); });
@@ -4431,7 +5045,7 @@ function TabKakao() {
   const [mode, setMode] = useState('month');
   const [idx, setIdx] = useState({ month: 0, week: 0, day: 0 });
   const [hoverBar, setHoverBar] = useState(null);
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/kakao-stats.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && j.friends && j.friends.daily) { setRaw(j); setStatus('ok'); } else setStatus('error'); }).catch(() => { if (alive) setStatus('error'); }); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; ghFetch('data/kakao-stats.json').then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && j.friends && j.friends.daily) { setRaw(j); setStatus('ok'); } else setStatus('error'); }).catch(() => { if (alive) setStatus('error'); }); return () => { alive = false; }; }, []);
   if (status === 'loading') return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>카카오 채널 데이터를 불러오는 중…</Card></div>;
   if (status === 'error' || !raw) return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>카카오 채널 데이터를 불러오지 못했습니다.<br /><span style={{ fontSize: 11 }}>data/kakao-stats.json 이 아직 없거나 형식이 다릅니다.</span></Card></div>;
   const fdAll = (raw.friends.daily || []).slice().sort((a, b) => a.date < b.date ? -1 : 1);
@@ -4722,7 +5336,7 @@ function TabChannel({ data, setData }) {
   const [vMode, setVMode] = useState('day');
   const [vIdx, setVIdx] = useState(0);
   const [vRange, setVRange] = useState({ start: '', end: '' });
-  useEffect(() => { let alive = true; fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/channel-tracking.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && (Array.isArray(j.rows) || (j.reports && typeof j.reports === 'object') || Array.isArray(j.channel_daily) || Array.isArray(j.custom_channel_daily) || Array.isArray(j.product_channel_daily))) { setRaw(j); setStatus('ok'); } else setStatus('none'); }).catch(() => { if (alive) setStatus('none'); }); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; ghFetch('data/channel-tracking.json').then(r => r.ok ? r.json() : null).then(j => { if (!alive) return; if (j && (Array.isArray(j.rows) || (j.reports && typeof j.reports === 'object') || Array.isArray(j.channel_daily) || Array.isArray(j.custom_channel_daily) || Array.isArray(j.product_channel_daily))) { setRaw(j); setStatus('ok'); } else setStatus('none'); }).catch(() => { if (alive) setStatus('none'); }); return () => { alive = false; }; }, []);
   const _rows = (raw && Array.isArray(raw.rows)) ? raw.rows : [];
   const _byType = t => ((raw && raw.report_type === t) ? _rows : []);
   const _rep = (raw && raw.reports) || {};
@@ -4894,11 +5508,15 @@ function aggSalesRange(days, start, end) {
   const subDays = inR.filter(d => d.subscription && ((d.subscription.orders || 0) > 0 || (d.subscription.activeSubscribers || 0) > 0));
   let subscription = null;
   if (subDays.length) {
-    const ss = f => subDays.reduce((a, d) => a + ((d.subscription && d.subscription[f]) || 0), 0);
+    // [index_138] 허브 규칙: 값이 없는 기간(2026-03~07)은 매출보고 에이전트가 null 로 내보낸다.
+    //   전 구간이 null 이면 합계도 null 로 올려보내 화면에서 '—' 로 찍히게 한다(0 으로 접으면 '구독자 0명'으로 읽힘).
+    //   일부만 null 이면 있는 값끼리 합산한다.
+    const ss = f => { let any = false, t = 0; subDays.forEach(d => { const v = d.subscription ? d.subscription[f] : null; if (v != null) { any = true; t += Number(v) || 0; } }); return any ? t : null; };
     const lastAct = [...subDays].reverse().find(d => d.subscription.activeSubscribers != null);
+    const lastMeta = [...subDays].reverse().find(d => d.subscription && (d.subscription.activeSubscribersAsOf || d.subscription.byStatus));
     const spMap = {};
     subDays.forEach(d => (d.subscription.products || []).forEach(p => { const k = p.productId || p.name; const m = spMap[k] || (spMap[k] = { productId: p.productId, name: p.name, orders: 0, revenue: 0 }); m.orders += p.orders || 0; m.revenue += p.revenue || 0; }));
-    subscription = { orders: ss('orders'), newOrders: ss('newOrders'), renewOrders: ss('renewOrders'), canceled: ss('canceled'), revenue: ss('revenue'), activeSubscribers: lastAct ? lastAct.subscription.activeSubscribers : 0, products: Object.values(spMap) };
+    subscription = { orders: ss('orders'), newOrders: ss('newOrders'), renewOrders: ss('renewOrders'), canceled: ss('canceled'), revenue: ss('revenue'), activeSubscribers: lastAct ? lastAct.subscription.activeSubscribers : null, activeSubscribersSource: lastAct ? (lastAct.subscription.activeSubscribersSource || '') : '', activeSubscribersAsOf: lastMeta ? (lastMeta.subscription.activeSubscribersAsOf || '') : '', byStatus: lastMeta ? (lastMeta.subscription.byStatus || null) : null, products: Object.values(spMap) };
   }
   const nDays = inR.filter(d => d.subscribers && d.subscribers.notify);
   let subscribers = null;
@@ -4950,7 +5568,6 @@ function TabSales({ data, setData }) {
   const [regOpen, setRegOpen] = useState(false);
   const [regName, setRegName] = useState('');
   const [dragId, setDragId] = useState(null);
-  const BASE = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/';
 
   const normalize = j => {
     if (!j) return null;
@@ -4961,7 +5578,7 @@ function TabSales({ data, setData }) {
 
   useEffect(() => {
     let alive = true; setStatus('loading');
-    fetch(BASE + 'naver-sales.json?t=' + Date.now())
+    ghFetch('data/naver-sales.json')
       .then(res => { if (!res.ok) throw new Error('nofile'); return res.json(); })
       .then(j => { if (!alive) return; setFull(normalize(j)); setStatus('ok'); setSample(false); })
       .catch(() => { if (!alive) return; setFull(normalize(SALES_SAMPLE)); setStatus('empty'); setSample(true); });
@@ -5075,7 +5692,9 @@ function TabSales({ data, setData }) {
               {list.map((it, i) => <option key={it.key || i} value={i}>{it.label || it.key}</option>)}
             </select>
           )}
-          <span style={{ fontSize: 11, color: '#A29C95' }}>{full && full.updatedAt ? '갱신 ' + full.updatedAt : ''}</span>
+          {full && full.updatedAt && (ghStale(SALES_SRC)
+            ? <span title={'동일 출처·GitHub Pages 에서 읽지 못해 raw.githubusercontent.com 으로 폴백했습니다. raw 는 CDN 캐시가 며칠씩 묵을 수 있어 이 숫자가 최신이 아닐 수 있어요. (실제 출처: ' + ghSrcOf(SALES_SRC) + ')'} style={{ fontSize: 11, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 7, padding: '3px 8px', cursor: 'help' }}>⚠ 갱신 {full.updatedAt} · 캐시 가능성</span>
+            : <span title={ghSrcOf(SALES_SRC) ? '데이터 출처: ' + ghSrcOf(SALES_SRC) : undefined} style={{ fontSize: 11, color: '#A29C95' }}>갱신 {full.updatedAt}</span>)}
         </div>
       )}
 
@@ -5264,8 +5883,13 @@ function TabSales({ data, setData }) {
           </Card>
         )}
 
-        {sub && (sub.orders > 0 || sub.activeSubscribers > 0) && (() => {
+        {sub && (sub.orders > 0 || sub.activeSubscribers > 0 || sub.revenue > 0) && (() => {
           const hasRev = sub.revenue > 0;
+          // [index_138] 허브 규칙 — null 은 '수집 이전'이라는 뜻. 0 으로 렌더하면 '구독자 0명'으로 오독된다.
+          const NA_TIP = '이 기간은 수집 이전이라 값이 없습니다.';
+          const dash = <span title={NA_TIP} style={{ color: '#C9C4BE', cursor: 'help' }}>—</span>;
+          const nOr = v => v == null ? dash : Number(v).toLocaleString();
+          const asOfTip = sub.activeSubscribersAsOf ? sub.activeSubscribersAsOf + ' 기준' : undefined;
           const totRev = sum.revenue ? sum.revenue.value : 0;
           const revShare = hasRev && totRev ? Math.round(sub.revenue / totRev * 1000) / 10 : null;
           const sprods = (sub.products || []).slice().sort((a, b) => (b.orders || 0) - (a.orders || 0));
@@ -5280,13 +5904,13 @@ function TabSales({ data, setData }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: 10, marginBottom: sprods.length ? 16 : 0 }}>
                 <div style={{ background: '#F7FAFD', border: '1px solid #D9E7F5', borderRadius: 10, padding: 12 }}>
                   <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>구독 주문</div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: G }}>{(sub.orders || 0).toLocaleString()}<span style={{ fontSize: 12, fontWeight: 600, color: '#6E6863' }}> 건</span></div>
-                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>신규 {sub.newOrders || 0} · 갱신 {sub.renewOrders || 0}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: G }}>{nOr(sub.orders)}<span style={{ fontSize: 12, fontWeight: 600, color: '#6E6863' }}> 건</span></div>
+                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>신규 {nOr(sub.newOrders)} · 갱신 {nOr(sub.renewOrders)}</div>
                 </div>
                 <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: 12 }}>
                   <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>활성 구독자</div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: '#166534' }}>{(sub.activeSubscribers || 0).toLocaleString()}<span style={{ fontSize: 12, fontWeight: 600, color: '#6E6863' }}> 명</span></div>
-                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>기간 말 진행중 기준</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#166534' }}><span title={sub.activeSubscribers == null ? undefined : asOfTip} style={asOfTip && sub.activeSubscribers != null ? { cursor: 'help' } : null}>{nOr(sub.activeSubscribers)}</span><span style={{ fontSize: 12, fontWeight: 600, color: '#6E6863' }}> 명</span>{sub.activeSubscribers != null && sub.activeSubscribersSource === 'order-derived' && <span title="구독 콘솔 값이 아니라 주문 데이터에서 역산한 추정치입니다." style={{ fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '1px 5px', marginLeft: 6, verticalAlign: 'middle' }}>· 주문 기준 추정</span>}</div>
+                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>{sub.activeSubscribersAsOf ? sub.activeSubscribersAsOf + ' 기준' : '기간 말 진행중 기준'}</div>
                 </div>
                 <div style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 10, padding: 12 }}>
                   <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>구독 매출</div>
@@ -5313,7 +5937,7 @@ function TabSales({ data, setData }) {
                   ))}
                 </div>
               )}
-              <div style={{ fontSize: 10, color: '#A29C95', marginTop: 10 }}>활성 구독자는 기간 말 진행중 기준(누적) · 신규=첫 결제, 갱신=2회차 이상{hasRev ? ' · 구독 매출은 판매성과 기준으로 정산 매출과 다를 수 있습니다' : ''}{mode === 'day' ? ' · 상품별 구독은 주간·월간에서 확인' : ''}</div>
+              <div style={{ fontSize: 10, color: '#A29C95', marginTop: 10 }}>활성 구독자는 기간 말 진행중 기준(누적) · 신규=첫 결제, 갱신=2회차 이상{hasRev ? ' · 구독 매출은 판매성과 기준으로 정산 매출과 다를 수 있습니다' : ''}{mode === 'day' ? ' · 상품별 구독은 주간·월간에서 확인' : ''}{(sub.activeSubscribers == null || sub.newOrders == null || sub.renewOrders == null) ? ' · —는 수집 이전이라 값이 없는 항목입니다(0이 아님)' : ''}</div>
             </Card>
           );
         })()}
@@ -5642,12 +6266,11 @@ function TabMeeting({ data, setData }) {
   const [editAtt, setEditAtt] = useState('');
   const [allDocs, setAllDocs] = useState(null);
   const [inboxF, setInboxF] = useState('전체');
-  const BASE = 'https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/';
   const fbMeetings = data.meetings || [];
 
   useEffect(() => {
     let alive = true; setStatus('loading');
-    fetch(BASE + 'meetings/index.json?t=' + Date.now())
+    ghFetch('data/meetings/index.json')
       .then(res => { if (!res.ok) throw new Error('no'); return res.json(); })
       .then(j => { if (!alive) return; setGhList(Array.isArray(j) ? j : []); setStatus('ok'); setSample(false); })
       .catch(() => { if (!alive) return; setGhList([]); setStatus('ok'); setSample(true); });
@@ -5660,7 +6283,7 @@ function TabMeeting({ data, setData }) {
     let alive = true;
     const fbIds = fbMeetings.map(m => m.id);
     const need = ghList.filter(m => fbIds.indexOf(m.id) < 0).map(m => m.id);
-    Promise.all(need.map(id => fetch(BASE + 'meetings/' + id + '.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)))
+    Promise.all(need.map(id => ghFetch('data/meetings/' + id + '.json').then(r => r.ok ? r.json() : null).catch(() => null)))
       .then(docs => {
         if (!alive) return;
         const byId = {};
@@ -5688,7 +6311,7 @@ function TabMeeting({ data, setData }) {
     if (row.__sample) { setOpenDoc(MEETING_SAMPLE); setOpenId(row.id); return; }
     // GitHub에서 개별 회의록 로드
     setOpenDoc('loading'); setOpenId(row.id);
-    fetch(BASE + 'meetings/' + row.id + '.json?t=' + Date.now())
+    ghFetch('data/meetings/' + row.id + '.json')
       .then(res => res.ok ? res.json() : null)
       .then(j => setOpenDoc(j || 'error'))
       .catch(() => setOpenDoc('error'));
@@ -6110,7 +6733,7 @@ function TabTrends({ data, setData }) {
   const [rejSeed, setRejSeed] = useState(null);
   useEffect(() => {
     let alive = true;
-    fetch('https://raw.githubusercontent.com/miraclead2026/lifemeal-dashboard/main/data/keyword-trends.json?t=' + Date.now())
+    ghFetch('data/keyword-trends.json')
       .then(r => r.ok ? r.json() : null)
       .then(j => {
         if (!alive) return;
@@ -6715,7 +7338,7 @@ function TabSchedule({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { team: '팀 현황', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
+const TAB_SLUG = { team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
 
 const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 
@@ -6776,7 +7399,7 @@ function App() {
   const heldCount = data ? data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length : 0;
   const trashCount = data ? (data.trash || []).length : 0;
   const TABS = [
-    { icon: '👥', label: '팀 현황', C: TabTeam },
+    { icon: '🏠', label: '홈', C: TabTeam },
     { icon: '📅', label: '데일리/주간', C: TabWeekly },
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
     { icon: '🗂️', label: '칸반', C: TabKanban },
