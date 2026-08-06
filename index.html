@@ -7529,10 +7529,17 @@ const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 //
 // [쓰기 경계 — 한 필드는 한 주체만]
 //   에이전트        : 카드 생성 · status:pending
-//   대시보드(여기)  : answer · answerNote · answeredAt · status→answered   ← 이 4개뿐
+//   대시보드(여기)  : answer · answerNote · answeredAt · status→answered · snoozedUntil  ← 이 5개뿐
 //   실행 에이전트   : appliedAt · status→applied
 //   그래서 expired 는 서버에 쓰지 않는다. 30일이 지났다는 '사실'을 화면에서 계산해
 //   표시만 한다(카드 자동 삭제 금지와 같은 이유 — 데이터는 손대지 않는다).
+//
+// [보류 = snoozedUntil (index_142, 허브 승인)]
+//   예전엔 보류를 answer:'hold' + status:'answered' 로 저장했다. 그러면 카드가
+//   대기에서 빠지고 질문이 영영 사라진다 — 보류의 의도("나중에 다시 물어봐라")와 반대다.
+//   지금은 status 를 pending 그대로 두고 snoozedUntil(ISO) 만 쓴다. 그 날짜가 지나면
+//   아무도 아무것도 하지 않아도 대기 목록으로 스스로 돌아온다(화면 계산이라 배치가 필요 없다).
+//   쓰기 주체는 여전히 대시보드 하나뿐이라 경계 원칙은 그대로다.
 // ═══════════════════════════════════════════════════════════════════════════
 const DEC_DOMAINS = ['광고', '상품', '고객', 'CS', '운영'];
 const DEC_TYPES = ['판정', '승인', '정합'];
@@ -7540,7 +7547,18 @@ const DEC_TYPE_C = { '판정': '#2D5FE0', '승인': '#1FA463', '정합': '#E0870
 const DEC_STALE_D = 7;    // 7일 무응답 → 시각 구분(재알림)
 const DEC_EXPIRE_D = 30;  // 30일 무응답 → 만료 '표시'. 삭제하지 않는다.
 const DEC_RECENT_D = 30;  // 하단 답변 완료 목록 노출 기간
-const DEC_HOLD = 'hold';  // options 외에 항상 붙는 답
+const DEC_HOLD = 'hold';  // (구) 보류를 answer 로 저장하던 시절의 값. 옛 카드 표시용으로만 남긴다.
+const DEC_SNOOZE_D = 7;   // 기본 스누즈 기간(허브 지정)
+const DEC_SNOOZE_OPTS = [3, 7, 14, 30];
+const DEC_SNOOZE_WARN = 3; // 이 횟수 이상 미룬 카드는 카드에 표시한다(허브 지정)
+
+// ── 시드 문안 개정 번호 ─────────────────────────────────────────────────────
+// DEC_SEED 상수만 고치면 라이브 카드는 안 바뀐다 — 3건은 이미 /decisions 에 등록돼 있고
+// '첫 3건 등록' 버튼은 화면이 완전히 빈 경우에만 뜨기 때문이다.
+// 그래서 이 번호를 올리면, 아직 답하지 않은 시드 카드에 한해 '내용 필드만' 한 번 덮어쓴다.
+// 답 필드(answer/answerNote/answeredAt/status/snoozedUntil/snoozeCount)는 절대 건드리지 않는다.
+const SEED_REV = 2;       // 2 = 2026-08-06 누출 교정(ROAS 선택지 교체 · 영양식 법적 프레임 제거)
+const SEED_FIX_KEYS = ['title', 'question', 'context', 'vaultHint', 'options', 'route', 'vaultTarget'];
 
 function decAgeD(iso) {
   if (!iso) return 0;
@@ -7549,9 +7567,24 @@ function decAgeD(iso) {
   return Math.floor((Date.now() - t) / 86400000);
 }
 function decDate(iso) { const s = String(iso || ''); return s.length >= 10 ? s.slice(0, 10) : s; }
+// 남은 스누즈 일수. 0 이하면 이미 풀린 것이다(올림 — '오늘 중 복귀'는 1일로 보인다).
+function decSnoozeLeftD(iso) {
+  if (!iso) return 0;
+  const t = Date.parse(iso);
+  if (isNaN(t)) return 0;
+  return Math.ceil((t - Date.now()) / 86400000);
+}
+function decSnoozed(c) {
+  if (!c || !c.snoozedUntil) return false;
+  const t = Date.parse(c.snoozedUntil);
+  return !isNaN(t) && t > Date.now();
+}
 function decEff(c) {
   if (!c) return 'pending';
   const s = c.status || 'pending';
+  // 스누즈가 만료보다 먼저다 — 일부러 미룬 카드를 '만료'로 부르면 말이 안 맞는다.
+  // 스누즈가 풀리는 순간 아래 만료 판정이 다시 적용된다.
+  if (s === 'pending' && decSnoozed(c)) return 'snoozed';
   if (s === 'pending' && decAgeD(c.createdAt) >= DEC_EXPIRE_D) return 'expired';
   return s;
 }
@@ -7573,29 +7606,36 @@ const DEC_SEED = [
     vaultHint: "닥터샐러드 커머스 카테고리가 '야채가루'. 매칭 가능성 있음",
     options: [{ key: 'exclude', label: '제외' }, { key: 'keep', label: '진단 유지' }],
     route: 'auto', vaultTarget: '80_광고/키워드 운영.md',
-    answer: null, answerNote: null, answeredAt: null, appliedAt: null,
+    answer: null, answerNote: null, answeredAt: null, appliedAt: null, snoozedUntil: null, snoozeCount: 0,
+    seedRev: SEED_REV,
   },
   {
+    // 선택지에서 '마진 역산'을 뺀 이유: 그걸 누르는 순간 ROAS 330% 와 조합돼 마진율이 역산된다.
+    // 이 노드는 읽기가 공개다. 물어야 할 것은 '근거 문서의 유무'지 '어떤 계산이었는지'가 아니다.
     id: 'dec_20260806_002', type: '판정', status: 'pending', domain: '광고',
     createdBy: 'ads-agent', createdAt: '2026-08-06T09:00:00+09:00',
     title: 'ROAS 330% 근거',
-    question: '이 값이 어디서 나왔나요?',
+    question: '이 값의 근거 문서가 있나요?',
     context: '인수인계 절대원칙에서 넘어온 값. 광고 판단 전체가 이 위에 서 있음',
     vaultHint: '볼트에 근거 문서 없음. 마진 역산 여부 미확인',
-    options: [{ key: 'margin', label: '마진 역산' }, { key: 'custom', label: '관행' }, { key: 'unknown', label: '모르겠음' }],
+    options: [{ key: 'has', label: '근거 문서 있음' }, { key: 'none', label: '근거 문서 없음' }, { key: 'unknown', label: '모르겠음' }],
     route: 'vault', vaultTarget: '80_광고/광고 판단 규칙.md',
-    answer: null, answerNote: null, answeredAt: null, appliedAt: null,
+    answer: null, answerNote: null, answeredAt: null, appliedAt: null, snoozedUntil: null, snoozeCount: 0,
+    seedRev: SEED_REV,
   },
   {
+    // 법적 프레임 제거: '뭐가 맞나요'(= 다른 쪽은 틀렸다)에서 '라벨 표기가 어느 쪽인가요'(= 사실 확인)로.
+    // context·vaultHint 도 두 문서의 숫자 대조까지만 적는다. 어느 쪽이 오기인지의 판단은 여기 쓰지 않는다.
     id: 'dec_20260806_003', type: '정합', status: 'pending', domain: '상품',
     createdBy: 'product-agent', createdAt: '2026-08-06T09:00:00+09:00',
     title: '영양식 원료 개수',
-    question: '31종과 300여종 중 뭐가 맞나요?',
-    context: '라벨 고시는 31종, 상세페이지 카피는 300여종',
-    vaultHint: '라벨 판독(08-05) 기준 31종. 300여종은 오기 의심',
+    question: '31종과 300여종 중 라벨 표기가 어느 쪽인가요?',
+    context: '라벨 고시 표기 31종 · 상세페이지 표기 300여종 — 두 문서의 숫자가 다름',
+    vaultHint: '라벨 판독(08-05) 실측 기준 31종. 300여종은 출처 문서 미확인',
     options: [{ key: 'n31', label: '31종' }, { key: 'n300', label: '300여종' }, { key: 'recheck', label: '실물 재확인 필요' }],
     route: 'vault', vaultTarget: '30_상품/영양식.md',
-    answer: null, answerNote: null, answeredAt: null, appliedAt: null,
+    answer: null, answerNote: null, answeredAt: null, appliedAt: null, snoozedUntil: null, snoozeCount: 0,
+    seedRev: SEED_REV,
   },
 ];
 
@@ -7660,6 +7700,11 @@ function TabDecisions({ decs, decErr }) {
   const [last, setLast] = useState(null);
   const [showExp, setShowExp] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [snoozeD, setSnoozeD] = useState({});   // 카드별로 고른 보류 기간(일). 비어 있으면 기본 7일
+  const [openSnz, setOpenSnz] = useState(false); // 보류 중 목록 펼침
+  const [fixed, setFixed] = useState([]);       // 이번 세션에 문안을 맞춘 시드 카드 id
+  const [stuck, setStuck] = useState([]);       // 문안이 바뀌기 전에 이미 답해버린 시드 카드 id
+  const fixTried = useRef({});                  // 카드당 1회만 시도 — 실패 시에만 다시 연다
 
   const loading = !decs || decs.list === null;
   const list = (decs && decs.list) || [];
@@ -7675,18 +7720,55 @@ function TabDecisions({ decs, decErr }) {
       answerNote: (notes[c._key] || '').trim() || null,
       answeredAt: new Date().toISOString(),
       status: 'answered',
+      snoozedUntil: null,   // 답이 나왔으면 남아 있던 스누즈는 의미가 없다
     };
     db.ref(DEC_PATH + '/' + c._key).update(patch).then(() => {
       setBusy('');
-      setLast({ key: c._key, title: c.title, label: decOptLabel(c, key), route: c.route });
+      setLast({ kind: 'answer', key: c._key, title: c.title, label: decOptLabel(c, key), route: c.route });
       setNotes(n => { const m = { ...n }; delete m[c._key]; return m; });
     }).catch(e => { setBusy(''); setErr((e && e.message) || '저장 실패'); });
+  };
+  // 보류 = 답이 아니다. status 를 건드리지 않고 snoozedUntil 만 민다.
+  // 그래서 그 날짜가 지나면 저절로 대기 목록으로 돌아온다 — 재등록해 줄 사람이 필요 없다.
+  const snooze = (c) => {
+    if (busy) return;
+    const d = Number(snoozeD[c._key] || DEC_SNOOZE_D) || DEC_SNOOZE_D;
+    setBusy(c._key); setErr('');
+    const until = new Date(Date.now() + d * 86400000).toISOString();
+    const note = (notes[c._key] || '').trim();
+    const cnt = (Number(c.snoozeCount) || 0) + 1;
+    // snoozeCount = 이 카드를 몇 번 미뤘는지. 허브 승인 6번째 필드.
+    // 답이 나와도 초기화하지 않는다 — '네 번 미루고서야 답한 질문'이라는 사실 자체가 기록이다.
+    const patch = { snoozedUntil: until, snoozeCount: cnt };
+    // 빈 값으로 덮어 기존 메모를 지우지 않는다. 적었을 때만 '왜 미뤘는지'로 남긴다.
+    if (note) patch.answerNote = note;
+    db.ref(DEC_PATH + '/' + c._key).update(patch).then(() => {
+      setBusy('');
+      setLast({ kind: 'snooze', key: c._key, title: c.title, days: d, until: until, count: cnt });
+      setNotes(n => { const m = { ...n }; delete m[c._key]; return m; });
+    }).catch(e => { setBusy(''); setErr((e && e.message) || '보류 실패'); });
+  };
+  // back=true 는 '방금 누른 보류를 취소'다 — 오클릭이므로 횟수도 같이 되돌린다.
+  // 보류 목록의 '지금 다시 보기'는 back 없이 부른다: 미룬 건 실제로 있었던 일이라 횟수를 남긴다.
+  const unsnooze = (k, back) => {
+    if (busy) return;
+    setBusy(k); setErr('');
+    const patch = { snoozedUntil: null };
+    if (back) {
+      const cur = list.filter(c => c._key === k)[0];
+      const n = Number(cur && cur.snoozeCount) || 0;
+      if (n > 0) patch.snoozeCount = n - 1;
+    }
+    db.ref(DEC_PATH + '/' + k).update(patch)
+      .then(() => { setBusy(''); setLast(l => (l && l.key === k) ? null : l); })
+      .catch(e => { setBusy(''); setErr((e && e.message) || '되돌리기 실패'); });
   };
   const undo = () => {
     if (!last || busy) return;
     const k = last.key;
+    if (last.kind === 'snooze') { unsnooze(k, true); return; }
     setBusy(k); setErr('');
-    db.ref(DEC_PATH + '/' + k).update({ answer: null, answerNote: null, answeredAt: null, status: 'pending' })
+    db.ref(DEC_PATH + '/' + k).update({ answer: null, answerNote: null, answeredAt: null, status: 'pending', snoozedUntil: null })
       .then(() => { setBusy(''); setLast(null); })
       .catch(e => { setBusy(''); setErr((e && e.message) || '되돌리기 실패'); });
   };
@@ -7698,6 +7780,31 @@ function TabDecisions({ decs, decErr }) {
     db.ref(DEC_PATH).update(patch).then(() => setSeeding(false))
       .catch(e => { setSeeding(false); setErr((e && e.message) || '등록 실패'); });
   };
+
+  // ── 이미 등록된 시드 카드의 문안 교정 ──────────────────────────────────────
+  // 시드 3건은 이미 /decisions 에 올라가 있고, 위 seed() 버튼은 화면이 완전히 빈 경우에만 뜬다.
+  // 그래서 DEC_SEED 상수만 고치면 유니님이 실제로 누르는 라이브 카드는 그대로 남는다.
+  // 대시보드가 만든 카드를 대시보드가 고치는 것이므로 경계 위반이 아니다 —
+  // 단, 쓰는 필드는 SEED_FIX_KEYS(+seedRev) 뿐이고 답 계열 6개는 여기서 절대 건드리지 않는다.
+  // 이미 답한 카드는 덮어쓰지 않는다. 나간 답을 없던 일로 만들 수 없으니 경고만 띄운다.
+  const seedFix = () => {
+    if (!decs || decs.list === null) return;
+    DEC_SEED.forEach(s => {
+      const live = decs.list.filter(c => c.id === s.id)[0];
+      if (!live) return;                                  // 아직 등록 전이면 seed() 가 최신 문안으로 넣는다
+      if ((Number(live.seedRev) || 0) >= SEED_REV) return; // 이미 맞춰졌다
+      const answered = live.answer != null || (live.status && live.status !== 'pending');
+      if (answered) { setStuck(a => a.indexOf(s.id) >= 0 ? a : a.concat([s.id])); return; }
+      if (fixTried.current[s.id]) return;
+      fixTried.current[s.id] = 1;
+      const patch = { seedRev: SEED_REV };
+      SEED_FIX_KEYS.forEach(k => { patch[k] = (s[k] === undefined ? null : s[k]); });
+      db.ref(DEC_PATH + '/' + live._key).update(patch)
+        .then(() => setFixed(a => a.indexOf(s.id) >= 0 ? a : a.concat([s.id])))
+        .catch(e => { fixTried.current[s.id] = 0; setErr((e && e.message) || '카드 문안 교정 실패'); });
+    });
+  };
+  useEffect(seedFix, [decs && decs.list]);
 
   // 오래 기다린 것부터 위로(선입선출). 단 만료 카드는 '지금 답해도 되지만 확인 필요'라
   // 살아 있는 질문보다 아래로 내린다 — 매번 만료 카드를 지나야 실제 질문에 닿는 걸 막는다.
@@ -7713,6 +7820,10 @@ function TabDecisions({ decs, decErr }) {
   const pendingN = queue.length;
   const staleN = queue.filter(c => decEff(c) === 'pending' && decAgeD(c.createdAt) >= DEC_STALE_D).length;
   const expiredN = queue.filter(c => decEff(c) === 'expired').length;
+  // 보류 중 = 아직 pending 인데 snoozedUntil 이 미래인 카드. 대기 수에는 안 넣지만
+  // 목록 자체는 접힌 채로 보여준다 — 어디로 갔는지 모르게 사라지면 그게 곧 유실이다.
+  const snz = list.filter(c => decEff(c) === 'snoozed')
+    .sort((a, b) => String(a.snoozedUntil || '').localeCompare(String(b.snoozedUntil || '')));
   const done = list.filter(c => (c.status === 'answered' || c.status === 'applied') && c.answeredAt && decAgeD(c.answeredAt) < DEC_RECENT_D)
     .sort((a, b) => String(b.answeredAt || '').localeCompare(String(a.answeredAt || '')));
   const cntDom = d => queue.filter(c => (d === '전체' || c.domain === d) && (fType === '전체' || c.type === fType)).length;
@@ -7733,6 +7844,7 @@ function TabDecisions({ decs, decErr }) {
         <span data-dec-badge style={{ background: pendingN > 0 ? '#C62828' : '#A29C95', color: 'white', borderRadius: 20, padding: '3px 13px', fontSize: 16, fontWeight: 800 }}>대기 {pendingN}건</span>
         {staleN > 0 ? <Badge label={'7일 이상 ' + staleN + '건'} color="#E08700" /> : null}
         {expiredN > 0 ? <Badge label={'만료 표시 ' + expiredN + '건'} color="#989088" /> : null}
+        {snz.length > 0 ? <span data-dec-snzbadge style={{ display: 'inline-block', padding: '3px 11px', borderRadius: 20, fontSize: 15, fontWeight: 700, color: '#3A3631', background: '#EDEBE7' }}>⏸ 보류 중 {snz.length}건</span> : null}
         {done.length > 0 ? <button onClick={() => setShowExp(true)} style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#3A3631', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>📋 볼트 형식 내보내기</button> : null}
       </div>
       <div style={{ fontSize: 15, color: '#6E6863', marginBottom: 14, lineHeight: 1.6 }}>
@@ -7742,9 +7854,26 @@ function TabDecisions({ decs, decErr }) {
       {readErr ? <div style={{ background: '#FDECEA', borderLeft: '4px solid #E53935', borderRadius: '0 8px 8px 0', padding: '10px 14px', fontSize: 15, color: '#8E2A22', marginBottom: 12 }}>판단 큐를 읽지 못했습니다 — {readErr}</div> : null}
       {err ? <div style={{ background: '#FDECEA', borderLeft: '4px solid #E53935', borderRadius: '0 8px 8px 0', padding: '10px 14px', fontSize: 15, color: '#8E2A22', marginBottom: 12 }}>{err}</div> : null}
 
+      {stuck.length > 0 ? (
+        <div data-dec-stuck style={{ background: '#FDECEA', borderLeft: '4px solid #E53935', borderRadius: '0 8px 8px 0', padding: '11px 14px', fontSize: 15, color: '#8E2A22', marginBottom: 12, lineHeight: 1.6 }}>
+          ⚠️ <b>{stuck.map(id => (DEC_SEED.filter(s => s.id === id)[0] || {}).title || id).join(' · ')}</b> — 답한 뒤에 이 카드의 질문·선택지가 바뀌었습니다.
+          저장된 답은 <b>바뀌기 전 문안 기준</b>이라 그대로 두었습니다. 볼트에 반영하기 전에 한 번 확인해주세요.
+        </div>
+      ) : null}
+      {fixed.length > 0 ? (
+        <div data-dec-fixed style={{ background: '#EEF3FB', borderLeft: '4px solid #2D5FE0', borderRadius: '0 8px 8px 0', padding: '11px 14px', fontSize: 15, color: '#1F3F8F', marginBottom: 12, lineHeight: 1.6 }}>
+          🔄 카드 {fixed.length}건의 질문·선택지를 최신 문안으로 맞췄습니다 — <b>{fixed.map(id => (DEC_SEED.filter(s => s.id === id)[0] || {}).title || id).join(' · ')}</b>.
+          답한 내용은 건드리지 않았습니다.
+        </div>
+      ) : null}
+
       {last ? (
         <div data-dec-undo style={{ background: '#EAF5EE', borderLeft: '4px solid #1FA463', borderRadius: '0 8px 8px 0', padding: '11px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 16, color: '#1A1614' }}>저장했습니다 — <b>{last.title}</b> · {last.label}{last.route === 'auto' ? ' (에이전트가 곧 실행합니다)' : ' (볼트 검토 후 반영됩니다)'}</span>
+          <span style={{ fontSize: 16, color: '#1A1614' }}>
+            {last.kind === 'snooze'
+              ? <React.Fragment>보류했습니다 — <b>{last.title}</b> · {last.days}일 뒤({decDate(last.until)}) 대기 목록으로 스스로 돌아옵니다{(Number(last.count) || 0) >= DEC_SNOOZE_WARN ? ' · 이 카드는 ' + last.count + '번째 보류입니다' : ''}</React.Fragment>
+              : <React.Fragment>저장했습니다 — <b>{last.title}</b> · {last.label}{last.route === 'auto' ? ' (에이전트가 곧 실행합니다)' : ' (볼트 검토 후 반영됩니다)'}</React.Fragment>}
+          </span>
           <button onClick={undo} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid #1FA463', background: 'white', color: '#14713F', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>되돌리기</button>
           <button onClick={() => setLast(null)} style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: 'transparent', color: '#6E6863', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>닫기</button>
         </div>
@@ -7786,6 +7915,8 @@ function TabDecisions({ decs, decErr }) {
         const stale = e === 'pending' && age >= DEC_STALE_D;
         const expired = e === 'expired';
         const auto = c.route === 'auto';
+        const snzN = Number(c.snoozeCount) || 0;
+        const snzHot = snzN >= DEC_SNOOZE_WARN;
         const cs = { marginBottom: 14, padding: 18 };
         if (expired) { cs.border = '1.5px dashed #A29C95'; cs.background = '#FAFAF9'; }
         else if (stale) { cs.border = '1.5px solid #E08700'; cs.boxShadow = '0 2px 12px rgba(224,135,0,0.18)'; }
@@ -7799,6 +7930,7 @@ function TabDecisions({ decs, decErr }) {
               </span>
               {stale ? <Badge label={'⏳ ' + age + '일째 대기'} color="#E08700" /> : null}
               {expired ? <Badge label={'⌛ ' + age + '일 경과 · 만료 표시'} color="#989088" /> : null}
+              {snzHot ? <span data-dec-snzcnt={c.id} style={{ display: 'inline-block', padding: '3px 11px', borderRadius: 20, fontSize: 15, fontWeight: 800, color: 'white', background: '#B26A00', whiteSpace: 'nowrap' }}>🔁 {snzN}번 미룸</span> : null}
               <span style={{ marginLeft: 'auto', fontSize: 14, color: '#A29C95' }}>{decDate(c.createdAt)} · {c.createdBy || '에이전트'}</span>
             </div>
 
@@ -7820,19 +7952,61 @@ function TabDecisions({ decs, decErr }) {
                 <button key={o.key} data-dec-opt={c.id + ':' + o.key} disabled={busy === c._key} onClick={() => save(c, o.key)}
                   style={{ padding: '11px 22px', borderRadius: 9, border: 'none', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: busy === c._key ? '#A29C95' : G, color: 'white' }}>{o.label}</button>
               ))}
-              <button data-dec-opt={c.id + ':' + DEC_HOLD} disabled={busy === c._key} onClick={() => save(c, DEC_HOLD)}
-                style={{ padding: '11px 20px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: 'white', color: '#6E6863' }}>보류</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+                <select value={String(snoozeD[c._key] || DEC_SNOOZE_D)} data-dec-snzsel={c.id}
+                  onChange={ev => { const v = ev.target.value; setSnoozeD(s => { const m = { ...s }; m[c._key] = Number(v); return m; }); }}
+                  style={{ padding: '10px 8px', borderRadius: 9, border: '1px solid #E3E0DC', background: 'white', fontSize: 16, color: '#3A3631', fontFamily: 'inherit', cursor: 'pointer' }}>
+                  {DEC_SNOOZE_OPTS.map(d => <option key={d} value={String(d)}>{d}일 뒤</option>)}
+                </select>
+                <button data-dec-snooze={c.id} disabled={busy === c._key} onClick={() => snooze(c)}
+                  style={{ padding: '11px 20px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: 'white', color: '#6E6863' }}>보류</button>
+              </div>
             </div>
+            <div style={{ fontSize: 14, color: '#A29C95', marginTop: 6 }}>보류는 답이 아닙니다 — 고른 기간이 지나면 이 카드가 대기 목록으로 스스로 돌아옵니다.</div>
+            {snzHot ? (
+              <div data-dec-snzmsg={c.id} style={{ fontSize: 15, color: '#8A5200', fontWeight: 700, marginTop: 6, lineHeight: 1.6 }}>
+                벌써 {snzN}번 미룬 카드입니다. 지금도 답하기 어렵다면, 아래 칸에 <b>무엇이 막고 있는지</b>만 한 줄 남겨주세요 — 그게 답보다 더 필요할 수 있습니다.
+              </div>
+            ) : null}
 
             <input value={notes[c._key] || ''} data-dec-note={c.id}
               onChange={ev => { const val = ev.target.value; setNotes(n => { const m = { ...n }; m[c._key] = val; return m; }); }}
               placeholder="한 줄 이유 (선택) — 먼저 적고 위 버튼을 누르면 답과 함께 저장됩니다"
               style={{ width: '100%', marginTop: 12, padding: '9px 10px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 16, boxSizing: 'border-box' }} />
+            {/* 이 노드는 읽기가 공개(.read:true)다. 카드 본문 금지 규칙이 에이전트에게만 걸려 있어서
+                사람이 직접 쓰는 이 칸이 유일하게 안 막힌 구멍이다 — 그래서 칸 바로 밑에 적는다. */}
+            <div data-dec-warn style={{ fontSize: 14, color: '#8A8279', marginTop: 6 }}>
+              🔒 원가·마진·손익분기 숫자, 협력사 단가, 고객 개인정보, <b>법적 리스크에 대한 내부 판단</b>은 적지 마세요. 이 칸은 외부에서 읽을 수 있습니다 — 이런 내용은 볼트 <b>90_내부/</b> 에 직접 적어주세요.
+            </div>
 
             {c.vaultTarget ? <div style={{ fontSize: 14, color: '#A29C95', marginTop: 10 }}>답은 볼트 <b>{c.vaultTarget}</b> 로 갑니다</div> : null}
           </Card>
         );
       })}
+
+      {snz.length > 0 ? (
+        <div style={{ marginTop: 22 }} data-dec-snzbox>
+          <button onClick={() => setOpenSnz(!openSnz)} style={{ width: '100%', textAlign: 'left', background: '#F5F4F2', border: '1px solid #EDEBE7', borderRadius: 10, padding: '11px 14px', fontSize: 16, fontWeight: 700, color: '#3A3631', cursor: 'pointer', fontFamily: 'inherit' }}>
+            {openSnz ? '▾' : '▸'} ⏸ 보류 중 {snz.length}건 — 기간이 지나면 위 대기 목록으로 돌아옵니다
+          </button>
+          {openSnz ? snz.map(c => {
+            const left = decSnoozeLeftD(c.snoozedUntil);
+            return (
+              <div key={'s' + c._key} data-dec-snz={c.id} style={{ background: 'white', borderLeft: '4px solid #C4BFB8', borderRadius: '0 10px 10px 0', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', padding: '11px 14px', marginTop: 8 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Badge label={c.domain || '운영'} color="#E3E0DC" />
+                  <Badge label={c.type || '판정'} color={DEC_TYPE_C[c.type] || '#6E6863'} />
+                  <span style={{ fontSize: 17, fontWeight: 800, color: '#1A1614' }}>{c.title}</span>
+                  <span style={{ fontSize: 15, color: '#6E6863' }}>{decDate(c.snoozedUntil)} 복귀 · {left <= 1 ? '오늘·내일 중' : left + '일 남음'}</span>
+                  {(Number(c.snoozeCount) || 0) >= DEC_SNOOZE_WARN ? <span data-dec-snzcnt2={c.id} style={{ display: 'inline-block', padding: '2px 9px', borderRadius: 20, fontSize: 14, fontWeight: 800, color: 'white', background: '#B26A00' }}>🔁 {Number(c.snoozeCount)}번째</span> : null}
+                  <button onClick={() => unsnooze(c._key)} disabled={busy === c._key} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#3A3631', fontSize: 15, fontWeight: 700, cursor: busy === c._key ? 'wait' : 'pointer' }}>지금 다시 보기</button>
+                </div>
+                {c.answerNote ? <div style={{ fontSize: 15, color: '#6E6863', marginTop: 5 }}>&gt; {c.answerNote}</div> : null}
+              </div>
+            );
+          }) : null}
+        </div>
+      ) : null}
 
       <div style={{ marginTop: 28 }}>
         <div style={{ fontSize: 18, fontWeight: 800, color: G, marginBottom: 2 }}>최근 {DEC_RECENT_D}일 답변 완료</div>
