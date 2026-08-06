@@ -35,49 +35,106 @@ const db = firebase.database();
 // 쓰기 권한용 익명 로그인 (Firebase 규칙: 읽기 공개, 쓰기 auth 필요)
 firebase.auth().signInAnonymously().catch(e => console.warn('익명 로그인 실패 — 저장이 안 될 수 있습니다:', e.message));
 const DB_PATH = '/dashboard';   // 운영
+// 판단 큐(index_141). 테스트는 이 값만 '/decisions_test' 로 바꾼다 — DB_PATH 는 건드리지 않는다.
+const DEC_PATH = '/decisions';
 const { useState, useEffect, useRef } = React;
 
-// ── GitHub 데이터 파일 공통 로더 (index_137, 2026-08-03) ─────────────────────
-// [배경] raw.githubusercontent.com/<repo>/main/... 은 CDN 캐시가 심하게 묵는다.
-//   2026-08-03 실측: raw(main) = updatedAt "2026-07-23 10:29" (11일 스탈)
-//                    GitHub Pages 동일경로 = updatedAt "2026-08-03 10:09" (정상)
-//   ?t=Date.now() 를 붙여도 raw 는 안 뚫렸다. 그래서 raw 를 1순위에서 내렸다.
-// [해법] 대시보드는 GitHub Pages 위에서 돌아가므로 data/ 를 '동일 출처'로 읽는다.
-//   순서: 동일출처(상대경로) → github.io 절대경로 → raw(main) 폴백.
-//   file:// 로 로컬 확인할 땐 동일출처가 없으므로 raw 만 쓴다(CORS 에러 방지).
-//   api.github.com 으로 커밋 SHA 를 받아 경로에 박는 방식은 채택하지 않았다 —
+// ── GitHub 데이터 파일 공통 로더 (index_140, 2026-08-04) ─────────────────────
+// [이력 — 두 번 다 '데이터가 낡았는데 아무도 몰랐다' 가 실제 피해였다]
+//   index_137 : raw.githubusercontent.com/<repo>/main/ 이 11일 스탈.
+//               raw = "2026-07-23 10:29" / Pages = "2026-08-03 10:09"
+//               → raw 를 1순위에서 내리고 동일출처(Pages)를 1순위로.
+//   index_140 : 이번엔 반대로 Pages 가 13시간 스탈(허브 직접 검증).
+//               Pages = "2026-08-03 10:09" (activeSubscribers 20, 구버그값)
+//               raw   = "2026-08-03 23:11" (activeSubscribers 32, 수정본)
+//               commit 4189398 은 main 에 있으나 pages-build-deployment 가
+//               안 돌아 옛 파일이 계속 서빙됐다. ?t= 캐시버스팅으로도 안 뚫렸다
+//               (엣지캐시 문제가 아니라 빌드 자체가 안 돈 것).
+// [결론] Pages 도 raw 도 '항상 신선하다' 고 믿을 수 없다. 순서를 바꿔봐야
+//   스탈한 쪽이 1순위로 걸리는 경우는 그대로 남는다.
+// [해법 · freshest-wins] 후보를 순서대로 하나만 고르지 않는다. 전부 동시에 받아
+//   본문의 updatedAt 을 비교해 '가장 최신' 을 채택한다. 어느 경로가 막혀도,
+//   어느 경로가 묵어도 팀이 보는 숫자는 항상 그 시점의 최신본이 된다.
+//   updatedAt 이 없는 파일(meetings 등)은 종전대로 우선순위 1등을 쓴다.
+//   api.github.com 으로 커밋 SHA 를 받는 방식은 여전히 안 쓴다 —
 //   비인증 60회/시간 레이트리밋이 있어 팀이 새로고침하면 데이터가 통째로 안 뜬다.
 const GH_REPO = 'miraclead2026/lifemeal-dashboard';
 const GH_PAGES = 'https://miraclead2026.github.io/lifemeal-dashboard/';
 const GH_RAW = 'https://raw.githubusercontent.com/' + GH_REPO + '/main/';
+const GH_LABEL = b => b === GH_RAW ? 'raw(main)' : b === GH_PAGES ? 'github.io' : '동일출처';
 const GH_BASES = () => {
   try {
     if (/^https?:$/.test(window.location.protocol)) {
       const self = new URL('./', window.location.href).href;
+      // 동일출처가 곧 Pages 인 경우(정상 배포 상태) 후보는 Pages·raw 둘.
       return self === GH_PAGES ? [GH_PAGES, GH_RAW] : [self, GH_PAGES, GH_RAW];
     }
   } catch (e) { }
-  return [GH_RAW];
+  return [GH_RAW];   // file:// 로컬 확인 — 동일출처가 없으므로 raw 만(CORS 에러 방지)
 };
-let GH_SRC = '';           // 마지막으로 성공한 출처(전역 진단용)
-const GH_SRC_MAP = {};     // 파일 경로별 실제 성공 출처 — 파일마다 다를 수 있어 따로 남긴다
+// meetings 상세는 한 번에 수십 건을 받으므로 전수조회 대상에서 뺀다(요청 3배 방지).
+const ghMulti = p => !/^data\/meetings\//.test(p);
+let GH_SRC = '';           // 마지막으로 채택된 출처(전역 진단용)
+const GH_SRC_MAP = {};     // 파일 경로별 채택 출처
+const GH_AT_MAP = {};      // 파일 경로별 채택본의 updatedAt — 신선도 배지가 읽는다
+const GH_ALL_MAP = {};     // 파일 경로별 후보 전수 결과 [{base,label,ok,at}] — 진단 표시용
+let GH_TICK = 0;           // 로드가 끝날 때마다 증가 — 화면이 폴링으로 감지한다
 const ghSrcOf = p => GH_SRC_MAP[p] || '';
-// [index_138] 마지막 후보(raw)까지 떨어져서 성공했다 = 지금 보는 데이터가 며칠 묵었을 수 있다.
-//   허브 요청: 이 경우 툴팁만으로는 아무도 못 알아채니 '갱신' 라벨 자체를 경고색으로.
-//   후보가 1개뿐인 file:// 로컬 확인은 '폴백'이 아니므로 경고하지 않는다.
-const ghStale = p => GH_SRC_MAP[p] === GH_RAW && GH_BASES().length > 1;
-const SALES_SRC = 'data/naver-sales.json';   // 매출탭 '갱신' 라벨이 진단할 대상 파일
-// fetch() 와 동일하게 Promise<Response> 를 돌려준다 → 호출부 로직은 그대로 둔다.
+const ghSrcLabel = p => GH_SRC_MAP[p] ? GH_LABEL(GH_SRC_MAP[p]) : '';
+const ghAtOf = p => GH_AT_MAP[p] || '';
+const ghAllOf = p => GH_ALL_MAP[p] || [];
+// 'YYYY-MM-DD HH:mm' (매출 자동화가 쓰는 형식) → epoch ms. 형식이 다르면 Date.parse.
+const ghParseAt = s => {
+  if (!s || typeof s !== 'string') return 0;
+  const m = s.match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+  if (m) return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime();
+  const d = Date.parse(s);
+  return isNaN(d) ? 0 : d;
+};
+const GH_STALE_H = 12;     // 허브 규칙: updatedAt 이 현재시각 대비 12시간 이상 과거면 ⚠️
+const ghAgeH = p => { const t = ghParseAt(GH_AT_MAP[p]); return t ? (Date.now() - t) / 3600000 : -1; };
+const ghStale = p => ghAgeH(p) >= GH_STALE_H;
+const ghAgeText = h => h < 0 ? '' : h < 1 ? Math.max(1, Math.round(h * 60)) + '분 지남' : h < 48 ? Math.round(h) + '시간 지남' : Math.floor(h / 24) + '일 지남';
+const SALES_SRC = 'data/naver-sales.json';   // 매출탭 신선도 배지가 진단할 대상 파일
+// fetch() 와 동일하게 Promise<Response> 모양을 돌려준다 → 호출부 로직은 그대로 둔다.
 const ghFetch = path => {
   const q = (path.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
   const bases = GH_BASES();
   const dead = { ok: false, status: 504, statusText: 'all-sources-failed', json: () => Promise.resolve(null) };
-  const step = i => {
-    if (i >= bases.length) return Promise.resolve(dead);
-    return fetch(bases[i] + path + q, { cache: 'no-store' })
-      .then(r => { if (!r.ok) return step(i + 1); GH_SRC = bases[i]; GH_SRC_MAP[path] = bases[i]; return r; }, () => step(i + 1));
-  };
-  return step(0);
+  const one = (b, i) => fetch(b + path + q, { cache: 'no-store' })
+    .then(r => r.ok ? r.text().then(t => ({ i: i, base: b, ok: true, text: t }), () => ({ i: i, base: b, ok: false })) : { i: i, base: b, ok: false })
+    .catch(() => ({ i: i, base: b, ok: false }));
+  // 후보가 하나뿐이거나(file://) 전수조회 대상이 아니면 옛 방식대로 순차 폴백.
+  if (bases.length < 2 || !ghMulti(path)) {
+    const step = i => {
+      if (i >= bases.length) return Promise.resolve(dead);
+      return fetch(bases[i] + path + q, { cache: 'no-store' })
+        .then(r => { if (!r.ok) return step(i + 1); GH_SRC = bases[i]; GH_SRC_MAP[path] = bases[i]; return r; }, () => step(i + 1));
+    };
+    return step(0).then(r => { GH_TICK++; return r; });
+  }
+  return Promise.all(bases.map(one)).then(res => {
+    const cands = [];
+    res.forEach(x => {
+      if (!x.ok) return;
+      let body = null;
+      try { body = JSON.parse(x.text); } catch (e) { }
+      const at = (body && typeof body === 'object' && body.updatedAt) || '';
+      cands.push({ i: x.i, base: x.base, body: body, at: at, ms: ghParseAt(at) });
+    });
+    GH_ALL_MAP[path] = bases.map((b, i) => {
+      const c = cands.filter(c => c.i === i)[0];
+      return { base: b, label: GH_LABEL(b), ok: !!c, at: c ? c.at : '' };
+    });
+    GH_TICK++;
+    if (!cands.length) return dead;
+    // updatedAt 이 읽힌 후보가 있으면 그중 최신(동률이면 우선순위 앞), 없으면 우선순위 1등.
+    const dated = cands.filter(c => c.ms > 0);
+    const pool = dated.length ? dated : cands;
+    const win = pool.reduce((a, b) => (b.ms > a.ms || (b.ms === a.ms && b.i < a.i)) ? b : a);
+    GH_SRC = win.base; GH_SRC_MAP[path] = win.base; GH_AT_MAP[path] = win.at;
+    return { ok: true, status: 200, statusText: 'OK', json: () => Promise.resolve(win.body) };
+  });
 };
 
 const G = '#1A1614', GO = '#1A1614', BG = '#FFFFFF';
@@ -5471,6 +5528,33 @@ function TabChannel({ data, setData }) {
   );
 }
 
+// ── 정기구독 수집 시작일 (index_140, 허브 규칙 【4】) ────────────────────────
+// 매출 자동화가 구독 데이터를 모으기 시작한 날. 이 날 이전 구간의 0 은 '진짜 0' 이
+// 아니라 '아직 안 모은 값' 이다. 예: 서빙 중이던 파일의 2026-W31(7/27~8/2) 은
+// activeSubscribers: 0 이었는데, 이걸 그대로 찍으면 '그 주 구독자 0명' 이라는
+// 거짓 정보가 된다. 그래서 구간 전체가 이 날 이전이면 숫자 대신 '—'(미수집) 로 찍는다.
+const SUB_START = '2026-08-01';
+// 레코드의 실제 날짜 범위를 구한다. daily[] 가 있으면 그게 가장 정확하고,
+// 없으면 key 로 역산한다(YYYY-MM-DD / YYYY-MM / YYYY-Www).
+function salesRecRange(rec) {
+  if (!rec) return ['', ''];
+  if (rec.periodStart && rec.periodEnd) return [rec.periodStart, rec.periodEnd];
+  const ds = ((rec.daily || []).map(x => x && x.date).filter(Boolean)).sort();
+  if (ds.length) return [ds[0], ds[ds.length - 1]];
+  const k = String(rec.key || '');
+  const f = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(k)) return [k, k];
+  if (/^\d{4}-\d{2}$/.test(k)) { const y = +k.slice(0, 4), m = +k.slice(5, 7); return [k + '-01', k + '-' + String(new Date(y, m, 0).getDate()).padStart(2, '0')]; }
+  const w = k.match(/^(\d{4})-W(\d{1,2})$/);
+  if (w) {   // ISO 주차 — 그 해 1월 4일이 속한 주의 월요일이 1주차 시작
+    const jan4 = new Date(+w[1], 0, 4);
+    const mon = new Date(jan4); mon.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7) + (+w[2] - 1) * 7);
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    return [f(mon), f(sun)];
+  }
+  return ['', ''];
+}
+
 function aggSalesRange(days, start, end) {
   if (!start || !end || start > end) return null;
   const inR = (days || []).filter(d => d.key && d.key >= start && d.key <= end).sort((a, b) => a.key < b.key ? -1 : 1);
@@ -5505,7 +5589,11 @@ function aggSalesRange(days, start, end) {
   const prMap = {};
   inR.forEach(d => (d.products || []).forEach(p => { const k = p.productId || p.name; const m = prMap[k] || (prMap[k] = { name: p.name, productId: p.productId, revenue: 0, qty: 0 }); m.revenue += p.revenue || 0; m.qty += p.qty || 0; }));
   const products = Object.values(prMap).sort((a, b) => b.revenue - a.revenue).map((p, i) => ({ rank: i + 1, name: p.name, productId: p.productId, revenue: p.revenue, qty: p.qty }));
-  const subDays = inR.filter(d => d.subscription && ((d.subscription.orders || 0) > 0 || (d.subscription.activeSubscribers || 0) > 0));
+  // [index_139] 전 필드가 null 인 날(수집 이전)도 후보에 넣어야 화면에서 '—' 로 찍힌다.
+  //   138 까지는 여기서 잘려나가 subscription 자체가 null 이 됐고, 카드가 통째로 사라졌다.
+  // [index_140] 수집 시작일 이전의 날도 넣는다 — 0 이 아니라 '미수집' 으로 보여주기 위해.
+  const SUBNF = ['orders', 'newOrders', 'renewOrders', 'activeSubscribers', 'revenue'];
+  const subDays = inR.filter(d => d.subscription && ((d.subscription.orders || 0) > 0 || (d.subscription.activeSubscribers || 0) > 0 || SUBNF.some(f => d.subscription[f] === null) || String(d.key || '') < SUB_START));
   let subscription = null;
   if (subDays.length) {
     // [index_138] 허브 규칙: 값이 없는 기간(2026-03~07)은 매출보고 에이전트가 null 로 내보낸다.
@@ -5549,6 +5637,49 @@ const REP_SEED = [
 ];
 const REP_DEFAULTS = REP_SEED.map(r => ({ id: r.id, name: r.name }));
 const REP_AUTO = (() => { const m = {}; REP_SEED.forEach(r => (r.fulls || []).forEach(f => { m[String(f).replace(/\s+/g, '').toLowerCase()] = r.id; })); return m; })();
+
+// ── 데이터 신선도 표시 (index_140, 허브 요청 【1】) ───────────────────────────
+// "지금까지 두 번 다 '데이터가 낡았는데 아무도 몰랐다' 가 실제 피해였습니다."
+// → 파일의 updatedAt 을 화면에 그대로 띄우고, 12시간 이상 과거면 경고색으로 바꾼다.
+//   채택된 출처(동일출처 / github.io / raw)와 후보별 갱신시각도 같이 보여준다.
+//   어느 경로가 묵었는지 운영자가 바로 알 수 있어야 원인 파악이 빨라진다.
+function useFreshTick() {   // 탭을 오래 열어둬도 '몇 시간 지남' 이 굳지 않게 1분마다 재계산
+  const [, setT] = useState(0);
+  useEffect(() => { const h = setInterval(() => setT(x => x + 1), 60000); return () => clearInterval(h); }, []);
+}
+function freshInfo(at) {
+  let ageH = ghAgeH(SALES_SRC);
+  if (ageH < 0) { const t = ghParseAt(at); ageH = t ? (Date.now() - t) / 3600000 : -1; }
+  return { src: ghSrcLabel(SALES_SRC), ageH: ageH, stale: ageH >= GH_STALE_H, all: ghAllOf(SALES_SRC) };
+}
+function FreshLabel({ at }) {
+  useFreshTick();
+  const f = freshInfo(at);
+  const tip = '데이터 파일 갱신시각 ' + at
+    + (f.src ? '\n채택 출처 ' + f.src : '')
+    + (f.ageH >= 0 ? '\n경과 ' + ghAgeText(f.ageH) : '')
+    + (f.all.length > 1 ? '\n\n[후보별 갱신시각]\n' + f.all.map(x => '· ' + x.label + ' — ' + (x.ok ? (x.at || '(updatedAt 없음)') : '읽기 실패')).join('\n') : '')
+    + (f.stale ? '\n\n⚠ ' + GH_STALE_H + '시간 이상 지난 파일입니다. 위 안내를 확인해 주세요.' : '');
+  return f.stale
+    ? <span title={tip} style={{ fontSize: 11, fontWeight: 800, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 7, padding: '3px 8px', cursor: 'help' }}>⚠ 갱신 {at}{f.src ? ' · ' + f.src : ''} · {ghAgeText(f.ageH)}</span>
+    : <span title={tip} style={{ fontSize: 11, color: '#A29C95', cursor: 'help' }}>갱신 {at}{f.src ? ' · ' + f.src : ''}</span>;
+}
+function FreshBanner({ at }) {
+  useFreshTick();
+  const f = freshInfo(at);
+  if (!f.stale) return null;
+  const ok = f.all.filter(x => x.ok);
+  return (
+    <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: 14, marginBottom: 14 }}>
+      <div style={{ fontSize: 12.5, fontWeight: 800, color: '#B45309' }}>⚠ 데이터가 {ghAgeText(f.ageH)} — 아래 숫자는 최신이 아닐 수 있습니다</div>
+      <div style={{ fontSize: 11, color: '#92400E', marginTop: 6, lineHeight: 1.8 }}>
+        파일 갱신시각 <b>{at}</b>{f.src ? <> · 채택 출처 <b>{f.src}</b></> : null}<br />
+        {ok.length > 1 ? <>후보별 갱신시각 — {ok.map((x, i) => <span key={x.label}>{i ? ' · ' : ''}{x.label} <b>{x.at || '(없음)'}</b></span>)}<br /></> : null}
+        매출 자동화가 멈췄거나, 커밋은 올라갔는데 <b>GitHub Pages 배포(pages-build-deployment)</b> 가 안 돈 상태일 수 있어요. 저장소 Actions 탭에서 최근 배포가 성공했는지 확인해 주세요.
+      </div>
+    </div>
+  );
+}
 
 function TabSales({ data, setData }) {
   const [mode, setMode] = useState('month');
@@ -5605,6 +5736,19 @@ function TabSales({ data, setData }) {
   const r = isCustom ? customRec : (list[curIdx] || null);
   const sum = (r && r.summary) || {}; const daily = (r && r.daily) || []; const channels = (r && r.channels) || []; const products = (r && r.products) || [];
   const sub = (r && r.subscription) || null;
+  // ── 구독 표시 판정 (index_139 + index_140) ────────────────────────────────
+  // subHasNull : 값이 null = '수집 이전' → 카드를 띄우고 '—' 로 찍는다(0 으로 접으면 오독).
+  // subShow    : 138 은 0/null 이면 카드를 통째로 감췄다 → 숫자가 조용히 사라져 아무도 몰랐다.
+  // subPre     : 구간 전체가 수집 시작일 이전 → 파일에 0 이 들어있어도 '미수집' 으로 찍는다.
+  // subPartial : 구간에 수집 이전 날짜가 섞여 있음 → 숫자는 그대로 두되 경고 문구를 단다.
+  const SUB_NF = ['orders', 'newOrders', 'renewOrders', 'activeSubscribers', 'revenue'];
+  const subHasNull = !!sub && SUB_NF.some(f => sub[f] === null);
+  const recRng = isCustom ? [range.start || '', range.end || ''] : salesRecRange(r);
+  const subPre = !!recRng[1] && recRng[1] < SUB_START;
+  const subPartial = !!recRng[0] && !!recRng[1] && recRng[0] < SUB_START && recRng[1] >= SUB_START;
+  const subShow = !!sub && (subPre || subHasNull || sub.orders > 0 || sub.activeSubscribers > 0 || sub.revenue > 0);
+  const fileHasSub = !!(full && [].concat(full.months || [], full.weeks || [], full.days || []).some(b => b && b.subscription));
+  const daysMissing = !!(full && (full.days || []).length === 0);
   const maxRev = Math.max(1, ...daily.map(x => x.revenue || 0));
   const dowStats = (() => { const order = ['월', '화', '수', '목', '금', '토', '일']; const m = {}; order.forEach(d => m[d] = { sum: 0, cnt: 0, days: [] }); daily.forEach(x => { const d = dowOf(x.date); if (m[d]) { m[d].sum += (x.revenue || 0); m[d].cnt += 1; m[d].days.push({ date: x.date, revenue: x.revenue || 0 }); } }); return order.map(d => ({ dow: d, avg: m[d].cnt ? Math.round(m[d].sum / m[d].cnt) : 0, sum: m[d].sum, cnt: m[d].cnt, days: m[d].days })); })();
   const maxDowAvg = Math.max(1, ...dowStats.map(d => d.avg));
@@ -5692,9 +5836,7 @@ function TabSales({ data, setData }) {
               {list.map((it, i) => <option key={it.key || i} value={i}>{it.label || it.key}</option>)}
             </select>
           )}
-          {full && full.updatedAt && (ghStale(SALES_SRC)
-            ? <span title={'동일 출처·GitHub Pages 에서 읽지 못해 raw.githubusercontent.com 으로 폴백했습니다. raw 는 CDN 캐시가 며칠씩 묵을 수 있어 이 숫자가 최신이 아닐 수 있어요. (실제 출처: ' + ghSrcOf(SALES_SRC) + ')'} style={{ fontSize: 11, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 7, padding: '3px 8px', cursor: 'help' }}>⚠ 갱신 {full.updatedAt} · 캐시 가능성</span>
-            : <span title={ghSrcOf(SALES_SRC) ? '데이터 출처: ' + ghSrcOf(SALES_SRC) : undefined} style={{ fontSize: 11, color: '#A29C95' }}>갱신 {full.updatedAt}</span>)}
+          {full && full.updatedAt && <FreshLabel at={full.updatedAt} />}
         </div>
       )}
 
@@ -5707,8 +5849,16 @@ function TabSales({ data, setData }) {
         </div>
       )}
 
+      {status !== 'loading' && full && full.updatedAt && <FreshBanner at={full.updatedAt} />}
+
       {status !== 'loading' && !isCustom && list.length === 0 && (
-        <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>{modeLabel[mode]} 데이터가 아직 없습니다</Card>
+        <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>
+          <div style={{ fontSize: 13 }}>{modeLabel[mode]} 데이터가 아직 없습니다</div>
+          {full && <div style={{ fontSize: 11, marginTop: 10, color: '#B45309', lineHeight: 1.8 }}>
+            데이터 파일 구성 — 월간 {(full.months || []).length}건 · 주간 {(full.weeks || []).length}건 · 일간 {(full.days || []).length}건
+            {mode === 'day' && daysMissing ? <><br />파일에 <b>root.days[]</b> 가 없습니다. 매출 자동화가 올려주면 일간·기간지정이 자동으로 켜집니다.</> : null}
+          </div>}
+        </Card>
       )}
 
       {r && status !== 'loading' && (<>
@@ -5883,24 +6033,48 @@ function TabSales({ data, setData }) {
           </Card>
         )}
 
-        {sub && (sub.orders > 0 || sub.activeSubscribers > 0 || sub.revenue > 0) && (() => {
-          const hasRev = sub.revenue > 0;
+        {/* [index_139] 값이 없을 때 카드가 조용히 사라지면 아무도 모른다 → 왜 없는지 말해준다 */}
+        {!subShow && fileHasSub && r && (mode === 'day' || isCustom) && (
+          <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: 14, marginBottom: 16 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: '#B45309' }}>🔁 정기구독 — 이 구간은 데이터 파일에 구독 값이 없습니다</div>
+            <div style={{ fontSize: 11, color: '#92400E', marginTop: 6, lineHeight: 1.7 }}>
+              대시보드는 <b>root.days[]</b> 를 그대로 읽습니다. 월간·주간에는 구독 수치가 보이는데 여기만 비어 있다면, 매출 자동화가 <b>일간 버킷(days[])에 subscription 을 아직 넣지 않은</b> 상태입니다. 파일이 채워지면 자동으로 표시됩니다.
+            </div>
+          </div>
+        )}
+
+        {subShow && (() => {
+          const hasRev = !subPre && sub.revenue > 0;
           // [index_138] 허브 규칙 — null 은 '수집 이전'이라는 뜻. 0 으로 렌더하면 '구독자 0명'으로 오독된다.
-          const NA_TIP = '이 기간은 수집 이전이라 값이 없습니다.';
+          // [index_140] 구간 전체가 수집 시작일(2026-08-01) 이전이면 파일에 0 이 들어있어도 '—' 로 찍는다.
+          const NA_TIP = subPre ? ('정기구독은 ' + SUB_START + ' 부터 수집합니다. 이 기간은 수집 이전이라 0 이 아니라 값이 없는 것입니다.') : '이 기간은 수집 이전이라 값이 없습니다.';
           const dash = <span title={NA_TIP} style={{ color: '#C9C4BE', cursor: 'help' }}>—</span>;
-          const nOr = v => v == null ? dash : Number(v).toLocaleString();
+          const nOr = v => (subPre || v == null) ? dash : Number(v).toLocaleString();
           const asOfTip = sub.activeSubscribersAsOf ? sub.activeSubscribersAsOf + ' 기준' : undefined;
           const totRev = sum.revenue ? sum.revenue.value : 0;
           const revShare = hasRev && totRev ? Math.round(sub.revenue / totRev * 1000) / 10 : null;
-          const sprods = (sub.products || []).slice().sort((a, b) => (b.orders || 0) - (a.orders || 0));
+          const sprods = subPre ? [] : (sub.products || []).slice().sort((a, b) => (b.orders || 0) - (a.orders || 0));
           const maxOrd = Math.max(1, ...sprods.map(p => p.orders || 0));
           return (
             <Card style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: G }}>🔁 정기구독 현황</div>
                 <span style={{ fontSize: 11, color: '#A29C95' }}>{modeLabel[mode]} 기준</span>
-                {!hasRev && <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '3px 8px' }}>매출 집계 준비중 (건수만 표시)</span>}
+                {subPre
+                  ? <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 6, padding: '3px 8px' }}>미수집 구간</span>
+                  : (!hasRev && <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '3px 8px' }}>매출 집계 준비중 (건수만 표시)</span>)}
               </div>
+              {/* [index_140] 허브 규칙 【4】 — 0 과 '아직 안 모음' 을 구분해서 말해준다 */}
+              {subPre && (
+                <div style={{ background: '#F8F7F5', border: '1px solid #E3E0DC', borderRadius: 10, padding: '10px 12px', marginBottom: 12, fontSize: 11, color: '#6E6863', lineHeight: 1.7 }}>
+                  정기구독 데이터는 <b>{SUB_START}</b> 부터 수집합니다. 이 기간({recRng[0]} ~ {recRng[1]})은 그 이전이라 <b>0 이 아니라 값이 없는 것</b>이에요. 파일에 0 이 들어 있어도 화면에는 <b>—</b> 로 표시합니다.
+                </div>
+              )}
+              {subPartial && (
+                <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 12px', marginBottom: 12, fontSize: 11, color: '#92400E', lineHeight: 1.7 }}>
+                  ⚠ 이 기간({recRng[0]} ~ {recRng[1]})에는 수집 시작일(<b>{SUB_START}</b>) 이전이 섞여 있습니다. <b>{recRng[0]} ~ {SUB_START} 직전</b>은 값이 없어 아래 합계에서 빠졌어요 — 기간 전체의 수치로 읽으면 안 됩니다.
+                </div>
+              )}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: 10, marginBottom: sprods.length ? 16 : 0 }}>
                 <div style={{ background: '#F7FAFD', border: '1px solid #D9E7F5', borderRadius: 10, padding: 12 }}>
                   <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>구독 주문</div>
@@ -5909,15 +6083,15 @@ function TabSales({ data, setData }) {
                 </div>
                 <div style={{ background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: 12 }}>
                   <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>활성 구독자</div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: '#166534' }}><span title={sub.activeSubscribers == null ? undefined : asOfTip} style={asOfTip && sub.activeSubscribers != null ? { cursor: 'help' } : null}>{nOr(sub.activeSubscribers)}</span><span style={{ fontSize: 12, fontWeight: 600, color: '#6E6863' }}> 명</span>{sub.activeSubscribers != null && sub.activeSubscribersSource === 'order-derived' && <span title="구독 콘솔 값이 아니라 주문 데이터에서 역산한 추정치입니다." style={{ fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '1px 5px', marginLeft: 6, verticalAlign: 'middle' }}>· 주문 기준 추정</span>}</div>
-                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>{sub.activeSubscribersAsOf ? sub.activeSubscribersAsOf + ' 기준' : '기간 말 진행중 기준'}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#166534' }}><span title={(subPre || sub.activeSubscribers == null) ? undefined : asOfTip} style={asOfTip && !subPre && sub.activeSubscribers != null ? { cursor: 'help' } : null}>{nOr(sub.activeSubscribers)}</span><span style={{ fontSize: 12, fontWeight: 600, color: '#6E6863' }}> 명</span>{!subPre && sub.activeSubscribers != null && sub.activeSubscribersSource === 'order-derived' && <span title="구독 콘솔 값이 아니라 주문 데이터에서 역산한 추정치입니다." style={{ fontSize: 10, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '1px 5px', marginLeft: 6, verticalAlign: 'middle' }}>· 주문 기준 추정</span>}</div>
+                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>{subPre ? '수집 이전' : (sub.activeSubscribersAsOf ? sub.activeSubscribersAsOf + ' 기준' : '기간 말 진행중 기준')}</div>
                 </div>
                 <div style={{ background: 'white', border: '1px solid #E3E0DC', borderRadius: 10, padding: 12 }}>
                   <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>구독 매출</div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: hasRev ? G : '#C9C4BE' }}>{hasRev ? won2(sub.revenue) : '준비중'}</div>
-                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>{hasRev ? (revShare != null ? '전체 매출의 ' + revShare + '%' : '기여 기준') : '집계 예정'}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: hasRev ? G : '#C9C4BE' }}>{subPre ? dash : (hasRev ? won2(sub.revenue) : '준비중')}</div>
+                  <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>{subPre ? '수집 이전' : (hasRev ? (revShare != null ? '전체 매출의 ' + revShare + '%' : '기여 기준') : '집계 예정')}</div>
                 </div>
-                {sub.canceled > 0 && (
+                {!subPre && sub.canceled > 0 && (
                   <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: 12 }}>
                     <div style={{ fontSize: 11, color: '#6E6863', marginBottom: 3 }}>해지</div>
                     <div style={{ fontSize: 20, fontWeight: 800, color: '#E53935' }}>{sub.canceled.toLocaleString()}<span style={{ fontSize: 12, fontWeight: 600, color: '#6E6863' }}> 건</span></div>
@@ -7338,9 +7512,353 @@ function TabSchedule({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
+const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
 
 const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 판단 대기 — AI가 사람에게 묻는 단일 창구   (index_141, 2026-08-06)
+// 설계 원장 : 볼트 70_에이전트/판단 큐 설계.md  (이 코드와 볼트가 다르면 볼트가 맞다)
+//
+// [왜 /dashboard 가 아니라 별도 노드인가]
+//   /dashboard 는 팀이 손으로 넣는 실행계획·예산·KPI 다. 저장이 통짜 set() 이고
+//   rev 가드가 걸려 있어서, 다른 주체가 끼어들어 한 필드만 고치는 걸 전제하지 않는다.
+//   판단 카드는 정반대다 — 에이전트가 만들고, 사람이 한 필드만 건드리고, 또 다른
+//   에이전트가 실행 표시를 남긴다. 성격이 다르므로 /decisions 로 분리했고,
+//   이 화면은 set() 을 절대 쓰지 않고 update() 로 자기 몫 필드만 덮는다.
+//
+// [쓰기 경계 — 한 필드는 한 주체만]
+//   에이전트        : 카드 생성 · status:pending
+//   대시보드(여기)  : answer · answerNote · answeredAt · status→answered   ← 이 4개뿐
+//   실행 에이전트   : appliedAt · status→applied
+//   그래서 expired 는 서버에 쓰지 않는다. 30일이 지났다는 '사실'을 화면에서 계산해
+//   표시만 한다(카드 자동 삭제 금지와 같은 이유 — 데이터는 손대지 않는다).
+// ═══════════════════════════════════════════════════════════════════════════
+const DEC_DOMAINS = ['광고', '상품', '고객', 'CS', '운영'];
+const DEC_TYPES = ['판정', '승인', '정합'];
+const DEC_TYPE_C = { '판정': '#2D5FE0', '승인': '#1FA463', '정합': '#E08700' };
+const DEC_STALE_D = 7;    // 7일 무응답 → 시각 구분(재알림)
+const DEC_EXPIRE_D = 30;  // 30일 무응답 → 만료 '표시'. 삭제하지 않는다.
+const DEC_RECENT_D = 30;  // 하단 답변 완료 목록 노출 기간
+const DEC_HOLD = 'hold';  // options 외에 항상 붙는 답
+
+function decAgeD(iso) {
+  if (!iso) return 0;
+  const t = Date.parse(iso);
+  if (isNaN(t)) return 0;
+  return Math.floor((Date.now() - t) / 86400000);
+}
+function decDate(iso) { const s = String(iso || ''); return s.length >= 10 ? s.slice(0, 10) : s; }
+function decEff(c) {
+  if (!c) return 'pending';
+  const s = c.status || 'pending';
+  if (s === 'pending' && decAgeD(c.createdAt) >= DEC_EXPIRE_D) return 'expired';
+  return s;
+}
+function decOptLabel(c, key) {
+  if (key === DEC_HOLD) return '보류';
+  const o = ((c && c.options) || []).filter(x => x && x.key === key)[0];
+  return o ? o.label : (key || '—');
+}
+
+// 첫 입주 대상 3건. 화면이 완전히 비었을 때만 '등록' 버튼으로 뜬다.
+// 자동으로 쓰지 않는다 — 카드 생성은 원래 에이전트 몫이고, 여기선 부트스트랩일 뿐이다.
+const DEC_SEED = [
+  {
+    id: 'dec_20260806_001', type: '판정', status: 'pending', domain: '광고',
+    createdBy: 'keyword-agent', createdAt: '2026-08-06T09:00:00+09:00',
+    title: '야채분말·야채가루 키워드',
+    question: '제외할까요, 진단으로 둘까요?',
+    context: '누적클릭 30 · 전환 0 · 톤앤매너 키워드 풀에 없음',
+    vaultHint: "닥터샐러드 커머스 카테고리가 '야채가루'. 매칭 가능성 있음",
+    options: [{ key: 'exclude', label: '제외' }, { key: 'keep', label: '진단 유지' }],
+    route: 'auto', vaultTarget: '80_광고/키워드 운영.md',
+    answer: null, answerNote: null, answeredAt: null, appliedAt: null,
+  },
+  {
+    id: 'dec_20260806_002', type: '판정', status: 'pending', domain: '광고',
+    createdBy: 'ads-agent', createdAt: '2026-08-06T09:00:00+09:00',
+    title: 'ROAS 330% 근거',
+    question: '이 값이 어디서 나왔나요?',
+    context: '인수인계 절대원칙에서 넘어온 값. 광고 판단 전체가 이 위에 서 있음',
+    vaultHint: '볼트에 근거 문서 없음. 마진 역산 여부 미확인',
+    options: [{ key: 'margin', label: '마진 역산' }, { key: 'custom', label: '관행' }, { key: 'unknown', label: '모르겠음' }],
+    route: 'vault', vaultTarget: '80_광고/광고 판단 규칙.md',
+    answer: null, answerNote: null, answeredAt: null, appliedAt: null,
+  },
+  {
+    id: 'dec_20260806_003', type: '정합', status: 'pending', domain: '상품',
+    createdBy: 'product-agent', createdAt: '2026-08-06T09:00:00+09:00',
+    title: '영양식 원료 개수',
+    question: '31종과 300여종 중 뭐가 맞나요?',
+    context: '라벨 고시는 31종, 상세페이지 카피는 300여종',
+    vaultHint: '라벨 판독(08-05) 기준 31종. 300여종은 오기 의심',
+    options: [{ key: 'n31', label: '31종' }, { key: 'n300', label: '300여종' }, { key: 'recheck', label: '실물 재확인 필요' }],
+    route: 'vault', vaultTarget: '30_상품/영양식.md',
+    answer: null, answerNote: null, answeredAt: null, appliedAt: null,
+  },
+];
+
+// /decisions 구독. /dashboard 상태 트리와 완전히 분리돼 있어서 기존 탭에 영향이 없다.
+function useDecisions() {
+  const [state, setState] = useState({ list: null, err: '' });
+  useEffect(() => {
+    let ref = null;
+    try { ref = db.ref(DEC_PATH); } catch (e) { setState({ list: [], err: (e && e.message) || '연결 실패' }); return; }
+    const cb = ref.on('value', snap => {
+      const v = (snap && snap.val()) || {};
+      const out = [];
+      Object.keys(v).forEach(k => {
+        const c = v[k];
+        if (!c || typeof c !== 'object') return;
+        out.push({ ...c, id: c.id || k, _key: k });
+      });
+      out.sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+      setState({ list: out, err: '' });
+    }, e => setState({ list: [], err: (e && e.message) || '읽기 실패' }));
+    return () => { try { ref.off('value', cb); } catch (e) {} };
+  }, []);
+  return state;
+}
+
+function DecExportModal({ rows, onClose }) {
+  const [copied, setCopied] = useState('');
+  const md = rows.map(c => {
+    const head = '## ' + decDate(c.answeredAt) + ' · ' + (c.domain || '') + ' · ' + (c.type || '');
+    const line = '**' + (c.title || '') + '** — ' + decOptLabel(c, c.answer);
+    const note = c.answerNote ? '\n> ' + c.answerNote : '';
+    const foot = '\n`' + (c.createdBy || '') + '` → ' + (c.vaultTarget || '');
+    return head + '\n' + line + note + foot;
+  }).join('\n\n');
+  const copy = () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(md); setCopied('복사했습니다'); return; }
+    } catch (e) {}
+    setCopied('복사가 막혀 있어요 — 아래 내용을 직접 선택해 복사해주세요');
+  };
+  return (
+    <ModalShell title="볼트 형식 내보내기" onClose={onClose}>
+      <div style={{ fontSize: 16, color: '#6E6863', lineHeight: 1.6 }}>
+        볼트 <b>_수신함/판단 기록/YYYY-MM.md</b> 에 그대로 붙일 수 있는 형식입니다. 최근 {DEC_RECENT_D}일 답변 {rows.length}건.
+      </div>
+      <textarea readOnly value={md} data-dec-export style={{ width: '100%', height: 260, padding: 12, borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 14, fontFamily: 'monospace', boxSizing: 'border-box', lineHeight: 1.6 }} />
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Btn onClick={copy}>📋 복사</Btn>
+        <Btn v="secondary" onClick={onClose}>닫기</Btn>
+        {copied ? <span style={{ fontSize: 15, color: '#6E6863' }}>{copied}</span> : null}
+      </div>
+    </ModalShell>
+  );
+}
+
+function TabDecisions({ decs, decErr }) {
+  const [fDom, setFDom] = useState('전체');
+  const [fType, setFType] = useState('전체');
+  const [notes, setNotes] = useState({});
+  const [busy, setBusy] = useState('');
+  const [err, setErr] = useState('');
+  const [last, setLast] = useState(null);
+  const [showExp, setShowExp] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+
+  const loading = !decs || decs.list === null;
+  const list = (decs && decs.list) || [];
+  const readErr = (decs && decs.err) || decErr || '';
+
+  // 클릭 = 즉시 저장. 확인 모달 없음(한 번 클릭으로 끝나야 한다).
+  // 대신 오클릭을 살릴 수 있게 '방금 저장' 줄을 띄운다 — 실행 전이면 되돌릴 수 있다.
+  const save = (c, key) => {
+    if (busy) return;
+    setBusy(c._key); setErr('');
+    const patch = {
+      answer: key,
+      answerNote: (notes[c._key] || '').trim() || null,
+      answeredAt: new Date().toISOString(),
+      status: 'answered',
+    };
+    db.ref(DEC_PATH + '/' + c._key).update(patch).then(() => {
+      setBusy('');
+      setLast({ key: c._key, title: c.title, label: decOptLabel(c, key), route: c.route });
+      setNotes(n => { const m = { ...n }; delete m[c._key]; return m; });
+    }).catch(e => { setBusy(''); setErr((e && e.message) || '저장 실패'); });
+  };
+  const undo = () => {
+    if (!last || busy) return;
+    const k = last.key;
+    setBusy(k); setErr('');
+    db.ref(DEC_PATH + '/' + k).update({ answer: null, answerNote: null, answeredAt: null, status: 'pending' })
+      .then(() => { setBusy(''); setLast(null); })
+      .catch(e => { setBusy(''); setErr((e && e.message) || '되돌리기 실패'); });
+  };
+  const seed = () => {
+    if (seeding) return;
+    setSeeding(true); setErr('');
+    const patch = {};
+    DEC_SEED.forEach(c => { patch[c.id] = c; });
+    db.ref(DEC_PATH).update(patch).then(() => setSeeding(false))
+      .catch(e => { setSeeding(false); setErr((e && e.message) || '등록 실패'); });
+  };
+
+  // 오래 기다린 것부터 위로(선입선출). 단 만료 카드는 '지금 답해도 되지만 확인 필요'라
+  // 살아 있는 질문보다 아래로 내린다 — 매번 만료 카드를 지나야 실제 질문에 닿는 걸 막는다.
+  const queue = list.filter(c => { const e = decEff(c); return e === 'pending' || e === 'expired'; })
+    .sort((a, b) => {
+      const ax = decEff(a) === 'expired' ? 1 : 0, bx = decEff(b) === 'expired' ? 1 : 0;
+      if (ax !== bx) return ax - bx;
+      return String(a.createdAt || '').localeCompare(String(b.createdAt || ''));
+    });
+  const shown = queue.filter(c => (fDom === '전체' || c.domain === fDom) && (fType === '전체' || c.type === fType));
+  // 대기 건수 = 화면에 실제로 쌓여 있는 카드 수(만료 포함). 만료 카드도 여전히 답할 수 있으므로
+  // 배지에서 빼면 "대기 2건"인데 카드는 3장 보이는 어긋남이 생긴다. 7일 이상·만료는 그 안의 하위 집계다.
+  const pendingN = queue.length;
+  const staleN = queue.filter(c => decEff(c) === 'pending' && decAgeD(c.createdAt) >= DEC_STALE_D).length;
+  const expiredN = queue.filter(c => decEff(c) === 'expired').length;
+  const done = list.filter(c => (c.status === 'answered' || c.status === 'applied') && c.answeredAt && decAgeD(c.answeredAt) < DEC_RECENT_D)
+    .sort((a, b) => String(b.answeredAt || '').localeCompare(String(a.answeredAt || '')));
+  const cntDom = d => queue.filter(c => (d === '전체' || c.domain === d) && (fType === '전체' || c.type === fType)).length;
+  const cntType = t => queue.filter(c => (t === '전체' || c.type === t) && (fDom === '전체' || c.domain === fDom)).length;
+
+  const chip = (on, label, n, onClick) => (
+    <button key={label} onClick={onClick} style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 16, fontWeight: 600, background: on ? G : '#E3E0DC', color: on ? 'white' : '#3A3631' }}>
+      {label}{n > 0 ? ' ' + n : ''}
+    </button>
+  );
+
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#6E6863', fontSize: 16 }}>판단 큐를 불러오는 중...</div>;
+
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: G }}>🧭 판단 대기</div>
+        <span data-dec-badge style={{ background: pendingN > 0 ? '#C62828' : '#A29C95', color: 'white', borderRadius: 20, padding: '3px 13px', fontSize: 16, fontWeight: 800 }}>대기 {pendingN}건</span>
+        {staleN > 0 ? <Badge label={'7일 이상 ' + staleN + '건'} color="#E08700" /> : null}
+        {expiredN > 0 ? <Badge label={'만료 표시 ' + expiredN + '건'} color="#989088" /> : null}
+        {done.length > 0 ? <button onClick={() => setShowExp(true)} style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#3A3631', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>📋 볼트 형식 내보내기</button> : null}
+      </div>
+      <div style={{ fontSize: 15, color: '#6E6863', marginBottom: 14, lineHeight: 1.6 }}>
+        AI가 볼트를 먼저 읽고도 판단하지 못한 것만 올라옵니다. 답은 볼트에 쌓이고, 쌓일수록 이 줄은 짧아집니다.
+      </div>
+
+      {readErr ? <div style={{ background: '#FDECEA', borderLeft: '4px solid #E53935', borderRadius: '0 8px 8px 0', padding: '10px 14px', fontSize: 15, color: '#8E2A22', marginBottom: 12 }}>판단 큐를 읽지 못했습니다 — {readErr}</div> : null}
+      {err ? <div style={{ background: '#FDECEA', borderLeft: '4px solid #E53935', borderRadius: '0 8px 8px 0', padding: '10px 14px', fontSize: 15, color: '#8E2A22', marginBottom: 12 }}>{err}</div> : null}
+
+      {last ? (
+        <div data-dec-undo style={{ background: '#EAF5EE', borderLeft: '4px solid #1FA463', borderRadius: '0 8px 8px 0', padding: '11px 14px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 16, color: '#1A1614' }}>저장했습니다 — <b>{last.title}</b> · {last.label}{last.route === 'auto' ? ' (에이전트가 곧 실행합니다)' : ' (볼트 검토 후 반영됩니다)'}</span>
+          <button onClick={undo} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid #1FA463', background: 'white', color: '#14713F', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>되돌리기</button>
+          <button onClick={() => setLast(null)} style={{ padding: '6px 10px', borderRadius: 8, border: 'none', background: 'transparent', color: '#6E6863', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>닫기</button>
+        </div>
+      ) : null}
+
+      <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+        {['전체'].concat(DEC_DOMAINS).map(d => chip(fDom === d, d, cntDom(d), () => setFDom(d)))}
+      </div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+        {['전체'].concat(DEC_TYPES).map(t => chip(fType === t, t, cntType(t), () => setFType(t)))}
+      </div>
+
+      {shown.length === 0 ? (
+        <Card style={{ padding: 30, textAlign: 'center' }}>
+          {queue.length === 0 && list.length === 0 ? (
+            <div>
+              <div style={{ fontSize: 34, marginBottom: 10 }}>🍃</div>
+              <div style={{ fontSize: 19, fontWeight: 800, color: G, marginBottom: 6 }}>지금 물어볼 것이 없습니다.</div>
+              <div style={{ fontSize: 16, color: '#6E6863', lineHeight: 1.7 }}>
+                AI가 판단이 막히면 여기로 올라옵니다. 비어 있다는 건 볼트가 답을 갖고 있다는 뜻입니다.
+              </div>
+              <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #EDEBE7' }}>
+                <div style={{ fontSize: 15, color: '#A29C95', marginBottom: 10 }}>첫 입주 대상 3건이 아직 등록되지 않았습니다.</div>
+                <Btn v="secondary" onClick={seed} disabled={seeding}>{seeding ? '등록 중...' : '첫 3건 등록하기'}</Btn>
+                <div style={{ fontSize: 14, color: '#A29C95', marginTop: 8 }}>야채분말 키워드 · ROAS 330% 근거 · 영양식 원료 개수</div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: 30, marginBottom: 8 }}>🔎</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: G, marginBottom: 4 }}>이 조건에 해당하는 대기 카드가 없습니다.</div>
+              <div style={{ fontSize: 16, color: '#6E6863' }}>대기 중인 카드는 전체 {queue.length}건입니다. 위 필터를 전체로 바꿔보세요.</div>
+            </div>
+          )}
+        </Card>
+      ) : shown.map(c => {
+        const e = decEff(c);
+        const age = decAgeD(c.createdAt);
+        const stale = e === 'pending' && age >= DEC_STALE_D;
+        const expired = e === 'expired';
+        const auto = c.route === 'auto';
+        const cs = { marginBottom: 14, padding: 18 };
+        if (expired) { cs.border = '1.5px dashed #A29C95'; cs.background = '#FAFAF9'; }
+        else if (stale) { cs.border = '1.5px solid #E08700'; cs.boxShadow = '0 2px 12px rgba(224,135,0,0.18)'; }
+        return (
+          <Card key={c._key} style={cs}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
+              <Badge label={c.type || '판정'} color={DEC_TYPE_C[c.type] || '#6E6863'} />
+              <Badge label={c.domain || '운영'} color="#E3E0DC" />
+              <span data-dec-route={c.route || 'vault'} style={{ display: 'inline-block', padding: '3px 11px', borderRadius: 20, fontSize: 15, fontWeight: 800, color: auto ? 'white' : '#3A3631', background: auto ? '#C62828' : '#E3E0DC', whiteSpace: 'nowrap' }}>
+                {auto ? '⚡ 승인 시 즉시 적용' : '📗 볼트 검토 후 반영'}
+              </span>
+              {stale ? <Badge label={'⏳ ' + age + '일째 대기'} color="#E08700" /> : null}
+              {expired ? <Badge label={'⌛ ' + age + '일 경과 · 만료 표시'} color="#989088" /> : null}
+              <span style={{ marginLeft: 'auto', fontSize: 14, color: '#A29C95' }}>{decDate(c.createdAt)} · {c.createdBy || '에이전트'}</span>
+            </div>
+
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#1A1614', marginBottom: 6 }}>{c.title}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: G, marginBottom: 6, lineHeight: 1.5 }}>{c.question}</div>
+            {c.context ? <div style={{ fontSize: 16, color: '#6E6863', lineHeight: 1.6 }}>{c.context}</div> : null}
+
+            {c.vaultHint ? (
+              <div data-dec-hint style={{ borderLeft: '4px solid ' + G, background: '#F5F3F0', borderRadius: '0 10px 10px 0', padding: '12px 14px', margin: '12px 0' }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#6E6863', letterSpacing: 0.4, marginBottom: 4 }}>📗 볼트가 아는 것</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#1A1614', lineHeight: 1.5 }}>{c.vaultHint}</div>
+              </div>
+            ) : null}
+
+            {expired ? <div style={{ fontSize: 15, color: '#8A8279', marginBottom: 10 }}>{DEC_EXPIRE_D}일이 지난 카드입니다. 지금 답해도 저장되지만, 상황이 바뀌었을 수 있으니 한 번 확인해주세요.</div> : null}
+
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+              {(c.options || []).slice(0, 3).map(o => (
+                <button key={o.key} data-dec-opt={c.id + ':' + o.key} disabled={busy === c._key} onClick={() => save(c, o.key)}
+                  style={{ padding: '11px 22px', borderRadius: 9, border: 'none', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: busy === c._key ? '#A29C95' : G, color: 'white' }}>{o.label}</button>
+              ))}
+              <button data-dec-opt={c.id + ':' + DEC_HOLD} disabled={busy === c._key} onClick={() => save(c, DEC_HOLD)}
+                style={{ padding: '11px 20px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: 'white', color: '#6E6863' }}>보류</button>
+            </div>
+
+            <input value={notes[c._key] || ''} data-dec-note={c.id}
+              onChange={ev => { const val = ev.target.value; setNotes(n => { const m = { ...n }; m[c._key] = val; return m; }); }}
+              placeholder="한 줄 이유 (선택) — 먼저 적고 위 버튼을 누르면 답과 함께 저장됩니다"
+              style={{ width: '100%', marginTop: 12, padding: '9px 10px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 16, boxSizing: 'border-box' }} />
+
+            {c.vaultTarget ? <div style={{ fontSize: 14, color: '#A29C95', marginTop: 10 }}>답은 볼트 <b>{c.vaultTarget}</b> 로 갑니다</div> : null}
+          </Card>
+        );
+      })}
+
+      <div style={{ marginTop: 28 }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: G, marginBottom: 2 }}>최근 {DEC_RECENT_D}일 답변 완료</div>
+        <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 10 }}>읽기 전용입니다. 이 목록이 그대로 볼트 _수신함/판단 기록 으로 넘어갑니다.</div>
+        {done.length === 0 ? (
+          <Card style={{ padding: 18, textAlign: 'center', color: '#A29C95', fontSize: 16 }}>최근 {DEC_RECENT_D}일 안에 답한 카드가 없습니다.</Card>
+        ) : done.map(c => (
+          <div key={'d' + c._key} data-dec-done={c.id} style={{ background: 'white', borderLeft: '4px solid ' + (c.status === 'applied' ? '#1FA463' : '#E3E0DC'), borderRadius: '0 10px 10px 0', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', padding: '12px 14px', marginBottom: 8 }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 14, color: '#A29C95' }}>{decDate(c.answeredAt)}</span>
+              <Badge label={c.domain || '운영'} color="#E3E0DC" />
+              <Badge label={c.type || '판정'} color={DEC_TYPE_C[c.type] || '#6E6863'} />
+              <span style={{ fontSize: 17, fontWeight: 800, color: '#1A1614' }}>{c.title}</span>
+              <span style={{ fontSize: 17, fontWeight: 800, color: G }}>— {decOptLabel(c, c.answer)}</span>
+              {c.status === 'applied' ? <Badge label={'✅ 적용됨 ' + decDate(c.appliedAt)} color="#1FA463" /> : <span style={{ fontSize: 14, color: '#A29C95' }}>{c.route === 'auto' ? '실행 대기' : '볼트 검토 대기'}</span>}
+            </div>
+            {c.answerNote ? <div style={{ fontSize: 16, color: '#3A3631', marginTop: 5 }}>&gt; {c.answerNote}</div> : null}
+            <div style={{ fontSize: 14, color: '#A29C95', marginTop: 5 }}>{c.createdBy || ''} → {c.vaultTarget || ''}</div>
+          </div>
+        ))}
+      </div>
+
+      {showExp ? <DecExportModal rows={done} onClose={() => setShowExp(false)} /> : null}
+    </div>
+  );
+}
 
 function App() {
   const [tab, setTab] = useState(0);
@@ -7359,6 +7877,7 @@ function App() {
   const revRef = useRef(0);
   const serverSnapRef = useRef(null);
   const backupDayRef = useRef('');
+  const decs = useDecisions();
   useDragAutoScroll();
 
   useEffect(() => {
@@ -7398,8 +7917,11 @@ function App() {
 
   const heldCount = data ? data.plans.filter(p => p.hold).length + data.subplans.filter(s => s.stage === '보류').length : 0;
   const trashCount = data ? (data.trash || []).length : 0;
+  // 탭 배지도 탭 안의 '대기 N건'과 같은 수여야 한다 — 만료 카드 포함(TabDecisions 의 pendingN 과 동일 정의)
+  const decPending = (decs.list || []).filter(c => { const e = decEff(c); return e === 'pending' || e === 'expired'; }).length;
   const TABS = [
     { icon: '🏠', label: '홈', C: TabTeam },
+    { icon: '🧭', label: '판단 대기', C: TabDecisions, badge: decPending },
     { icon: '📅', label: '데일리/주간', C: TabWeekly },
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
     { icon: '🗂️', label: '칸반', C: TabKanban },
@@ -7450,7 +7972,7 @@ function App() {
         </div>
       </div>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-        <TabC data={data} setData={setData} onEdit={t => setEditStack([t])} onRecord={id => setRecordId(id)} goTab={label => { const i = TABS.findIndex(t => t.label === label); if (i >= 0) setTab(i); }} />
+        <TabC data={data} setData={setData} decs={decs} decErr={decs.err} onEdit={t => setEditStack([t])} onRecord={id => setRecordId(id)} goTab={label => { const i = TABS.findIndex(t => t.label === label); if (i >= 0) setTab(i); }} />
       </div>
       {modal && <AddModal data={data} setData={setData} onClose={() => setModal(false)} />}
       {showUpdates && <UpdateCenterModal data={data} setData={setData} onClose={() => setShowUpdates(false)} />}
