@@ -7529,8 +7529,13 @@ const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 //
 // [쓰기 경계 — 한 필드는 한 주체만]
 //   에이전트        : 카드 생성 · status:pending
-//   대시보드(여기)  : answer · answerNote · answeredAt · status→answered · snoozedUntil  ← 이 5개뿐
-//   실행 에이전트   : appliedAt · status→applied
+//   대시보드(여기)  : answer · answerNote · answeredAt · status→answered · snoozedUntil
+//                    · snoozeCount · applyNow · applyAskedAt  ← 이 8개뿐 (허브 승인)
+//   실행 에이전트   : appliedAt · status→applied · applyNow/applyAskedAt 해제
+//                    · applyError · applyErrorAt
+//   applyNow 는 '대시보드가 켜고 에이전트가 끈다'는 점에서 유일하게 양쪽이 만지는 필드다.
+//   그래서 대시보드는 true 만 쓰고 false 를 쓰지 않는다 — 끄는 건 처리한 쪽의 몫이다.
+//   applyAskedAt 도 같은 짝이다. 켤 때 함께 쓰고, 끄는 건 안 한다.
 //   그래서 expired 는 서버에 쓰지 않는다. 30일이 지났다는 '사실'을 화면에서 계산해
 //   표시만 한다(카드 자동 삭제 금지와 같은 이유 — 데이터는 손대지 않는다).
 //
@@ -7555,12 +7560,24 @@ const DEC_SNOOZE_D = 7;   // 기본 스누즈 기간(허브 지정)
 const DEC_SNOOZE_OPTS = [3, 7, 14, 30];
 const DEC_SNOOZE_WARN = 3; // 이 횟수 이상 미룬 카드는 카드에 표시한다(허브 지정)
 
+// ── 정기 반영 시각 ──────────────────────────────────────────────────────────
+// 에이전트가 하루 네 번 답을 볼트에 반영한다. 대시보드는 이 시각을 '표시만' 한다 —
+// 스케줄러가 여기 있는 게 아니다. 답만 하고 화면이 조용하면 눌려도 안 눌린 것처럼
+// 보이므로, 언제 반영되는지를 카드에 적어 기다림을 설명 가능하게 만든다(허브 지시).
+const DEC_APPLY_SLOTS = ['10:30', '14:00', '17:00', '21:00'];
+// 정기 반영은 '답한 지 10분 지난 것'만 처리한다. 그 10분이 되돌리기 창이다.
+// [지금 반영]은 이 창을 건너뛴다 — 그래서 되돌릴 수 없다고 버튼에 적는다.
+const DEC_UNDO_MIN = 10;
+// 에이전트가 5분 안에 처리하기로 되어 있다. 넘으면 화면에 '지연'이라고 알린다.
+const DEC_APPLY_LATE_MIN = 5;
+
 // ── 시드 문안 개정 번호 ─────────────────────────────────────────────────────
 // DEC_SEED 상수만 고치면 라이브 카드는 안 바뀐다 — 3건은 이미 /decisions 에 등록돼 있고
 // '첫 3건 등록' 버튼은 화면이 완전히 빈 경우에만 뜨기 때문이다.
 // 그래서 이 번호를 올리면, 아직 답하지 않은 시드 카드에 한해 '내용 필드만' 한 번 덮어쓴다.
 // 답 필드(answer/answerNote/answeredAt/status/snoozedUntil/snoozeCount)는 절대 건드리지 않는다.
-const SEED_REV = 2;       // 2 = 2026-08-06 누출 교정(ROAS 선택지 교체 · 영양식 법적 프레임 제거)
+const SEED_REV = 3;       // 3 = 2026-08-06 성과 실측치 제거(6번째 금지 항목 신설, dec_001 context)
+                          // 2 = 2026-08-06 누출 교정(ROAS 선택지 교체 · 영양식 법적 프레임 제거)
 const SEED_FIX_KEYS = ['title', 'question', 'context', 'vaultHint', 'options', 'route', 'vaultTarget'];
 
 function decAgeD(iso) {
@@ -7597,13 +7614,72 @@ function decOptLabel(c, key) {
   const o = ((c && c.options) || []).filter(x => x && x.key === key)[0];
   return o ? o.label : (key || '—');
 }
+// 답한 선택지에 붙은 실행 명세(허브·자동화PC 확정). 선택지 단위로 붙는다 —
+// 같은 카드라도 답이 무엇이냐에 따라 할 일이 달라지기 때문이다.
+// 대시보드는 내용을 해석하지 않는다. 있는지 없는지만 본다.
+function decApplySpec(c) {
+  if (!c || !c.answer) return null;
+  const o = ((c && c.options) || []).filter(x => x && x.key === c.answer)[0];
+  return (o && o.applySpec) || null;
+}
 // 화면·내보내기에서 쓰는 '실효 경로'. answer 가 other 면 원래 route 가 auto 여도 vault 로 낮춘다.
 // 에이전트가 예상하지 못한 답이라 자동 실행하면 안 되기 때문이다(허브 지시).
-// DB 의 route 필드는 건드리지 않는다 — 강등은 표시 계층에서만 일어난다.
+// 답한 선택지에 applySpec 이 없을 때도 마찬가지로 낮춘다 — 자동화PC는 명세가 없으면
+// 그 카드를 실행하지 않는다(추측 실행 금지). 화면만 '실행 대기'라고 말하면 오지 않을
+// 실행을 사람이 기다리게 된다. 표시는 실제 동작과 같은 말을 해야 한다(허브 지시).
+// 미답 카드는 어느 선택지로 갈지 아직 모르므로 원래 route 를 그대로 보여준다.
+// DB 의 route 필드는 어느 경우에도 건드리지 않는다 — 강등은 표시 계층에서만 일어난다.
 function decRoute(c) {
   if (!c) return 'vault';
   if (c.answer === DEC_OTHER) return 'vault';
+  if (c.answer && c.answer !== DEC_HOLD && !decApplySpec(c)) return 'vault';
   return c.route || 'vault';
+}
+
+// ── 반영 관련 계산 (전부 표시용 — 서버에 쓰지 않는다) ────────────────────────
+// 다음 정기 반영 시각. 오늘 남은 슬롯이 없으면 내일 첫 슬롯이다.
+function decNextApply(now) {
+  const d = now || new Date();
+  const cur = d.getHours() * 60 + d.getMinutes();
+  for (let i = 0; i < DEC_APPLY_SLOTS.length; i++) {
+    const p = DEC_APPLY_SLOTS[i].split(':');
+    if (Number(p[0]) * 60 + Number(p[1]) > cur) return { label: DEC_APPLY_SLOTS[i], tomorrow: false };
+  }
+  return { label: DEC_APPLY_SLOTS[0], tomorrow: true };
+}
+function decMinSince(iso) {
+  if (!iso) return 0;
+  const t = Date.parse(iso);
+  if (isNaN(t)) return 0;
+  return Math.floor((Date.now() - t) / 60000);
+}
+// 되돌리기 창에 남은 분. 정기 반영은 답한 지 10분 지난 것만 처리하기 때문에
+// 그 10분 동안은 답을 되돌려도 볼트에 반영되지 않는다. [지금 반영]은 이 창을 버린다.
+function decUndoLeftMin(c) {
+  if (!c || !c.answeredAt) return 0;
+  const left = DEC_UNDO_MIN - decMinSince(c.answeredAt);
+  return left > 0 ? left : 0;
+}
+// 반영 상태. 하나의 함수로 모아 카드·완료목록이 같은 말을 하게 한다.
+//   applied  = 에이전트가 appliedAt 을 씀 (구독 중이라 즉시 ✅ 로 바뀐다)
+//   failed   = 에이전트가 applyNow 를 끄고 사유를 씀
+//   asked    = [지금 반영] 요청이 살아 있음 (applyNow: true)
+//   late     = 요청한 지 5분이 넘도록 아무 변화가 없음
+//   waiting  = 정기 반영 대기
+// 요청 시각은 서버의 applyAskedAt 에서 읽는다(허브 승인 — 8번째 쓰기 필드).
+// 전에는 브라우저 안에만 두어서 새로고침하면 지연을 못 쟀는데, 그 자리가 바로
+// "눌렀는데 반응이 없다"는 지적이 나온 지점이라 필드로 올렸다.
+// applyAskedAt 이 없는 요청(옛 빌드가 만든 것)은 지연을 잴 수 없으므로 asked 로 둔다 —
+// 모르는 것을 '지연'이라고 단정하지 않는다.
+function decApplyState(c) {
+  if (!c) return 'waiting';
+  if (c.status === 'applied' || c.appliedAt) return 'applied';
+  if (c.applyNow === true) {
+    const t = c.applyAskedAt ? Date.parse(c.applyAskedAt) : NaN;
+    return (!isNaN(t) && (Date.now() - t) > DEC_APPLY_LATE_MIN * 60000) ? 'late' : 'asked';
+  }
+  if (c.applyError) return 'failed';
+  return 'waiting';
 }
 
 // 첫 입주 대상 3건. 화면이 완전히 비었을 때만 '등록' 버튼으로 뜬다.
@@ -7614,7 +7690,10 @@ const DEC_SEED = [
     createdBy: 'keyword-agent', createdAt: '2026-08-06T09:00:00+09:00',
     title: '야채분말·야채가루 키워드',
     question: '제외할까요, 진단으로 둘까요?',
-    context: '누적클릭 30 · 전환 0 · 톤앤매너 키워드 풀에 없음',
+    // 원래 '누적클릭 30 · 전환 0' 이었다. 하나면 사소하지만 큐가 일상이 되면 수백 건이 쌓여
+    // 우리 광고 성과 지도가 된다 — 6번째 금지 항목(성과 실측치)이 생긴 이유다(허브).
+    // 임계치가 30이라는 사실은 볼트 광고 판단 규칙에 있으므로 카드에 다시 적지 않는다.
+    context: '판단 임계치 도달, 전환 없음 · 톤앤매너 키워드 풀에 없음',
     vaultHint: "닥터샐러드 커머스 카테고리가 '야채가루'. 매칭 가능성 있음",
     options: [{ key: 'exclude', label: '제외' }, { key: 'keep', label: '진단 유지' }],
     route: 'auto', vaultTarget: '80_광고/키워드 운영.md',
@@ -7677,9 +7756,13 @@ function DecExportModal({ rows, onClose }) {
   const [copied, setCopied] = useState('');
   const md = rows.map(c => {
     const head = '## ' + decDate(c.answeredAt) + ' · ' + (c.domain || '') + ' · ' + (c.type || '');
-    // 기타는 선택지 밖의 답이라 내보내기에서도 자동 실행 금지를 명시한다(허브: 화면·내보내기에서 vault 취급).
-    const line = '**' + (c.title || '') + '** — ' + decOptLabel(c, c.answer)
-      + (c.answer === DEC_OTHER ? ' ⚠ 선택지 밖 · 자동 실행 금지 · 볼트 검토 후 반영' : '');
+    // 자동 실행되지 않는 답은 내보내기에도 그렇게 적는다. 화면은 볼트 검토 대기라고 하는데
+    // 볼트 기록에는 아무 표시가 없으면, 나중에 이 기록만 보는 사람이 반영된 줄로 읽는다.
+    // 이유는 둘로 갈린다 — 선택지 밖의 답이었거나, 그 선택지에 실행 명세가 없거나.
+    const mark = c.answer === DEC_OTHER ? ' ⚠ 선택지 밖 · 자동 실행 금지 · 볼트 검토 후 반영'
+      : (c.answer && c.answer !== DEC_HOLD && decRoute(c) === 'vault' && c.route === 'auto')
+        ? ' ⚠ 실행 명세 없음 · 자동 실행 금지 · 볼트 검토 후 반영' : '';
+    const line = '**' + (c.title || '') + '** — ' + decOptLabel(c, c.answer) + mark;
     const note = c.answerNote ? '\n> ' + c.answerNote : '';
     const foot = '\n`' + (c.createdBy || '') + '` → ' + (c.vaultTarget || '');
     return head + '\n' + line + note + foot;
@@ -7720,6 +7803,16 @@ function TabDecisions({ decs, decErr }) {
   const [fixed, setFixed] = useState([]);       // 이번 세션에 문안을 맞춘 시드 카드 id
   const [stuck, setStuck] = useState([]);       // 문안이 바뀌기 전에 이미 답해버린 시드 카드 id
   const fixTried = useRef({});                  // 카드당 1회만 시도 — 실패 시에만 다시 연다
+  const [confirmNow, setConfirmNow] = useState(''); // [지금 반영] 확인 단계에 들어간 카드
+  const [tick, setTick] = useState(0);          // 30초마다 다시 그려 '다음 반영 시각'이 굳지 않게 한다
+
+  // 시계가 필요한 이유: 다음 반영 시각과 되돌리기 잔여 분은 시간이 지나면 저절로 바뀌는데,
+  // 화면은 스냅샷이 올 때만 다시 그려진다. 답하고 가만히 보고 있으면 14:00 이 지나도
+  // '다음 반영 14:00' 이 그대로 남아 거짓말이 된다.
+  useEffect(() => {
+    const t = setInterval(() => setTick(x => x + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
 
   const loading = !decs || decs.list === null;
   const list = (decs && decs.list) || [];
@@ -7784,6 +7877,23 @@ function TabDecisions({ decs, decErr }) {
       .then(() => { setBusy(''); setLast(l => (l && l.key === k) ? null : l); })
       .catch(e => { setBusy(''); setErr((e && e.message) || '되돌리기 실패'); });
   };
+  // ── [지금 반영] ────────────────────────────────────────────────────────────
+  // 대시보드가 쓰는 7·8번째 필드(허브 승인). applyNow 는 true 만 쓰고, 요청 시각을
+  // applyAskedAt 에 같이 남긴다. 둘 다 끄지 않는다 — 끄는 건 처리한 에이전트 몫이다.
+  // 정기 반영은 답한 지 10분 지난 것만 처리해 되돌리기 창을 지킨다. 이 버튼은 그 창을 버린다.
+  // 그래서 [기타]와 같은 방식으로 한 단계 확인을 둔다: 되돌릴 수 없는 일에는 확인이 있어야 한다.
+  const applyNowReq = (c) => {
+    if (busy) return;
+    setBusy(c._key); setErr('');
+    db.ref(DEC_PATH + '/' + c._key).update({ applyNow: true, applyAskedAt: new Date().toISOString() }).then(() => {
+      setBusy('');
+      setConfirmNow('');
+      // 즉시 반영을 요청한 순간 이 카드의 '방금 저장' 되돌리기 줄은 거짓이 된다.
+      // 에이전트가 5분 안에 가져가므로 되돌릴 수 있다고 안내하면 안 된다.
+      setLast(l => (l && l.key === c._key) ? null : l);
+    }).catch(e => { setBusy(''); setErr((e && e.message) || '반영 요청 실패'); });
+  };
+
   const undo = () => {
     if (!last || busy) return;
     const k = last.key;
@@ -8006,7 +8116,7 @@ function TabDecisions({ decs, decErr }) {
             {/* 이 노드는 읽기가 공개(.read:true)다. 카드 본문 금지 규칙이 에이전트에게만 걸려 있어서
                 사람이 직접 쓰는 이 칸이 유일하게 안 막힌 구멍이다 — 그래서 칸 바로 밑에 적는다. */}
             <div data-dec-warn style={{ fontSize: 14, color: '#8A8279', marginTop: 6 }}>
-              🔒 원가·마진·손익분기 숫자, 협력사 단가, 고객 개인정보, <b>법적 리스크에 대한 내부 판단</b>은 적지 마세요. 이 칸은 외부에서 읽을 수 있습니다 — 이런 내용은 볼트 <b>90_내부/</b> 에 직접 적어주세요.
+              🔒 원가·마진·손익분기 숫자, 협력사 단가, 고객 개인정보, <b>법적 리스크에 대한 내부 판단</b>, <b>키워드·캠페인 단위 성과 실측치</b>(클릭수·전환수·CTR 등)는 적지 마세요. 이 칸은 외부에서 읽을 수 있습니다 — 이런 내용은 볼트 <b>90_내부/</b> 에 직접 적어주세요.
             </div>
 
             {otherOn ? (
@@ -8072,8 +8182,19 @@ function TabDecisions({ decs, decErr }) {
         ) : null}
         {done.length === 0 ? (
           <Card style={{ padding: 18, textAlign: 'center', color: '#A29C95', fontSize: 16 }}>최근 {DEC_RECENT_D}일 안에 답한 카드가 없습니다.</Card>
-        ) : done.map(c => (
-          <div key={'d' + c._key} data-dec-done={c.id} style={{ background: 'white', borderLeft: '4px solid ' + (c.status === 'applied' ? '#1FA463' : '#E3E0DC'), borderRadius: '0 10px 10px 0', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', padding: '12px 14px', marginBottom: 8 }}>
+        ) : done.map(c => {
+          // 반영 상태는 한 곳에서만 계산한다. 배지·버튼·설명이 서로 다른 말을 하면
+          // 화면을 못 믿게 되고, 못 믿는 화면에서는 [지금 반영] 같은 버튼을 아무도 안 누른다.
+          const ast = decApplyState(c);
+          const nx = decNextApply();
+          // applySpec 이 없는 답이면 decRoute 가 vault 로 내려주므로 여기 문구도 자동으로 바뀐다.
+          const waitLbl = decRoute(c) === 'auto' ? '실행 대기' : '볼트 검토 대기';
+          // 실패한 카드에도 버튼을 남긴다 — 사유를 읽고 고친 뒤 다시 누르는 게 자연스러운 순서다.
+          const canAsk = (ast === 'waiting' || ast === 'failed');
+          const asking = confirmNow === c._key;
+          const bc = ast === 'applied' ? '#1FA463' : ast === 'failed' ? '#C62828' : (ast === 'asked' || ast === 'late') ? '#2D5FE0' : '#E3E0DC';
+          return (
+          <div key={'d' + c._key} data-dec-done={c.id} data-dec-applystate={ast} style={{ background: 'white', borderLeft: '4px solid ' + bc, borderRadius: '0 10px 10px 0', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', padding: '12px 14px', marginBottom: 8 }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 14, color: '#A29C95' }}>{decDate(c.answeredAt)}</span>
               <Badge label={c.domain || '운영'} color="#E3E0DC" />
@@ -8081,13 +8202,77 @@ function TabDecisions({ decs, decErr }) {
               <span style={{ fontSize: 17, fontWeight: 800, color: '#1A1614' }}>{c.title}</span>
               <span style={{ fontSize: 17, fontWeight: 800, color: G }}>— {decOptLabel(c, c.answer)}</span>
               {c.answer === DEC_OTHER ? <span data-dec-otherbadge={c.id} style={{ display: 'inline-block', padding: '2px 9px', borderRadius: 20, fontSize: 14, fontWeight: 800, color: 'white', background: '#2D5FE0' }}>✏ 기타</span> : null}
-              {/* 여기도 decRoute — route:auto 카드라도 other 로 답했으면 '실행 대기'라고 쓰면 안 된다. */}
-              {c.status === 'applied' ? <Badge label={'✅ 적용됨 ' + decDate(c.appliedAt)} color="#1FA463" /> : <span style={{ fontSize: 14, color: '#A29C95' }}>{decRoute(c) === 'auto' ? '실행 대기' : '볼트 검토 대기'}</span>}
+              {/* 여기도 decRoute — route:auto 카드라도 other 로 답했으면 '실행 대기'라고 쓰면 안 된다.
+                  '실행 대기'만 있고 언제 실행되는지가 없으면 답한 사람은 화면이 멈춘 줄 안다.
+                  그래서 대기 상태에는 반드시 다음 반영 시각을 같이 적는다(허브 지시). */}
+              {ast === 'applied' ? <Badge label={'✅ 적용됨 ' + decDate(c.appliedAt)} color="#1FA463" />
+                : ast === 'failed' ? <Badge label="⚠ 반영 실패" color="#C62828" />
+                : ast === 'late' ? <Badge label={'⏳ 요청 후 ' + DEC_APPLY_LATE_MIN + '분 경과'} color="#B26A00" />
+                : ast === 'asked' ? <Badge label={'⚡ 지금 반영 요청됨' + (c.applyAskedAt ? ' ' + decDate(c.applyAskedAt) : '')} color="#2D5FE0" />
+                : <span data-dec-nextapply={nx.label} style={{ fontSize: 14, color: '#A29C95' }}>{waitLbl} · 다음 반영 <b style={{ color: '#6E6863', fontSize: 15 }}>{nx.label}</b>{nx.tomorrow ? ' (내일)' : ''}</span>}
             </div>
             {c.answerNote ? <div style={{ fontSize: 16, color: '#3A3631', marginTop: 5 }}>&gt; {c.answerNote}</div> : null}
             <div style={{ fontSize: 14, color: '#A29C95', marginTop: 5 }}>{c.createdBy || ''} → {c.vaultTarget || ''}</div>
+
+            {/* 자동 실행 카드로 답했는데 볼트로 내려온 경우. 답한 사람 입장에서는 어제까지
+                '자동 실행'이라고 적혀 있던 카드가 갑자기 볼트로 가는 것이라 이유를 적어준다.
+                이유는 둘 중 하나뿐이다 — 선택지 밖의 답이었거나, 그 선택지에 실행 명세가 없거나. */}
+            {(c.route === 'auto' && decRoute(c) === 'vault' && ast !== 'applied') ? (
+              <div data-dec-nospec={c.id} style={{ fontSize: 14, color: '#8A8279', marginTop: 4, lineHeight: 1.6 }}>
+                {c.answer === DEC_OTHER
+                  ? '선택지 밖의 답이라 자동 실행하지 않습니다 — 볼트 검토로 갑니다.'
+                  : '이 선택지에는 실행 명세가 아직 없어 자동 실행하지 않습니다 — 볼트 검토로 갑니다.'}
+              </div>
+            ) : null}
+
+            {/* ── 반영 실패 사유 ─ 에이전트가 쓰는 자리다. 대시보드는 읽기만 한다. ──────
+                요청이 살아 있는 동안(applyNow:true)은 이전 시도의 사유이므로 흐리게 낮춘다.
+                지운 게 아니라 낮춘 이유: 지우면 방금 뭐가 잘못됐는지가 사라진다. */}
+            {c.applyError ? (
+              <div data-dec-applyerr={c.id} style={{ marginTop: 8, padding: '9px 12px', borderRadius: 9, background: (ast === 'asked' || ast === 'late') ? '#F5F4F2' : '#FDECEA', borderLeft: '3px solid ' + ((ast === 'asked' || ast === 'late') ? '#C4BFB8' : '#C62828'), lineHeight: 1.6 }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: (ast === 'asked' || ast === 'late') ? '#8A8279' : '#8E2018' }}>
+                  {(ast === 'asked' || ast === 'late') ? '이전 시도 실패 사유 (지금 다시 시도 중)' : '반영 실패 — 에이전트가 남긴 사유'}
+                  {c.applyErrorAt ? <span style={{ fontWeight: 600, color: '#A29C95' }}> · {decDate(c.applyErrorAt)}</span> : null}
+                </div>
+                <div style={{ fontSize: 16, color: (ast === 'asked' || ast === 'late') ? '#8A8279' : '#3A3631', marginTop: 3 }}>{c.applyError}</div>
+              </div>
+            ) : null}
+
+            {/* ── [지금 반영] ─ 대시보드가 쓰는 applyNow · applyAskedAt 두 개만 켠다 ────
+                정기 반영은 답한 지 10분 지난 것만 처리해 되돌리기 창을 지킨다.
+                이 버튼은 그 창을 버린다 — 그래서 [기타]와 같은 방식으로 한 단계 확인을 둔다. */}
+            {canAsk ? (asking ? (
+              <div data-dec-applyconfirm={c.id} style={{ marginTop: 10, padding: '11px 13px', borderRadius: 10, background: '#FFF6E5', borderLeft: '3px solid #E08700' }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: '#8A5200', lineHeight: 1.6 }}>지금 반영하면 되돌릴 수 없습니다.</div>
+                <div style={{ fontSize: 15, color: '#6E6863', marginTop: 4, lineHeight: 1.6 }}>
+                  정기 반영({DEC_APPLY_SLOTS.join(' · ')})은 답한 지 <b>{DEC_UNDO_MIN}분</b>이 지난 것만 처리합니다 — 그 {DEC_UNDO_MIN}분이 답을 고칠 수 있는 시간입니다. 지금 반영은 그 시간을 건너뜁니다.
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginTop: 10 }}>
+                  <button data-dec-applyyes={c.id} disabled={busy === c._key} onClick={() => applyNowReq(c)}
+                    style={{ padding: '10px 20px', borderRadius: 9, border: 'none', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 16, fontWeight: 800, background: busy === c._key ? '#C4BFB8' : '#C62828', color: 'white' }}>지금 반영 — 되돌릴 수 없습니다</button>
+                  <button data-dec-applyno={c.id} onClick={() => setConfirmNow('')}
+                    style={{ padding: '10px 16px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: 'pointer', fontSize: 15, fontWeight: 700, background: 'white', color: '#6E6863' }}>취소 — {nx.label}에 반영</button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginTop: 9 }}>
+                <button data-dec-applybtn={c.id} disabled={busy === c._key} onClick={() => setConfirmNow(c._key)}
+                  style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #E3E0DC', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 15, fontWeight: 700, background: 'white', color: '#3A3631' }}>⚡ {ast === 'failed' ? '다시 지금 반영' : '지금 반영'}</button>
+                {decUndoLeftMin(c) > 0 ? <span data-dec-undoleft={c.id} style={{ fontSize: 14, color: '#A29C95' }}>답을 고칠 수 있는 시간 {decUndoLeftMin(c)}분 남음</span> : null}
+              </div>
+            )) : null}
+
+            {/* 요청이 살아 있는 동안. 5분이 넘으면 '지연'이라고 말한다 — 조용한 화면은 고장과 구분이 안 된다. */}
+            {(ast === 'asked' || ast === 'late') ? (
+              <div data-dec-asked={c.id} style={{ fontSize: 15, color: ast === 'late' ? '#8A5200' : '#1F3F8F', fontWeight: 700, marginTop: 8, lineHeight: 1.6 }}>
+                {ast === 'late'
+                  ? '요청한 지 ' + DEC_APPLY_LATE_MIN + '분이 지났는데 아직 반영되지 않았습니다. 에이전트가 밀렸을 수 있습니다 — 요청은 그대로 남아 있으니 다시 누를 필요는 없습니다.'
+                  : '에이전트가 ' + DEC_APPLY_LATE_MIN + '분 안에 처리합니다. 되돌리기는 이미 지나갔습니다.'}
+              </div>
+            ) : null}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {showExp ? <DecExportModal rows={done} onClose={() => setShowExp(false)} /> : null}
