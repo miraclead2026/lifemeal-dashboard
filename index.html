@@ -7548,6 +7548,9 @@ const DEC_STALE_D = 7;    // 7일 무응답 → 시각 구분(재알림)
 const DEC_EXPIRE_D = 30;  // 30일 무응답 → 만료 '표시'. 삭제하지 않는다.
 const DEC_RECENT_D = 30;  // 하단 답변 완료 목록 노출 기간
 const DEC_HOLD = 'hold';  // (구) 보류를 answer 로 저장하던 시절의 값. 옛 카드 표시용으로만 남긴다.
+// 선택지 밖의 답(허브 승인). 에이전트가 답의 '종류'까지 안다는 가정이 틀렸을 때 쓰는 출구다.
+// answerNote 가 곧 답이라 필수이고, 예상 못 한 답이므로 route 는 vault 로 강등한다.
+const DEC_OTHER = 'other';
 const DEC_SNOOZE_D = 7;   // 기본 스누즈 기간(허브 지정)
 const DEC_SNOOZE_OPTS = [3, 7, 14, 30];
 const DEC_SNOOZE_WARN = 3; // 이 횟수 이상 미룬 카드는 카드에 표시한다(허브 지정)
@@ -7590,8 +7593,17 @@ function decEff(c) {
 }
 function decOptLabel(c, key) {
   if (key === DEC_HOLD) return '보류';
+  if (key === DEC_OTHER) return '기타 — 직접 입력';
   const o = ((c && c.options) || []).filter(x => x && x.key === key)[0];
   return o ? o.label : (key || '—');
+}
+// 화면·내보내기에서 쓰는 '실효 경로'. answer 가 other 면 원래 route 가 auto 여도 vault 로 낮춘다.
+// 에이전트가 예상하지 못한 답이라 자동 실행하면 안 되기 때문이다(허브 지시).
+// DB 의 route 필드는 건드리지 않는다 — 강등은 표시 계층에서만 일어난다.
+function decRoute(c) {
+  if (!c) return 'vault';
+  if (c.answer === DEC_OTHER) return 'vault';
+  return c.route || 'vault';
 }
 
 // 첫 입주 대상 3건. 화면이 완전히 비었을 때만 '등록' 버튼으로 뜬다.
@@ -7665,7 +7677,9 @@ function DecExportModal({ rows, onClose }) {
   const [copied, setCopied] = useState('');
   const md = rows.map(c => {
     const head = '## ' + decDate(c.answeredAt) + ' · ' + (c.domain || '') + ' · ' + (c.type || '');
-    const line = '**' + (c.title || '') + '** — ' + decOptLabel(c, c.answer);
+    // 기타는 선택지 밖의 답이라 내보내기에서도 자동 실행 금지를 명시한다(허브: 화면·내보내기에서 vault 취급).
+    const line = '**' + (c.title || '') + '** — ' + decOptLabel(c, c.answer)
+      + (c.answer === DEC_OTHER ? ' ⚠ 선택지 밖 · 자동 실행 금지 · 볼트 검토 후 반영' : '');
     const note = c.answerNote ? '\n> ' + c.answerNote : '';
     const foot = '\n`' + (c.createdBy || '') + '` → ' + (c.vaultTarget || '');
     return head + '\n' + line + note + foot;
@@ -7702,6 +7716,7 @@ function TabDecisions({ decs, decErr }) {
   const [seeding, setSeeding] = useState(false);
   const [snoozeD, setSnoozeD] = useState({});   // 카드별로 고른 보류 기간(일). 비어 있으면 기본 7일
   const [openSnz, setOpenSnz] = useState(false); // 보류 중 목록 펼침
+  const [otherOpen, setOtherOpen] = useState({}); // [기타 — 직접 입력]을 켠 카드. 켜져 있으면 메모가 필수다
   const [fixed, setFixed] = useState([]);       // 이번 세션에 문안을 맞춘 시드 카드 id
   const [stuck, setStuck] = useState([]);       // 문안이 바뀌기 전에 이미 답해버린 시드 카드 id
   const fixTried = useRef({});                  // 카드당 1회만 시도 — 실패 시에만 다시 연다
@@ -7714,18 +7729,24 @@ function TabDecisions({ decs, decErr }) {
   // 대신 오클릭을 살릴 수 있게 '방금 저장' 줄을 띄운다 — 실행 전이면 되돌릴 수 있다.
   const save = (c, key) => {
     if (busy) return;
+    const note = (notes[c._key] || '').trim();
+    // [기타]만 즉시 저장의 예외다 — 메모가 곧 답이라 비어 있으면 저장할 것이 없다.
+    // 버튼도 비활성이지만, 키보드·자동화로 들어오는 경로까지 여기서 한 번 더 막는다.
+    if (key === DEC_OTHER && !note) { setErr('[기타]는 내용을 적어야 저장됩니다 — 아래 칸에 한 줄 적어주세요.'); return; }
     setBusy(c._key); setErr('');
     const patch = {
       answer: key,
-      answerNote: (notes[c._key] || '').trim() || null,
+      answerNote: note || null,
       answeredAt: new Date().toISOString(),
       status: 'answered',
       snoozedUntil: null,   // 답이 나왔으면 남아 있던 스누즈는 의미가 없다
     };
     db.ref(DEC_PATH + '/' + c._key).update(patch).then(() => {
       setBusy('');
-      setLast({ kind: 'answer', key: c._key, title: c.title, label: decOptLabel(c, key), route: c.route });
+      // 토스트에도 강등된 경로를 쓴다 — other 를 '곧 실행합니다'로 안내하면 그게 곧 오해다.
+      setLast({ kind: 'answer', key: c._key, title: c.title, label: decOptLabel(c, key), route: (key === DEC_OTHER ? 'vault' : c.route) });
       setNotes(n => { const m = { ...n }; delete m[c._key]; return m; });
+      setOtherOpen(s => { const m = { ...s }; delete m[c._key]; return m; });
     }).catch(e => { setBusy(''); setErr((e && e.message) || '저장 실패'); });
   };
   // 보류 = 답이 아니다. status 를 건드리지 않고 snoozedUntil 만 민다.
@@ -7826,6 +7847,10 @@ function TabDecisions({ decs, decErr }) {
     .sort((a, b) => String(a.snoozedUntil || '').localeCompare(String(b.snoozedUntil || '')));
   const done = list.filter(c => (c.status === 'answered' || c.status === 'applied') && c.answeredAt && decAgeD(c.answeredAt) < DEC_RECENT_D)
     .sort((a, b) => String(b.answeredAt || '').localeCompare(String(a.answeredAt || '')));
+  // [기타] 집계. 비율이 높으면 카드가 아니라 '선택지 설계'가 틀렸다는 신호다(허브).
+  // 지금은 세어서 보여주기만 한다 — 어디에도 쓰지 않고 판단도 하지 않는다.
+  const otherN = done.filter(c => c.answer === DEC_OTHER).length;
+  const otherPct = done.length ? Math.round(otherN * 100 / done.length) : 0;
   const cntDom = d => queue.filter(c => (d === '전체' || c.domain === d) && (fType === '전체' || c.type === fType)).length;
   const cntType = t => queue.filter(c => (t === '전체' || c.type === t) && (fDom === '전체' || c.domain === fDom)).length;
 
@@ -7914,9 +7939,11 @@ function TabDecisions({ decs, decErr }) {
         const age = decAgeD(c.createdAt);
         const stale = e === 'pending' && age >= DEC_STALE_D;
         const expired = e === 'expired';
-        const auto = c.route === 'auto';
+        const auto = decRoute(c) === 'auto';   // other 면 여기서 이미 vault 로 내려온다
         const snzN = Number(c.snoozeCount) || 0;
         const snzHot = snzN >= DEC_SNOOZE_WARN;
+        const otherOn = !!otherOpen[c._key];          // [기타] 모드 — 메모가 필수가 된다
+        const noteVal = (notes[c._key] || '').trim();
         const cs = { marginBottom: 14, padding: 18 };
         if (expired) { cs.border = '1.5px dashed #A29C95'; cs.background = '#FAFAF9'; }
         else if (stale) { cs.border = '1.5px solid #E08700'; cs.boxShadow = '0 2px 12px rgba(224,135,0,0.18)'; }
@@ -7925,7 +7952,7 @@ function TabDecisions({ decs, decErr }) {
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
               <Badge label={c.type || '판정'} color={DEC_TYPE_C[c.type] || '#6E6863'} />
               <Badge label={c.domain || '운영'} color="#E3E0DC" />
-              <span data-dec-route={c.route || 'vault'} style={{ display: 'inline-block', padding: '3px 11px', borderRadius: 20, fontSize: 15, fontWeight: 800, color: auto ? 'white' : '#3A3631', background: auto ? '#C62828' : '#E3E0DC', whiteSpace: 'nowrap' }}>
+              <span data-dec-route={decRoute(c)} style={{ display: 'inline-block', padding: '3px 11px', borderRadius: 20, fontSize: 15, fontWeight: 800, color: auto ? 'white' : '#3A3631', background: auto ? '#C62828' : '#E3E0DC', whiteSpace: 'nowrap' }}>
                 {auto ? '⚡ 승인 시 즉시 적용' : '📗 볼트 검토 후 반영'}
               </span>
               {stale ? <Badge label={'⏳ ' + age + '일째 대기'} color="#E08700" /> : null}
@@ -7947,39 +7974,65 @@ function TabDecisions({ decs, decErr }) {
 
             {expired ? <div style={{ fontSize: 15, color: '#8A8279', marginBottom: 10 }}>{DEC_EXPIRE_D}일이 지난 카드입니다. 지금 답해도 저장되지만, 상황이 바뀌었을 수 있으니 한 번 확인해주세요.</div> : null}
 
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+            {/* ── 1층 · 준비된 선택지 ─ 누르면 즉시 저장된다 ────────────────────────── */}
+            <div data-dec-layer1={c.id} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
               {(c.options || []).slice(0, 3).map(o => (
-                <button key={o.key} data-dec-opt={c.id + ':' + o.key} disabled={busy === c._key} onClick={() => save(c, o.key)}
-                  style={{ padding: '11px 22px', borderRadius: 9, border: 'none', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: busy === c._key ? '#A29C95' : G, color: 'white' }}>{o.label}</button>
+                <button key={o.key} data-dec-opt={c.id + ':' + o.key} disabled={busy === c._key || otherOn} onClick={() => save(c, o.key)}
+                  style={{ padding: '11px 22px', borderRadius: 9, border: 'none', cursor: (busy === c._key || otherOn) ? 'default' : 'pointer', fontSize: 17, fontWeight: 700, background: (busy === c._key || otherOn) ? '#C4BFB8' : G, color: 'white' }}>{o.label}</button>
               ))}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
-                <select value={String(snoozeD[c._key] || DEC_SNOOZE_D)} data-dec-snzsel={c.id}
-                  onChange={ev => { const v = ev.target.value; setSnoozeD(s => { const m = { ...s }; m[c._key] = Number(v); return m; }); }}
-                  style={{ padding: '10px 8px', borderRadius: 9, border: '1px solid #E3E0DC', background: 'white', fontSize: 16, color: '#3A3631', fontFamily: 'inherit', cursor: 'pointer' }}>
-                  {DEC_SNOOZE_OPTS.map(d => <option key={d} value={String(d)}>{d}일 뒤</option>)}
-                </select>
-                <button data-dec-snooze={c.id} disabled={busy === c._key} onClick={() => snooze(c)}
-                  style={{ padding: '11px 20px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: 'white', color: '#6E6863' }}>보류</button>
-              </div>
+              {/* ── 2층 · 선택지 밖의 답 ─ 여기만 즉시 저장이 아니다. 메모가 곧 답이라 적어야 저장된다. */}
+              <button data-dec-other={c.id} disabled={busy === c._key}
+                onClick={() => setOtherOpen(s => { const m = { ...s }; if (m[c._key]) delete m[c._key]; else m[c._key] = 1; return m; })}
+                style={{ padding: '11px 22px', borderRadius: 9, border: '2px solid ' + (otherOn ? '#2D5FE0' : '#C4BFB8'), cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 17, fontWeight: 700, background: otherOn ? '#EEF3FB' : 'white', color: otherOn ? '#1F3F8F' : '#3A3631' }}>
+                ✏ 기타 — 직접 입력
+              </button>
             </div>
-            <div style={{ fontSize: 14, color: '#A29C95', marginTop: 6 }}>보류는 답이 아닙니다 — 고른 기간이 지나면 이 카드가 대기 목록으로 스스로 돌아옵니다.</div>
+            {otherOn ? (
+              <div data-dec-othermsg={c.id} style={{ fontSize: 15, color: '#1F3F8F', fontWeight: 700, marginTop: 8, lineHeight: 1.6 }}>
+                선택지에 없는 답이면 아래 칸에 직접 적어주세요 — <b>적어야 저장됩니다.</b> 이 답은 에이전트가 예상하지 못한 답이라 <b>자동 실행되지 않고</b>, 볼트 검토를 거쳐 반영됩니다.
+              </div>
+            ) : null}
             {snzHot ? (
               <div data-dec-snzmsg={c.id} style={{ fontSize: 15, color: '#8A5200', fontWeight: 700, marginTop: 6, lineHeight: 1.6 }}>
                 벌써 {snzN}번 미룬 카드입니다. 지금도 답하기 어렵다면, 아래 칸에 <b>무엇이 막고 있는지</b>만 한 줄 남겨주세요 — 그게 답보다 더 필요할 수 있습니다.
               </div>
             ) : null}
 
+            {otherOn ? <div data-dec-notereq={c.id} style={{ fontSize: 15, fontWeight: 800, color: '#1F3F8F', marginTop: 12 }}>답 내용 <span style={{ color: '#C62828' }}>*필수</span></div> : null}
             <input value={notes[c._key] || ''} data-dec-note={c.id}
               onChange={ev => { const val = ev.target.value; setNotes(n => { const m = { ...n }; m[c._key] = val; return m; }); }}
-              placeholder="한 줄 이유 (선택) — 먼저 적고 위 버튼을 누르면 답과 함께 저장됩니다"
-              style={{ width: '100%', marginTop: 12, padding: '9px 10px', borderRadius: 8, border: '1px solid #E3E0DC', fontSize: 16, boxSizing: 'border-box' }} />
+              placeholder={otherOn ? '선택지에 없는 답을 그대로 적어주세요 — 이 내용이 곧 답입니다' : '한 줄 이유 (선택) — 먼저 적고 위 버튼을 누르면 답과 함께 저장됩니다'}
+              style={{ width: '100%', marginTop: otherOn ? 5 : 12, padding: '9px 10px', borderRadius: 8, border: otherOn ? '2px solid #2D5FE0' : '1px solid #E3E0DC', background: otherOn ? '#FBFCFF' : 'white', fontSize: 16, boxSizing: 'border-box' }} />
             {/* 이 노드는 읽기가 공개(.read:true)다. 카드 본문 금지 규칙이 에이전트에게만 걸려 있어서
                 사람이 직접 쓰는 이 칸이 유일하게 안 막힌 구멍이다 — 그래서 칸 바로 밑에 적는다. */}
             <div data-dec-warn style={{ fontSize: 14, color: '#8A8279', marginTop: 6 }}>
               🔒 원가·마진·손익분기 숫자, 협력사 단가, 고객 개인정보, <b>법적 리스크에 대한 내부 판단</b>은 적지 마세요. 이 칸은 외부에서 읽을 수 있습니다 — 이런 내용은 볼트 <b>90_내부/</b> 에 직접 적어주세요.
             </div>
 
-            {c.vaultTarget ? <div style={{ fontSize: 14, color: '#A29C95', marginTop: 10 }}>답은 볼트 <b>{c.vaultTarget}</b> 로 갑니다</div> : null}
+            {otherOn ? (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginTop: 10 }}>
+                <button data-dec-othersave={c.id} disabled={busy === c._key || !noteVal} onClick={() => save(c, DEC_OTHER)}
+                  style={{ padding: '11px 22px', borderRadius: 9, border: 'none', cursor: (busy === c._key || !noteVal) ? 'not-allowed' : 'pointer', fontSize: 17, fontWeight: 700, background: (busy === c._key || !noteVal) ? '#C4BFB8' : '#2D5FE0', color: 'white' }}>이 내용으로 저장</button>
+                <button data-dec-othercancel={c.id} onClick={() => setOtherOpen(s => { const m = { ...s }; delete m[c._key]; return m; })}
+                  style={{ padding: '11px 18px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: 'pointer', fontSize: 16, fontWeight: 700, background: 'white', color: '#6E6863' }}>취소</button>
+                {!noteVal ? <span data-dec-otherreq={c.id} style={{ fontSize: 15, color: '#8A5200', fontWeight: 700 }}>내용을 적어야 저장할 수 있습니다</span> : null}
+              </div>
+            ) : null}
+
+            {/* ── 3층 · 보류 ─ 답이 아니다. 그래서 위 두 층과 선으로 끊어 놓는다(허브 지시). ────── */}
+            <div data-dec-layer3={c.id} style={{ borderTop: '1px dashed #E3E0DC', marginTop: 16, paddingTop: 12, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#8A8279' }}>지금은 답하기 어렵다면</span>
+              <select value={String(snoozeD[c._key] || DEC_SNOOZE_D)} data-dec-snzsel={c.id}
+                onChange={ev => { const v = ev.target.value; setSnoozeD(s => { const m = { ...s }; m[c._key] = Number(v); return m; }); }}
+                style={{ padding: '10px 8px', borderRadius: 9, border: '1px solid #E3E0DC', background: 'white', fontSize: 16, color: '#3A3631', fontFamily: 'inherit', cursor: 'pointer' }}>
+                {DEC_SNOOZE_OPTS.map(d => <option key={d} value={String(d)}>{d}일 뒤</option>)}
+              </select>
+              <button data-dec-snooze={c.id} disabled={busy === c._key} onClick={() => snooze(c)}
+                style={{ padding: '10px 20px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: busy === c._key ? 'wait' : 'pointer', fontSize: 16, fontWeight: 700, background: '#F5F4F2', color: '#6E6863' }}>보류</button>
+              <span style={{ fontSize: 14, color: '#A29C95' }}>보류는 답이 아닙니다 — 고른 기간이 지나면 이 카드가 대기 목록으로 스스로 돌아옵니다.</span>
+            </div>
+
+            {c.vaultTarget ? <div style={{ fontSize: 14, color: '#A29C95', marginTop: 10 }}>답은 볼트 <b>{c.vaultTarget}</b> 로 갑니다{c.answer === DEC_OTHER ? ' (기타는 검토 후)' : ''}</div> : null}
           </Card>
         );
       })}
@@ -8011,6 +8064,12 @@ function TabDecisions({ decs, decErr }) {
       <div style={{ marginTop: 28 }}>
         <div style={{ fontSize: 18, fontWeight: 800, color: G, marginBottom: 2 }}>최근 {DEC_RECENT_D}일 답변 완료</div>
         <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 10 }}>읽기 전용입니다. 이 목록이 그대로 볼트 _수신함/판단 기록 으로 넘어갑니다.</div>
+        {otherN > 0 ? (
+          <div data-dec-othern={otherN} style={{ fontSize: 15, color: otherPct >= 50 ? '#8A5200' : '#6E6863', background: otherPct >= 50 ? '#FFF6E5' : '#F5F4F2', border: '1px solid ' + (otherPct >= 50 ? '#E7C98A' : '#EDEBE7'), borderRadius: 9, padding: '9px 12px', marginBottom: 10, lineHeight: 1.6 }}>
+            ✏ <b>기타 {otherN}건</b> / {done.length}건 (<b>{otherPct}%</b>) — 준비된 선택지 밖의 답입니다.
+            {otherPct >= 50 ? <span> 절반을 넘었습니다. 카드가 틀린 게 아니라 <b>선택지를 잘못 뽑고 있다는 신호</b>일 수 있으니 허브에 알려주세요.</span> : null}
+          </div>
+        ) : null}
         {done.length === 0 ? (
           <Card style={{ padding: 18, textAlign: 'center', color: '#A29C95', fontSize: 16 }}>최근 {DEC_RECENT_D}일 안에 답한 카드가 없습니다.</Card>
         ) : done.map(c => (
@@ -8021,7 +8080,9 @@ function TabDecisions({ decs, decErr }) {
               <Badge label={c.type || '판정'} color={DEC_TYPE_C[c.type] || '#6E6863'} />
               <span style={{ fontSize: 17, fontWeight: 800, color: '#1A1614' }}>{c.title}</span>
               <span style={{ fontSize: 17, fontWeight: 800, color: G }}>— {decOptLabel(c, c.answer)}</span>
-              {c.status === 'applied' ? <Badge label={'✅ 적용됨 ' + decDate(c.appliedAt)} color="#1FA463" /> : <span style={{ fontSize: 14, color: '#A29C95' }}>{c.route === 'auto' ? '실행 대기' : '볼트 검토 대기'}</span>}
+              {c.answer === DEC_OTHER ? <span data-dec-otherbadge={c.id} style={{ display: 'inline-block', padding: '2px 9px', borderRadius: 20, fontSize: 14, fontWeight: 800, color: 'white', background: '#2D5FE0' }}>✏ 기타</span> : null}
+              {/* 여기도 decRoute — route:auto 카드라도 other 로 답했으면 '실행 대기'라고 쓰면 안 된다. */}
+              {c.status === 'applied' ? <Badge label={'✅ 적용됨 ' + decDate(c.appliedAt)} color="#1FA463" /> : <span style={{ fontSize: 14, color: '#A29C95' }}>{decRoute(c) === 'auto' ? '실행 대기' : '볼트 검토 대기'}</span>}
             </div>
             {c.answerNote ? <div style={{ fontSize: 16, color: '#3A3631', marginTop: 5 }}>&gt; {c.answerNote}</div> : null}
             <div style={{ fontSize: 14, color: '#A29C95', marginTop: 5 }}>{c.createdBy || ''} → {c.vaultTarget || ''}</div>
