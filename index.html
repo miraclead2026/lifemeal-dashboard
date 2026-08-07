@@ -126,6 +126,18 @@ function sortByDate(arr, key) {
   const k = key || 'date';
   return (Array.isArray(arr) ? arr : []).filter(x => x && x[k]).slice().sort(byDateAsc(k));
 }
+// [index_151] 화면에 늘어놓는 기간 목록은 '최신 먼저'다. 계산용 정렬과 방향이 반대다.
+//
+//   계산: 마지막 원소가 최신이어야 편하다        → sortByDate (오름차순)
+//   화면: 첫 원소가 최신이어야 한다               → latestFirst (내림차순)
+//
+//   두 뜻이 한 배열에 얹혀 있었고, index_149 가 계산 쪽만 명시하는 바람에 화면 쪽이
+//   뒤집혔다(매출 탭이 3월부터 나왔다). buildDailyPeriods 도 원래 내림차순을 돌려준다 —
+//   광고·카카오 탭이 그 규칙을 쓰고 있었고, 매출 탭만 '파일이 그렇게 오겠지'에 기대고 있었다.
+//   순서에 뜻이 있으면 그 뜻을 쓰는 자리에서 코드로 밝힌다. 파일에 맡기지 않는다.
+function latestFirst(arr, key) {
+  return sortByDate(arr, key).reverse();
+}
 // 월·주 배열에서 '지금 것'을 고른다. 찾는 기간이 파일에 없을 때 배열 첫 원소로 떨어지면
 // 아무 달의 매출이 「이번 달 매출」로 찍힌다. 그래서 없으면 키가 가장 큰 것(=최신)을 쓴다.
 function pickLatestPeriod(arr, ymKey) {
@@ -191,14 +203,15 @@ const CAT_PALETTE = ['#1A1614', '#7C4DFF', '#6E6863', '#2D5FE0', '#E08700', '#E5
 const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E08700', '안내': '#6E6863' };
 // ═══════════════════════════════════════════════════════════════════════════
 // 빌드 표기 — 이 줄이 정본이다
-//   index_150 · 2026-08-07 · [폐기] 를 답변 완료 카드까지 확장
+//   index_151 · 2026-08-07 · 매출 탭 기간 목록을 다시 '최신 먼저'로 (149 회귀 교정)
+//   (index_150 · 2026-08-07 · [폐기] 를 답변 완료 카드까지 확장)
 //   (index_149 · 2026-08-07 · 바깥 JSON 날짜 배열 정렬을 수신 지점으로 이동)
 //   (index_148 · 2026-08-07 · 판단 카드 [폐기] 버튼 · 「폐기됨」 영역)
 //   (index_147 · 2026-08-07 · 업데이트 내역 교정 — UPDATES_REV 병합)
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_150';
+const BUILD_TAG = 'index_151';
 
 // [index_147] 업데이트 내역(updates)은 사람이 화면에서 편집한다 — 추가·수정·삭제·고정.
 //   그래서 seedRev 처럼 통째로 덮으면 안 된다. 덮으면 유니님이 지운 안내가 되살아나고
@@ -5816,7 +5829,8 @@ function TabSales({ data, setData }) {
   const daysAll = (full && full.days) || [];
   const availKeys = daysAll.map(d => d.key).filter(Boolean).sort();
   const availMin = availKeys[0] || '', availMax = availKeys[availKeys.length - 1] || '';
-  const list = (full && full[modeKeyMap[mode]]) || [];
+  // idx 0 = 최신. 아래 ← → 버튼과 '직전 기간' 계산이 전부 이 약속 위에 서 있다.
+  const list = latestFirst((full && full[modeKeyMap[mode]]) || [], 'key');
   const curIdx = Math.min(idx[mode] || 0, Math.max(0, list.length - 1));
   const customRec = isCustom ? aggSalesRange(daysAll, range.start, range.end) : null;
   const r = isCustom ? customRec : (list[curIdx] || null);
