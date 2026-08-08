@@ -203,7 +203,8 @@ const CAT_PALETTE = ['#1A1614', '#7C4DFF', '#6E6863', '#2D5FE0', '#E08700', '#E5
 const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E08700', '안내': '#6E6863' };
 // ═══════════════════════════════════════════════════════════════════════════
 // 빌드 표기 — 이 줄이 정본이다
-//   index_153 · 2026-08-08 · 판단 대기 화면을 읽는 사람의 말로 (「볼트」·「실행기」 제거)
+//   index_154 · 2026-08-08 · 실결제 내역 CSV 내보내기 (카드 마감 대조용)
+//   (index_153 · 2026-08-08 · 판단 대기 화면을 읽는 사람의 말로)
 //   (index_152 · 2026-08-07 · 자동 반영 상태 표시 · 「승인」 문구 제거 · 선택지 결과 설명)
 //   (index_151 · 2026-08-07 · 매출 탭 기간 목록을 다시 '최신 먼저'로 — 149 회귀 교정)
 //   (index_150 · 2026-08-07 · [폐기] 를 답변 완료 카드까지 확장)
@@ -213,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_153';
+const BUILD_TAG = 'index_154';
 
 // [index_147] 업데이트 내역(updates)은 사람이 화면에서 편집한다 — 추가·수정·삭제·고정.
 //   그래서 seedRev 처럼 통째로 덮으면 안 된다. 덮으면 유니님이 지운 안내가 되살아나고
@@ -417,6 +418,64 @@ const effDate = b => (b.status === '결제완료' && b.paidDate) ? b.paidDate : 
 const effTotal = b => (b.status === '결제완료' && b.paidAmount != null && b.paidAmount !== '') ? Number(b.paidAmount) : itemTotal(b);
 const budgetNames = (data, b) => { const o = data.outputs.find(x => x.id === b.outputId); const p = b.planId ? data.plans.find(x => x.id === b.planId) : null; const s = b.subplanId ? data.subplans.find(x => x.id === b.subplanId) : null; const c = b.checklistId ? data.checklists.find(x => x.id === b.checklistId) : null; return { project: o ? outLabel(o) : '', plan: p ? p.name : '-', detail: c ? c.text : (s ? s.name : (p ? p.name : (o ? o.name : ''))) }; };
 const budgetOutId = (data, b) => { const o = (data.outputs || []).find(x => x.id === b.outputId); if (o) return String(o.id); if (b.planId) { const pl = (data.plans || []).find(p => p.id === b.planId); if (pl) { const o2 = (data.outputs || []).find(x => x.id === pl.outputId); if (o2) return String(o2.id); } } return '__none'; };
+// ═══════════════════════════════════════════════════════════════════════════
+// [index_154] 실결제 CSV — 카드 마감 때 영수증과 1:1로 맞추는 용도
+//
+//   열 순서는 경리 요청 그대로다. 대시보드에 없는 값은 **빈 칸으로 낸다.**
+//   특히 '상태'를 전부 '정상'으로 채우고 싶은 유혹이 있는데, 그러면 취소 건까지
+//   정상으로 보고하는 셈이 된다. 모르는 것은 비워야 받는 사람이 채울 수 있다.
+//
+//   요청 9열 뒤에 대시보드가 실제로 가진 값 둘(결제수단·프로젝트)을 덧붙인다.
+//   앞 9열은 순서도 뜻도 그대로라 저쪽 템플릿이 어긋나지 않는다.
+// ═══════════════════════════════════════════════════════════════════════════
+const PAY_CSV_HEADER = ['결제일시', '카드', '결제처', '금액', '구분', '승인번호', '목적/메모', '영수증등록', '상태',
+                        '결제수단(대시보드)', '프로젝트'];
+// 대시보드에 아예 없는 열 — 화면에도 이대로 적어 준다. 받는 사람이 왜 비었는지 알아야 한다.
+const PAY_CSV_EMPTY = [
+  { col: '결제일시의 시각(HH:MM)', why: '결제일만 저장합니다 (날짜 입력칸)' },
+  { col: '구분 (온라인/오프라인)', why: '대시보드에 그 구분이 없습니다' },
+  { col: '승인번호', why: '입력칸 자체가 없습니다' },
+  { col: '상태 (정상/취소/환불)', why: '취소·환불을 따로 기록하지 않습니다' },
+];
+function csvCell(v) {
+  const t = (v === null || v === undefined) ? '' : String(v);
+  return /[",\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+}
+function payCsvRows(data, list) {
+  return (list || []).map(p => {
+    const receipt = p.receiptName || (p.receiptUrl ? p.receiptUrl : '');
+    const proj = (data.outputs || []).filter(o => String(o.id) === String(p.projectId))[0];
+    return [
+      p.paidDate || '',                          // 1 결제일시 — 시각은 없다
+      cardLabel(data, p.cardId) || '',           // 2 카드
+      p.vendor || '',                            // 3 결제처
+      (Number(p.amount) || 0),                   // 4 금액 — 숫자만
+      '',                                        // 5 구분 — 없음
+      '',                                        // 6 승인번호 — 없음
+      p.memo || '',                              // 7 목적/메모
+      receipt || 'N',                            // 8 영수증등록
+      '',                                        // 9 상태 — 없음
+      p.payMethod || '',                         // + 결제수단
+      (p.project || (proj ? outLabel(proj) : '')),// + 프로젝트
+    ];
+  });
+}
+function payCsvText(data, list) {
+  const rows = [PAY_CSV_HEADER].concat(payCsvRows(data, list));
+  return '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n') + '\r\n';
+}
+function downloadText(text, filename, mime) {
+  try {
+    const blob = new Blob([text], { type: (mime || 'text/csv') + ';charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+    return '';
+  } catch (e) { return (e && e.message) || '내려받기 실패'; }
+}
+
 const cardOf = (data, id) => (data.cards || []).find(c => String(c.id) === String(id)) || null;
 const cardLabel = (data, id) => { const c = cardOf(data, id); return c ? (c.name + (c.issuer ? ' (' + c.issuer + ')' : '')) : ''; };
 const fmtSize = n => n > 1024*1024 ? (n/(1024*1024)).toFixed(1)+'MB' : (n/1024).toFixed(0)+'KB';
@@ -4081,6 +4140,10 @@ function TabBudget({ data, setData, goTab }) {
   const fBOn = !!(fB.q || fB.proj || fB.vendor || fB.pay || fB.card || fB.status);
   const fPOn = !!(fP.q || fP.proj || fP.vendor || fP.pay || fP.card);
   const shownBudgets = tableBudgets.filter(bMatch);
+  // [index_154] 내보내기 기간 — 비워 두면 지금 화면(필터 결과) 전체가 나간다
+  const [expS, setExpS] = useState('');
+  const [expE, setExpE] = useState('');
+  const [expMsg, setExpMsg] = useState('');
   const shownPays = payments.filter(pMatch);
   const filterBar = (f, setF, isPay) => (
     <Card style={{ marginBottom: 12, padding: '10px 12px' }}>
@@ -4280,6 +4343,40 @@ function TabBudget({ data, setData, goTab }) {
           </Card>
         )}
         {filterBar(fP, setFP, true)}
+
+        {/* [index_154] 카드 마감 대조용 내보내기. 기간은 결제일 기준이다. */}
+        <Card style={{ marginBottom: 12, padding: '10px 12px' }} data-pay-export>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#6E6863' }}>📤 내보내기</span>
+            <input type="date" value={expS} onChange={ev => { setExpS(ev.target.value); setExpMsg(''); }} data-pay-exp-s
+              style={{ padding: '6px 9px', borderRadius: 7, border: '1px solid ' + (expS ? G : '#E3E0DC'), fontSize: 11.5, fontFamily: 'inherit', color: '#3A3631' }} />
+            <span style={{ fontSize: 11.5, color: '#A29C95' }}>~</span>
+            <input type="date" value={expE} onChange={ev => { setExpE(ev.target.value); setExpMsg(''); }} data-pay-exp-e
+              style={{ padding: '6px 9px', borderRadius: 7, border: '1px solid ' + (expE ? G : '#E3E0DC'), fontSize: 11.5, fontFamily: 'inherit', color: '#3A3631' }} />
+            <button data-pay-exp-last onClick={() => { const d = new Date(); const y = d.getFullYear(), m = d.getMonth(); const f = new Date(y, m - 1, 1), l = new Date(y, m, 0); const fmt = x => x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); setExpS(fmt(f)); setExpE(fmt(l)); setExpMsg(''); }}
+              style={{ padding: '6px 10px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>지난 달</button>
+            <button data-pay-exp-clear onClick={() => { setExpS(''); setExpE(''); setExpMsg(''); }}
+              style={{ padding: '6px 10px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>기간 지우기</button>
+            {(() => {
+              const rows = shownPays.filter(p => (!expS || (p.paidDate && p.paidDate >= expS)) && (!expE || (p.paidDate && p.paidDate <= expE)));
+              const label = (expS || expE) ? ((expS || '처음') + '_' + (expE || '끝')) : '전체';
+              return (
+                <React.Fragment>
+                  <button data-pay-exp-go disabled={!rows.length}
+                    onClick={() => { const e = downloadText(payCsvText(data, rows), '실결제_' + label + '.csv'); setExpMsg(e ? ('내려받기에 실패했습니다 — ' + e) : (rows.length + '건을 내려받았습니다.')); }}
+                    style={{ marginLeft: 'auto', padding: '6px 14px', borderRadius: 7, border: 'none', background: rows.length ? G : '#D8D4CF', color: 'white', fontSize: 11.5, fontWeight: 800, cursor: rows.length ? 'pointer' : 'not-allowed', fontFamily: 'inherit' }}>
+                    CSV 내려받기 ({rows.length}건)
+                  </button>
+                </React.Fragment>
+              );
+            })()}
+          </div>
+          <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 7, lineHeight: 1.6 }}>
+            결제일 기준입니다. 기간을 비우면 <b>지금 필터에 걸린 전체</b>가 나갑니다. 엑셀에서 바로 열리는 형식(UTF-8)입니다.
+            <br /><b>대시보드에 없어서 빈 칸으로 나가는 항목</b> — {PAY_CSV_EMPTY.map(x => x.col).join(' · ')}. 지어내지 않고 비워 둡니다.
+          </div>
+          {expMsg ? <div data-pay-exp-msg style={{ fontSize: 11.5, fontWeight: 700, color: G, marginTop: 6 }}>{expMsg}</div> : null}
+        </Card>
         {!shownPays.length ? (<Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}><div style={{ fontSize: 34, marginBottom: 10 }}>🧾</div><div>{fPOn ? '필터 조건에 맞는 실결제가 없습니다' : '등록된 실결제 기록이 없습니다'}</div><div style={{ fontSize: 12, marginTop: 6 }}>{fPOn ? '조건을 바꾸거나 초기화해 보세요' : '프로젝트와 업체를 선택하고 결제 금액을 입력해 기록하세요'}</div>{fPOn ? <button onClick={() => setFP({ q: '', proj: '', vendor: '', pay: '', card: '' })} style={{ marginTop: 10, padding: '6px 14px', borderRadius: 7, border: '1px solid #E3E0DC', background: 'white', color: G, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>필터 초기화</button> : null}</Card>) :
           payKeys.map(k => { const list = payGroups[k]; const sub = list.reduce((a, p) => a + (Number(p.amount) || 0), 0); return (
             <Card key={k} style={{ padding: 0, overflow: 'hidden', marginBottom: 16 }}>
