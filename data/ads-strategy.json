@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-09 17:54",
+  "updatedAt": "2026-08-09 18:25",
   "basedOn": "2026-08-07",
   "items": [
     {
@@ -141,52 +141,7 @@
       "evidence": "해당 그룹 전 7일 광고비 0원·ROAS 0% / 후 7일 0원·ROAS 0%"
     }
   ],
-  "roadmaps": [
-    {
-      "id": "gfa-ab-webconv",
-      "title": "GFA 애드부스트 → 리타겟·유사 확장 로드맵",
-      "subtitle": "GFA=애드부스트(자동) 운영·상품별 소재 · 판정=스토어 총매출 통합ROAS(목표 330%) · 객단가 86,336원·목표CPA 26,162원 · A/B 미집행(전량 애드부스트, 2026-07 유니 결정)",
-      "stages": [
-        {
-          "id": "step4_retarget",
-          "title": "1) 리타겟(카탈로그 판매)",
-          "status": "pending",
-          "entryCondition": "스토어타겟 준비완료 & 모수 ≥ 1,000",
-          "entryMet": false,
-          "action": "카탈로그 판매 리타겟 착수 — 이탈자(장바구니 포함 − 구매완료 제외) 재노출",
-          "successCriteria": "리타겟 리포트ROAS + 스토어 총매출 증분",
-          "nextTrigger": "리타겟 안정화 후 유사 확장",
-          "setup": [
-            {
-              "label": "이탈자 타겟",
-              "value": "광고그룹 '잠재고객 불러오기'에서 장바구니 포함 − 구매완료 제외(단일생성 불가)"
-            },
-            {
-              "label": "스토어타겟",
-              "value": "방문/장바구니/구매완료/찜/결제시작/쿠폰(90일)+알림받기 — 2026-07-08 등록, 현재 준비중"
-            }
-          ],
-          "manualEntry": true
-        },
-        {
-          "id": "step5_lookalike",
-          "title": "2) 유사타겟 확장",
-          "status": "pending",
-          "entryCondition": "구매완료 모수 ≥ 1,000 (유사 시드)",
-          "entryMet": false,
-          "action": "유사타겟(SEED=구매완료)으로 신규 확장",
-          "successCriteria": "유사 전환 CPA ≤ 목표 26,162원",
-          "nextTrigger": "채널 데이터 파이프라인 유입 후 최적화 모드 전환",
-          "setup": [
-            {
-              "label": "시드",
-              "value": "스토어타겟 구매완료(90일)"
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  "roadmaps": [],
   "powerlinkPlans": [],
   "powerlinkGroupProposals": [],
   "recentAdOps": [],
