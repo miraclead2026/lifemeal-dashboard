@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_155';
+const BUILD_TAG = 'index_157';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -406,6 +406,7 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   roadmapOverrides: raw.roadmapOverrides || {},
   adOpsLog: raw.adOpsLog || [],
   powerlinkApprovals: raw.powerlinkApprovals || {},
+  bidApprovals: raw.bidApprovals || {},
   adKeywordRegistry: raw.adKeywordRegistry || {},
   messageSchedules: raw.messageSchedules || {},
   routines: (raw.routines || []).map(r => ({ freq: 'weekly', days: [], dom: 1, everyN: 1, start: '', end: '', memo: '', owner: [], active: true, ...r, owner: Array.isArray(r.owner) ? r.owner.filter(Boolean) : (r.owner ? [r.owner] : []) })),
@@ -797,6 +798,7 @@ const INIT = {
   payments: [],
   routines: [],
   routineLogs: {},
+  bidApprovals: {},
   goalFormula: DEFAULT_GOAL_FORMULA,
   outputs: [
     { id: 1, code: 'MD-1', type: 'MD출력', name: '쿠팡 광고 운영' }, { id: 2, code: 'MD-2', type: 'MD출력', name: '네이버 대용량 할인제품 & 정기배송' },
@@ -5144,6 +5146,90 @@ function AdOpsLog({ data, setData }) {
   );
 }
 
+function PowerlinkBidPanel({ data, setData }) {
+  const [bp, setBp] = React.useState(null);
+  const [status, setStatus] = React.useState('loading');
+  React.useEffect(() => {
+    let alive = true;
+    ghFetch('data/ads-bid-proposals.json')
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => { if (!alive) return; if (j && Array.isArray(j.proposals)) { setBp(j); setStatus('ok'); } else setStatus('none'); })
+      .catch(() => { if (alive) setStatus('none'); });
+    return () => { alive = false; };
+  }, []);
+  const appr = data.bidApprovals || {};
+  // [승인] — 규약(#35): 이 세 필드만 쓴다. 자동화PC 가 읽어 다음날 반영.
+  const approve = p => setData(d => ({ ...d, bidApprovals: { ...(d.bidApprovals || {}), [p.id]: { status: 'approved', approvedAt: new Date().toISOString(), by: '유니' } } }));
+  const cancel = id => setData(d => { const b = { ...(d.bidApprovals || {}) }; delete b[id]; return { ...d, bidApprovals: b }; });
+  const won = n => (n == null ? '—' : Number(n).toLocaleString());
+  const ST = {
+    '관측중': { bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863' },
+    '진단': { bg: '#EFF6FF', bd: '#BFDBFE', tx: '#2563EB' },
+    '제안': { bg: '#FFF7ED', bd: '#FED7AA', tx: '#9A3412' },
+    '적용대기': { bg: '#ECFEFF', bd: '#A5F3FC', tx: '#0E7490' },
+    '적용됨': { bg: '#F0FDF4', bd: '#BBF7D0', tx: '#047857' },
+  };
+  const props = bp && Array.isArray(bp.proposals) ? bp.proposals : [];
+  const rules = (bp && bp.rules) || {};
+  const proposeN = props.filter(p => p.status === '제안').length;
+  return (
+    <Card style={{ marginTop: 16 }}>
+      <div data-pl-bid style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: G }}>🔗 파워링크 입찰·예산 제안</div>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>상품별 그룹을 한 곳에서 보고 · 제안 나오면 [승인]하면 자동화PC가 반영</span>
+        {bp ? <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{bp.basedOn ? bp.basedOn + ' 기준' : ''}{bp.updatedAt ? ' · 갱신 ' + String(bp.updatedAt).slice(0, 16).replace('T', ' ') : ''}</span> : null}
+      </div>
+      {status === 'loading' ? <div style={{ fontSize: 12, color: '#A29C95', padding: '10px 0' }}>불러오는 중…</div> : null}
+      {(status === 'none' || (status === 'ok' && props.length === 0)) ? <div data-pl-empty style={{ fontSize: 12, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 8, padding: '12px 14px', lineHeight: 1.6 }}>아직 올라온 제안이 없습니다. 자동화PC가 <b>data/ads-bid-proposals.json</b> 을 올리면 여기 상품그룹별 입찰·예산 제안이 나타납니다. <span style={{ color: '#A29C95' }}>(없음 — 오류가 아닙니다)</span></div> : null}
+      {status === 'ok' && props.length > 0 ? (
+        <React.Fragment>
+          {proposeN > 0 ? <div style={{ fontSize: 12.5, fontWeight: 700, color: '#9A3412', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 8, padding: '7px 11px', marginBottom: 10 }}>답해주실 제안 {proposeN}건 — 아래 [승인]을 누르면 다음날 반영됩니다.</div> : <div style={{ fontSize: 12, color: '#6E6863', marginBottom: 10 }}>지금 승인하실 제안은 없습니다. 클릭이 {rules.clickGate || 30}회 쌓인 그룹부터 제안이 생깁니다.</div>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {props.map(p => {
+              const st = ST[p.status] || ST['관측중'];
+              const ap = appr[p.id];
+              const isApproved = ap && ap.status === 'approved';
+              const w = p.window7d || {};
+              const bidChg = p.proposedBid != null && p.currentBid != null && p.proposedBid !== p.currentBid;
+              const budChg = p.proposedBudget != null && p.currentBudget != null && p.proposedBudget !== p.currentBudget;
+              return (
+                <div key={p.id} data-pl-card={p.id} style={{ border: '1px solid ' + (p.status === '제안' ? '#FED7AA' : '#EDEBE7'), borderLeft: '3px solid ' + st.tx, borderRadius: 10, padding: '10px 12px', background: p.status === '제안' ? '#FFFDFA' : 'white' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                    <span style={{ fontSize: 13.5, fontWeight: 800, color: '#1A1614' }}>{p.category || p.target}</span>
+                    <span data-pl-status={p.status} style={{ fontSize: 11, fontWeight: 800, color: st.tx, background: st.bg, border: '1px solid ' + st.bd, borderRadius: 6, padding: '1px 8px' }}>{p.status}</span>
+                    {isApproved ? <span data-pl-approved={p.id} style={{ fontSize: 11, fontWeight: 800, color: '#047857', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 6, padding: '1px 8px' }}>✅ 승인됨{ap.approvedAt ? ' · ' + String(ap.approvedAt).slice(0, 10) : ''}</span> : null}
+                    <span style={{ marginLeft: 'auto', fontSize: 11.5, color: '#6E6863' }}>클릭 {w.clicks != null ? w.clicks : '—'} · ROAS {w.roas != null ? w.roas + '%' : '—'}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 12.5, marginBottom: 4 }}>
+                    <span style={{ color: '#6E6863' }}>입찰 <b style={{ color: '#1A1614' }}>{won(p.currentBid)}원</b>{bidChg ? <React.Fragment> → <b style={{ color: st.tx }}>{won(p.proposedBid)}원</b></React.Fragment> : <span style={{ color: '#A29C95' }}> (유지)</span>}</span>
+                    <span style={{ color: '#6E6863' }}>예산 <b style={{ color: '#1A1614' }}>{won(p.currentBudget)}원</b>{budChg ? <React.Fragment> → <b style={{ color: st.tx }}>{won(p.proposedBudget)}원</b></React.Fragment> : <span style={{ color: '#A29C95' }}> (유지)</span>}</span>
+                    {p.deltaPct ? <span style={{ fontSize: 11, fontWeight: 700, color: p.deltaPct > 0 ? '#047857' : '#DC2626' }}>{p.deltaPct > 0 ? '▲' : '▼'} {Math.abs(p.deltaPct)}%</span> : null}
+                  </div>
+                  {p.rationale ? <div style={{ fontSize: 12, color: '#6E6863', lineHeight: 1.5 }}>{p.rationale}</div> : null}
+                  {p.successMetric ? <div style={{ fontSize: 11, color: '#A29C95', marginTop: 2 }}>판정 기준: {p.successMetric}</div> : null}
+                  {p.status === '제안' && !isApproved ? (
+                    <div style={{ marginTop: 8 }}>
+                      <button data-pl-approve={p.id} onClick={() => approve(p)} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: G, color: 'white', fontWeight: 800, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>승인</button>
+                      <span style={{ fontSize: 11, color: '#A29C95', marginLeft: 8 }}>승인하면 자동화PC가 다음날 반영합니다.</span>
+                    </div>
+                  ) : null}
+                  {isApproved ? (
+                    <div style={{ marginTop: 8 }}>
+                      <button data-pl-cancel={p.id} onClick={() => cancel(p.id)} style={{ padding: '5px 12px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>취소</button>
+                      <span style={{ fontSize: 11, color: '#A29C95', marginLeft: 8 }}>아직 반영 전이면 취소할 수 있어요.</span>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 10, lineHeight: 1.55 }}>목표 ROAS {rules.targetRoas || 330}% · 판정 표본 클릭 {rules.clickGate || 30}회 · {rules.window || '7일 확정치'} · 입찰 {rules.bidMin || 70}~{rules.bidMax || 1500}원. 승인은 자동화PC의 <b>bidApprovals</b>로 넘어가고, 실행기가 켜진 뒤 다음날 계정에 반영됩니다(지금은 실행기 정지 중).</div>
+        </React.Fragment>
+      ) : null}
+    </Card>
+  );
+}
+
 function AdsStrategyPanel({ data, setData, prodNames }) {
   const [strat, setStrat] = useState(null);
   const [status, setStatus] = useState('loading');
@@ -8735,6 +8821,7 @@ function TabDecisions({ decs, decErr, data, setData }) {
       </div>
 
       <div style={{ marginTop: 24 }}><AdsStrategyPanel data={data} setData={setData} prodNames={{}} /></div>
+      <PowerlinkBidPanel data={data} setData={setData} />
       {showExp ? <DecExportModal rows={done} onClose={() => setShowExp(false)} /> : null}
     </div>
   );
