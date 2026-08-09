@@ -214,7 +214,10 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_154';
+const BUILD_TAG = 'index_155';
+// [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
+//   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
+const TAB_GROUPS_ON = true;
 
 // [index_147] 업데이트 내역(updates)은 사람이 화면에서 편집한다 — 추가·수정·삭제·고정.
 //   그래서 seedRev 처럼 통째로 덮으면 안 된다. 덮으면 유니님이 지운 안내가 되살아나고
@@ -223,9 +226,10 @@ const BUILD_TAG = 'index_154';
 //   각 시드에 addedRev 를 달고, 저장된 updatesRev 보다 큰 것만 삽입한다.
 //   삽입 후 updatesRev 가 올라가므로, 사람이 그 안내를 지워도 다시 올라오지 않는다.
 //   (지운 것을 되살리지 않는다 = 판단 카드 자동 삭제 금지와 같은 원칙 — 사람의 손을 덮지 않는다)
-const UPDATES_REV = 2;   // DEFAULT_UPDATES 에 새 항목을 넣을 때마다 +1, 새 항목엔 addedRev: 그 값
+const UPDATES_REV = 3;   // DEFAULT_UPDATES 에 새 항목을 넣을 때마다 +1, 새 항목엔 addedRev: 그 값
 
 const DEFAULT_UPDATES = [
+  { id: 1000016, addedRev: 3, date: '2026-08-09', tag: '개선', title: '위쪽 탭을 6개로 묶었어요', content: '탭이 홈·AI 에이전트·업무·성과·인사이트·예산 6개로 정리됐어요. 누르면 그 아래에 세부 화면이 나옵니다. 칸반은 「단계별 보기」 버튼으로, 보류·휴지통은 배지로 옮겨졌고 기능은 그대로예요.', pinned: false },
   { id: 1000015, addedRev: 2, date: '2026-08-06', tag: '신규기능', title: '「판단 대기」 탭이 생겼어요', content: 'AI가 사람 판단이 필요한 일을 카드로 올려두는 자리예요. 홈 바로 옆 「판단 대기」 탭에서 답하면 됩니다. 선택지에 없는 답은 [기타 — 직접 입력]으로 쓰고, 지금 정하기 어려운 건 [보류]로 밀어두면 정한 날짜에 다시 올라와요.', pinned: false },
   { id: 1000014, addedRev: 2, date: '2026-08-06', tag: '개선', title: '판단 카드 · [지금 반영] 버튼', content: '답한 내용을 바로 실행에 넘기고 싶을 때 누르는 버튼이에요. 언제 요청했는지 시각이 함께 남아서, 밀린 건지 아닌지 구분됩니다.', pinned: false },
   { id: 1000013, addedRev: 2, date: '2026-08-03', tag: '개선', title: '홈 탭 · 반복 업무와 회의록 알림', content: '매주·매달 반복되는 업무가 홈에서 바로 보이고, 회의록이 올라오면 알림이 뜹니다.', pinned: false },
@@ -2384,6 +2388,12 @@ function TeamCalendar({ data, setData, onEdit }) {
           {rts.length > 0 && <span title={'반복업무 ' + rts.length + '건' + (rMiss ? ' · 미완료 ' + rMiss + '건' : '')} style={{ fontSize: 13, fontWeight: 700, padding: '0 5px', borderRadius: 8, background: rMiss ? '#FEF2F2' : '#FFF7ED', color: rMiss ? '#DC2626' : '#9A3412', border: '1px solid ' + (rMiss ? '#FCA5A5' : '#FED7AA') }}>🔁 {rts.length - rMiss}/{rts.length}</span>}
           <div style={{ flex: 1, fontSize: 19, fontWeight: isToday ? 800 : 600, color: isToday ? G : (dow === 0 ? '#DC2626' : (dow === 6 ? '#2563EB' : '#6E6863')), textAlign: 'right', paddingRight: 3 }}>{dd}</div>
         </div>
+        {rts.map(r => { const rdone = routineDone(data, r.id, date); return (
+          <div key={'rt' + r.id} onClick={e => { e.stopPropagation(); setData(d => toggleRoutineDone(d, r.id, date, '')); }} title={'반복업무 · ' + routineDesc(r) + (rdone ? ' · 완료 (누르면 해제)' : ' · 누르면 완료 체크')} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '3px 7px', marginBottom: 3, borderRadius: 7, background: rdone ? '#F0FDF4' : '#FFF7ED', border: '1px solid ' + (rdone ? '#BBF7D0' : '#FED7AA'), cursor: 'pointer' }}>
+            <span style={{ flexShrink: 0, fontSize: 13 }}>{rdone ? '✅' : '🔁'}</span>
+            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 14.5, fontWeight: 600, color: rdone ? '#A29C95' : '#9A3412', textDecoration: rdone ? 'line-through' : 'none' }}>{r.title}</span>
+          </div>
+        ); })}
         {(exp ? chks : chks.slice(0, 3)).map(c => chip(c))}
         {chks.length > 3 && <div onClick={e => { e.stopPropagation(); toggleExp(date); }} title={exp ? '접기' : '이 날짜의 나머지 항목을 아래에 펼쳐서 보기'} style={{ fontSize: 14.5, fontWeight: 700, color: exp ? G : '#6E6863', textAlign: 'center', padding: '2px 0', borderRadius: 6, background: '#F5F4F2', cursor: 'pointer' }}>{exp ? '▲ 접기' : '+' + (chks.length - 3) + '건 더보기'}</div>}
       </div>
@@ -2662,7 +2672,7 @@ function UpdateCenterModal({ data, setData, onClose }) {
   );
 }
 
-function TabProgress({ data, setData, onEdit }) {
+function TabProgress({ data, setData, onEdit, goTab }) {
   const [filter, setFilter] = useState('전체');
   const [showCatOrder, setShowCatOrder] = useState(false);
   const [showProjOrder, setShowProjOrder] = useState(false);
@@ -2676,7 +2686,7 @@ function TabProgress({ data, setData, onEdit }) {
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-        <div style={{ fontSize: 21, fontWeight: 700, color: G }}>프로젝트 진행 상황</div>
+        <div style={{ fontSize: 21, fontWeight: 700, color: G }}>프로젝트 진행 상황</div><button onClick={() => goTab && goTab('단계별 보기')} title="실행계획을 단계별(예정·진행중·검토중·완료·보류)로 봅니다" style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 15, fontWeight: 700, fontFamily: 'inherit' }}>🗂 단계별 보기</button>
         <button onClick={() => setShowProjOrder(true)} style={{ marginLeft: 'auto', padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 16, fontWeight: 600 }}>⠿ 프로젝트 순서</button>
         <button onClick={() => setShowCatOrder(true)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 16, fontWeight: 600 }}>⠿ 분류 순서 변경</button>
       </div>
@@ -5041,7 +5051,6 @@ function TabAds({ data, setData }) {
         {hasGroups && pgAgg.some(g => g.ungrouped) ? <div style={{ fontSize: 10.5, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 7, padding: '6px 9px', marginTop: 8, lineHeight: 1.5 }}>⚠ <b>미분류 상품이 있습니다</b> — 그룹핑 규칙에 매칭되지 않은 신규 상품입니다. 광고 에이전트에 예외매핑 추가 요청이 필요합니다.</div> : null}
         <div style={{ fontSize: 10, color: '#A29C95', marginTop: 8 }}>{hasGroups ? '그룹 ROAS는 합산 기준(전환매출 합 ÷ 광고비 합) · 그룹 행을 클릭하면 수량·맛별 개별 상품이 펼쳐집니다 · ' : ''}전환매출·ROAS·전환수는 모두 구매완료 기준 · 전환매출은 광고 기여 기준으로 정산 매출과 다를 수 있습니다</div>
       </Card>
-      <AdsStrategyPanel data={data} setData={setData} prodNames={(() => { const m = {}; daysAll.forEach(x => (x.products || []).forEach(p => { if (p.productId && p.name) m[String(p.productId)] = p.name; })); return m; })()} />
       <AdOpsLog data={data} setData={setData} />
     </div>
   );
@@ -7711,7 +7720,7 @@ function TabSchedule({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '칸반', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
+const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
 
 const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 
@@ -8081,7 +8090,7 @@ function DecDiscardConfirm({ c, note, onNote, onYes, onNo, busy }) {
   );
 }
 
-function TabDecisions({ decs, decErr }) {
+function TabDecisions({ decs, decErr, data, setData }) {
   const [fDom, setFDom] = useState('전체');
   const [fType, setFType] = useState('전체');
   const [notes, setNotes] = useState({});
@@ -8725,6 +8734,7 @@ function TabDecisions({ decs, decErr }) {
         })}
       </div>
 
+      <div style={{ marginTop: 24 }}><AdsStrategyPanel data={data} setData={setData} prodNames={{}} /></div>
       {showExp ? <DecExportModal rows={done} onClose={() => setShowExp(false)} /> : null}
     </div>
   );
@@ -8794,7 +8804,7 @@ function App() {
     { icon: '🧭', label: '판단 대기', C: TabDecisions, badge: decPending },
     { icon: '📅', label: '데일리/주간', C: TabWeekly },
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
-    { icon: '🗂️', label: '칸반', C: TabKanban },
+    { icon: '🗂️', label: '단계별 보기', C: TabKanban },
     { icon: '🏆', label: '업무 성과', C: TabPerformance },
     { icon: '📊', label: 'KPI', C: TabKpi },
     { icon: '💵', label: '매출', C: TabSales },
@@ -8808,6 +8818,20 @@ function App() {
     { icon: '💰', label: '예산', C: TabBudget },
     { icon: '🗑', label: '휴지통', C: TabTrash, badge: trashCount },
   ];
+
+  const GROUPS = TAB_GROUPS_ON ? [
+    { icon: '🏠', label: '홈', tabs: ['홈'] },
+    { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기'] },
+    { icon: '📋', label: '업무', tabs: ['데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
+    { icon: '📊', label: '성과', tabs: ['KPI', '매출', '카카오', '광고'] },
+    { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드'] },
+    { icon: '💰', label: '예산', tabs: ['예산'] },
+  ] : null;
+  const ORPHAN_PARENT = { '단계별 보기': '업무', '보류': '업무', '휴지통': '예산' };
+  const curLabel = TABS[tab] ? TABS[tab].label : '';
+  const groupOf = lbl => { if (!GROUPS) return -1; let gi = GROUPS.findIndex(g => g.tabs.indexOf(lbl) >= 0); if (gi < 0) { const par = ORPHAN_PARENT[lbl]; if (par) gi = GROUPS.findIndex(g => g.label === par); } return gi; };
+  const activeGroup = groupOf(curLabel);
+  const goLabel = lbl => { const i = TABS.findIndex(t => t.label === lbl); if (i >= 0) setTab(i); };
 
   useEffect(() => {
     const applyHash = () => { const raw = decodeURIComponent((window.location.hash || '').replace(/^#/, '')).trim(); if (!raw) return; const label = TAB_SLUG[raw.toLowerCase()] || raw; const i = TABS.findIndex(t => t.label === label); if (i >= 0) setTab(i); };
@@ -8832,15 +8856,33 @@ function App() {
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <SyncBadge status={sync} errMsg={syncErr} />
           {MEMBERS.map(m => <div key={m} style={{ width: 30, height: 30, borderRadius: '50%', background: GO, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, border: '2px solid rgba(255,255,255,0.25)' }}>{AV[m]}</div>)}
-          {heldCount > 0 && <div onClick={() => setTab(TABS.findIndex(t => t.label === '보류'))} style={{ background: '#989088', borderRadius: 20, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>⏸ {heldCount}</div>}
+          {heldCount > 0 && <div onClick={() => setTab(TABS.findIndex(t => t.label === '보류'))} style={{ background: '#989088', borderRadius: 20, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>⏸ {heldCount}</div>}{trashCount > 0 && <div onClick={() => setTab(TABS.findIndex(t => t.label === '휴지통'))} title="휴지통 열기" style={{ background: '#989088', borderRadius: 20, padding: '4px 10px', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>🗑 {trashCount}</div>}
           <button onClick={() => setModal(true)} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: 'white', color: G, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>+ 업무 추가하기</button>
         </div>
       </div>
+      {GROUPS ? (
+      <React.Fragment>
+        <div data-nav-groups style={{ background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflowX: 'auto' }}>
+          <div style={{ display: 'flex', minWidth: 'max-content' }}>
+            {GROUPS.map((g, gi) => <button key={gi} data-nav-group={g.label} onClick={() => goLabel(g.tabs[0])} style={{ padding: '12px 20px', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: activeGroup === gi ? 800 : 600, color: activeGroup === gi ? G : '#6E6863', background: 'transparent', borderBottom: activeGroup === gi ? '3px solid ' + G : '3px solid transparent', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{g.icon} {g.label}{g.label === 'AI 에이전트' && decPending > 0 ? <span style={{ background: '#C62828', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{decPending}</span> : null}</button>)}
+          </div>
+        </div>
+        {activeGroup >= 0 && (GROUPS[activeGroup].tabs.length > 1 || ORPHAN_PARENT[curLabel] === GROUPS[activeGroup].label) ? (
+        <div data-nav-sub style={{ background: '#FAFAF9', borderBottom: '1px solid #EDEBE7', overflowX: 'auto' }}>
+          <div style={{ display: 'flex', minWidth: 'max-content', padding: '0 8px' }}>
+            {GROUPS[activeGroup].tabs.map(lbl => { const i = TABS.findIndex(t => t.label === lbl); if (i < 0) return null; const t = TABS[i]; const on = i === tab; return <button key={lbl} data-nav-subtab={lbl} onClick={() => setTab(i)} style={{ padding: '9px 14px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: on ? 700 : 500, color: on ? G : '#6E6863', background: 'transparent', borderBottom: on ? '2.5px solid ' + G : '2.5px solid transparent', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>{t.icon} {lbl}{t.badge > 0 ? <span style={{ background: '#989088', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{t.badge}</span> : null}</button>; })}
+            {ORPHAN_PARENT[curLabel] === GROUPS[activeGroup].label ? (() => { const t = TABS[tab]; return <button key="__orphan" data-nav-orphan={t.label} style={{ padding: '9px 14px', border: 'none', fontSize: 13, fontWeight: 700, color: G, background: 'transparent', borderBottom: '2.5px solid ' + G, display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>{t.icon} {t.label}{t.badge > 0 ? <span style={{ background: '#989088', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{t.badge}</span> : null}</button>; })() : null}
+          </div>
+        </div>
+        ) : null}
+      </React.Fragment>
+      ) : (
       <div style={{ background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflowX: 'auto' }}>
         <div style={{ display: 'flex', minWidth: 'max-content' }}>
           {TABS.map((t, i) => <button key={i} onClick={() => setTab(i)} style={{ padding: '11px 18px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: tab === i ? 700 : 500, color: tab === i ? G : '#6E6863', background: 'transparent', borderBottom: tab === i ? '2.5px solid ' + G : '2.5px solid transparent', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>{t.icon} {t.label}{t.badge > 0 ? <span style={{ background: '#989088', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{t.badge}</span> : null}</button>)}
         </div>
       </div>
+      )}
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
         <TabC data={data} setData={setData} decs={decs} decErr={decs.err} onEdit={t => setEditStack([t])} onRecord={id => setRecordId(id)} goTab={label => { const i = TABS.findIndex(t => t.label === label); if (i >= 0) setTab(i); }} />
       </div>
