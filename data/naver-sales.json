@@ -1,37 +1,37 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-08-08 09:38",
+  "updatedAt": "2026-08-09 16:31",
   "months": [
     {
       "key": "2026-08",
       "label": "2026년 8월",
       "periodStart": "2026-08-01",
-      "periodEnd": "2026-08-07",
+      "periodEnd": "2026-08-08",
       "summary": {
         "revenue": {
-          "value": 17579420,
-          "deltaValue": -9821770,
-          "deltaPct": -35.8
+          "value": 21744590,
+          "deltaValue": -8924170,
+          "deltaPct": -29.1
         },
         "orders": {
-          "value": 224,
-          "deltaValue": -128,
-          "deltaPct": -36.4
+          "value": 272,
+          "deltaValue": -118,
+          "deltaPct": -30.3
         },
         "aov": {
-          "value": 78480,
-          "deltaValue": 636,
-          "deltaPct": 0.8
+          "value": 79943,
+          "deltaValue": 1305,
+          "deltaPct": 1.7
         },
         "refund": {
-          "value": 1381220,
-          "deltaValue": -1021980,
-          "deltaPct": -42.5,
+          "value": 1694240,
+          "deltaValue": -838560,
+          "deltaPct": -33.1,
           "breakdown": {
             "basis": "처리일(취소완료일)",
             "cancel": {
-              "amount": 1355370,
-              "count": 13
+              "amount": 1668390,
+              "count": 16
             },
             "return": {
               "amount": 120150,
@@ -42,20 +42,20 @@
               "count": 1
             },
             "total": {
-              "amount": 1494740,
-              "count": 15
+              "amount": 1807760,
+              "count": 18
             },
-            "deltaValue": -975460,
-            "deltaPct": -39.5
+            "deltaValue": -916130,
+            "deltaPct": -33.6
           }
         },
         "visitors": {
-          "value": 4921,
+          "value": 5797,
           "deltaValue": 0,
           "deltaPct": null
         },
         "conversion": {
-          "value": 4.55,
+          "value": 4.69,
           "deltaValue": 0,
           "deltaPct": null
         }
@@ -88,86 +88,102 @@
         {
           "date": "2026-08-07",
           "revenue": 3494370
+        },
+        {
+          "date": "2026-08-08",
+          "revenue": 4165170
         }
       ],
       "channels": [
         {
           "name": "네이버 ADVoost쇼핑",
-          "revenue": 5998900,
-          "sharePct": 43.8,
-          "visitors": 1783
+          "revenue": 7268580,
+          "sharePct": 44.3,
+          "visitors": 2116
         },
         {
           "name": "네이버 브랜드검색(일반형)",
-          "revenue": 1997790,
-          "sharePct": 14.6,
-          "visitors": 521
+          "revenue": 2586090,
+          "sharePct": 15.7,
+          "visitors": 567
         },
         {
           "name": "네이버가격비교-통합검색",
           "revenue": 1565980,
-          "sharePct": 11.4,
-          "visitors": 252
+          "sharePct": 9.5,
+          "visitors": 292
+        },
+        {
+          "name": "네이버플러스스토어-홈",
+          "revenue": 883270,
+          "sharePct": 5.4,
+          "visitors": 80
         },
         {
           "name": "네이버가격비교-검색",
           "revenue": 864970,
-          "sharePct": 6.3,
-          "visitors": 60
-        },
-        {
-          "name": "네이버플러스스토어-홈",
-          "revenue": 830470,
-          "sharePct": 6.1,
-          "visitors": 65
+          "sharePct": 5.3,
+          "visitors": 63
         },
         {
           "name": "네이버플러스스토어-검색",
-          "revenue": 717580,
-          "sharePct": 5.2,
-          "visitors": 103
-        },
-        {
-          "name": "네이버검색",
-          "revenue": 679580,
-          "sharePct": 5.0,
-          "visitors": 84
+          "revenue": 778780,
+          "sharePct": 4.7,
+          "visitors": 126
         },
         {
           "name": "네이버 쇼핑검색광고",
-          "revenue": 426190,
-          "sharePct": 3.1,
-          "visitors": 119
+          "revenue": 772330,
+          "sharePct": 4.7,
+          "visitors": 190
+        },
+        {
+          "name": "네이버검색",
+          "revenue": 713060,
+          "sharePct": 4.3,
+          "visitors": 86
+        },
+        {
+          "name": "웹사이트",
+          "revenue": 234300,
+          "sharePct": 1.4,
+          "visitors": 58
         },
         {
           "name": "네이버 모바일메인",
           "revenue": 218250,
-          "sharePct": 1.6,
+          "sharePct": 1.3,
           "visitors": 6
+        },
+        {
+          "name": "네이버 마케팅링크",
+          "revenue": 144000,
+          "sharePct": 0.9,
+          "visitors": 240
         },
         {
           "name": "네이버플러스스토어-통합검색",
           "revenue": 139790,
-          "sharePct": 1.0,
-          "visitors": 66
+          "sharePct": 0.9,
+          "visitors": 81
         },
         {
-          "name": "웹사이트",
-          "revenue": 135300,
-          "sharePct": 1.0,
-          "visitors": 53
+          "name": "네이버-쇼핑라이브",
+          "revenue": 125080,
+          "sharePct": 0.8,
+          "visitors": 1
         },
         {
           "name": "네이버-서비스",
           "revenue": 90090,
-          "sharePct": 0.7,
-          "visitors": 122
+          "sharePct": 0.5,
+          "visitors": 139
         },
         {
           "name": "사용자정의",
           "revenue": 37200,
-          "sharePct": 0.3,
-          "visitors": 2
+          "sharePct": 0.2,
+          "visitors": 3
         }
       ],
       "products": [
@@ -175,50 +191,50 @@
           "rank": 1,
           "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 3개",
           "productId": "13616691087",
-          "revenue": 3721530,
-          "qty": 40
+          "revenue": 4542390,
+          "qty": 49
         },
         {
           "rank": 2,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
           "productId": "12763789807",
-          "revenue": 2349360,
-          "qty": 17
+          "revenue": 3269860,
+          "qty": 24
         },
         {
           "rank": 3,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
           "productId": "13635278957",
-          "revenue": 2345300,
-          "qty": 23
+          "revenue": 2840300,
+          "qty": 28
         },
         {
           "rank": 4,
-          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
-          "productId": "12894742052",
-          "revenue": 1438920,
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 4개",
+          "productId": "13616691089",
+          "revenue": 1748970,
           "qty": 14
         },
         {
           "rank": 5,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 4개",
-          "productId": "13616691089",
-          "revenue": 1146300,
-          "qty": 9
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
+          "productId": "12894742052",
+          "revenue": 1638000,
+          "qty": 16
         },
         {
           "rank": 6,
-          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
-          "productId": "13635293181",
-          "revenue": 1071000,
-          "qty": 9
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 1개",
+          "productId": "13447249282",
+          "revenue": 1288600,
+          "qty": 40
         },
         {
           "rank": 7,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 1개",
-          "productId": "13447249282",
-          "revenue": 911200,
-          "qty": 28
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635293181",
+          "revenue": 1183500,
+          "qty": 10
         },
         {
           "rank": 8,
@@ -231,36 +247,36 @@
           "rank": 9,
           "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 2개",
           "productId": "13616691086",
-          "revenue": 426120,
-          "qty": 7
+          "revenue": 539220,
+          "qty": 9
         },
         {
           "rank": 10,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
           "productId": "12747389906",
-          "revenue": 401760,
-          "qty": 11
+          "revenue": 505920,
+          "qty": 14
         },
         {
           "rank": 11,
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+          "productId": "12763859709",
+          "revenue": 426440,
+          "qty": 10
+        },
+        {
+          "rank": 12,
           "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 3개",
           "productId": "13670188795",
           "revenue": 382690,
           "qty": 5
         },
         {
-          "rank": 12,
-          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-          "productId": "12763859709",
-          "revenue": 382340,
-          "qty": 9
-        },
-        {
           "rank": 13,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
           "productId": "12763906780",
-          "revenue": 340200,
-          "qty": 9
+          "revenue": 380700,
+          "qty": 10
         },
         {
           "rank": 14,
@@ -278,111 +294,125 @@
         },
         {
           "rank": 16,
+          "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 3개",
+          "productId": "13638665039",
+          "revenue": 226800,
+          "qty": 3
+        },
+        {
+          "rank": 17,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 2개",
           "productId": "13635278956",
           "revenue": 214200,
           "qty": 3
         },
         {
-          "rank": 17,
+          "rank": 18,
           "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 2개",
           "productId": "13635293180",
           "revenue": 167580,
           "qty": 2
         },
         {
-          "rank": 18,
+          "rank": 19,
           "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 2개",
           "productId": "13670188794",
           "revenue": 151200,
           "qty": 3
         },
         {
-          "rank": 19,
+          "rank": 20,
           "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 푸룬 식이섬유, 300g, 16개",
           "productId": "13678485910",
           "revenue": 148000,
           "qty": 1
         },
         {
-          "rank": 20,
-          "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 3개",
-          "productId": "13638665039",
-          "revenue": 145800,
+          "rank": 21,
+          "name": "[비밀특가] 황성주 박사의 닥터 샐러드 14포, 6개",
+          "productId": "13676606672",
+          "revenue": 144000,
           "qty": 2
         },
         {
-          "rank": 21,
+          "rank": 22,
           "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 6개",
           "productId": "13637171566",
           "revenue": 114000,
           "qty": 1
         },
         {
-          "rank": 22,
+          "rank": 23,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 3개",
+          "productId": "12894790301",
+          "revenue": 110200,
+          "qty": 2
+        },
+        {
+          "rank": 24,
           "name": "황성주 박사의 데이 크런치 프로틴바 에너지바 칼로리 간식 그레인, 10개입, 1개",
           "productId": "13064086505",
           "revenue": 78000,
           "qty": 4
         },
         {
-          "rank": 23,
+          "rank": 25,
           "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 2개",
           "productId": "13638665038",
           "revenue": 59200,
           "qty": 1
         },
         {
-          "rank": 24,
-          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 3개",
-          "productId": "12894790301",
-          "revenue": 58000,
-          "qty": 1
-        },
-        {
-          "rank": 25,
+          "rank": 26,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 바나나맛, 45g, 14개",
           "productId": "13586137694",
           "revenue": 52500,
           "qty": 1
         },
         {
-          "rank": 26,
+          "rank": 27,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 1개",
+          "productId": "12764484763",
+          "revenue": 46000,
+          "qty": 2
+        },
+        {
+          "rank": 28,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 2개",
+          "productId": "12894778669",
+          "revenue": 35100,
+          "qty": 1
+        },
+        {
+          "rank": 29,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 초코맛, 45g, 7개",
           "productId": "13558590921",
           "revenue": 31500,
           "qty": 1
         },
         {
-          "rank": 27,
+          "rank": 30,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 단호박 앤 고구마, 45g, 7개",
           "productId": "13558590919",
           "revenue": 28350,
           "qty": 1
         },
         {
-          "rank": 28,
+          "rank": 31,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 바나나맛, 45g, 7개",
           "productId": "13558590920",
           "revenue": 28350,
           "qty": 1
         },
         {
-          "rank": 29,
-          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 1개",
-          "productId": "12764484763",
-          "revenue": 23000,
-          "qty": 1
-        },
-        {
-          "rank": 30,
+          "rank": 32,
           "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 콜라겐 ABC, 300g, 1개",
           "productId": "13495028611",
           "revenue": 15000,
           "qty": 1
         },
         {
-          "rank": 31,
+          "rank": 33,
           "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 푸룬 식이섬유, 300g, 1개",
           "productId": "13495035486",
           "revenue": 15000,
@@ -391,35 +421,35 @@
       ],
       "subscribers": {
         "notify": {
-          "total": 2883,
-          "added": 145
+          "total": 2939,
+          "added": 201
         },
         "interest": {
-          "total": 2883,
-          "added": 145
+          "total": 2939,
+          "added": 201
         }
       },
       "subscription": {
-        "revenue": 582500,
+        "revenue": 852800,
         "products": [
           {
             "productId": "13616691087",
             "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 3개",
-            "orders": 1,
-            "revenue": 582500
+            "orders": 4,
+            "revenue": 852800
           }
         ],
         "subscriptionRenewalRevenue": null,
-        "orders": 1,
-        "newOrders": 1,
+        "orders": 4,
+        "newOrders": 4,
         "renewOrders": 0,
-        "activeSubscribers": 34,
+        "activeSubscribers": 37,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-08-08 09:38",
+        "activeSubscribersAsOf": "2026-08-09 16:31",
         "canceled": 1,
         "byStatus": {
-          "전체": 35,
-          "진행중": 34,
+          "전체": 38,
+          "진행중": 37,
           "종료": 0,
           "해지": 1
         }
@@ -3057,34 +3087,34 @@
   "weeks": [
     {
       "key": "2026-W32",
-      "label": "2026 32주차 (8/3~8/7)",
+      "label": "2026 32주차 (8/3~8/8)",
       "periodStart": "2026-08-03",
-      "periodEnd": "2026-08-07",
+      "periodEnd": "2026-08-08",
       "summary": {
         "revenue": {
-          "value": 13536670,
-          "deltaValue": -7170450,
-          "deltaPct": -34.6
+          "value": 17701840,
+          "deltaValue": -5224850,
+          "deltaPct": -22.8
         },
         "orders": {
-          "value": 174,
-          "deltaValue": -95,
-          "deltaPct": -35.3
+          "value": 222,
+          "deltaValue": -75,
+          "deltaPct": -25.3
         },
         "aov": {
-          "value": 77797,
-          "deltaValue": 819,
-          "deltaPct": 1.1
+          "value": 79738,
+          "deltaValue": 2544,
+          "deltaPct": 3.3
         },
         "refund": {
-          "value": 702330,
-          "deltaValue": -1116630,
-          "deltaPct": -61.4,
+          "value": 1015350,
+          "deltaValue": -1370000,
+          "deltaPct": -57.4,
           "breakdown": {
             "basis": "처리일(취소완료일)",
             "cancel": {
-              "amount": 676480,
-              "count": 8
+              "amount": 989500,
+              "count": 11
             },
             "return": {
               "amount": 120150,
@@ -3095,15 +3125,15 @@
               "count": 0
             },
             "total": {
-              "amount": 796630,
-              "count": 9
+              "amount": 1109650,
+              "count": 12
             },
-            "deltaValue": -1170930,
-            "deltaPct": -59.5
+            "deltaValue": -1424300,
+            "deltaPct": -56.2
           }
         },
         "visitors": {
-          "value": 3162,
+          "value": 4038,
           "deltaValue": 0,
           "deltaPct": null
         },
@@ -3133,80 +3163,96 @@
         {
           "date": "2026-08-07",
           "revenue": 3494370
+        },
+        {
+          "date": "2026-08-08",
+          "revenue": 4165170
         }
       ],
       "channels": [
         {
           "name": "네이버 ADVoost쇼핑",
-          "revenue": 5482110,
-          "sharePct": 49.3,
-          "visitors": 1568
+          "revenue": 6751790,
+          "sharePct": 48.8,
+          "visitors": 1901
         },
         {
           "name": "네이버 브랜드검색(일반형)",
-          "revenue": 1597390,
-          "sharePct": 14.4,
-          "visitors": 422
+          "revenue": 2185690,
+          "sharePct": 15.8,
+          "visitors": 468
         },
         {
           "name": "네이버가격비교-통합검색",
           "revenue": 951740,
-          "sharePct": 8.6,
-          "visitors": 181
+          "sharePct": 6.9,
+          "visitors": 221
         },
         {
           "name": "네이버플러스스토어-홈",
-          "revenue": 777470,
-          "sharePct": 7.0,
-          "visitors": 55
+          "revenue": 830270,
+          "sharePct": 6.0,
+          "visitors": 70
+        },
+        {
+          "name": "네이버 쇼핑검색광고",
+          "revenue": 772330,
+          "sharePct": 5.6,
+          "visitors": 188
         },
         {
           "name": "네이버가격비교-검색",
           "revenue": 717670,
-          "sharePct": 6.4,
-          "visitors": 41
-        },
-        {
-          "name": "네이버 쇼핑검색광고",
-          "revenue": 426190,
-          "sharePct": 3.8,
-          "visitors": 117
+          "sharePct": 5.2,
+          "visitors": 44
         },
         {
           "name": "네이버검색",
-          "revenue": 421580,
-          "sharePct": 3.8,
-          "visitors": 55
+          "revenue": 455060,
+          "sharePct": 3.3,
+          "visitors": 57
         },
         {
           "name": "네이버플러스스토어-검색",
-          "revenue": 385080,
-          "sharePct": 3.5,
-          "visitors": 64
+          "revenue": 446280,
+          "sharePct": 3.2,
+          "visitors": 87
         },
         {
           "name": "웹사이트",
-          "revenue": 135300,
-          "sharePct": 1.2,
-          "visitors": 30
+          "revenue": 234300,
+          "sharePct": 1.7,
+          "visitors": 35
+        },
+        {
+          "name": "네이버 마케팅링크",
+          "revenue": 144000,
+          "sharePct": 1.0,
+          "visitors": 240
+        },
+        {
+          "name": "네이버-쇼핑라이브",
+          "revenue": 125080,
+          "sharePct": 0.9,
+          "visitors": 1
         },
         {
           "name": "네이버 모바일메인",
           "revenue": 107650,
-          "sharePct": 1.0,
+          "sharePct": 0.8,
           "visitors": 5
         },
         {
           "name": "네이버-서비스",
           "revenue": 90090,
-          "sharePct": 0.8,
-          "visitors": 99
+          "sharePct": 0.7,
+          "visitors": 116
         },
         {
           "name": "사용자정의",
           "revenue": 37200,
           "sharePct": 0.3,
-          "visitors": 2
+          "visitors": 3
         }
       ],
       "products": [
@@ -3214,50 +3260,50 @@
           "rank": 1,
           "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 3개",
           "productId": "13616691087",
-          "revenue": 2551260,
-          "qty": 28
+          "revenue": 3372120,
+          "qty": 37
         },
         {
           "rank": 2,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
           "productId": "12763789807",
-          "revenue": 2054760,
-          "qty": 15
+          "revenue": 2975260,
+          "qty": 22
         },
         {
           "rank": 3,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
           "productId": "13635278957",
-          "revenue": 1630300,
-          "qty": 16
+          "revenue": 2125300,
+          "qty": 21
         },
         {
           "rank": 4,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
           "productId": "12894742052",
-          "revenue": 1328320,
-          "qty": 13
+          "revenue": 1527400,
+          "qty": 15
         },
         {
           "rank": 5,
-          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
-          "productId": "13635293181",
-          "revenue": 821000,
-          "qty": 7
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 4개",
+          "productId": "13616691089",
+          "revenue": 1361820,
+          "qty": 11
         },
         {
           "rank": 6,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 4개",
-          "productId": "13616691089",
-          "revenue": 759150,
-          "qty": 6
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 1개",
+          "productId": "13447249282",
+          "revenue": 1091400,
+          "qty": 34
         },
         {
           "rank": 7,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 1개",
-          "productId": "13447249282",
-          "revenue": 714000,
-          "qty": 22
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635293181",
+          "revenue": 933500,
+          "qty": 8
         },
         {
           "rank": 8,
@@ -3270,137 +3316,158 @@
           "rank": 9,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
           "productId": "12747389906",
-          "revenue": 364560,
-          "qty": 10
+          "revenue": 468720,
+          "qty": 13
         },
         {
           "rank": 10,
-          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
-          "productId": "12763906780",
-          "revenue": 303750,
-          "qty": 8
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 2개",
+          "productId": "13616691086",
+          "revenue": 411920,
+          "qty": 7
         },
         {
           "rank": 11,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 2개",
-          "productId": "13616691086",
-          "revenue": 298820,
-          "qty": 5
+          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
+          "productId": "12763906780",
+          "revenue": 344250,
+          "qty": 9
         },
         {
           "rank": 12,
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+          "productId": "12763859709",
+          "revenue": 258860,
+          "qty": 6
+        },
+        {
+          "rank": 13,
           "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 1개",
           "productId": "12764948626",
           "revenue": 258360,
           "qty": 9
         },
         {
-          "rank": 13,
+          "rank": 14,
           "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 3개",
           "productId": "13670188795",
           "revenue": 228690,
           "qty": 3
         },
         {
-          "rank": 14,
-          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-          "productId": "12763859709",
-          "revenue": 214760,
-          "qty": 5
+          "rank": 15,
+          "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 3개",
+          "productId": "13638665039",
+          "revenue": 226800,
+          "qty": 3
         },
         {
-          "rank": 15,
+          "rank": 16,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 2개",
           "productId": "13635278956",
           "revenue": 214200,
           "qty": 3
         },
         {
-          "rank": 16,
+          "rank": 17,
           "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 2개",
           "productId": "13635293180",
           "revenue": 167580,
           "qty": 2
         },
         {
-          "rank": 17,
+          "rank": 18,
           "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 2개",
           "productId": "13670188794",
           "revenue": 151200,
           "qty": 3
         },
         {
-          "rank": 18,
+          "rank": 19,
           "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 푸룬 식이섬유, 300g, 16개",
           "productId": "13678485910",
           "revenue": 148000,
           "qty": 1
         },
         {
-          "rank": 19,
-          "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 3개",
-          "productId": "13638665039",
-          "revenue": 145800,
+          "rank": 20,
+          "name": "[비밀특가] 황성주 박사의 닥터 샐러드 14포, 6개",
+          "productId": "13676606672",
+          "revenue": 144000,
           "qty": 2
         },
         {
-          "rank": 20,
+          "rank": 21,
           "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 6개",
           "productId": "13637171566",
           "revenue": 114000,
           "qty": 1
         },
         {
-          "rank": 21,
+          "rank": 22,
           "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
           "productId": "12764871210",
           "revenue": 113100,
           "qty": 4
         },
         {
-          "rank": 22,
+          "rank": 23,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 3개",
+          "productId": "12894790301",
+          "revenue": 110200,
+          "qty": 2
+        },
+        {
+          "rank": 24,
           "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 2개",
           "productId": "13638665038",
           "revenue": 59200,
           "qty": 1
         },
         {
-          "rank": 23,
-          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 3개",
-          "productId": "12894790301",
-          "revenue": 58000,
-          "qty": 1
-        },
-        {
-          "rank": 24,
+          "rank": 25,
           "name": "황성주 박사의 데이 크런치 프로틴바 에너지바 칼로리 간식 그레인, 10개입, 1개",
           "productId": "13064086505",
           "revenue": 40000,
           "qty": 2
         },
         {
-          "rank": 25,
+          "rank": 26,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 2개",
+          "productId": "12894778669",
+          "revenue": 35100,
+          "qty": 1
+        },
+        {
+          "rank": 27,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 초코맛, 45g, 7개",
           "productId": "13558590921",
           "revenue": 31500,
           "qty": 1
         },
         {
-          "rank": 26,
+          "rank": 28,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 단호박 앤 고구마, 45g, 7개",
           "productId": "13558590919",
           "revenue": 28350,
           "qty": 1
         },
         {
-          "rank": 27,
+          "rank": 29,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 바나나맛, 45g, 7개",
           "productId": "13558590920",
           "revenue": 28350,
           "qty": 1
         },
         {
-          "rank": 28,
+          "rank": 30,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 1개",
+          "productId": "12764484763",
+          "revenue": 23000,
+          "qty": 1
+        },
+        {
+          "rank": 31,
           "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 푸룬 식이섬유, 300g, 1개",
           "productId": "13495035486",
           "revenue": 15000,
@@ -3409,35 +3476,35 @@
       ],
       "subscribers": {
         "notify": {
-          "total": 2883,
-          "added": 126
+          "total": 2939,
+          "added": 182
         },
         "interest": {
-          "total": 2883,
-          "added": 126
+          "total": 2939,
+          "added": 182
         }
       },
       "subscription": {
-        "revenue": 483500,
+        "revenue": 753800,
         "products": [
           {
             "productId": "13616691087",
             "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 3개",
-            "orders": 1,
-            "revenue": 483500
+            "orders": 4,
+            "revenue": 753800
           }
         ],
         "subscriptionRenewalRevenue": null,
-        "orders": 1,
-        "newOrders": 1,
+        "orders": 4,
+        "newOrders": 4,
         "renewOrders": 0,
-        "activeSubscribers": 34,
+        "activeSubscribers": 37,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-08-08 09:38",
+        "activeSubscribersAsOf": "2026-08-09 16:31",
         "canceled": 1,
         "byStatus": {
-          "전체": 35,
-          "진행중": 34,
+          "전체": 38,
+          "진행중": 37,
           "종료": 0,
           "해지": 1
         }
@@ -7464,6 +7531,274 @@
     }
   ],
   "days": [
+    {
+      "key": "2026-08-08",
+      "label": "8월 8일",
+      "periodStart": "2026-08-08",
+      "periodEnd": "2026-08-08",
+      "summary": {
+        "revenue": {
+          "value": 4165170,
+          "deltaValue": 670800,
+          "deltaPct": 19.2
+        },
+        "orders": {
+          "value": 48,
+          "deltaValue": 8,
+          "deltaPct": 20.0
+        },
+        "aov": {
+          "value": 86774,
+          "deltaValue": -585,
+          "deltaPct": -0.7
+        },
+        "refund": {
+          "value": 313020,
+          "deltaValue": 72180,
+          "deltaPct": 30.0,
+          "breakdown": {
+            "basis": "처리일(취소완료일)",
+            "cancel": {
+              "amount": 313020,
+              "count": 3
+            },
+            "return": {
+              "amount": 0,
+              "count": 0
+            },
+            "exchange": {
+              "amount": 0,
+              "count": 0
+            },
+            "total": {
+              "amount": 313020,
+              "count": 3
+            },
+            "deltaValue": 72180,
+            "deltaPct": 30.0
+          }
+        },
+        "visitors": {
+          "value": 876,
+          "deltaValue": 216,
+          "deltaPct": 32.7
+        },
+        "conversion": {
+          "value": 5.48,
+          "deltaValue": 1.24,
+          "deltaPct": 29.2
+        }
+      },
+      "daily": [
+        {
+          "date": "2026-08-08",
+          "revenue": 4165170
+        }
+      ],
+      "channels": [
+        {
+          "name": "네이버 ADVoost쇼핑",
+          "revenue": 1269680,
+          "sharePct": 46.7,
+          "visitors": 333
+        },
+        {
+          "name": "네이버 브랜드검색(일반형)",
+          "revenue": 588300,
+          "sharePct": 21.6,
+          "visitors": 46
+        },
+        {
+          "name": "네이버 쇼핑검색광고",
+          "revenue": 346140,
+          "sharePct": 12.7,
+          "visitors": 71
+        },
+        {
+          "name": "네이버 마케팅링크",
+          "revenue": 144000,
+          "sharePct": 5.3,
+          "visitors": 218
+        },
+        {
+          "name": "네이버-쇼핑라이브",
+          "revenue": 125080,
+          "sharePct": 4.6,
+          "visitors": 1
+        },
+        {
+          "name": "웹사이트",
+          "revenue": 99000,
+          "sharePct": 3.6,
+          "visitors": 5
+        },
+        {
+          "name": "네이버플러스스토어-검색",
+          "revenue": 61200,
+          "sharePct": 2.3,
+          "visitors": 23
+        },
+        {
+          "name": "네이버플러스스토어-홈",
+          "revenue": 52800,
+          "sharePct": 1.9,
+          "visitors": 15
+        },
+        {
+          "name": "네이버검색",
+          "revenue": 33480,
+          "sharePct": 1.2,
+          "visitors": 2
+        }
+      ],
+      "products": [
+        {
+          "rank": 1,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
+          "productId": "12763789807",
+          "revenue": 920500,
+          "qty": 7
+        },
+        {
+          "rank": 2,
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 3개",
+          "productId": "13616691087",
+          "revenue": 820860,
+          "qty": 9
+        },
+        {
+          "rank": 3,
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 4개",
+          "productId": "13616691089",
+          "revenue": 602670,
+          "qty": 5
+        },
+        {
+          "rank": 4,
+          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635278957",
+          "revenue": 495000,
+          "qty": 5
+        },
+        {
+          "rank": 5,
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 1개",
+          "productId": "13447249282",
+          "revenue": 377400,
+          "qty": 12
+        },
+        {
+          "rank": 6,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
+          "productId": "12894742052",
+          "revenue": 199080,
+          "qty": 2
+        },
+        {
+          "rank": 7,
+          "name": "[비밀특가] 황성주 박사의 닥터 샐러드 14포, 6개",
+          "productId": "13676606672",
+          "revenue": 144000,
+          "qty": 2
+        },
+        {
+          "rank": 8,
+          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 2개",
+          "productId": "13616691086",
+          "revenue": 113100,
+          "qty": 2
+        },
+        {
+          "rank": 9,
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635293181",
+          "revenue": 112500,
+          "qty": 1
+        },
+        {
+          "rank": 10,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
+          "productId": "12747389906",
+          "revenue": 104160,
+          "qty": 3
+        },
+        {
+          "rank": 11,
+          "name": "갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 3개",
+          "productId": "13638665039",
+          "revenue": 81000,
+          "qty": 1
+        },
+        {
+          "rank": 12,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 3개",
+          "productId": "12894790301",
+          "revenue": 52200,
+          "qty": 1
+        },
+        {
+          "rank": 13,
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+          "productId": "12763859709",
+          "revenue": 44100,
+          "qty": 1
+        },
+        {
+          "rank": 14,
+          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
+          "productId": "12763906780",
+          "revenue": 40500,
+          "qty": 1
+        },
+        {
+          "rank": 15,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 2개",
+          "productId": "12894778669",
+          "revenue": 35100,
+          "qty": 1
+        },
+        {
+          "rank": 16,
+          "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 1개",
+          "productId": "12764484763",
+          "revenue": 23000,
+          "qty": 1
+        }
+      ],
+      "subscribers": {
+        "notify": {
+          "total": 2939,
+          "added": 56
+        },
+        "interest": {
+          "total": 2939,
+          "added": 56
+        }
+      },
+      "customers": {
+        "total": 43,
+        "new": 35,
+        "returning": 8
+      },
+      "subscription": {
+        "revenue": 270300,
+        "products": [],
+        "subscriptionRenewalRevenue": null,
+        "orders": 3,
+        "newOrders": 3,
+        "renewOrders": 0,
+        "activeSubscribers": 37,
+        "activeSubscribersSource": "subscription-console",
+        "activeSubscribersAsOf": "2026-08-09 16:31",
+        "canceled": 1,
+        "byStatus": {
+          "전체": 38,
+          "진행중": 37,
+          "종료": 0,
+          "해지": 1
+        }
+      }
+    },
     {
       "key": "2026-08-07",
       "label": "8월 7일",
@@ -20794,136 +21129,6 @@
       "customers": {
         "total": 6,
         "new": 5,
-        "returning": 1
-      }
-    },
-    {
-      "key": "2026-06-09",
-      "label": "6월 9일",
-      "periodStart": "2026-06-09",
-      "periodEnd": "2026-06-09",
-      "summary": {
-        "revenue": {
-          "value": 421500,
-          "deltaValue": -405470,
-          "deltaPct": -49.0
-        },
-        "orders": {
-          "value": 4,
-          "deltaValue": -7,
-          "deltaPct": -63.6
-        },
-        "aov": {
-          "value": 105375,
-          "deltaValue": 30196,
-          "deltaPct": 40.2
-        },
-        "refund": {
-          "value": 0,
-          "deltaValue": -40500,
-          "deltaPct": -100.0,
-          "breakdown": {
-            "basis": "처리일(취소완료일)",
-            "cancel": {
-              "amount": 0,
-              "count": 0
-            },
-            "return": {
-              "amount": 0,
-              "count": 0
-            },
-            "exchange": {
-              "amount": 0,
-              "count": 0
-            },
-            "total": {
-              "amount": 0,
-              "count": 0
-            },
-            "deltaValue": -40500,
-            "deltaPct": -100.0
-          }
-        },
-        "visitors": {
-          "value": 182,
-          "deltaValue": 85,
-          "deltaPct": 87.6
-        },
-        "conversion": {
-          "value": 2.2,
-          "deltaValue": -6.05,
-          "deltaPct": -73.3
-        }
-      },
-      "daily": [
-        {
-          "date": "2026-06-09",
-          "revenue": 421500
-        }
-      ],
-      "channels": [
-        {
-          "name": "네이버플러스스토어-검색",
-          "revenue": 159560,
-          "sharePct": 54.9,
-          "visitors": 18
-        },
-        {
-          "name": "네이버가격비교-통합검색",
-          "revenue": 130970,
-          "sharePct": 45.1,
-          "visitors": 25
-        }
-      ],
-      "products": [
-        {
-          "rank": 1,
-          "name": "황성주박사의 발효건강식 황성주생식 식사대용 90포, 3개",
-          "productId": "12894837614",
-          "revenue": 261940,
-          "qty": 2
-        },
-        {
-          "rank": 2,
-          "name": "황성주박사의 영양식 황성주생식 식사대용 90포, 3개",
-          "productId": "12763921362",
-          "revenue": 120280,
-          "qty": 1
-        },
-        {
-          "rank": 3,
-          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
-          "productId": "12763906780",
-          "revenue": 39280,
-          "qty": 1
-        }
-      ],
-      "subscribers": {
-        "notify": {
-          "total": 764,
-          "added": 3
-        },
-        "interest": {
-          "total": 764,
-          "added": 3
-        }
-      },
-      "subscription": {
-        "revenue": 0,
-        "products": [],
-        "subscriptionRenewalRevenue": null,
-        "orders": null,
-        "newOrders": null,
-        "renewOrders": null,
-        "activeSubscribers": null,
-        "activeSubscribersSource": null,
-        "activeSubscribersAsOf": null,
-        "canceled": null,
-        "byStatus": null
-      },
-      "customers": {
-        "total": 4,
-        "new": 3,
         "returning": 1
       }
     }
