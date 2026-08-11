@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_157';
+const BUILD_TAG = 'index_158';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -407,6 +407,7 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   adOpsLog: raw.adOpsLog || [],
   powerlinkApprovals: raw.powerlinkApprovals || {},
   bidApprovals: raw.bidApprovals || {},
+  shoppingApprovals: raw.shoppingApprovals || {},
   adKeywordRegistry: raw.adKeywordRegistry || {},
   messageSchedules: raw.messageSchedules || {},
   routines: (raw.routines || []).map(r => ({ freq: 'weekly', days: [], dom: 1, everyN: 1, start: '', end: '', memo: '', owner: [], active: true, ...r, owner: Array.isArray(r.owner) ? r.owner.filter(Boolean) : (r.owner ? [r.owner] : []) })),
@@ -799,6 +800,7 @@ const INIT = {
   routines: [],
   routineLogs: {},
   bidApprovals: {},
+  shoppingApprovals: {},
   goalFormula: DEFAULT_GOAL_FORMULA,
   outputs: [
     { id: 1, code: 'MD-1', type: 'MD출력', name: '쿠팡 광고 운영' }, { id: 2, code: 'MD-2', type: 'MD출력', name: '네이버 대용량 할인제품 & 정기배송' },
@@ -5146,6 +5148,89 @@ function AdOpsLog({ data, setData }) {
   );
 }
 
+function ShoppingProposalPanel({ data, setData }) {
+  const [sp, setSp] = React.useState(null);
+  const [status, setStatus] = React.useState('loading');
+  const [later, setLater] = React.useState({});   // [나중에] — 화면에서만 접음(안 씀)
+  React.useEffect(() => {
+    let alive = true;
+    ghFetch('data/shopping-proposals.json')
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => { if (!alive) return; if (j && Array.isArray(j.cards)) { setSp(j); setStatus('ok'); } else setStatus('none'); })
+      .catch(() => { if (alive) setStatus('none'); });
+    return () => { alive = false; };
+  }, []);
+  const appr = data.shoppingApprovals || {};
+  // [승인] — 규약(#39): 이 세 필드만 쓴다(파워링크 bidApprovals 와 동일). 5분 모터가 읽어 반영.
+  const approve = c => setData(d => ({ ...d, shoppingApprovals: { ...(d.shoppingApprovals || {}), [c.id]: { status: 'approved', approvedAt: new Date().toISOString(), by: '유니' } } }));
+  const cancel = id => setData(d => { const a = { ...(d.shoppingApprovals || {}) }; delete a[id]; return { ...d, shoppingApprovals: a }; });
+  const won = n => (n == null ? '' : Number(n).toLocaleString() + '원');
+  const SEV = { high: { bg: '#FEF2F2', bd: '#FECACA', tx: '#DC2626', l: '중요' }, mid: { bg: '#FFFBEB', bd: '#FDE68A', tx: '#B45309', l: '권장' }, low: { bg: '#F5F4F2', bd: '#E3E0DC', tx: '#6E6863', l: '참고' } };
+  const TY = { budget: { l: '예산', c: '#2563EB' }, product_drop: { l: '상품 빼기', c: '#DC2626' }, product_check: { l: '상품 점검', c: '#B45309' }, keyword_harvest: { l: '검색어', c: '#047857' } };
+  const AUTO = { budget: 1, product_drop: 1 };   // 승인 시 5분 모터가 계정에 반영하는 유형
+  const cards = sp && Array.isArray(sp.cards) ? sp.cards : [];
+  const shown = cards.filter(c => !later[c.id]);
+  const rules = (sp && sp.rules) || {};
+  return (
+    <Card style={{ marginTop: 16 }}>
+      <div data-ss-panel style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: G }}>🛒 쇼핑검색 최적화</div>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>매일 올라오는 카드 · [승인]하면 5분 안에 반영(예산·상품 빼기), 점검·검색어는 사람이 반영</span>
+        {sp ? <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{sp.basedOn ? sp.basedOn + ' 기준' : ''}{sp.updatedAt ? ' · 갱신 ' + String(sp.updatedAt).slice(0, 16).replace('T', ' ') : ''}</span> : null}
+      </div>
+      {status === 'loading' ? <div style={{ fontSize: 12, color: '#A29C95', padding: '10px 0' }}>불러오는 중…</div> : null}
+      {(status === 'none' || (status === 'ok' && cards.length === 0)) ? <div data-ss-empty style={{ fontSize: 12, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 8, padding: '12px 14px', lineHeight: 1.6 }}>오늘 올라온 쇼핑검색 카드가 없습니다. 자동화PC가 <b>data/shopping-proposals.json</b> 을 올리면 여기 4단 카드가 나타납니다. <span style={{ color: '#A29C95' }}>(없음 — 오류가 아닙니다)</span></div> : null}
+      {status === 'ok' && cards.length > 0 ? (
+        <React.Fragment>
+          {shown.length === 0 ? <div style={{ fontSize: 12, color: '#6E6863', marginBottom: 6 }}>오늘 카드는 다 넘겼습니다. 넘긴 카드는 내일 다시 올라옵니다.</div> : null}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {shown.map(c => {
+              const sev = SEV[c.severity] || SEV.low;
+              const ty = TY[c.type] || { l: c.type || '', c: '#6E6863' };
+              const ap = appr[c.id];
+              const isApproved = ap && ap.status === 'approved';
+              const isAuto = !!AUTO[c.type];
+              const row = (label, val, strong) => val ? (
+                <div style={{ display: 'flex', gap: 8, fontSize: 12.5, lineHeight: 1.55, marginTop: 4 }}>
+                  <span style={{ flexShrink: 0, width: 62, color: '#A29C95', fontWeight: 700 }}>{label}</span>
+                  <span style={{ flex: 1, minWidth: 0, color: strong ? '#1A1614' : '#3A3631', fontWeight: strong ? 700 : 400 }}>{val}</span>
+                </div>
+              ) : null;
+              return (
+                <div key={c.id} data-ss-card={c.id} style={{ border: '1px solid ' + sev.bd, borderLeft: '3px solid ' + sev.tx, borderRadius: 10, padding: '11px 13px', background: 'white' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', marginBottom: 4 }}>
+                    <span style={{ fontSize: 13.5, fontWeight: 800, color: '#1A1614' }}>{c.title}</span>
+                    <span style={{ fontSize: 10.5, fontWeight: 800, color: ty.c, background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 6, padding: '1px 7px' }}>{ty.l}</span>
+                    <span data-ss-status={c.status} style={{ fontSize: 10.5, fontWeight: 800, color: sev.tx, background: sev.bg, border: '1px solid ' + sev.bd, borderRadius: 6, padding: '1px 7px' }}>{c.status}</span>
+                    {isApproved ? <span data-ss-approved={c.id} style={{ fontSize: 10.5, fontWeight: 800, color: '#047857', background: '#D1FAE5', border: '1px solid #6EE7B7', borderRadius: 6, padding: '1px 7px' }}>✅ 승인됨{ap.approvedAt ? ' · ' + String(ap.approvedAt).slice(0, 10) : ''}</span> : null}
+                  </div>
+                  {row('이렇게', c.action, true)}
+                  {row('왜냐하면', c.reason)}
+                  {row('효율근거', c.evidence)}
+                  {row('다음스텝', c.nextStep)}
+                  {isApproved ? (
+                    <div style={{ marginTop: 9 }}>
+                      <button data-ss-cancel={c.id} onClick={() => cancel(c.id)} style={{ padding: '5px 12px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>취소</button>
+                      <span style={{ fontSize: 11, color: '#A29C95', marginLeft: 8 }}>{isAuto ? '5분 모터가 아직 안 돌았으면 취소돼요.' : '점검·검색어는 사람이 반영합니다.'}</span>
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <button data-ss-approve={c.id} onClick={() => approve(c)} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: G, color: 'white', fontWeight: 800, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>승인</button>
+                      <button data-ss-later={c.id} onClick={() => setLater(o => ({ ...o, [c.id]: 1 }))} style={{ padding: '7px 14px', borderRadius: 8, border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>나중에</button>
+                      <span style={{ fontSize: 11, color: '#A29C95' }}>{isAuto ? '승인 시 5분 안에 계정에 반영돼요 · [나중에]는 안 눌러도 내일 다시 올라와요' : '승인은 기록만 — 계정은 사람이 반영해요'}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 10, lineHeight: 1.55 }}>목표 ROAS {rules.targetRoas || 330}% · 판정 표본 클릭 {rules.clickGate || 30}회. 승인은 자동화PC의 <b>shoppingApprovals</b>로 넘어가고, 예산·상품 빼기는 5분 모터가 계정에 반영합니다(점검·검색어는 사람 몫). [나중에]는 아무것도 저장하지 않고 다음날 다시 올라옵니다.</div>
+        </React.Fragment>
+      ) : null}
+    </Card>
+  );
+}
+
 function PowerlinkBidPanel({ data, setData }) {
   const [bp, setBp] = React.useState(null);
   const [status, setStatus] = React.useState('loading');
@@ -8822,6 +8907,7 @@ function TabDecisions({ decs, decErr, data, setData }) {
 
       <div style={{ marginTop: 24 }}><AdsStrategyPanel data={data} setData={setData} prodNames={{}} /></div>
       <PowerlinkBidPanel data={data} setData={setData} />
+      <ShoppingProposalPanel data={data} setData={setData} />
       {showExp ? <DecExportModal rows={done} onClose={() => setShowExp(false)} /> : null}
     </div>
   );
