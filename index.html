@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_158';
+const BUILD_TAG = 'index_159';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -7891,7 +7891,7 @@ function TabSchedule({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통' };
+const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통', 'n.파워링크': 'N.파워링크', 'powerlink': 'N.파워링크', 'n.쇼핑검색': 'N.쇼핑검색', 'shopping': 'N.쇼핑검색', '키워드 총합본': '키워드 총합본', '키워드총합본': '키워드 총합본', keyworddict: '키워드 총합본', keywords: '키워드 총합본' };
 
 const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 
@@ -8257,6 +8257,127 @@ function DecDiscardConfirm({ c, note, onNote, onYes, onNo, busy }) {
           style={{ padding: '10px 18px', borderRadius: 9, border: '1px solid #E3E0DC', cursor: 'pointer', fontSize: 16, fontWeight: 700, background: 'white', color: '#6E6863', fontFamily: 'inherit' }}>취소</button>
         {!has ? <span data-dec-dscnoreq={c.id} style={{ fontSize: 15, color: '#8A5200', fontWeight: 700 }}>사유를 적어야 폐기됩니다</span> : null}
       </div>
+    </div>
+  );
+}
+
+function TabPowerlink({ data, setData }) {
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: G }}>🔗 N.파워링크</div>
+        <span style={{ fontSize: 12, color: '#A29C95' }}>네이버 검색광고 · 파워링크 입찰·예산 제안. [승인]하면 자동화PC가 계정에 반영합니다.</span>
+      </div>
+      <PowerlinkBidPanel data={data} setData={setData} />
+    </div>
+  );
+}
+
+function TabShopping({ data, setData }) {
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: G }}>🛒 N.쇼핑검색</div>
+        <span style={{ fontSize: 12, color: '#A29C95' }}>네이버 쇼핑검색광고 · 최적화 카드. [승인]→예산·상품 빼기는 5분 안에 반영, [나중에]는 안 씀.</span>
+      </div>
+      <ShoppingProposalPanel data={data} setData={setData} />
+    </div>
+  );
+}
+
+function TabKeywordDict() {
+  const [dict, setDict] = React.useState(null);
+  const [status, setStatus] = React.useState('loading');
+  const [open, setOpen] = React.useState({});
+  const [q, setQ] = React.useState('');
+  React.useEffect(() => {
+    let alive = true; let ref = null;
+    try {
+      ref = db.ref('/keywordDictionary');
+      ref.on('value', function (sn) {
+        if (!alive) return;
+        const v = sn && sn.val ? sn.val() : null;
+        setDict(v && typeof v === 'object' ? v : {});
+        setStatus('ok');
+      }, function () { if (alive) setStatus('error'); });
+    } catch (e) { setStatus('error'); }
+    return function () { alive = false; try { if (ref) ref.off(); } catch (e) {} };
+  }, []);
+  const keys = dict ? Object.keys(dict).filter(function (k) { return k && typeof dict[k] === 'object'; }) : [];
+  const has = function (o) { return o && typeof o === 'object' && Object.keys(o).length > 0; };
+  const cnt = function (z) { return keys.filter(function (k) { return has(dict[k][z]); }).length; };
+  const num = function (n) { return (n == null || n === '') ? null : (typeof n === 'number' ? n.toLocaleString() : String(n)); };
+  const ql = q.trim().toLowerCase();
+  const shown = ql ? keys.filter(function (k) { const e = dict[k]; const vs = Array.isArray(e.variants) ? e.variants.join(' ') : ''; return (k + ' ' + (e.display || '') + ' ' + vs).toLowerCase().indexOf(ql) >= 0; }) : keys;
+  const FLAGDEF = [['brandOwn', '자사', '#047857', '#D1FAE5', '#6EE7B7'], ['brandCompetitor', '경쟁', '#B45309', '#FEF3C7', '#FDE68A'], ['legalRisk', '법적', '#DC2626', '#FEF2F2', '#FECACA'], ['excluded', '제외', '#6E6863', '#F5F4F2', '#E3E0DC']];
+  const flagBadges = function (f) {
+    if (!f || typeof f !== 'object') return <span style={{ color: '#C9C4BE' }}>—</span>;
+    const on = FLAGDEF.filter(function (d) { return f[d[0]]; });
+    if (on.length === 0) return <span style={{ color: '#C9C4BE' }}>—</span>;
+    return on.map(function (d) { return <span key={d[0]} style={{ fontSize: 10.5, fontWeight: 800, color: d[2], background: d[3], border: '1px solid ' + d[4], borderRadius: 6, padding: '1px 7px', marginRight: 4 }}>{d[1]}</span>; });
+  };
+  const cell = function (o, parts) {
+    if (!has(o)) return <span style={{ color: '#C9C4BE' }}>—</span>;
+    const ps = parts.filter(Boolean);
+    if (ps.length === 0) return <span style={{ color: '#6E6863', fontSize: 11 }}>채움 {Object.keys(o).length}</span>;
+    return <div style={{ fontSize: 11.5, lineHeight: 1.5, color: '#3A3631' }}>{ps.map(function (x, i) { return <div key={i}>{x}</div>; })}</div>;
+  };
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 6 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: G }}>🧩 키워드 총합본</div>
+        <span style={{ fontSize: 12, color: '#A29C95' }}>트렌드·광고·상품 세 에이전트가 같은 키로 채우는 통합 사전 · 읽기 전용</span>
+      </div>
+      <div style={{ fontSize: 11.5, color: '#6E6863', background: '#F8F7F5', border: '1px solid #EDEBE7', borderRadius: 8, padding: '9px 12px', marginBottom: 12, lineHeight: 1.55 }}>키워드마다 <b>트렌드</b>(발굴)·<b>광고</b>(검색량·성과)·<b>스토어</b>(유입)·<b>상품</b>(상품명·태그)·<b>플래그</b>(자사·경쟁·법적·제외)가 한 줄에 모입니다. 플래그는 유니·허브만 확정하고 다른 에이전트는 읽기만 해요. <span style={{ color: '#A29C95' }}>출처: Firebase /keywordDictionary 실시간.</span></div>
+      {status === 'loading' ? <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>사전을 불러오는 중…</Card> : null}
+      {status === 'error' ? <Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>사전을 불러오지 못했습니다.<br /><span style={{ fontSize: 11 }}>아직 노드가 없거나 읽기 권한이 없을 수 있어요 (에이전트가 채우는 중).</span></Card> : null}
+      {status === 'ok' && keys.length === 0 ? <Card style={{ padding: '16px 18px', color: '#6E6863', lineHeight: 1.6 }}><div data-kd-empty>아직 채워진 키워드가 없습니다. 에이전트가 <b>/keywordDictionary</b> 에 자기 구역을 채우면 여기 나타납니다. <span style={{ color: '#A29C95' }}>(없음 — 오류가 아닙니다)</span></div></Card> : null}
+      {status === 'ok' && keys.length > 0 ? (
+        <React.Fragment>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 10, fontSize: 11.5, color: '#6E6863' }}>
+            <span style={{ fontWeight: 700, color: '#3A3631' }}>총 {keys.length}개</span>
+            <span>· 트렌드 {cnt('trend')}</span><span>· 광고 {cnt('ads')}</span><span>· 스토어 {cnt('store')}</span><span>· 상품 {cnt('product')}</span><span>· 플래그 {cnt('flags')}</span>
+            <input value={q} onChange={function (e) { setQ(e.target.value); }} placeholder="키워드 검색" style={{ marginLeft: 'auto', padding: '5px 10px', border: '1px solid #E3E0DC', borderRadius: 8, fontSize: 12, fontFamily: 'inherit', width: 160 }} />
+          </div>
+          <Card style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr style={{ background: '#FAFAF9', color: '#6E6863', textAlign: 'left' }}>
+                    <th style={{ padding: '9px 12px', fontWeight: 700, whiteSpace: 'nowrap' }}>키워드</th>
+                    <th style={{ padding: '9px 12px', fontWeight: 700 }}>트렌드</th>
+                    <th style={{ padding: '9px 12px', fontWeight: 700 }}>광고</th>
+                    <th style={{ padding: '9px 12px', fontWeight: 700 }}>스토어</th>
+                    <th style={{ padding: '9px 12px', fontWeight: 700 }}>상품</th>
+                    <th style={{ padding: '9px 12px', fontWeight: 700, whiteSpace: 'nowrap' }}>플래그</th>
+                    <th style={{ padding: '9px 8px' }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {shown.map(function (k) {
+                    const e = dict[k]; const t = e.trend || {}; const a = e.ads || {}; const st = e.store || {}; const pr = e.product || {};
+                    const isOpen = !!open[k];
+                    return (
+                      <React.Fragment key={k}>
+                        <tr data-kd-row={k} style={{ borderTop: '1px solid #F0EEEA', verticalAlign: 'top' }}>
+                          <td style={{ padding: '9px 12px' }}><div style={{ fontWeight: 700, color: '#1A1614' }}>{e.display || k}</div>{Array.isArray(e.variants) && e.variants.length > 1 ? <div style={{ fontSize: 10.5, color: '#A29C95' }}>변형 {e.variants.length}</div> : null}</td>
+                          <td style={{ padding: '9px 12px' }}>{cell(t, [num(t.datalabIndex) != null ? '지수 ' + num(t.datalabIndex) : (t.spike ? '급등 ' + t.spike : null), t.source ? '출처 ' + t.source : null, t.firstDetected ? '발견 ' + String(t.firstDetected).slice(0, 10) : null])}</td>
+                          <td style={{ padding: '9px 12px' }}>{cell(a, [num(a.monthlyVolume) != null ? '검색 ' + num(a.monthlyVolume) : null, a.roas != null ? 'ROAS ' + a.roas : null, a.adStatus ? String(a.adStatus) : null])}</td>
+                          <td style={{ padding: '9px 12px' }}>{cell(st, [num(st.visits7d) != null ? '방문 ' + num(st.visits7d) : null, st.convRate != null ? '전환 ' + st.convRate : null])}</td>
+                          <td style={{ padding: '9px 12px' }}>{cell(pr, [pr.termsType ? String(pr.termsType) : null, Array.isArray(pr.inTitleOf) && pr.inTitleOf.length ? '상품명 ' + pr.inTitleOf.length : null, pr.ruleTwoResult ? String(pr.ruleTwoResult) : null])}</td>
+                          <td style={{ padding: '9px 12px', whiteSpace: 'nowrap' }}>{flagBadges(e.flags)}</td>
+                          <td style={{ padding: '9px 8px' }}><button onClick={function () { setOpen(function (o) { const m = Object.assign({}, o); m[k] = !m[k]; return m; }); }} style={{ border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', borderRadius: 6, padding: '3px 8px', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{isOpen ? '접기' : '자세히'}</button></td>
+                        </tr>
+                        {isOpen ? <tr style={{ background: '#FBFAF8' }}><td colSpan={7} style={{ padding: '0 12px 12px' }}><pre style={{ margin: 0, fontSize: 11, color: '#3A3631', whiteSpace: 'pre-wrap', wordBreak: 'break-all', maxHeight: 300, overflow: 'auto' }}>{JSON.stringify(e, null, 2)}</pre></td></tr> : null}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </React.Fragment>
+      ) : null}
     </div>
   );
 }
@@ -8906,8 +9027,6 @@ function TabDecisions({ decs, decErr, data, setData }) {
       </div>
 
       <div style={{ marginTop: 24 }}><AdsStrategyPanel data={data} setData={setData} prodNames={{}} /></div>
-      <PowerlinkBidPanel data={data} setData={setData} />
-      <ShoppingProposalPanel data={data} setData={setData} />
       {showExp ? <DecExportModal rows={done} onClose={() => setShowExp(false)} /> : null}
     </div>
   );
@@ -8975,6 +9094,8 @@ function App() {
   const TABS = [
     { icon: '🏠', label: '홈', C: TabTeam },
     { icon: '🧭', label: '판단 대기', C: TabDecisions, badge: decPending },
+    { icon: '🔗', label: 'N.파워링크', C: TabPowerlink },
+    { icon: '🛒', label: 'N.쇼핑검색', C: TabShopping },
     { icon: '📅', label: '데일리/주간', C: TabWeekly },
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
     { icon: '🗂️', label: '단계별 보기', C: TabKanban },
@@ -8985,6 +9106,7 @@ function App() {
     { icon: '💬', label: '카카오', C: TabKakao },
     { icon: '📣', label: '광고', C: TabAds },
     { icon: '🔥', label: '키워드 트렌드', C: TabTrends },
+    { icon: '🧩', label: '키워드 총합본', C: TabKeywordDict },
     { icon: '📨', label: '발송 스케줄', C: TabSchedule },
     { icon: '🗓', label: '회의', C: TabMeeting },
     { icon: '⏸', label: '보류', C: TabHold, badge: heldCount },
@@ -8994,10 +9116,10 @@ function App() {
 
   const GROUPS = TAB_GROUPS_ON ? [
     { icon: '🏠', label: '홈', tabs: ['홈'] },
-    { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기'] },
+    { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색'] },
     { icon: '📋', label: '업무', tabs: ['데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
     { icon: '📊', label: '성과', tabs: ['KPI', '매출', '카카오', '광고'] },
-    { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드'] },
+    { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드', '키워드 총합본'] },
     { icon: '💰', label: '예산', tabs: ['예산'] },
   ] : null;
   const ORPHAN_PARENT = { '단계별 보기': '업무', '보류': '업무', '휴지통': '예산' };
