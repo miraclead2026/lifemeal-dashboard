@@ -1,6 +1,6 @@
 {
- "updatedAt": "2026-08-14T10:33:35+09:00",
- "basedOn": "2026-08-12",
+ "updatedAt": "2026-08-15T10:33:05+09:00",
+ "basedOn": "2026-08-13",
  "rules": {
   "targetRoas": 330,
   "step": 0.1,
@@ -25,11 +25,11 @@
    "currentBid": 300,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 60,
-    "spend": 15571,
+    "clicks": 71,
+    "spend": 18738,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 1390,
+    "impressions": 1632,
     "avgRnk": 2.5,
     "roas": 0.0
    },
@@ -38,7 +38,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "진단",
-   "rationale": "클릭 60·전환0 — 입찰 아닌 소재/랜딩 진단(광고판단규칙 '진단 먼저')",
+   "rationale": "클릭 71·전환0 — 입찰 아닌 소재/랜딩 진단(광고판단규칙 '진단 먼저')",
    "successMetric": "진단 후 14일 전환 발생"
   },
   {
@@ -49,11 +49,11 @@
    "currentBid": 300,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 24,
-    "spend": 6621,
+    "clicks": 26,
+    "spend": 7143,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 1726,
+    "impressions": 1886,
     "avgRnk": 2.0,
     "roas": 0.0
    },
@@ -62,7 +62,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 1726·클릭 24 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 1886·클릭 26 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   },
   {
@@ -73,12 +73,12 @@
    "currentBid": 300,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 7,
-    "spend": 1850,
+    "clicks": 8,
+    "spend": 2213,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 671,
-    "avgRnk": 4.3,
+    "impressions": 753,
+    "avgRnk": 4.2,
     "roas": 0.0
    },
    "lever": "bid",
@@ -86,7 +86,7 @@
    "proposedBudget": 30000,
    "deltaPct": 10,
    "status": "제안",
-   "rationale": "평균순위 4.3위(하위 노출) — 입찰이 낮아 경매서 밀림. 노출·순위 확보 위해 증액(+10%)",
+   "rationale": "평균순위 4.2위(하위 노출) — 입찰이 낮아 경매서 밀림. 노출·순위 확보 위해 증액(+10%)",
    "successMetric": "증액 후 7일 노출·순위 상승 (안 오르면 QI/경쟁/검색량 → 중단)"
   },
   {
@@ -101,7 +101,7 @@
     "spend": 2332,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 268,
+    "impressions": 302,
     "avgRnk": 2.7,
     "roas": 0.0
    },
@@ -110,7 +110,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 268·클릭 5 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 302·클릭 5 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   },
   {
@@ -121,12 +121,12 @@
    "currentBid": 300,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 2,
-    "spend": 570,
+    "clicks": 4,
+    "spend": 1190,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 229,
-    "avgRnk": 2.7,
+    "impressions": 280,
+    "avgRnk": 2.8,
     "roas": 0.0
    },
    "lever": null,
@@ -134,7 +134,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 229·클릭 2 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 280·클릭 4 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   },
   {
@@ -145,11 +145,11 @@
    "currentBid": 330,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 4,
-    "spend": 2377,
+    "clicks": 6,
+    "spend": 2853,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 968,
+    "impressions": 1210,
     "avgRnk": 5.1,
     "roas": 0.0
    },
@@ -169,12 +169,12 @@
    "currentBid": 300,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 2,
-    "spend": 647,
+    "clicks": 4,
+    "spend": 1241,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 2544,
-    "avgRnk": 3.6,
+    "impressions": 3191,
+    "avgRnk": 3.8,
     "roas": 0.0
    },
    "lever": null,
@@ -182,7 +182,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 2544·클릭 2 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 3191·클릭 4 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   },
   {
@@ -197,17 +197,17 @@
     "spend": 304,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 327,
-    "avgRnk": 4.2,
+    "impressions": 511,
+    "avgRnk": 3.9,
     "roas": 0.0
    },
-   "lever": "bid",
-   "proposedBid": 360,
+   "lever": null,
+   "proposedBid": 330,
    "proposedBudget": 30000,
-   "deltaPct": 9,
-   "status": "제안",
-   "rationale": "평균순위 4.2위(하위 노출) — 입찰이 낮아 경매서 밀림. 노출·순위 확보 위해 증액(+10%)",
-   "successMetric": "증액 후 7일 노출·순위 상승 (안 오르면 QI/경쟁/검색량 → 중단)"
+   "deltaPct": 0,
+   "status": "관측중",
+   "rationale": "7일 노출 511·클릭 1 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "successMetric": "클릭 30 누적 후 판정"
   },
   {
    "id": "bid-grp-a001-01-000000071517206",
@@ -217,12 +217,12 @@
    "currentBid": 330,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 1,
-    "spend": 122,
+    "clicks": 3,
+    "spend": 729,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 171,
-    "avgRnk": 6.8,
+    "impressions": 195,
+    "avgRnk": 7.1,
     "roas": 0.0
    },
    "lever": "bid",
@@ -230,7 +230,7 @@
    "proposedBudget": 30000,
    "deltaPct": 9,
    "status": "제안",
-   "rationale": "평균순위 6.8위(하위 노출) — 입찰이 낮아 경매서 밀림. 노출·순위 확보 위해 증액(+10%)",
+   "rationale": "평균순위 7.1위(하위 노출) — 입찰이 낮아 경매서 밀림. 노출·순위 확보 위해 증액(+10%)",
    "successMetric": "증액 후 7일 노출·순위 상승 (안 오르면 QI/경쟁/검색량 → 중단)"
   },
   {
@@ -245,7 +245,7 @@
     "spend": 233,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 152,
+    "impressions": 178,
     "avgRnk": 2.9,
     "roas": 0.0
    },
@@ -254,7 +254,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 152·클릭 2 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 178·클릭 2 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   },
   {
@@ -269,8 +269,8 @@
     "spend": 0,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 127,
-    "avgRnk": 3.5,
+    "impressions": 141,
+    "avgRnk": 3.4,
     "roas": null
    },
    "lever": null,
@@ -278,7 +278,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 127·클릭 0 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 141·클릭 0 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   },
   {
@@ -289,12 +289,12 @@
    "currentBid": 300,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 1,
-    "spend": 330,
+    "clicks": 2,
+    "spend": 630,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 232,
-    "avgRnk": 3.5,
+    "impressions": 287,
+    "avgRnk": 3.7,
     "roas": 0.0
    },
    "lever": null,
@@ -302,7 +302,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 232·클릭 1 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 287·클릭 2 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   },
   {
@@ -313,12 +313,12 @@
    "currentBid": 300,
    "currentBudget": 30000,
    "window7d": {
-    "clicks": 1,
-    "spend": 242,
+    "clicks": 2,
+    "spend": 577,
     "purchaseConv": 0,
     "convRevenue": 0,
-    "impressions": 96,
-    "avgRnk": 3.6,
+    "impressions": 117,
+    "avgRnk": 3.5,
     "roas": 0.0
    },
    "lever": null,
@@ -326,7 +326,7 @@
    "proposedBudget": 30000,
    "deltaPct": 0,
    "status": "관측중",
-   "rationale": "7일 노출 96·클릭 1 (<30) — 노출/순위 정상, 표본만 부족(유지)",
+   "rationale": "7일 노출 117·클릭 2 (<30) — 노출/순위 정상, 표본만 부족(유지)",
    "successMetric": "클릭 30 누적 후 판정"
   }
  ]
