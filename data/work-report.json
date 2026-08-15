@@ -1,0 +1,312 @@
+{
+ "updatedAt": "2026-08-15 09:37",
+ "weeks": [
+  {
+   "weekKey": "2026-W32",
+   "label": "2026 32주차 (8/3~8/9)",
+   "periodStart": "2026-08-03",
+   "periodEnd": "2026-08-09",
+   "headline": "광고비를 절반 가까이 늘렸는데 매출은 3주째 내려갔습니다.",
+   "metrics": [
+    {
+     "label": "매출",
+     "value": "19,791,800원",
+     "delta": -20.0,
+     "note": ""
+    },
+    {
+     "label": "주문",
+     "value": "255건",
+     "delta": -20.1,
+     "note": ""
+    },
+    {
+     "label": "객단가",
+     "value": "77,615원",
+     "delta": 0.0,
+     "note": ""
+    },
+    {
+     "label": "광고비",
+     "value": "7,894,721원",
+     "delta": 49.6,
+     "note": ""
+    },
+    {
+     "label": "광고 ROAS",
+     "value": "165%",
+     "delta": -23.5,
+     "note": "목표 330%"
+    },
+    {
+     "label": "카카오 신규친구",
+     "value": "1명",
+     "delta": 0.0,
+     "note": "전주 1명"
+    }
+   ],
+   "outcomes": [],
+   "md": {
+    "verdict": "광고비를 50% 올렸는데 매출은 3주 연속 내려갔습니다 — 지금은 더 쓸 때가 아니라 새는 곳을 막을 때입니다.",
+    "worked": "애드부스트는 광고비의 80%를 쓰면서 ROAS 182%로, 다시 켠 쇼핑검색보다 두 배 낫습니다.",
+    "didntWork": "쇼핑검색 재개가 안 먹혔습니다 — 154만원 써서 ROAS 93%. 7월 중순 같은 채널이 346%였던 것과 비교하면 무언가 달라졌습니다.",
+    "nextPlan": "쇼핑검색을 더 키우기 전에 7월 중순과 무엇이 달라졌는지부터 보세요. 그때는 목표를 넘겼고 지금은 쓴 돈도 못 건집니다."
+   },
+   "ad": {
+    "verdict": "",
+    "worked": "",
+    "didntWork": "",
+    "nextPlan": "",
+    "askToUni": ""
+   },
+   "watchouts": [
+    "이번 주 처리한 카드 0건 (가장 최근 처리 2026-07-06)",
+    "판단 카드 3건 답 대기 (최장 7일째)",
+    "광고 전략 카드 10건 미처리",
+    "4주 추이: 매출 2,021만 → 2,927만 → 2,475만 → 1,979만 / ROAS 246% → 235% → 216% → 165%"
+   ],
+   "coverage": [
+    "meetings: 최신 2026-07-20 (26일 전)",
+    "FB adOpsLog: 비어 있음",
+    "FB kpiLogs: 비어 있음",
+    "FB insights: 비어 있음",
+    "인스타그램 컨텐츠 성과: 수집 경로 없음",
+    "광고 소재 썸네일: naver-ads.json 에 이미지 URL 필드 없음"
+   ],
+   "sources": [
+    "data/naver-sales.json weeks[2026-W32] — 매출 19,791,800",
+    "data/naver-ads.json 채널별 — display 6,354,496(ROAS 182.1%) / search 1,540,225(ROAS 93.0%)",
+    "data/naver-ads.json 4주 광고비 — 3,243,074 → 8,524,496 → 5,277,532 → 7,894,721",
+    "data/naver-ads.json 4주 ROAS — 246% → 235% → 216% → 165%",
+    "Firebase /dashboard/adsLog — 이번 주 처리 0건, 최근 처리 2026-07-06"
+   ]
+  },
+  {
+   "weekKey": "2026-W31",
+   "label": "2026 31주차 (7/27~8/2)",
+   "periodStart": "2026-07-27",
+   "periodEnd": "2026-08-02",
+   "headline": "쇼핑검색을 껐고, 매출은 15% 내려갔습니다.",
+   "metrics": [
+    {
+     "label": "매출",
+     "value": "24,749,870원",
+     "delta": -15.4,
+     "note": ""
+    },
+    {
+     "label": "주문",
+     "value": "319건",
+     "delta": -12.1,
+     "note": ""
+    },
+    {
+     "label": "객단가",
+     "value": "77,586원",
+     "delta": -3.8,
+     "note": ""
+    },
+    {
+     "label": "광고비",
+     "value": "5,277,532원",
+     "delta": -38.1,
+     "note": ""
+    },
+    {
+     "label": "광고 ROAS",
+     "value": "216%",
+     "delta": -8.5,
+     "note": "목표 330%"
+    },
+    {
+     "label": "카카오 신규친구",
+     "value": "1명",
+     "delta": -99.8,
+     "note": "전주 484명"
+    }
+   ],
+   "outcomes": [],
+   "md": {
+    "verdict": "광고비를 38% 줄였더니 매출은 15%만 줄었습니다 — 줄인 것 자체는 손해가 아니었습니다.",
+    "worked": "광고비를 320만원 아꼈는데 매출 감소는 그 절반 수준이었습니다.",
+    "didntWork": "'260708 애드부스트 제품' 그룹이 2주 연속 새고 있습니다 — 54만원 써서 ROAS 29%.",
+    "nextPlan": "'260708 애드부스트 제품'을 끄세요. 2주 연속 ROAS 30% 아래라 회복을 기다릴 근거가 없습니다."
+   },
+   "ad": {
+    "verdict": "",
+    "worked": "",
+    "didntWork": "",
+    "nextPlan": "",
+    "askToUni": ""
+   },
+   "watchouts": [
+    "이번 주 처리한 카드 0건 (가장 최근 처리 2026-07-06)"
+   ],
+   "coverage": [
+    "meetings: 최신 2026-07-20 (26일 전)",
+    "FB adOpsLog: 비어 있음",
+    "FB kpiLogs: 비어 있음",
+    "FB insights: 비어 있음",
+    "인스타그램 컨텐츠 성과: 수집 경로 없음",
+    "광고 소재 썸네일: naver-ads.json 에 이미지 URL 필드 없음"
+   ],
+   "sources": [
+    "data/naver-sales.json weeks[2026-W31] — 매출 24,749,870",
+    "data/naver-ads.json 채널별 — display 5,275,968(ROAS 205.6%) / search 1,564원(사실상 정지)",
+    "data/naver-ads.json 저효율 — '260708 애드부스트 제품' 544,900원 ROAS 28.5%"
+   ]
+  },
+  {
+   "weekKey": "2026-W30",
+   "label": "2026 30주차 (7/20~7/26)",
+   "periodStart": "2026-07-20",
+   "periodEnd": "2026-07-26",
+   "headline": "4주 중 최고 매출 — 광고비를 2.6배 쓰고 매출을 45% 올렸습니다.",
+   "metrics": [
+    {
+     "label": "매출",
+     "value": "29,271,010원",
+     "delta": 44.8,
+     "note": ""
+    },
+    {
+     "label": "주문",
+     "value": "363건",
+     "delta": 33.9,
+     "note": ""
+    },
+    {
+     "label": "객단가",
+     "value": "80,636원",
+     "delta": 8.1,
+     "note": ""
+    },
+    {
+     "label": "광고비",
+     "value": "8,524,496원",
+     "delta": 162.9,
+     "note": ""
+    },
+    {
+     "label": "광고 ROAS",
+     "value": "235%",
+     "delta": -4.4,
+     "note": "목표 330%"
+    },
+    {
+     "label": "카카오 신규친구",
+     "value": "484명",
+     "delta": 48300.0,
+     "note": "전주 1명"
+    }
+   ],
+   "outcomes": [],
+   "md": {
+    "verdict": "광고비를 2.6배로 늘려 매출 45%를 얻었습니다. 늘린 만큼 효율은 조금 떨어졌습니다(ROAS 235%).",
+    "worked": "카카오 친구가 484명 늘었습니다 — 다른 주는 1명입니다. 이때 무엇을 했는지가 재현의 열쇠입니다.",
+    "didntWork": "'260708 애드부스트 제품' 그룹은 66만원 써서 ROAS 27% — 쓴 돈의 4분의 1도 못 건졌습니다.",
+    "nextPlan": "484명이 어디서 왔는지부터 확인하세요. 재현할 수 있다면 가장 싼 성장입니다."
+   },
+   "ad": {
+    "verdict": "",
+    "worked": "",
+    "didntWork": "",
+    "nextPlan": "",
+    "askToUni": ""
+   },
+   "watchouts": [
+    "이번 주 처리한 카드 0건 (가장 최근 처리 2026-07-06)"
+   ],
+   "coverage": [
+    "meetings: 최신 2026-07-20 (26일 전)",
+    "FB adOpsLog: 비어 있음",
+    "FB kpiLogs: 비어 있음",
+    "FB insights: 비어 있음",
+    "인스타그램 컨텐츠 성과: 수집 경로 없음",
+    "광고 소재 썸네일: naver-ads.json 에 이미지 URL 필드 없음"
+   ],
+   "sources": [
+    "data/naver-sales.json weeks[2026-W30] — 매출 29,271,010 (4주 최고)",
+    "data/naver-ads.json 채널별 — display 5,933,011(ROAS 236.7%) / search 2,591,485(ROAS 232.4%)",
+    "data/naver-ads.json 저효율 — '260708 애드부스트 제품' 661,487원 ROAS 26.9%",
+    "data/kakao-stats.json — 신규친구 484명 (전주 1명)"
+   ]
+  },
+  {
+   "weekKey": "2026-W29",
+   "label": "2026 29주차 (7/13~7/19)",
+   "periodStart": "2026-07-13",
+   "periodEnd": "2026-07-19",
+   "headline": "쇼핑검색이 목표를 넘긴 유일한 주입니다 — ROAS 346%.",
+   "metrics": [
+    {
+     "label": "매출",
+     "value": "20,211,320원",
+     "delta": -17.3,
+     "note": ""
+    },
+    {
+     "label": "주문",
+     "value": "271건",
+     "delta": -13.4,
+     "note": ""
+    },
+    {
+     "label": "객단가",
+     "value": "74,581원",
+     "delta": -4.5,
+     "note": ""
+    },
+    {
+     "label": "광고비",
+     "value": "3,243,074원",
+     "delta": -20.5,
+     "note": ""
+    },
+    {
+     "label": "광고 ROAS",
+     "value": "246%",
+     "delta": -23.9,
+     "note": "목표 330%"
+    },
+    {
+     "label": "카카오 신규친구",
+     "value": "1명",
+     "delta": 0.0,
+     "note": "전주 1명"
+    }
+   ],
+   "outcomes": [],
+   "md": {
+    "verdict": "광고비를 20% 줄인 주인데, 쇼핑검색만 목표(330%)를 넘겼습니다.",
+    "worked": "쇼핑검색이 44만원 써서 155만원을 벌었습니다 — 4주 통틀어 목표를 넘긴 건 이 한 번뿐입니다.",
+    "didntWork": "매출은 4주 중 두 번째로 낮았습니다. 광고비를 20% 줄인 만큼 매출도 17% 줄었습니다.",
+    "nextPlan": "쇼핑검색에 더 쓸 여지를 보세요 — 목표를 넘긴 유일한 채널입니다."
+   },
+   "ad": {
+    "verdict": "",
+    "worked": "",
+    "didntWork": "",
+    "nextPlan": "",
+    "askToUni": ""
+   },
+   "watchouts": [
+    "이번 주 처리한 카드 0건 (가장 최근 처리 2026-07-06)",
+    "광고 데이터 6/7일만 수집됨 — 주간 비교 시 주의"
+   ],
+   "coverage": [
+    "meetings: 최신 2026-07-20 (26일 전)",
+    "FB adOpsLog: 비어 있음",
+    "FB kpiLogs: 비어 있음",
+    "FB insights: 비어 있음",
+    "인스타그램 컨텐츠 성과: 수집 경로 없음",
+    "광고 소재 썸네일: naver-ads.json 에 이미지 URL 필드 없음"
+   ],
+   "sources": [
+    "data/naver-sales.json weeks[2026-W29] — 매출 20,211,320",
+    "data/naver-ads.json 채널별 — display 2,794,457(ROAS 230.2%) / search 448,617(ROAS 346.0%)",
+    "data/naver-ads.json — 6/7일만 수집됨"
+   ]
+  }
+ ]
+}
