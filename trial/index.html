@@ -454,7 +454,8 @@ function viewPosts() {
     const stTag = st === 'final' ? el('span', { class: 'tag ok' }, '채점완료')
       : st === 'provisional' ? el('span', { class: 'tag warn' }, '잠정')
         : st === 'blocked' ? el('span', { class: 'tag bad' }, '보류')
-          : el('span', { class: 'tag warn' }, '미채점');
+          : st === 'autochecked' ? el('span', { class: 'tag' }, '자동체크됨')
+            : el('span', { class: 'tag warn' }, '미채점');
     const ac = obj(p.autoCheck);
     tb.append(el('tr', {},
       el('td', {}, who ? who.name : el('span', { class: 'sub' }, p.pid)),
@@ -609,6 +610,7 @@ function showKakao(wrap) {
 function viewScoring() {
   const posts = list(DATA.posts);
   const pending = posts.filter(p => !p.scoringStatus || p.scoringStatus === 'pending');
+  const autoOnly = posts.filter(p => p.scoringStatus === 'autochecked');
   const prov = posts.filter(p => p.scoringStatus === 'provisional');
   const blocked = posts.filter(p => p.scoringStatus === 'blocked');
   const done = posts.filter(p => p.scoringStatus === 'final');
@@ -617,7 +619,8 @@ function viewScoring() {
   wrap.append(el('div', { class: 'card' },
     el('h2', {}, '채점 진행'),
     el('div', { class: 'row' },
-      ...[['미채점', pending.length, 'warn'], ['잠정', prov.length, 'warn'],
+      ...[['미채점', pending.length, 'warn'], ['자동체크됨', autoOnly.length, 'warn'],
+      ['잠정', prov.length, 'warn'],
       ['보류', blocked.length, 'bad'], ['완료', done.length, 'ok']]
         .map(([l, n, c]) => el('div', {
           style: 'flex:1;min-width:110px;border:1px solid var(--line);border-radius:8px;padding:10px'
@@ -628,21 +631,27 @@ function viewScoring() {
       '내용·진정성 채점은 사진과 본문을 직접 확인해야 하므로 이 페이지에서 입력할 수 없습니다. ' +
       '접수된 게시물은 채점 워커가 가져가 채점하고, 결과가 여기에 자동으로 반영됩니다.')));
 
-  if (pending.length) {
+  // 루브릭 채점이 남은 건 = 미채점 + 자동체크만 끝난 것
+  const waiting = pending.concat(autoOnly);
+  if (waiting.length) {
     const tb = el('tbody');
-    for (const p of pending) {
+    for (const p of waiting) {
       const who = obj(DATA.participants)[p.pid];
+      const ac = obj(p.autoCheck);
       tb.append(el('tr', {},
         el('td', {}, who ? who.name : p.pid),
         el('td', {}, `${p.week}주 ${p.type || '의무'}`),
         el('td', {}, el('a', { href: p.url, target: '_blank', style: 'color:#5b7fb5;font-size:12px' },
           (p.url || '').slice(0, 62))),
-        el('td', { class: 'sub' }, p.submittedAt ? p.submittedAt.slice(0, 10) : '')));
+        el('td', { class: 'sub' }, p.submittedAt ? p.submittedAt.slice(0, 10) : ''),
+        el('td', {}, p.scoringStatus === 'autochecked'
+          ? el('span', { class: 'tag' }, `자동체크 완료 (${ac.char_count ?? '?'}자·미디어 ${ac.media_count ?? '?'})`)
+          : el('span', { class: 'tag warn' }, '자동체크 대기'))));
     }
     wrap.append(el('div', { class: 'card' },
-      el('h2', {}, `채점 대기 ${pending.length}건`),
+      el('h2', {}, `채점 대기 ${waiting.length}건`),
       el('table', {}, el('thead', {}, el('tr', {},
-        ...['참가자', '주차', 'URL', '접수일'].map(h => el('th', {}, h)))), tb)));
+        ...['참가자', '주차', 'URL', '접수일', '진행'].map(h => el('th', {}, h)))), tb)));
   }
 
   if (blocked.length) {
