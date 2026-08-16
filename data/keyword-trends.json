@@ -46477,5 +46477,1973 @@
       "사전 flags 게이트: 오늘 제안에 들어간 신규 키 20종(두유·마테차·슈퍼푸드·이너뷰티·클렌즈다이어트·콩단백질·제로슈거·식이섬유보충제·단백질요거트·선식가루·비건식단·저속노화식품·간편건강식품·단백질전쟁·콩국수·서리태 + 인물 윤가이·이수정·이하정·화사) 전부 legalRisk·brandCompetitor 플래그 없음(사전 미등록 = 무플래그). 기존 사전 등록 16키도 차단 0건. push 후 push_dict_trend.py 로 trend 구역만 patch 한다.",
       "카톡 등 외부 발송 없음 — 산출물은 data/keyword-trends.json 단일 채널(대시보드). digestKakao 는 대시보드 알림 레이어용으로 생성만 했다."
     ]
+  },
+  {
+    "date": "2026-08-17",
+    "schemaVersion": 2,
+    "generatedAt": "2026-08-17T07:11:12+09:00",
+    "digest": "# 8/17 키워드 트렌드 다이제스트\n\n**오늘은 절반만 돌았다.** 뉴스·블로그·카페 감지 트랙(PlayMCP NaverSearch)이 인증되지 않아 이슈 감지가 0건이고, 유튜브 바이럴 트랙(youtube MCP)도 미연결이라 영상 수집이 0건이다. **감지 0건이 아니라 감지 불가**다 — 둘을 구분해서 읽어야 한다. 검색광고 API·Firebase·GitHub 은 정상이라 아래 숫자는 전부 오늘 실측이다.\n\n## 오늘 잡힌 것\n\n- **'황성주생식' 광고면 일곱 자리가 비어 있다.** 브랜드어 월 16,280 에 광고깊이 7 인데 우리 광고 레지스트리 79개에 이 키워드가 없다. 그 자리를 누가 채우는지 확인이 필요하다 — 오늘 가장 먼저 볼 것.\n- **레지스트리에 실제 변화가 있었다.** 어제 79개 전부 `null` 이던 `adProduct` 가 오늘 전부 `power_link` 로 채워졌다. 그런데 `updatedAt` 은 7/22 그대로다. **값은 바뀌는데 updatedAt 이 안 따라온다** — 그동안 \"정합 job 이 멈춘 것 같다\"고 보고해 온 해석을 다시 볼 필요가 있다. 허브 보고 대상.\n- **쉐이크 축은 오늘도 통째로 미등록.** 단백질쉐이크 112,100(보합) · 프로틴 40,450(+100) · 단백질보충제 34,530 — 셋 다 레지스트리에 없다. 등록된 건 바(bar)·그래놀라 하위어 중심이라는 구조가 어제와 동일하다.\n- **'천연위고비'는 광고가 아니라 콘텐츠 자리다.** 월 13,670 인데 경쟁 낮음·광고깊이 1. 이미 paused 상태라 재추천 게이트로 신규 추천에서는 뺐다.\n\n## 워치리스트 (10)\n\n검색광고 실측 기준 상위 10이다. **오늘은 이슈 앵커가 없어 `relatedSignal` 이 전부 비어 있다** — 뉴스에서 뜬 이슈에 붙은 키워드가 아니라 시드 연관어 중 검색량·경쟁도로 고른 것들이라는 뜻이다. 평소보다 한 단계 낮춰 읽어야 한다.\n\n- 재추천 게이트 적용: **천연위고비(paused)·다이어트식단(registered)** 은 표시·추적만 하고 신규 추천에서 제외.\n- 신규 후보: 다이어트도시락(21,800) · 단백질쉐이크(112,100) · 곤약밥(12,270) · 병아리콩간식(10,280) · 프로틴(40,450) · 간헐적단식시간(5,780) · 다이어트음식(24,380).\n- 브랜드 방어: 황성주생식(16,280, `defend`).\n- 곤약밥·병아리콩간식·다이어트도시락은 대응 SKU 가 없어 `productHints` 를 비웠다(억지 매핑 금지). 시장 신호로만 읽는다.\n\n## 오늘 안 된 것\n\n- **signals: 0건** — PlayMCP NaverSearch 미인증. 뉴스·블로그·카페 어느 것도 조회하지 못했다. 대체 검색원으로 우회해 목록을 채우지 않았다(검증 안 된 감지를 감지된 것처럼 내보내지 않는다).\n- **viral: 0건** — youtube MCP 미연결. 어제(8/16)도 0건이라 이틀 연속이다.\n- **인물 안테나** — 뉴스·유튜브 양쪽이 다 죽어 아예 돌지 못했다. 승인된 인물 시드(조혜련·서인영·박규리)도 오늘은 추적분이 없다.\n- **seedCandidates 6건은 8/16 근거 그대로 이월**했다. 오늘 새 근거는 없다 — 학습칸에서 사라지지 않게 유지만 한 것이니 승인 판단은 어제 카드 기준으로 하면 된다.\n\n## 다음 런에 필요한 것\n\nPlayMCP 와 youtube MCP 재인증이면 감지·바이럴 트랙이 그대로 복구된다. 인증만 되면 오늘 빠진 signals·viral 은 다음 런에서 정상 수집된다.",
+    "digestKakao": "[8/17 키워드트렌드] 감지트랙(PlayMCP)·유튜브 MCP 미인증으로 signals 0 / viral 0 — 감지 불가(0건 아님). 검색광고 실측은 정상. ①'황성주생식' 월 16,280·광고깊이 7 인데 레지스트리 미등록 — 브랜드 광고면 누가 채우는지 확인 필요. ②레지스트리 adProduct 가 null→power_link 로 바뀌었는데 updatedAt 은 7/22 그대로(신선도 지표 신뢰불가, 허브 보고). ③쉐이크 축(단백질쉐이크 112,100·프로틴 40,450) 여전히 통째로 미등록. 워치리스트 10 중 천연위고비·다이어트식단은 재추천 게이트로 추적만.",
+    "signals": [],
+    "watchlist": [
+      {
+        "keyword": "천연위고비",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": null,
+        "reason": "승인된 trend 시드다. 월 13,670(전일 +10)으로 사실상 보합이고, 경쟁 낮음·광고깊이 1 — 광고면이 거의 안 붙는 정보성 검색어다. 이미 레지스트리에 paused 로 올라 있어 재추천 게이트상 신규 추천 대상이 아니다(표시·검색량 추적만 유지). 광고보다 콘텐츠 축으로 다룰 자리.",
+        "monthlyPc": 1970,
+        "monthlyMobile": 11700,
+        "delta": 10,
+        "competition": "낮음",
+        "adDepth": 1,
+        "avgBid": null,
+        "intentType": "info",
+        "intentBasis": "ad-signal",
+        "intentReason": "광고깊이 1·경쟁 낮음 — 광고주 경쟁이 거의 없다. 형태도 '~위고비'로 효능 궁금증형이라 info 로 본다. (search_shop 폐지로 쇼핑 실검증 불가, 광고경쟁 신호 기준)",
+        "productHints": [],
+        "productHintBasis": "",
+        "priorityScore": 8.96,
+        "status": "proposed",
+        "adStatus": "paused",
+        "adProduct": "power_link",
+        "adRegisteredAt": "2026-07-18T23:49:15.000Z",
+        "adUpdatedAt": "2026-07-19T00:08:48.000Z",
+        "adRefCount": 1,
+        "adRefs": [
+          {
+            "keywordRef": "nkw-a001-01-000008409403975",
+            "campaignRef": "cmp-a001-01-000000010875409",
+            "adGroupName": "grp-a001-01-000000070384535",
+            "biddingPrice": 500,
+            "adStatus": "paused",
+            "registeredAt": "2026-07-18T23:49:15.000Z"
+          }
+        ],
+        "relatedKeywords": []
+      },
+      {
+        "keyword": "다이어트식단",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": null,
+        "reason": "이미 등록된 키워드 중 비타민C 다음으로 큰 축이다(월 59,100, 전일 +500). 재추천 게이트로 신규 제안에서는 빠지고 검색량 추적만 남긴다. 연관어 상단이 다이어트도시락·곤약밥 같은 '실물 식단' 탐색어로 채워져 있어, 식사대용 축의 진입로 역할을 계속하고 있다.",
+        "monthlyPc": 12400,
+        "monthlyMobile": 46700,
+        "delta": 500,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 중간 + 광고깊이 8로 광고면이 꽉 차 있고 연관어 상단이 제품 탐색어다 — shopping. (search_shop 폐지, 광고경쟁 신호 기준)",
+        "productHints": [],
+        "productHintBasis": "",
+        "priorityScore": 8.93,
+        "status": "proposed",
+        "adStatus": "registered",
+        "adProduct": "power_link",
+        "adRegisteredAt": "2026-07-18T23:49:15.000Z",
+        "adUpdatedAt": "2026-07-18T23:49:21.000Z",
+        "adRefCount": 1,
+        "adRefs": [
+          {
+            "keywordRef": "nkw-a001-01-000008409403968",
+            "campaignRef": "cmp-a001-01-000000010875409",
+            "adGroupName": "grp-a001-01-000000070384535",
+            "biddingPrice": 70,
+            "adStatus": "registered",
+            "registeredAt": "2026-07-18T23:49:15.000Z"
+          }
+        ],
+        "relatedKeywords": [
+          {
+            "keyword": "보리밥",
+            "monthlyPc": 1790,
+            "monthlyMobile": 30500,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트도시락",
+            "monthlyPc": 5000,
+            "monthlyMobile": 16800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "곤약밥",
+            "monthlyPc": 1870,
+            "monthlyMobile": 10400,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "현미밥",
+            "monthlyPc": 1940,
+            "monthlyMobile": 10200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "오뚜기밥",
+            "monthlyPc": 2050,
+            "monthlyMobile": 8160,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "즉석밥",
+            "monthlyPc": 1580,
+            "monthlyMobile": 6970,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "카무트쌀",
+            "monthlyPc": 530,
+            "monthlyMobile": 7280,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "잡곡",
+            "monthlyPc": 1480,
+            "monthlyMobile": 6200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "지중해식식단",
+            "monthlyPc": 880,
+            "monthlyMobile": 6190,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "선식",
+            "monthlyPc": 1200,
+            "monthlyMobile": 5830,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "다이어트도시락",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": null,
+        "reason": "오늘 처음 측정한 미등록 상위어다. 월 21,800·경쟁 중간·광고깊이 8 — 광고면은 이미 형성돼 있는데 우리 레지스트리 79개에는 없다. 다만 우리 SKU 중 도시락 형태가 없어 productHints 를 비웠다(억지 매핑 금지). 광고 입찰보다 '한 끼를 대체한다'는 식사대용 각도의 콘텐츠 접점으로 먼저 볼 자리.",
+        "monthlyPc": 5000,
+        "monthlyMobile": 16800,
+        "delta": null,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 중간 + 광고깊이 8 — 광고주 경쟁이 형성된 구매 탐색어다. shopping. (광고경쟁 신호 기준)",
+        "productHints": [],
+        "productHintBasis": "",
+        "priorityScore": 8.41,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "다이어트식단",
+            "monthlyPc": 12400,
+            "monthlyMobile": 46700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "보리밥",
+            "monthlyPc": 1790,
+            "monthlyMobile": 30500,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "곤약밥",
+            "monthlyPc": 1870,
+            "monthlyMobile": 10400,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "현미밥",
+            "monthlyPc": 1940,
+            "monthlyMobile": 10200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "오뚜기밥",
+            "monthlyPc": 2050,
+            "monthlyMobile": 8160,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "즉석밥",
+            "monthlyPc": 1580,
+            "monthlyMobile": 6970,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "카무트쌀",
+            "monthlyPc": 530,
+            "monthlyMobile": 7280,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "잡곡",
+            "monthlyPc": 1480,
+            "monthlyMobile": 6200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "지중해식식단",
+            "monthlyPc": 880,
+            "monthlyMobile": 6190,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "선식",
+            "monthlyPc": 1200,
+            "monthlyMobile": 5830,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "단백질쉐이크",
+        "targets": [
+          "운동헬스"
+        ],
+        "relatedSignal": null,
+        "reason": "월 112,100(전일 보합)으로 오늘도 우리 접점 최대이자 여전히 미등록이다. 레지스트리 79개가 바(bar)·그래놀라·야채가루 하위어 중심이라 쉐이크 축 상위어가 통째로 비어 있는 구조가 어제와 똑같이 유지됐다. 연관어 상단도 프로틴(40,450)·단백질보충제(34,530)·단백질음료(30,680)로 제품 탐색어다.",
+        "monthlyPc": 17600,
+        "monthlyMobile": 94500,
+        "delta": 0,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 중간 + 광고깊이 8, 연관어 상단이 전부 제품 탐색어 — shopping. (search_shop 폐지, 광고경쟁 신호 기준)",
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "high"
+          }
+        ],
+        "productHintBasis": "제품명 직결: aliases '단백질쉐이크' 매칭",
+        "priorityScore": 8.2,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "본죽",
+            "monthlyPc": 29800,
+            "monthlyMobile": 392000,
+            "competition": "높음",
+            "adDepth": 9,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "프로틴",
+            "monthlyPc": 6450,
+            "monthlyMobile": 34000,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "마녀스프레시피",
+            "monthlyPc": 2600,
+            "monthlyMobile": 29600,
+            "competition": "높음",
+            "adDepth": 3,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질많은음식",
+            "monthlyPc": 2450,
+            "monthlyMobile": 24300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "양배추",
+            "monthlyPc": 4450,
+            "monthlyMobile": 21500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "귀리",
+            "monthlyPc": 6030,
+            "monthlyMobile": 18800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "죽",
+            "monthlyPc": 2420,
+            "monthlyMobile": 22300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "아침식사",
+            "monthlyPc": 840,
+            "monthlyMobile": 23800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "간헐적단식",
+            "monthlyPc": 2720,
+            "monthlyMobile": 16400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "간단한저녁메뉴",
+            "monthlyPc": 2810,
+            "monthlyMobile": 15300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "곤약밥",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": null,
+        "reason": "저속노화 시드의 연관어에서 올라온 미등록어다. 월 12,270·경쟁 중간·광고깊이 8. 우리 SKU 에 대응 제품이 없어 productHints 는 비웠고, '포만감을 유지하면서 탄수를 줄인다'는 수요가 우리 식사대용 축 옆에서 따로 커지고 있다는 시장 신호로만 읽는다.",
+        "monthlyPc": 1870,
+        "monthlyMobile": 10400,
+        "delta": null,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 중간 + 광고깊이 8 — 구매 탐색 광고면이 형성돼 있다. shopping. (광고경쟁 신호 기준)",
+        "productHints": [],
+        "productHintBasis": "",
+        "priorityScore": 8.11,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "다이어트식단",
+            "monthlyPc": 12400,
+            "monthlyMobile": 46700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "보리밥",
+            "monthlyPc": 1790,
+            "monthlyMobile": 30500,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트도시락",
+            "monthlyPc": 5000,
+            "monthlyMobile": 16800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "현미밥",
+            "monthlyPc": 1940,
+            "monthlyMobile": 10200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "오뚜기밥",
+            "monthlyPc": 2050,
+            "monthlyMobile": 8160,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "즉석밥",
+            "monthlyPc": 1580,
+            "monthlyMobile": 6970,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "카무트쌀",
+            "monthlyPc": 530,
+            "monthlyMobile": 7280,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "잡곡",
+            "monthlyPc": 1480,
+            "monthlyMobile": 6200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "지중해식식단",
+            "monthlyPc": 880,
+            "monthlyMobile": 6190,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "선식",
+            "monthlyPc": 1200,
+            "monthlyMobile": 5830,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "병아리콩간식",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": null,
+        "reason": "프로틴바 시드의 연관어다. 월 10,280·경쟁 중간·광고깊이 8. 식물성 단백질 간식 수요가 견과·바 카테고리 밖에서도 잡힌다는 뜻인데, 우리 SKU 중 병아리콩 제품은 없어 productHints 를 비웠다. 원재료 소구점 검증 없이 상품명·태그로 끌어오면 안 되는 종류의 단어다.",
+        "monthlyPc": 1180,
+        "monthlyMobile": 9100,
+        "delta": null,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 중간 + 광고깊이 8 — shopping. (광고경쟁 신호 기준)",
+        "productHints": [],
+        "productHintBasis": "",
+        "priorityScore": 8.01,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "단백질많은음식",
+            "monthlyPc": 2450,
+            "monthlyMobile": 24300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질바",
+            "monthlyPc": 5160,
+            "monthlyMobile": 11300,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트과자",
+            "monthlyPc": 1640,
+            "monthlyMobile": 13800,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트간식",
+            "monthlyPc": 4010,
+            "monthlyMobile": 10800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "에너지바",
+            "monthlyPc": 3570,
+            "monthlyMobile": 6710,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "아몬드효능",
+            "monthlyPc": 880,
+            "monthlyMobile": 8830,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "혼밥",
+            "monthlyPc": 580,
+            "monthlyMobile": 8810,
+            "competition": "높음",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "프로틴바",
+            "monthlyPc": 3670,
+            "monthlyMobile": 3510,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "글루텐프리",
+            "monthlyPc": 1050,
+            "monthlyMobile": 6020,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "간단한아침메뉴",
+            "monthlyPc": 600,
+            "monthlyMobile": 5700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "황성주생식",
+        "targets": [
+          "시니어건강"
+        ],
+        "relatedSignal": null,
+        "reason": "브랜드 방어용 상시 감시 항목이다. 월 16,280(전일 보합), 광고깊이 7 — 우리 브랜드명 위에 광고면이 일곱 자리나 붙어 있는데 레지스트리 79개에는 이 키워드가 없다(미등록). 브랜드어 광고면을 우리가 안 잡고 있는 상태라는 뜻이라, 경쟁사 침입 여부는 광고 쪽에서 실제 노출면 확인이 필요하다. 상위어라 발효·영양식 두 SKU 를 모두 medium 으로 단다.",
+        "monthlyPc": 1080,
+        "monthlyMobile": 15200,
+        "delta": 0,
+        "competition": "중간",
+        "adDepth": 7,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 중간 + 광고깊이 7 — 브랜드어인데도 광고 경쟁이 붙어 있다. shopping. (광고경쟁 신호 기준)",
+        "productHints": [
+          {
+            "group": "ilsaeng-lifemeal-420g",
+            "confidence": "medium"
+          },
+          {
+            "group": "balhyo-hwangseongju",
+            "confidence": "medium"
+          },
+          {
+            "group": "yeongyang-hwangseongju",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "상위어 → 복수 그룹: aliases '생식'/'황성주생식'/'황성주생식' 매칭",
+        "priorityScore": 7.75,
+        "status": "defend",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "이롬황성주생식",
+            "monthlyPc": 240,
+            "monthlyMobile": 2940,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "이롬생식",
+            "monthlyPc": 170,
+            "monthlyMobile": 1120,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "황성주선식",
+            "monthlyPc": 50,
+            "monthlyMobile": 360,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "황성주1일1생식",
+            "monthlyPc": 10,
+            "monthlyMobile": 220,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "프로틴",
+        "targets": [
+          "운동헬스"
+        ],
+        "relatedSignal": null,
+        "reason": "월 40,450(전일 +100)의 미등록 상위어다. 단백질쉐이크와 같은 축이며 레지스트리에는 프로틴바·저당프로틴바 같은 하위어만 있다. 프로틴 골드 HIGH5 의 alias 에 직접 걸린다.",
+        "monthlyPc": 6450,
+        "monthlyMobile": 34000,
+        "delta": 100,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 중간 + 광고깊이 8 — shopping. (광고경쟁 신호 기준)",
+        "productHints": [
+          {
+            "group": "proteingold-high5",
+            "confidence": "high"
+          }
+        ],
+        "productHintBasis": "제품명 직결: aliases '프로틴' 매칭",
+        "priorityScore": 7.73,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "본죽",
+            "monthlyPc": 29800,
+            "monthlyMobile": 392000,
+            "competition": "높음",
+            "adDepth": 9,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질쉐이크",
+            "monthlyPc": 17600,
+            "monthlyMobile": 94500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "마녀스프레시피",
+            "monthlyPc": 2600,
+            "monthlyMobile": 29600,
+            "competition": "높음",
+            "adDepth": 3,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질많은음식",
+            "monthlyPc": 2450,
+            "monthlyMobile": 24300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "양배추",
+            "monthlyPc": 4450,
+            "monthlyMobile": 21500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "귀리",
+            "monthlyPc": 6030,
+            "monthlyMobile": 18800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "죽",
+            "monthlyPc": 2420,
+            "monthlyMobile": 22300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "아침식사",
+            "monthlyPc": 840,
+            "monthlyMobile": 23800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "간헐적단식",
+            "monthlyPc": 2720,
+            "monthlyMobile": 16400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "간단한저녁메뉴",
+            "monthlyPc": 2810,
+            "monthlyMobile": 15300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "간헐적단식시간",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": null,
+        "reason": "월 5,780·경쟁 중간·광고깊이 4로 오늘 워치리스트에서 유일하게 mixed 가 나온 자리다. '언제 먹느냐'를 묻는 정보 검색인데 광고면이 절반쯤 붙어 있다. 우리 제품이 '한 끼를 대체하는 시간표'에 들어가는 접점이라 콘텐츠 쪽 우선.",
+        "monthlyPc": 770,
+        "monthlyMobile": 5010,
+        "delta": null,
+        "competition": "중간",
+        "adDepth": 4,
+        "avgBid": null,
+        "intentType": "mixed",
+        "intentBasis": "ad-signal",
+        "intentReason": "광고깊이 4·경쟁 중간 — shopping 과 info 사이 중간대다. mixed. (광고경쟁 신호 기준)",
+        "productHints": [],
+        "productHintBasis": "",
+        "priorityScore": 7.71,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "미숫가루",
+            "monthlyPc": 5370,
+            "monthlyMobile": 33600,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "아침식사",
+            "monthlyPc": 840,
+            "monthlyMobile": 23800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "간헐적단식",
+            "monthlyPc": 2720,
+            "monthlyMobile": 16400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "간단한저녁메뉴",
+            "monthlyPc": 2810,
+            "monthlyMobile": 15300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "퀴노아",
+            "monthlyPc": 1570,
+            "monthlyMobile": 10200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "심으뜸",
+            "monthlyPc": 1930,
+            "monthlyMobile": 9200,
+            "competition": "낮음",
+            "adDepth": 1,
+            "intentType": "info"
+          },
+          {
+            "keyword": "시금치",
+            "monthlyPc": 1550,
+            "monthlyMobile": 9290,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "미숫가루타는법",
+            "monthlyPc": 730,
+            "monthlyMobile": 10100,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "케일효능",
+            "monthlyPc": 850,
+            "monthlyMobile": 9810,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "말차라떼",
+            "monthlyPc": 1230,
+            "monthlyMobile": 9360,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "다이어트음식",
+        "targets": [
+          "다이어터"
+        ],
+        "relatedSignal": null,
+        "reason": "월 24,380(전일 -10) 보합. 경쟁 높음·광고깊이 10 으로 오늘 목록 중 광고면이 가장 포화된 자리다. 검색량은 크지만 신규 진입 비용이 높은 쪽이라 입찰보다 연관 하위어(다이어트도시락·곤약밥) 쪽이 실익이 있다.",
+        "monthlyPc": 3480,
+        "monthlyMobile": 20900,
+        "delta": -10,
+        "competition": "높음",
+        "adDepth": 10,
+        "avgBid": null,
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "경쟁 높음 + 광고깊이 10(만석) — 전형적 shopping. (광고경쟁 신호 기준)",
+        "productHints": [],
+        "productHintBasis": "",
+        "priorityScore": 7.66,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefCount": 0,
+        "adRefs": [],
+        "relatedKeywords": [
+          {
+            "keyword": "단백질쉐이크",
+            "monthlyPc": 17600,
+            "monthlyMobile": 94500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "프로틴",
+            "monthlyPc": 6450,
+            "monthlyMobile": 34000,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질보충제",
+            "monthlyPc": 7030,
+            "monthlyMobile": 27500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질음료",
+            "monthlyPc": 5080,
+            "monthlyMobile": 25600,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질많은음식",
+            "monthlyPc": 2450,
+            "monthlyMobile": 24300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "WPC",
+            "monthlyPc": 10000,
+            "monthlyMobile": 12700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질",
+            "monthlyPc": 3210,
+            "monthlyMobile": 16800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트간식",
+            "monthlyPc": 4010,
+            "monthlyMobile": 10800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "WPI프로틴",
+            "monthlyPc": 1920,
+            "monthlyMobile": 9030,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "산양유단백질",
+            "monthlyPc": 1740,
+            "monthlyMobile": 8890,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      }
+    ],
+    "contentIdeas": [
+      {
+        "title": "[오늘 먼저 볼 것] '황성주생식' 광고면 일곱 자리를 우리가 안 잡고 있다",
+        "body": "오늘 검색광고 데이터에서 가장 눈에 걸린 건 브랜드어다. '황성주생식'은 월 16,280(전일 보합)인데 광고깊이가 7이다 — 우리 브랜드명을 친 사람에게 광고 일곱 자리가 뜬다는 뜻이다. 그런데 광고 레지스트리 79개를 훑어보면 이 키워드가 없다. 즉 그 일곱 자리를 채우는 게 누구인지 우리가 모르는 상태다. 오늘 할 일은 두 가지다. (1) 광고 쪽에 '황성주생식' 실제 검색결과 광고면 캡처를 요청해 경쟁사 침입 여부를 눈으로 확인한다. (2) 침입이 확인되면 브랜드 방어 입찰 여부를 광고 에이전트가 판단하도록 넘긴다 — 이 스킬은 추천만 하고 입찰은 하지 않는다. '라이프밀'(월 960)·'닥터샐러드'(월 160)는 검색량 자체가 작아 우선순위가 아니다. 브랜드 방어에서 실제로 지킬 값어치가 있는 건 황성주생식 한 축이다.",
+        "caution": "브랜드 방어 판단까지가 우리 몫이고 입찰·예산 집행은 광고 에이전트 소관이다. 경쟁사 상표를 우리 키워드로 등록하는 방향은 검토 대상이 아니다(상표권 리스크)."
+      },
+      {
+        "title": "'천연위고비'는 광고가 아니라 콘텐츠 자리다 — 오늘 데이터가 그렇게 말한다",
+        "body": "승인된 trend 시드 '천연위고비'는 월 13,670 으로 워치리스트 1위지만, 경쟁 '낮음'에 광고깊이 1이다. 광고주가 사실상 안 붙는다는 뜻이고, 레지스트리에서도 이미 paused 상태다(그래서 재추천 게이트상 신규 추천에서 제외했다). 검색량은 큰데 광고면이 비어 있는 조합은 대개 '사고 싶다'가 아니라 '그게 뭔데'에 가깝다 — 콘텐츠로 먹는 자리다. 우리 쪽 각도는 분명하다: 이 말을 검색하는 사람이 실제로 찾는 건 '약 없이 포만감을 오래 유지하는 한 끼'다. 그 자리에 우리가 놓을 수 있는 건 식이섬유·단백질이 함께 들어간 식사대용 구성이라는 사실 서술까지다.",
+        "caution": "★위고비는 GLP-1 계열 전문의약품이다. '천연 위고비', '위고비 대신', '약 없이 살 빠지는' 류의 표현은 의약품 오인·질병 치료 시사에 해당해 쓰지 않는다. 검색어로 관찰만 하고, 우리 콘텐츠 문구에는 이 단어를 제목·본문 주장으로 쓰지 않는다. 원재료·영양성분 사실 서술까지만."
+      },
+      {
+        "title": "레지스트리 79개가 여전히 '바(bar) 하위어'에 몰려 있다 — 쉐이크 축은 오늘도 통째로 비었다",
+        "body": "오늘 인벤토리 79개 키워드를 전부 다시 재보니 구성이 어제와 같다. 등록된 건 단백질바·프로틴바·저당그래놀라·에너지바·야채가루처럼 하위어이고, 우리 접점 최대인 '단백질쉐이크'(월 112,100)·'프로틴'(40,450)·'단백질보충제'(34,530)는 셋 다 미등록이다. 어제와 오늘 검색량이 각각 0, +100, +100 으로 움직이지 않았으니 이건 트렌드 변동이 아니라 구조 문제다 — 등록 전략이 바 카테고리에서 멈춰 있다. 광고 쪽에 넘길 제안은 '쉐이크 축 상위어 3개를 한 번에 올리자'가 아니라, 데이 업 쉐이크·프로틴 골드 두 SKU 의 ROAS 이력으로 이 축에 들어갈 값어치가 있는지부터 확인하자는 쪽이다.",
+        "caution": "입찰가·예산은 광고 에이전트가 정한다. 이 항목은 추천이며, 여기서 캠페인·그룹을 만들거나 수정하지 않는다."
+      }
+    ],
+    "viral": [],
+    "seedCandidates": [
+      {
+        "seed": "파이버맥싱",
+        "tier": "trend",
+        "status": "pending",
+        "caughtCount": 4,
+        "catchReason": "[8/17 이월] 오늘은 뉴스·블로그·카페 감지 트랙(PlayMCP NaverSearch)이 인증 불가로 돌지 못해 새 근거를 더하지 못했다. 아래는 8/16 까지의 근거 그대로이며, 판단은 여전히 유효하다.\n\n여섯째 재제출이다. 검색량 650(+10)로 사흘째 바닥 횡보, 매체는 8/11 이후 신규 0건. 블로그만 오늘 새벽 1건·8/15 1건(전지현 파이버맥싱 식단)·8/14 2건으로 계속 생산된다.\n[판단 재료 추가] 오늘 확인한 건 우리 루티너 4기 후기가 #파이버맥싱 해시태그를 달고 있다는 사실이다 — 즉 이 트렌드의 블로그 생산량 일부는 우리가 만든 것이다. 시장 신호와 자사 집행분을 분리하지 않으면 판단이 왜곡된다. 승인하면 시드로 추적하되 자사분 표시가 필요하고, 거절해도 signal 로는 계속 남는다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "◎ 파이버맥싱 (#Fibermaxxing)",
+            "url": "https://blog.naver.com/sung0217/224377556227"
+          },
+          {
+            "title": "\"46세 아들맘\" 배우 전지현의 패션 센스는 파이버맥싱 식단 자기관리",
+            "url": "https://blog.naver.com/1208_sj/224379495338"
+          }
+        ]
+      },
+      {
+        "seed": "마이크로바이옴",
+        "tier": "trend",
+        "status": "pending",
+        "caughtCount": 2,
+        "catchReason": "[8/17 이월] 오늘은 뉴스·블로그·카페 감지 트랙(PlayMCP NaverSearch)이 인증 불가로 돌지 못해 새 근거를 더하지 못했다. 아래는 8/16 까지의 근거 그대로이며, 판단은 여전히 유효하다.\n\n어제 처음 올린 후보의 이틀째다. CJ웰케어 맥플랜(8/14) 보도 물량은 오늘 끝났고(신규 0건), 검색량은 5,040(-210)로 오늘 후보 중 가장 큰 낙폭(-4.0%)이다. 소비자어인 프리바이오틱스는 14,020(+160)로 오히려 올라 격차가 2.6배→2.8배로 벌어졌다.\n[판단 재료] '업계가 쓰는 말'과 '소비자가 치는 말'의 분리가 하루 더 확인됐다 — 시드로 승인한다면 추적 대상은 마이크로바이옴이 아니라 프리바이오틱스여야 한다는 쪽으로 근거가 기울었다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "CJ웰케어, 장내 미생물 겨냥 '맥플랜' 출시",
+            "url": "https://www.pinpointnews.co.kr/news/articleView.html?idxno=477470"
+          }
+        ]
+      },
+      {
+        "seed": "저분자콜라겐",
+        "tier": "learning",
+        "status": "pending",
+        "caughtCount": 1,
+        "catchReason": "[8/17 이월] 오늘은 뉴스·블로그·카페 감지 트랙(PlayMCP NaverSearch)이 인증 불가로 돌지 못해 새 근거를 더하지 못했다. 아래는 8/16 까지의 근거 그대로이며, 판단은 여전히 유효하다.\n\nseedsLearning.ingredient 에 있으나 승인 기록이 없는 pending 시드다. 오늘 새 재료는 8/15 매경헬스 '가방에 쏙, 한 포면 끝' 기사로, 이너뷰티 시장 성장과 PDRN·저분자 콜라겐을 같이 다뤘다. 검색량 9,980(+60)로 우리 이너뷰티 접점 중 가장 크고 사흘째 완만한 상승이다.\n[판단 재료] 성분어라 인물·트렌드와 달리 유행이 꺼져도 남는다. 다만 우리 SKU 중 콜라겐 제품은 프룻 젤리 스틱 계열뿐이라, 승인 시 추적 범위를 이너뷰티 한 축으로 좁히는 게 맞다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "\"가방에 쏙, 한 포면 끝\"…간편 건강식품 뜨는 이유",
+            "url": "http://www.mkhealth.co.kr/news/articleView.html?idxno=79646"
+          }
+        ]
+      },
+      {
+        "seed": "윤가이",
+        "tier": "person",
+        "status": "pending",
+        "caughtCount": 1,
+        "catchReason": "[8/17 이월] 오늘은 뉴스·블로그·카페 감지 트랙(PlayMCP NaverSearch)이 인증 불가로 돌지 못해 새 근거를 더하지 못했다. 아래는 8/16 까지의 근거 그대로이며, 판단은 여전히 유효하다.\n\n오늘 새로 뜬 인물이다. 8/16 06:26 뉴스엔이 장기하의 연인 윤가이 편을 정리하며 '혈당 관리를 위해 토마토와 천연 위고비로 한 차례 식사'를 그대로 옮겼다 — 승인된 trend 시드 '천연위고비'와 맥락어 '혈당·식단'이 동시 출현한 인물 패턴이다.\n[지속성] 매체 1건뿐이고 본인 채널이 아니라 관찰 예능의 한 장면이며, 기사 초점도 다이어트가 아니라 나이·취향이다. 같은 장면에서 바로 컵라면을 꺼낸 것으로 서술돼 식단 콘텐츠로서의 일관성도 없다 — 반복성 미확인, 고정 추적감보다는 '천연위고비라는 말이 규제 기사 밖으로 나온 첫 사례'라는 이슈 활용 쪽이 맞다. 거절해도 signal 은 남는다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "'장기하♥' 윤가이, 영락없는 2000년생‥사주 맹신+빈티지 취향에도",
+            "url": "https://www.newsen.com/news_view.php?uid=202608152303066110"
+          }
+        ]
+      },
+      {
+        "seed": "성시경",
+        "tier": "person",
+        "status": "pending",
+        "caughtCount": 2,
+        "catchReason": "[8/17 이월] 오늘은 뉴스·블로그·카페 감지 트랙(PlayMCP NaverSearch)이 인증 불가로 돌지 못해 새 근거를 더하지 못했다. 아래는 8/16 까지의 근거 그대로이며, 판단은 여전히 유효하다.\n\n이틀째 재제출이다. 8/14 15:55 서울신문이 '10kg 감량 후 유지 비결 — 먹방 전 이 음식 먼저'로 후속을 냈고, 최화정·홍현희까지 묶어 '식사 전 달걀' 습관을 공통 패턴으로 다뤘다. 어제 5개 매체 뒤 오늘 신규 1건으로 물량은 줄었다.\n[지속성] 본인 유튜브 채널이 식단 콘텐츠를 정체성으로 삼는 채널은 아니지만 감량·유지 서사가 반년 넘게 반복 인용되고 있고, '첫 끼를 무엇으로 채우나'는 우리 식사대용 축의 질문과 정확히 같다. 반복성은 중간 — 고정 추적감으로 볼 여지가 있다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "성시경, 10kg 감량 후 유지 비결…먹방 전 '이 음식' 먼저",
+            "url": "https://www.seoul.co.kr/news/entertainment/starinterN/2026/08/14/20260814500199?wlog_tag3=naver"
+          }
+        ]
+      },
+      {
+        "seed": "홍현희",
+        "tier": "person",
+        "status": "pending",
+        "caughtCount": 2,
+        "catchReason": "[8/17 이월] 오늘은 뉴스·블로그·카페 감지 트랙(PlayMCP NaverSearch)이 인증 불가로 돌지 못해 새 근거를 더하지 못했다. 아래는 8/16 까지의 근거 그대로이며, 판단은 여전히 유효하다.\n\n닷새째다. 8/14 15:04 코메디닷컴이 '위고비·마운자로 아냐, 피 뽑자 — 그럼 어떻게 뺐나'로 라디오스타(8/12) 해명을 이어받았고, 8/12 뉴시스는 11kg 감량 식단(삶은 달걀·방울토마토)을 실었다. 오늘 신규는 없다.\n[지속성] 우리와 협찬 관계가 없고 발화의 중심이 '비만치료제를 썼느냐'는 해명이라, 우리 카테고리(식사대용·단백질) 언급은 부수적이다. 반복성은 높지만 맥락이 의약품 쪽이라 고정 추적 시 우리 메시지와 어긋날 위험이 있다 — 이슈 활용 우선을 권한다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "'10kg 감량' 홍현희 \"위고비·마운자로 아냐, 피 뽑자\"…그럼 어떻게?",
+            "url": "https://kormedi.com/?p=2845519"
+          }
+        ]
+      }
+    ],
+    "registeredKeywordTrends": [
+      {
+        "keyword": "비타민C",
+        "monthlyPc": 15600,
+        "monthlyMobile": 78600,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 200,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트식단",
+        "monthlyPc": 12400,
+        "monthlyMobile": 46700,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 500,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "단백질바",
+        "monthlyPc": 5160,
+        "monthlyMobile": 11300,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -40,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "천연위고비",
+        "monthlyPc": 1970,
+        "monthlyMobile": 11700,
+        "competition": "낮음",
+        "adDepth": 1,
+        "delta": 10,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "paused"
+      },
+      {
+        "keyword": "에너지바",
+        "monthlyPc": 3570,
+        "monthlyMobile": 6710,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -110,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "프로틴바",
+        "monthlyPc": 3670,
+        "monthlyMobile": 3510,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "생식",
+        "monthlyPc": 870,
+        "monthlyMobile": 5970,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -30,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "칼로리바다이어트",
+        "monthlyPc": 500,
+        "monthlyMobile": 4290,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 20,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "paused"
+      },
+      {
+        "keyword": "마시는샐러드",
+        "monthlyPc": 780,
+        "monthlyMobile": 3400,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": -50,
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당그래놀라",
+        "monthlyPc": 600,
+        "monthlyMobile": 3160,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "칼로리바",
+        "monthlyPc": 550,
+        "monthlyMobile": 2580,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:44:01.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채가루",
+        "monthlyPc": 290,
+        "monthlyMobile": 1810,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -10,
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당과자",
+        "monthlyPc": 530,
+        "monthlyMobile": 1520,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -20,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "생식가루",
+        "monthlyPc": 90,
+        "monthlyMobile": 1670,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조야채",
+        "monthlyPc": 240,
+        "monthlyMobile": 1490,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -10,
+        "registeredAt": "2026-07-18T23:49:14.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트시리얼",
+        "monthlyPc": 270,
+        "monthlyMobile": 1280,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "당뇨과자",
+        "monthlyPc": 270,
+        "monthlyMobile": 1180,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "단백질바추천",
+        "monthlyPc": 290,
+        "monthlyMobile": 1060,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저칼로리과자",
+        "monthlyPc": 220,
+        "monthlyMobile": 1020,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -20,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당단백질바",
+        "monthlyPc": 240,
+        "monthlyMobile": 920,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 20,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "견과류바",
+        "monthlyPc": 250,
+        "monthlyMobile": 890,
+        "competition": "높음",
+        "adDepth": 9,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "개별포장간식",
+        "monthlyPc": 290,
+        "monthlyMobile": 780,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당에너지바",
+        "monthlyPc": 220,
+        "monthlyMobile": 750,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트과자추천",
+        "monthlyPc": 130,
+        "monthlyMobile": 680,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채분말",
+        "monthlyPc": 150,
+        "monthlyMobile": 630,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트그래놀라",
+        "monthlyPc": 110,
+        "monthlyMobile": 650,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "영양바",
+        "monthlyPc": 130,
+        "monthlyMobile": 580,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "어른간식",
+        "monthlyPc": 120,
+        "monthlyMobile": 520,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조야채가루",
+        "monthlyPc": 60,
+        "monthlyMobile": 570,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -10,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "사무실과자추천",
+        "monthlyPc": 320,
+        "monthlyMobile": 230,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "견과바",
+        "monthlyPc": 100,
+        "monthlyMobile": 440,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "라운딩간식",
+        "monthlyPc": 80,
+        "monthlyMobile": 410,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조야채분말",
+        "monthlyPc": 60,
+        "monthlyMobile": 420,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:49:14.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채파우더",
+        "monthlyPc": 60,
+        "monthlyMobile": 390,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-18T23:49:14.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "그래놀라바",
+        "monthlyPc": 100,
+        "monthlyMobile": 300,
+        "competition": "높음",
+        "adDepth": 9,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "샐러드가루",
+        "monthlyPc": 50,
+        "monthlyMobile": 340,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -20,
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "샐러드토핑",
+        "monthlyPc": 100,
+        "monthlyMobile": 220,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:49:14.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "채소가루",
+        "monthlyPc": 40,
+        "monthlyMobile": 270,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -10,
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채동결건조",
+        "monthlyPc": 20,
+        "monthlyMobile": 270,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "몸에좋은간식",
+        "monthlyPc": 70,
+        "monthlyMobile": 220,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "에너지바추천",
+        "monthlyPc": 50,
+        "monthlyMobile": 210,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "건조야채",
+        "monthlyPc": 40,
+        "monthlyMobile": 210,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당프로틴바",
+        "monthlyPc": 80,
+        "monthlyMobile": 160,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트바",
+        "monthlyPc": 40,
+        "monthlyMobile": 200,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트센터",
+        "monthlyPc": 50,
+        "monthlyMobile": 180,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "paused"
+      },
+      {
+        "keyword": "휴대용간식",
+        "monthlyPc": 10,
+        "monthlyMobile": 210,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -20,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조채소",
+        "monthlyPc": 30,
+        "monthlyMobile": 150,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 10,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "운동선수간식",
+        "monthlyPc": 30,
+        "monthlyMobile": 140,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "견과류과자",
+        "monthlyPc": 30,
+        "monthlyMobile": 130,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "사무실건강간식",
+        "monthlyPc": 90,
+        "monthlyMobile": 50,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트에너지바",
+        "monthlyPc": 10,
+        "monthlyMobile": 130,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "단백질초코바",
+        "monthlyPc": 30,
+        "monthlyMobile": 110,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "요거트그래놀라",
+        "monthlyPc": 20,
+        "monthlyMobile": 120,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "운동간식",
+        "monthlyPc": 20,
+        "monthlyMobile": 110,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "고단백질바",
+        "monthlyPc": 30,
+        "monthlyMobile": 90,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당과자추천",
+        "monthlyPc": 20,
+        "monthlyMobile": 80,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "채소파우더",
+        "monthlyPc": 10,
+        "monthlyMobile": 80,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "건강식간식",
+        "monthlyPc": 20,
+        "monthlyMobile": 70,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "간편건강식",
+        "monthlyPc": 20,
+        "monthlyMobile": 60,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조분말",
+        "monthlyPc": 30,
+        "monthlyMobile": 40,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "수제에너지바",
+        "monthlyPc": 10,
+        "monthlyMobile": 60,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "필드간식",
+        "monthlyPc": 10,
+        "monthlyMobile": 60,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조가루",
+        "monthlyPc": 10,
+        "monthlyMobile": 50,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "고단백그래놀라",
+        "monthlyPc": 10,
+        "monthlyMobile": 50,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결가루",
+        "monthlyPc": 0,
+        "monthlyMobile": 50,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": -10,
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "간편야채",
+        "monthlyPc": 10,
+        "monthlyMobile": 20,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "식사대용바",
+        "monthlyPc": 0,
+        "monthlyMobile": 30,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "성인간식",
+        "monthlyPc": 10,
+        "monthlyMobile": 20,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "하루그래놀라",
+        "monthlyPc": 0,
+        "monthlyMobile": 30,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "건강바",
+        "monthlyPc": 10,
+        "monthlyMobile": 20,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "회사건강간식",
+        "monthlyPc": 20,
+        "monthlyMobile": 10,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당그래놀라바",
+        "monthlyPc": 0,
+        "monthlyMobile": 20,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 0,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "달지않은단백질바",
+        "monthlyPc": 0,
+        "monthlyMobile": 20,
+        "competition": "중간",
+        "adDepth": 4,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당견과류바",
+        "monthlyPc": 0,
+        "monthlyMobile": 20,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "칼슘간식",
+        "monthlyPc": 0,
+        "monthlyMobile": 20,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채영양",
+        "monthlyPc": 0,
+        "monthlyMobile": 10,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -10,
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "과일그래놀라",
+        "monthlyPc": 0,
+        "monthlyMobile": 10,
+        "competition": "중간",
+        "adDepth": 5,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "그래놀라간식",
+        "monthlyPc": 0,
+        "monthlyMobile": 10,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": -10,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "하루그래놀라바",
+        "monthlyPc": 0,
+        "monthlyMobile": 0,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -20,
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      }
+    ],
+    "adRegistryMeta": {
+      "path": "/dashboard/adKeywordInventory",
+      "fetchedAt": "2026-08-17T07:11:12+09:00",
+      "total": 79,
+      "uniqueKeywords": 79,
+      "statusDist": {
+        "registered": 76,
+        "paused": 3
+      },
+      "prevStatusDist": {
+        "registered": 76,
+        "paused": 3
+      },
+      "deltaVsPrev": {
+        "registered": 0,
+        "paused": 0
+      },
+      "latestRegisteredAt": "2026-07-21T09:45:52.000Z",
+      "latestUpdatedAt": "2026-07-22T08:26:06.000Z",
+      "adProductNulls": 0,
+      "stale": true,
+      "staleNote": "statusDist(registered 76 / paused 3)가 7/28~8/17 스냅샷 15개에서 완전히 동일하다. 최신 registeredAt 은 2026-07-21, 최신 updatedAt 은 2026-07-22 — 27일째 등록·해제 변동이 반영되지 않았고 staleDays(3) 초과가 8/9부터 ★9일 연속 미해소다. ★단, 오늘 처음으로 노드가 실제로 변한 흔적이 잡혔다: 어제 스냅샷에서 79개 전부 null 이던 adProduct 가 오늘은 79개 전부 'power_link' 로 채워져 있다(adProductNulls 79 → 0). 값이 바뀌었는데 updatedAt 은 7/22 그대로다 — updatedAt 을 신선도 지표로 신뢰할 수 없다는 뜻이므로, '정합 job 이 멈췄다'는 그동안의 해석도 재검토 대상이다. 허브 재보고 필요. 부수 효과로 watchlist.adProduct 가 오늘부터 power_link 로 채워져 나간다(campaignTp 유추 아님, 레코드 명시 필드 그대로).",
+      "alert": false,
+      "alertNote": "removed 증가분이 0이라 alertRemovedRatio(0.3) 조건 미충족 — detector 규칙대로 alert 는 올리지 않는다. stale 은 9일 연속 유지, adProduct 변동 건은 별도 보고 대상."
+    },
+    "runNotes": {
+      "status": "partial",
+      "ok": [
+        "검색광고 키워드도구 API(로컬 자격증명)",
+        "Firebase seedApprovals/adKeywordInventory/keywordDictionary(서비스계정)",
+        "GitHub push(blob API 경유)"
+      ],
+      "failed": [
+        {
+          "track": "이슈 감지(news/blog/cafe)",
+          "tool": "mcp__claude_ai_PlayMCP__NaverSearch-*",
+          "cause": "claude.ai PlayMCP 커넥터 미인증(비대화형 세션에서 OAuth 불가)",
+          "impact": "signals 0건 · 인물 안테나 뉴스 트랙 미가동 · watchlist 의 relatedSignal 전부 null",
+          "workaround": "없음. 대체 검색원(WebSearch/WebFetch)으로 우회 목록을 만들지 않았다 — search.naver.com 은 WebFetch 차단이며, 다른 출처로 채우면 검증 안 된 감지를 검증된 것처럼 내보내게 된다."
+        },
+        {
+          "track": "바이럴(youtube)",
+          "tool": "mcp__youtube__call-actor",
+          "cause": "youtube MCP 서버 미연결(도구 노출 안 됨)",
+          "impact": "viral 0건 · 인물 안테나 유튜브 트랙 미가동 · seedCandidates 신규 근거 없음(8/16분 이월)",
+          "workaround": "없음(격리 규칙대로 키워드 트랙만 진행)"
+        }
+      ],
+      "notes": [
+        "watchlist 는 이슈 앵커 없이 시드 연관어를 검색량·경쟁도로 고른 것이라 평소 런보다 신뢰도가 낮다(relatedSignal=null 로 표시).",
+        "seedCandidates 6건은 8/16 근거 그대로 이월(학습칸 유실 방지). catchReason 앞에 [8/17 이월] 표기.",
+        "재추천 게이트 적용: 천연위고비(paused)·다이어트식단(registered)은 표시·추적만.",
+        "경쟁사 브랜드어(마이밀뉴프로틴 등)는 워치리스트 후보에서 제외했다 — 사전 flags 미설정이나 상표 리스크로 자체 제외, 허브에 brandCompetitor 플래그 등록 검토 요청.",
+        "저볼륨 꼬리 컷: 월 합산 1,000 미만은 워치리스트 후보에서 제외(오늘 런 한정 기준)."
+      ]
+    }
   }
 ]
