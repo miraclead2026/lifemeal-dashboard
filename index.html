@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_162';
+const BUILD_TAG = 'index_165';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -409,6 +409,7 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   bidApprovals: raw.bidApprovals || {},
   shoppingApprovals: raw.shoppingApprovals || {},
   productApprovals: raw.productApprovals || {},
+  insights: raw.insights || {},
   adKeywordRegistry: raw.adKeywordRegistry || {},
   messageSchedules: raw.messageSchedules || {},
   routines: (raw.routines || []).map(r => ({ freq: 'weekly', days: [], dom: 1, everyN: 1, start: '', end: '', memo: '', owner: [], active: true, ...r, owner: Array.isArray(r.owner) ? r.owner.filter(Boolean) : (r.owner ? [r.owner] : []) })),
@@ -803,6 +804,7 @@ const INIT = {
   bidApprovals: {},
   shoppingApprovals: {},
   productApprovals: {},
+  insights: {},
   goalFormula: DEFAULT_GOAL_FORMULA,
   outputs: [
     { id: 1, code: 'MD-1', type: 'MD출력', name: '쿠팡 광고 운영' }, { id: 2, code: 'MD-2', type: 'MD출력', name: '네이버 대용량 할인제품 & 정기배송' },
@@ -8275,6 +8277,306 @@ function PsSection({ title, sub, children }) {
   );
 }
 
+function TabWorkReport({ data, setData, onEdit, goTab }) {
+  const [rep, setRep] = React.useState(null);
+  const [rstat, setRstat] = React.useState('loading');
+  const [openP, setOpenP] = React.useState({});
+  const [kf, setKf] = React.useState(false);
+  const [kName, setKName] = React.useState('');
+  const [kTarget, setKTarget] = React.useState('');
+  const [kUnit, setKUnit] = React.useState('');
+  const [kMonth, setKMonth] = React.useState(TODAY.slice(0, 7));
+  React.useEffect(() => {
+    let alive = true;
+    ghFetch('data/work-report.json').then(r => (r.ok ? r.json() : null)).then(j => { if (!alive) return; if (j && Array.isArray(j.weeks) && j.weeks.length) { setRep(j); setRstat('ok'); } else setRstat('none'); }).catch(() => { if (alive) setRstat('none'); });
+    return () => { alive = false; };
+  }, []);
+
+  const curMonth = TODAY.slice(0, 7);
+  const box = (bd, bg) => ({ border: '1px solid ' + bd, background: bg, borderRadius: 10, padding: '11px 13px' });
+  const sec = t => <div style={{ fontSize: 10.5, color: '#A29C95', fontWeight: 800, letterSpacing: '.04em', margin: '20px 0 8px' }}>{t}</div>;
+  const stageCol = st => (st === '진행중' ? '#047857' : st === '검토중' ? '#B45309' : st === '보류' ? '#6E6863' : '#3A3631');
+  const inp = { width: '100%', boxSizing: 'border-box', border: '1px solid #D6D0C8', borderRadius: 8, padding: '7px 9px', fontSize: 12.5, fontFamily: 'inherit' };
+
+  const w0 = (rep && rep.weeks && rep.weeks[0]) || null;
+  const metrics = (w0 && Array.isArray(w0.metrics)) ? w0.metrics : [];
+
+  const projs = (data.outputs || []).map(o => {
+    const plans = plansOfOut(data, o.id);
+    const rows = plans.map(p => {
+      const subs = (data.subplans || []).filter(s => isLinkedPlan(s, p.id));
+      const open = subs.filter(s => s.stage !== '완료');
+      return { it: p, subs: open, doneN: subs.length - open.length };
+    });
+    const todo = rows.reduce((a, r) => a + (r.subs.length || (r.it.hold ? 0 : 1)), 0);
+    return { o, plans, rows, todo };
+  }).filter(x => x.plans.length);
+
+  const kpis = (data.mainKpis || []);
+  const kpiTargetOf = k => { const t = (k.targets || {})[curMonth]; return (t != null) ? t : (k.target != null ? k.target : null); };
+  const kpiLogged = k => (data.kpiLogs || []).some(l => l.kpiId === k.id) || (Array.isArray(k.manuals) && k.manuals.length > 0);
+  const addKpi = () => {
+    const nm = kName.trim(); if (!nm) return;
+    const tv = (kTarget === '' ? null : Number(kTarget));
+    const kpi = { id: 'mk' + Date.now(), name: nm, unit: kUnit.trim(), linkedPlanIds: [], linkedKpiIds: [], targets: (tv != null && kMonth) ? { [kMonth]: tv } : {}, manuals: [] };
+    setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), kpi] }));
+    setKName(''); setKTarget(''); setKUnit(''); setKf(false);
+  };
+
+  const wk = (w0 && w0.weekKey) || curMonth;
+  const teamSaved = (data.insights && data.insights[wk]) || {};
+  const teamVal = f => (teamSaved[f] != null ? teamSaved[f] : '');
+  const teamSet = (f, v) => setData(d => ({ ...d, insights: { ...(d.insights || {}), [wk]: { ...((d.insights || {})[wk] || {}), [f]: v } } }));
+
+  const doneNoPerf = (data.subplans || []).filter(s => s.stage === '완료' && !s.perfRecorded).length;
+  const kpiNoTarget = kpis.filter(k => kpiTargetOf(k) == null).length;
+
+  return (
+    <div style={{ padding: '16px 20px', maxWidth: 1040, margin: '0 auto' }}>
+      {sec('이번 주 한눈에 · 효율')}
+      <Card>
+        {rstat === 'loading' ? <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div> :
+          (metrics.length ? (
+            <div>
+              {w0.headline ? <div style={{ fontSize: 13.5, fontWeight: 700, color: '#1A1614', marginBottom: 10, lineHeight: 1.5 }}>{w0.headline}</div> : null}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px,1fr))', gap: 9 }}>
+                {metrics.map((m, i) => {
+                  const up = m.delta != null && Number(m.delta) >= 0;
+                  const good = String(m.label).indexOf('광고비') < 0;
+                  const col = m.delta == null ? '#6E6863' : (!good ? '#6E6863' : (up ? '#047857' : '#DC2626'));
+                  return <div key={i} data-wr-metric style={box('#E3E0DC', 'white')}>
+                    <div style={{ fontSize: 11, color: '#6E6863' }}>{m.label}</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, marginTop: 2 }}>{m.value}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: col, marginTop: 2 }}>{m.delta != null ? (up ? '▲ +' : '▼ ') + m.delta + '%' : ''}{m.note ? <span style={{ color: '#A29C95', fontWeight: 400 }}> {m.note}</span> : ''}</div>
+                  </div>;
+                })}
+              </div>
+              {w0.label ? <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 8 }}>{w0.label}</div> : null}
+            </div>
+          ) : <div data-wr-empty style={{ fontSize: 12, color: '#6E6863' }}>효율 데이터(work-report.json) 없음 — 자동화PC가 올리면 채워집니다. <span style={{ color: '#A29C95' }}>(오류가 아닙니다)</span></div>)}
+      </Card>
+
+      {sec('진행 중인 프로젝트 · 클릭하면 다음 할 일')}
+      <Card>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 800 }}>프로젝트</div>
+          <button onClick={() => goTab && goTab('프로젝트 진행 상황')} style={{ marginLeft: 'auto', cursor: 'pointer', border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', borderRadius: 8, padding: '4px 10px', fontSize: 11.5, fontFamily: 'inherit' }}>전체 보기 →</button>
+        </div>
+        <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 10 }}>줄을 클릭하면 다음 할 일이 펼쳐집니다. 할 일을 클릭하면 바로 수정(다른 탭과 연동).</div>
+        {projs.length ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+            {projs.map(({ o, rows, todo }) => {
+              const on = !!openP[o.id];
+              return <div key={o.id} data-wr-proj={o.code} style={{ border: '1px solid #E3E0DC', borderRadius: 11, overflow: 'hidden' }}>
+                <div data-wr-proj-head onClick={() => setOpenP(m => Object.assign({}, m, { [o.id]: !m[o.id] }))} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '11px 13px', cursor: 'pointer', background: on ? '#F0F4F1' : 'white', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 800, color: G, background: '#EAF1EE', border: '1px solid #CFE0D8', borderRadius: 6, padding: '2px 8px' }}>{o.code}</span>
+                  <span style={{ fontSize: 13.5, fontWeight: 700, color: '#1A1614' }}>{o.name}</span>
+                  <span style={{ fontSize: 11.5, color: todo ? '#B45309' : '#A29C95', fontWeight: 700 }}>{todo ? '다음 할 일 ' + todo + '건' : '남은 할 일 없음'}</span>
+                  <span style={{ marginLeft: 'auto', color: '#A29C95', fontSize: 13 }}>{on ? '▾' : '▸'}</span>
+                </div>
+                {on ? <div style={{ padding: '2px 13px 12px', background: '#FBFCFB', borderTop: '1px solid #EEF1EF' }}>
+                  {rows.map(({ it, subs, doneN }) => (
+                    <div key={it.id} style={{ marginTop: 9 }}>
+                      <div data-wr-task onClick={() => onEdit && onEdit({ kind: 'plan', id: it.id })} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', padding: '4px 0' }}>
+                        <span style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>{it.name}</span>
+                        {it.hold ? <span style={{ fontSize: 10, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '0 5px' }}>보류</span> : null}
+                        <span style={{ fontSize: 11, color: '#A29C95' }}>{ownerAv(it)} {ownerNm(it)}{it.due ? ' · ~' + String(it.due).slice(5) : ''}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#1B4D3E' }}>수정 ✎</span>
+                      </div>
+                      {subs.map(sp => (
+                        <div key={sp.id} data-wr-task onClick={() => onEdit && onEdit({ kind: 'subplan', id: sp.id })} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', padding: '3px 0 3px 14px', borderLeft: '2px solid #E3E0DC', marginLeft: 3 }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 700, color: stageCol(sp.stage), background: '#fff', border: '1px solid #E3E0DC', borderRadius: 5, padding: '0 5px' }}>{sp.stage}</span>
+                          <span style={{ fontSize: 12, color: '#3A3631' }}>{sp.name}</span>
+                          <span style={{ fontSize: 10.5, color: '#A29C95' }}>{ownerAv(sp)}{sp.due ? ' ~' + String(sp.due).slice(5) : ''}</span>
+                          <span style={{ marginLeft: 'auto', fontSize: 10, color: '#1B4D3E' }}>✎</span>
+                        </div>
+                      ))}
+                      {doneN ? <div style={{ fontSize: 10.5, color: '#A29C95', padding: '2px 0 0 16px' }}>완료 {doneN}건</div> : null}
+                    </div>
+                  ))}
+                </div> : null}
+              </div>;
+            })}
+          </div>
+        ) : <div style={{ fontSize: 12, color: '#A29C95' }}>표시할 프로젝트가 없습니다. (프로젝트 진행 상황에서 추가하면 여기 뜹니다.)</div>}
+      </Card>
+
+      {sec('목표 (KPI) · 만들고 추가')}
+      <Card>
+        <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 2 }}>이번 달 목표</div>
+        <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 10 }}>목표를 세우고 실적을 붙이면 프로젝트 결과와 이어집니다. KPI 탭과 연동됩니다.</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {kpis.map(k => { const tg = kpiTargetOf(k); const lg = kpiLogged(k); return (
+            <div key={k.id} data-wr-kpi onClick={() => goTab && goTab('KPI')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, border: '1px solid #E3E0DC', borderRadius: 10, padding: '9px 12px', cursor: 'pointer', flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700 }}>{k.name}</div>
+              <div style={{ fontSize: 11.5, color: '#6E6863' }}>목표 {tg != null ? Number(tg).toLocaleString() + (k.unit || '') : <span style={{ color: '#DC2626' }}>미설정</span>} · 실적 {lg ? <span style={{ color: '#047857' }}>기록됨</span> : <span style={{ color: '#DC2626' }}>미기록</span>}</div>
+            </div>
+          ); })}
+          {!kpis.length ? <div style={{ fontSize: 12, color: '#A29C95' }}>아직 목표가 없습니다. 아래에서 추가하세요.</div> : null}
+        </div>
+        <div style={{ marginTop: 9 }}>
+          {!kf ? <button data-wr-kpi-add onClick={() => setKf(true)} style={{ width: '100%', cursor: 'pointer', border: '1px dashed ' + G, color: G, background: '#F3F8F5', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 800, fontFamily: 'inherit' }}>＋ 목표 추가하기</button> :
+            <div style={{ border: '1px solid #CFE0D8', background: '#F7FAF8', borderRadius: 11, padding: 12 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div style={{ flex: 2, minWidth: 150 }}><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>지표명</div><input data-wr-kpi-name value={kName} onChange={e => setKName(e.target.value)} placeholder="예: 인스타 도달수" style={inp} /></div>
+                <div style={{ flex: 1, minWidth: 90 }}><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>목표값</div><input data-wr-kpi-target value={kTarget} onChange={e => setKTarget(e.target.value)} placeholder="50000" style={inp} /></div>
+                <div style={{ minWidth: 70 }}><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>단위</div><input value={kUnit} onChange={e => setKUnit(e.target.value)} placeholder="회/원/%" style={Object.assign({}, inp, { width: 70 })} /></div>
+                <div><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>목표 월</div><input value={kMonth} onChange={e => setKMonth(e.target.value)} placeholder="2026-08" style={Object.assign({}, inp, { width: 100 })} /></div>
+              </div>
+              <div style={{ marginTop: 11, display: 'flex', gap: 8 }}>
+                <button data-wr-kpi-go onClick={addKpi} style={{ background: G, color: 'white', border: 0, borderRadius: 8, padding: '8px 16px', fontSize: 12.5, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>목표 추가</button>
+                <button onClick={() => setKf(false)} style={{ background: 'white', color: '#6E6863', border: '1px solid #D6D0C8', borderRadius: 8, padding: '8px 13px', fontSize: 12.5, cursor: 'pointer', fontFamily: 'inherit' }}>취소</button>
+              </div>
+            </div>}
+        </div>
+      </Card>
+
+      {sec('팀 판단 · 회의에서 함께')}
+      <Card>
+        <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 2 }}>이번 주 팀 판단</div>
+        <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 10 }}>회의 때 다 같이 채우는 칸 (담당자 구분 없음). 입력하면 자동 저장.</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 10 }}>
+          {[{ k: 'teamWorked', l: '✅ 효과적이었던 것' }, { k: 'teamDidnt', l: '△ 아쉬운 것' }, { k: 'teamNext', l: '→ 다음 방향' }].map(f => (
+            <div key={f.k}><div style={{ fontSize: 11, fontWeight: 800, color: '#6E6863', marginBottom: 4 }}>{f.l}</div>
+              <textarea data-wr-team={f.k} value={teamVal(f.k)} onChange={e => teamSet(f.k, e.target.value)} rows={3} placeholder="회의에서 함께…" style={Object.assign({}, inp, { resize: 'vertical', lineHeight: 1.5 })} /></div>
+          ))}
+        </div>
+      </Card>
+
+      {sec('보고가 살려면 · 채워야 할 것')}
+      <Card style={{ borderColor: '#FDE68A' }}>
+        <div style={{ fontSize: 13, fontWeight: 800, color: '#B45309', marginBottom: 8 }}>⚠️ 지금 비어 있어 보고가 얕은 곳</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12.5, color: '#3A3631' }}>
+          <div>· 완료했는데 성과 기록이 안 된 세부업무 <b>{doneNoPerf}건</b></div>
+          <div>· 목표(KPI)가 없는 지표 <b>{kpiNoTarget}개</b></div>
+          <div>· 인스타 콘텐츠 성과 · 광고 썸네일 — <b style={{ color: '#B45309' }}>수집 경로 없음(자동화PC)</b></div>
+        </div>
+      </Card>
+
+      {sec('가장 중요 · 데이터 준비 중')}
+      <div style={{ border: '1px dashed #C9C3BC', background: '#FAF9F7', borderRadius: 12, padding: '14px 16px', marginBottom: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 800, color: '#6E6863' }}>📸 콘텐츠 · 광고 효율 (썸네일 + 성과)</div>
+        <div style={{ fontSize: 11.5, color: '#A29C95', marginTop: 6, lineHeight: 1.6 }}>인스타 콘텐츠 성과(도달·저장·전환) + 썸네일 + 네이버 광고 소재 썸네일. 자동화PC가 수집을 붙이면 여기에 썸네일+효율로 채워집니다.</div>
+      </div>
+    </div>
+  );
+}
+
+const INSTA_SEED = { updatedAt: '2026-08-15', currency: 'KRW', window: '최근 30일', seed: true, ads: [
+  { id: '120251764582120603', name: '릴스_SUMMERSALE_얼음_판매_픽셀샵_260812', type: 'VIDEO', cta: 'SHOP_NOW', thumb: 'https://scontent-ord5-2.xx.fbcdn.net/v/t15.5256-10/770758841_1619307296420149_7556877196154930679_n.jpg?_nc_cat=110&ccb=1-7&_nc_ohc=ehY4D0R2AHoQ7kNvwFA6d-q&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&_nc_sid=58080a&oh=00_AQENXQUbJ4zxduYkZmZWICtY6yWnHktD1sAa2nkKAuWfxQ&oe=6A87B1B0', impressions: 10852, reach: 8833, clicks: 188, spend: 356145, ctr: 1.73 },
+  { id: '120251645363950603', name: '닥터샐러드_64OFF_다7일_A', type: 'SHARE', cta: 'SHOP_NOW', thumb: 'https://scontent-ord5-1.xx.fbcdn.net/v/t45.1600-4/766079311_27308244122187002_3825292862092320734_n.png?_nc_cat=108&ccb=1-7&_nc_ohc=sYwnOemNh8gQ7kNvwEfz5Kf&_nc_zt=1&_nc_ht=scontent-ord5-1.xx&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&_nc_sid=58080a&oh=00_AQG_lkqONApF5Pk25PQPVyMjCoZyyal2GY4bCG3_FkYT2Q&oe=6A87ACCB', impressions: 14082, reach: 11930, clicks: 289, spend: 98874, ctr: 2.05 },
+  { id: '120251682357600603', name: '릴스_SUMMERSALE_얼음_판매_260809', type: 'VIDEO', cta: 'SHOP_NOW', thumb: 'https://scontent-ord5-1.xx.fbcdn.net/v/t15.5256-10/770738329_4575989169394212_4200483273212750650_n.jpg?_nc_cat=111&ccb=1-7&_nc_ohc=9C9arM4hvK8Q7kNvwHUfGC3&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&_nc_sid=58080a&oh=00_AQFMYE0Qejza_utBcuJPigTyMCweIV9ThISDZWrHkjiflw&oe=6A87A22F', impressions: 6430, reach: 4018, clicks: 424, spend: 101735, ctr: 6.59 },
+  { id: '120251668010220603', name: '릴스_SUMMERSALE_얼음_A', type: 'VIDEO', cta: 'SHOP_NOW', thumb: 'https://scontent-ord5-2.xx.fbcdn.net/v/t15.5256-10/767560375_2450147175473937_8045329093703640513_n.jpg?_nc_cat=102&ccb=1-7&_nc_ohc=bxpeKIOvzjsQ7kNvwEM3cJ2&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&stp=c0.5000x0.5000f_dst-emg0_p64x64_q75_tt6&_nc_sid=58080a&oh=00_AQH_SbSGirwFu8Mu0nRrySlmQySniJ6x0h8SlT-kJgDDsw&oe=6A87A59D', impressions: 4462, reach: 4240, clicks: 233, spend: 69265, ctr: 5.22 },
+  { id: '120251682332220603', name: '닥터샐러드_64OFF_7일_판매_260809', type: 'SHARE', cta: 'SHOP_NOW', thumb: 'https://scontent-ord5-1.xx.fbcdn.net/v/t45.1600-4/766079311_27308244122187002_3825292862092320734_n.png?stp=dst-jpg_tt6&_nc_cat=108&ccb=1-7&_nc_sid=d5bd00&_nc_ohc=sYwnOemNh8gQ7kNvwEfz5Kf&_nc_zt=1&_nc_ht=scontent-ord5-1.xx&oh=00_AQF-sbQal5KL7qjhKiHN7yjDwiRq8OgRuPyZk-0soE9SVQ&oe=6A87ACCB', impressions: 2108, reach: 1823, clicks: 37, spend: 31233, ctr: 1.76 },
+  { id: '120251764401280603', name: '닥터샐러드_64OFF_7일_판매_픽셀샵_260812', type: 'SHARE', cta: 'SHOP_NOW', thumb: 'https://scontent-ord5-1.xx.fbcdn.net/v/t45.1600-4/766079311_27308244122187002_3825292862092320734_n.png?stp=dst-jpg_tt6&_nc_cat=108&ccb=1-7&_nc_sid=d5bd00&_nc_ohc=sYwnOemNh8gQ7kNvwGtZQJu&_nc_zt=1&_nc_ht=scontent-ord5-1.xx&oh=00_AQGOviolGydtJ4yZ8oj2WKw4j1aiUhJmnDovIvbYgTzk6A&oe=6A87ACCB', impressions: 936, reach: 795, clicks: 21, spend: 15498, ctr: 2.24 },
+] };
+
+function TabInstaAds() {
+  const [d, setD] = React.useState(null);
+  const [status, setStatus] = React.useState('loading');
+  const [sortK, setSortK] = React.useState('spend');
+  React.useEffect(() => {
+    let alive = true;
+    ghFetch('data/insta-ads.json').then(r => (r.ok ? r.json() : null)).then(j => {
+      if (!alive) return;
+      if (j && Array.isArray(j.ads) && j.ads.length) { setD(j); setStatus('live'); }
+      else { setD(INSTA_SEED); setStatus('seed'); }
+    }).catch(() => { if (alive) { setD(INSTA_SEED); setStatus('seed'); } });
+    return () => { alive = false; };
+  }, []);
+
+  const box = (bd, bg) => ({ border: '1px solid ' + bd, background: bg, borderRadius: 10, padding: '11px 13px' });
+  const won = n => '₩' + Number(n || 0).toLocaleString();
+  const num = n => Number(n || 0).toLocaleString();
+
+  if (!d) return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>인스타 광고 데이터를 불러오는 중…</Card></div>;
+
+  const ads0 = Array.isArray(d.ads) ? d.ads : [];
+  const sum = k => ads0.reduce((a, x) => a + (Number(x[k]) || 0), 0);
+  const tSpend = sum('spend'), tReach = sum('reach'), tImpr = sum('impressions'), tClick = sum('clicks');
+  const avgCtr = tImpr ? (tClick / tImpr * 100) : 0;
+  const maxReach = Math.max(1, ...ads0.map(a => Number(a.reach) || 0));
+  const byCtr = ads0.slice().sort((a, b) => (Number(b.ctr) || 0) - (Number(a.ctr) || 0));
+  const best = byCtr[0] || null;
+  const topSpend = ads0.slice().sort((a, b) => (Number(b.spend) || 0) - (Number(a.spend) || 0))[0] || null;
+  const ads = ads0.slice().sort((a, b) => (Number(b[sortK]) || 0) - (Number(a[sortK]) || 0));
+  const typeLabel = t => (t === 'VIDEO' ? '릴스·영상' : '이미지');
+  const ctrCol = v => (v >= 3 ? '#047857' : v >= 1.5 ? '#6E6863' : '#DC2626');
+
+  const tile = (label, val, sub) => (
+    <div data-ia-tile style={{ ...box('#E3E0DC', 'white'), minWidth: 128, flex: 1 }}>
+      <div style={{ fontSize: 11, color: '#6E6863' }}>{label}</div>
+      <div style={{ fontSize: 18, fontWeight: 800, marginTop: 2, color: '#1A1614' }}>{val}</div>
+      {sub ? <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 2 }}>{sub}</div> : null}
+    </div>
+  );
+  const sortBtn = (k, l) => (
+    <button onClick={() => setSortK(k)} style={{ cursor: 'pointer', border: '1px solid ' + (sortK === k ? G : '#E3E0DC'), background: sortK === k ? G : 'white', color: sortK === k ? 'white' : '#6E6863', borderRadius: 999, padding: '3px 11px', fontSize: 11.5, fontWeight: sortK === k ? 800 : 600, fontFamily: 'inherit' }}>{l}</button>
+  );
+
+  return (
+    <div style={{ padding: '16px 20px', maxWidth: 1120, margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+        <div style={{ fontSize: 21, fontWeight: 800, color: G }}>📸 인스타 광고</div>
+        <span style={{ fontSize: 12, color: '#A29C95' }}>{d.window || '최근 30일'} · Meta 광고</span>
+        {status === 'seed' ? <span style={{ fontSize: 10.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '1px 7px' }}>스냅샷(파이프라인 연결 전)</span> : null}
+        {d.updatedAt ? <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>갱신 {d.updatedAt}</span> : null}
+      </div>
+      <div style={{ fontSize: 11.5, color: '#A29C95', marginBottom: 14 }}>라이브 소재의 썸네일과 효율을 한눈에. (전환·ROAS는 픽셀 데이터 붙이면 추가)</div>
+
+      <div data-ia-insights style={{ display: 'flex', gap: 9, flexWrap: 'wrap', marginBottom: 12 }}>
+        {tile('총 지출', won(tSpend))}
+        {tile('총 도달', num(tReach))}
+        {tile('총 노출', num(tImpr))}
+        {tile('평균 CTR', avgCtr.toFixed(2) + '%', '클릭 ' + num(tClick))}
+        {tile('광고 수', ads0.length + '개')}
+      </div>
+
+      {(best || topSpend) ? (
+        <Card style={{ marginBottom: 14, background: '#F0F4F1', borderColor: '#D8E3DC' }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: G, marginBottom: 6 }}>💡 이번 인사이트</div>
+          {best ? <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6 }}>· 효율 최고 소재 — <b>{best.name}</b> (CTR <b style={{ color: '#047857' }}>{Number(best.ctr).toFixed(2)}%</b>). 이런 결의 소재를 더.</div> : null}
+          {topSpend && Number(topSpend.ctr) < avgCtr ? <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6, marginTop: 3 }}>· 지출 최대인데 CTR 낮음 — <b>{topSpend.name}</b> ({won(topSpend.spend)} · CTR {Number(topSpend.ctr).toFixed(2)}%). 예산 대비 반응 점검.</div> : null}
+        </Card>
+      ) : null}
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+        <span style={{ fontSize: 11.5, color: '#A29C95', fontWeight: 700 }}>정렬</span>
+        {sortBtn('spend', '지출순')}{sortBtn('reach', '도달순')}{sortBtn('ctr', 'CTR순')}
+      </div>
+
+      <div data-ia-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: 12 }}>
+        {ads.map(a => {
+          const rp = Math.round((Number(a.reach) || 0) / maxReach * 100);
+          return (
+            <div key={a.id} data-ia-card style={{ border: '1px solid #E7E4E0', borderRadius: 12, overflow: 'hidden', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,.04)' }}>
+              <div style={{ position: 'relative', height: 150, background: '#EFEDEA' }}>
+                <img src={a.thumb} alt="" loading="lazy" onError={e => { e.target.style.display = 'none'; }} style={{ width: '100%', height: 150, objectFit: 'cover', display: 'block' }} />
+                <span style={{ position: 'absolute', top: 8, left: 8, fontSize: 10, fontWeight: 700, color: 'white', background: 'rgba(0,0,0,0.55)', borderRadius: 6, padding: '2px 7px' }}>{typeLabel(a.type)}</span>
+              </div>
+              <div style={{ padding: '10px 12px' }}>
+                <div title={a.name} style={{ fontSize: 12, fontWeight: 700, color: '#1A1614', lineHeight: 1.4, height: 33, overflow: 'hidden' }}>{a.name}</div>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', margin: '8px 0 6px' }}>
+                  <div><div style={{ fontSize: 9.5, color: '#A29C95' }}>노출</div><div style={{ fontSize: 12.5, fontWeight: 700 }}>{num(a.impressions)}</div></div>
+                  <div><div style={{ fontSize: 9.5, color: '#A29C95' }}>클릭</div><div style={{ fontSize: 12.5, fontWeight: 700 }}>{num(a.clicks)}</div></div>
+                  <div><div style={{ fontSize: 9.5, color: '#A29C95' }}>CTR</div><div style={{ fontSize: 12.5, fontWeight: 800, color: ctrCol(Number(a.ctr) || 0) }}>{Number(a.ctr || 0).toFixed(2)}%</div></div>
+                  <div style={{ marginLeft: 'auto' }}><div style={{ fontSize: 9.5, color: '#A29C95' }}>지출</div><div style={{ fontSize: 12.5, fontWeight: 700 }}>{won(a.spend)}</div></div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 9.5, color: '#A29C95', whiteSpace: 'nowrap' }}>도달 {num(a.reach)}</span>
+                  <div style={{ flex: 1, height: 5, background: '#EAF1EE', borderRadius: 3, overflow: 'hidden' }}><div style={{ height: 5, width: rp + '%', background: G, borderRadius: 3 }} /></div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 14, lineHeight: 1.6 }}>출처: Meta 광고 API · 계정 lifemealXmiracle. {status === 'seed' ? 'data/insta-ads.json 이 올라오면 이 화면이 실데이터로 자동 갱신됩니다.' : ''}</div>
+    </div>
+  );
+}
+
 function TabProductSeo() {
   const [seo, setSeo] = React.useState(null);
   const [status, setStatus] = React.useState('loading');
@@ -9341,11 +9643,13 @@ function App() {
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
     { icon: '🗂️', label: '단계별 보기', C: TabKanban },
     { icon: '🏆', label: '업무 성과', C: TabPerformance },
+    { icon: '📝', label: '업무보고', C: TabWorkReport },
     { icon: '📊', label: 'KPI', C: TabKpi },
     { icon: '💵', label: '매출', C: TabSales },
     { icon: '🔎', label: '네이버 채널 추적', C: TabChannel },
     { icon: '💬', label: '카카오', C: TabKakao },
     { icon: '📣', label: '광고', C: TabAds },
+    { icon: '📸', label: '인스타 광고', C: TabInstaAds },
     { icon: '🔥', label: '키워드 트렌드', C: TabTrends },
     { icon: '🧩', label: '키워드 총합본', C: TabKeywordDict },
     { icon: '📨', label: '발송 스케줄', C: TabSchedule },
@@ -9359,7 +9663,7 @@ function App() {
     { icon: '🏠', label: '홈', tabs: ['홈'] },
     { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색', '상품 최적화'] },
     { icon: '📋', label: '업무', tabs: ['데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
-    { icon: '📊', label: '성과', tabs: ['KPI', '매출', '카카오', '광고'] },
+    { icon: '📊', label: '성과', tabs: ['업무보고', 'KPI', '매출', '카카오', '광고', '인스타 광고'] },
     { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드', '키워드 총합본'] },
     { icon: '💰', label: '예산', tabs: ['예산'] },
   ] : null;
