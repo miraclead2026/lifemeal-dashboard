@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_171';
+const BUILD_TAG = 'index_172';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -7897,7 +7897,7 @@ function TabSchedule({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통', 'n.파워링크': 'N.파워링크', 'powerlink': 'N.파워링크', 'n.쇼핑검색': 'N.쇼핑검색', 'shopping': 'N.쇼핑검색', '키워드 총합본': '키워드 총합본', '키워드총합본': '키워드 총합본', keyworddict: '키워드 총합본', keywords: '키워드 총합본', '상품 최적화': '상품 최적화', '상품최적화': '상품 최적화', productseo: '상품 최적화', seo: '상품 최적화', '업무보고': '주간 보고', '주간보고': '주간 보고', workreport: '주간 보고', report: '주간 보고' };
+const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통', 'n.파워링크': 'N.파워링크', 'powerlink': 'N.파워링크', 'n.쇼핑검색': 'N.쇼핑검색', 'shopping': 'N.쇼핑검색', '키워드 총합본': '키워드 총합본', '키워드총합본': '키워드 총합본', keyworddict: '키워드 총합본', keywords: '키워드 총합본', '상품 최적화': '상품 최적화', '상품최적화': '상품 최적화', productseo: '상품 최적화', seo: '상품 최적화', '업무보고': '주간 보고', '주간보고': '주간 보고', workreport: '주간 보고', report: '주간 보고', advoost: '애드부스트', '애드부스트': '애드부스트' };
 
 const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 
@@ -9044,6 +9044,160 @@ function TabShoppingConnect() {
   );
 }
 
+const ADVOOST_SEED = { updatedAt: '2026-08-17', goal: { goal: '애드부스트 쇼핑으로 라이프밀 상품을 팔되, 실구매 ROAS를 다시 목표선까지 올린다.', goalNote: '표기 ROAS(장바구니 포함)는 640%대로 좋아 보이지만, 실제 돈이 되는 실구매 ROAS는 200% 안팎으로 목표 미달.', targets: [{ label: '실구매 ROAS', value: '~200% → 330%' }, { label: '구조', value: '1개 캠페인 → 신규+리타겟 2트랙' }, { label: '장바구니 회수', value: '담고 안 산 사람 되잡기(현재 회수광고 없음)' }], stance: '선조치 후보고 · 실구매 ROAS로 판단(표기 ROAS 착시 배제) · 집행은 화면작업(소재는 유니).' },
+  problems: [
+    { title: "리타겟 캠페인이 '구매 최적화'를 못 한다 (전환 추적 미설정)", status: '막힘-선행필요', detail: "실측(광고관리자): 카탈로그 판매 캠페인 입찰목표 선택지에 '전환수 최대화'가 없고 '클릭 수 최대화'만 있음 = GFA 전환 추적/이벤트 미설정으로 추정. 이걸 먼저 세팅해야 리타겟이 '구매'를 최적화. (그 외 잠재고객 미설정·소재 없음도 있음, 집행 0)" },
+    { title: 'ADVoost 하나가 신규+전체를 다 떠안는다', status: '대기', detail: '단일 캠페인에 예산만 키워(40만→90만/일) 모수 소진 → 실구매 ROAS 300%대→200%대 하락.' },
+    { title: '표기 ROAS가 실구매를 가린다', status: '인지', detail: '표기 644% vs 실구매 163%. 장바구니 전환까지 포함돼 부풀려짐 → 실구매 ROAS로 판단.' },
+    { title: '애셋그룹이 무차별', status: '대기', detail: '모든 아이템·시그널 미설정 → AI가 최적 상품·구매자를 못 좁힘.' }],
+  plan: [
+    { step: 0, title: 'GFA 전환 추적 세팅 (새로 발견한 선행 조건)', status: '확인 필요', actions: ['GFA 도구>전환 추적 or 스마트스토어 연동 상태 확인', '구매 전환 이벤트 잡히게 세팅', "→ 되면 리타겟이 '전환수 최대화' 선택 가능"] },
+    { step: 1, title: '죽은 리타겟 광고 되살리기 (전환추적 된 뒤)', status: '대기(0단계 후)', actions: ['입찰목표 클릭→전환수 최대화', '잠재고객=방문·장바구니 이탈 + 구매자 제외', '소재 등록(유니)', '예산 이전'] },
+    { step: 2, title: 'ADVoost 신규트랙 정리', status: '대기', actions: ['애셋그룹 시그널 설정', '예산 2주 고정(학습리셋 방지)', '판단을 실구매 ROAS로'] },
+    { step: 3, title: '상품별 세분화', status: '대기(2주 뒤 데이터)', actions: ['잘 팔리는 상품군끼리 애셋그룹 분리', '시그널 차별화'] }],
+  performance: { latest: { date: '2026-08-16', spend: 354972, purchaseSales: 579130, purchaseRoas: 163 }, trend14d: [
+    { date: '2026-08-03', spend: 801416, purchaseSales: 1541560, purchaseRoas: 192 }, { date: '2026-08-04', spend: 896873, purchaseSales: 1043470, purchaseRoas: 116 },
+    { date: '2026-08-05', spend: 884528, purchaseSales: 1718580, purchaseRoas: 194 }, { date: '2026-08-06', spend: 885581, purchaseSales: 1647370, purchaseRoas: 186 },
+    { date: '2026-08-07', spend: 904408, purchaseSales: 2281940, purchaseRoas: 252 }, { date: '2026-08-08', spend: 887817, purchaseSales: 1806600, purchaseRoas: 203 },
+    { date: '2026-08-09', spend: 900716, purchaseSales: 1395740, purchaseRoas: 155 }, { date: '2026-08-10', spend: 702126, purchaseSales: 1716690, purchaseRoas: 244 },
+    { date: '2026-08-11', spend: 694704, purchaseSales: 2033320, purchaseRoas: 293 }, { date: '2026-08-12', spend: 660152, purchaseSales: 2346700, purchaseRoas: 355 },
+    { date: '2026-08-13', spend: 660219, purchaseSales: 1131780, purchaseRoas: 171 }, { date: '2026-08-14', spend: 700614, purchaseSales: 2228330, purchaseRoas: 318 },
+    { date: '2026-08-15', spend: 684438, purchaseSales: 1711450, purchaseRoas: 250 }, { date: '2026-08-16', spend: 354972, purchaseSales: 579130, purchaseRoas: 163 }] },
+  timeline: [
+    { date: '2026-08-17', category: '진단', what: '애드부스트 쇼핑 세분화 조사·계정 실측 완료', detail: '공식 도움말+실화면 분석. 세분화 캠페인들이 만들어졌으나 다 죽어있음을 확인 — ADVoost 하나가 신규+전체를 떠안는 구조.', why: '실구매 ROAS가 예산 증액과 함께 300%대→200%대로 하락. 세분화 필요를 데이터로 확인.' },
+    { date: '2026-08-17', category: '조치시도', what: "리타겟 캠페인 '구매 최적화'로 변경 시도 → 막힘 발견", detail: "광고관리자 화면에서 입찰 목표를 열어보니 선택지가 '클릭 수 최대화' 하나뿐. '전환수 최대화'가 없음 = GFA 전환 추적/이벤트 미설정으로 추정. 아무것도 저장 안 함(바꿀 유효값 없음).", why: "리타겟은 '구매'를 최적화해야 하는데 지금은 '클릭'만 가능. 전환 추적 세팅이 선행돼야 리타겟 전략이 성립." }] };
+
+function TabAdvoost() {
+  const [d, setD] = React.useState(null);
+  const [status, setStatus] = React.useState('loading');
+  React.useEffect(() => {
+    let alive = true;
+    ghFetch('data/advoost-agent.json').then(r => (r.ok ? r.json() : null)).then(j => {
+      if (!alive) return;
+      if (j && j.goal && Array.isArray(j.problems)) { setD(j); setStatus('live'); } else { setD(ADVOOST_SEED); setStatus('seed'); }
+    }).catch(() => { if (alive) { setD(ADVOOST_SEED); setStatus('seed'); } });
+    return () => { alive = false; };
+  }, []);
+
+  const nf = n => Number(n || 0).toLocaleString();
+  const manA = n => Math.round(Number(n || 0) / 10000).toLocaleString() + '만';
+  const stMeta = st => { const s = String(st || ''); if (s.indexOf('막힘') >= 0) return { c: '#DC2626', bg: '#FEF2F2', bd: '#FCA5A5' }; if (s.indexOf('해결') >= 0 || s.indexOf('완료') >= 0) return { c: '#047857', bg: '#ECFDF5', bd: '#A7F3D0' }; if (s.indexOf('고치는') >= 0 || s.indexOf('진행') >= 0) return { c: '#2D5FE0', bg: '#EFF6FF', bd: '#BFDBFE' }; if (s.indexOf('확인') >= 0) return { c: '#7C3AED', bg: '#F5F3FF', bd: '#DDD6FE' }; if (s.indexOf('인지') >= 0) return { c: '#6E6863', bg: '#F5F4F2', bd: '#E3E0DC' }; return { c: '#B45309', bg: '#FFF7ED', bd: '#FDBA74' }; };
+  const catMeta = c => ({ '진단': { i: '🔍', col: '#2D5FE0' }, '조치시도': { i: '🔧', col: '#B45309' }, '조치': { i: '🔧', col: '#047857' }, '마일스톤': { i: '🏁', col: '#7C3AED' }, '자동화': { i: '⚙️', col: '#6E6863' } }[c] || { i: '·', col: '#6E6863' });
+  const secT = (t, sub) => <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, margin: '18px 2px 8px' }}><span style={{ fontSize: 14.5, fontWeight: 800, color: '#1A1614' }}>{t}</span>{sub ? <span style={{ fontSize: 11, color: '#A29C95' }}>{sub}</span> : null}</div>;
+
+  if (!d) return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>애드부스트 데이터를 불러오는 중…</Card></div>;
+
+  const g = d.goal || {};
+  const probs = d.problems || [];
+  const plan = d.plan || [];
+  const perf = d.performance || {};
+  const latest = perf.latest || {};
+  const trend = (perf.trend14d || []).slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+  const tmax = Math.max(330, ...trend.map(x => Number(x.purchaseRoas) || 0));
+  const tl = (d.timeline || []).slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+
+  return (
+    <div style={{ padding: '16px 20px', maxWidth: 1000, margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+        <div style={{ fontSize: 21, fontWeight: 800, color: G }}>🚀 애드부스트</div>
+        <span style={{ fontSize: 12, color: '#A29C95' }}>GFA 쇼핑 · 광고 에이전트 자동 기록</span>
+        {status === 'seed' ? <span style={{ fontSize: 10.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '1px 7px' }}>스냅샷</span> : null}
+        {d.updatedAt ? <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>갱신 {d.updatedAt}</span> : null}
+      </div>
+
+      {/* ① 목표 */}
+      <Card style={{ marginBottom: 4, borderColor: '#D8E3DC', background: '#FBFDFC' }}>
+        <div data-av-goal style={{ fontSize: 14, fontWeight: 800, color: '#1A1614', lineHeight: 1.5 }}>🎯 {g.goal}</div>
+        {g.goalNote ? <div style={{ fontSize: 12, color: '#B45309', marginTop: 5, lineHeight: 1.55 }}>⚠ {g.goalNote}</div> : null}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+          {(g.targets || []).map((t, i) => (
+            <div key={i} data-av-target style={{ flex: 1, minWidth: 150, border: '1px solid #E3E0DC', background: 'white', borderRadius: 10, padding: '9px 12px' }}>
+              <div style={{ fontSize: 10.5, color: '#6E6863' }}>{t.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, marginTop: 2, color: '#1A1614' }}>{t.value}</div>
+            </div>
+          ))}
+        </div>
+        {g.stance ? <div style={{ fontSize: 11, color: '#6E6863', marginTop: 9 }}>태도 — {g.stance}</div> : null}
+      </Card>
+
+      {/* ② 지금 문제점 */}
+      {secT('🚧 지금 문제점', probs.length + '건 · 광고 에이전트 실측')}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {probs.map((p, i) => { const m = stMeta(p.status); return (
+          <div key={i} data-av-prob style={{ border: '1px solid #E7E4E0', borderLeft: '4px solid ' + m.c, borderRadius: 10, background: 'white', padding: '10px 13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 10, fontWeight: 800, color: m.c, background: m.bg, border: '1px solid ' + m.bd, borderRadius: 5, padding: '1px 7px' }}>{p.status}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1614' }}>{p.title}</span>
+            </div>
+            {p.detail ? <div style={{ fontSize: 11.5, color: '#6E6863', marginTop: 5, lineHeight: 1.6 }}>{p.detail}</div> : null}
+          </div>
+        ); })}
+      </div>
+
+      {/* ③ 앞으로 계획 */}
+      {secT('🗺 앞으로 계획', '단계 순서대로 — 0단계가 선행 조건')}
+      <Card style={{ padding: '6px 15px' }}>
+        {plan.map((s, i) => { const m = stMeta(s.status); return (
+          <div key={i} data-av-plan style={{ display: 'flex', gap: 11, padding: '11px 0', borderBottom: i < plan.length - 1 ? '1px dashed #EFEDEA' : 'none' }}>
+            <div style={{ width: 26, height: 26, borderRadius: 8, background: m.bg, border: '1px solid ' + m.bd, color: m.c, fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{s.step}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 12.5, fontWeight: 800 }}>{s.title}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: m.c, background: m.bg, border: '1px solid ' + m.bd, borderRadius: 5, padding: '0 6px' }}>{s.status}</span>
+              </div>
+              <div style={{ fontSize: 11.5, color: '#6E6863', marginTop: 4, lineHeight: 1.6 }}>{(s.actions || []).map((a, j) => <div key={j}>· {a}</div>)}</div>
+            </div>
+          </div>
+        ); })}
+      </Card>
+
+      {/* ④ 실구매 ROAS 추이 */}
+      {secT('📈 실구매 ROAS 추이', '최근 14일 · 목표선 330% · 표기 ROAS 아님')}
+      <Card style={{ marginBottom: 4 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
+          <div data-av-latest style={{ border: '1.5px solid ' + ((latest.purchaseRoas || 0) >= 330 ? '#A7F3D0' : '#FCA5A5'), background: '#FBFAF9', borderRadius: 10, padding: '9px 13px' }}>
+            <div style={{ fontSize: 10.5, color: '#6E6863' }}>최신 {latest.date ? String(latest.date).slice(5) : ''} 실구매 ROAS</div>
+            <div style={{ fontSize: 21, fontWeight: 800, color: (latest.purchaseRoas || 0) >= 330 ? '#047857' : '#DC2626' }}>{latest.purchaseRoas || 0}%</div>
+            <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 1 }}>지출 {manA(latest.spend)} · 실구매 {manA(latest.purchaseSales)}</div>
+          </div>
+          <div style={{ flex: 1, minWidth: 260 }}>
+            <div data-av-trend style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 3, height: 110, borderBottom: '1px solid #E7E4E0' }}>
+              <div style={{ position: 'absolute', left: 0, right: 0, bottom: Math.round(330 / tmax * 100) + '%', borderTop: '2px dashed #047857', zIndex: 1 }} title="목표 330%" />
+              {trend.map(x => { const r = Number(x.purchaseRoas) || 0; const h = Math.max(3, Math.round(r / tmax * 100)); return (
+                <div key={x.date} data-av-bar title={x.date + ' · 실구매 ROAS ' + r + '% · 지출 ' + nf(x.spend) + '원 · 실구매 ' + nf(x.purchaseSales) + '원'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', height: '100%' }}>
+                  <span style={{ fontSize: 8.5, fontWeight: 700, color: r >= 330 ? '#047857' : '#A29C95' }}>{r}</span>
+                  <div style={{ width: '100%', height: h + '%', maxHeight: '86%', background: r >= 330 ? '#047857' : r >= 250 ? '#B45309' : '#DC2626', borderRadius: '3px 3px 0 0' }} />
+                </div>
+              ); })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9.5, color: '#A29C95', marginTop: 4 }}>
+              <span>{trend[0] ? trend[0].date.slice(5) : ''}</span><span>─ ─ 목표 330%</span><span>{trend.length ? trend[trend.length - 1].date.slice(5) : ''}</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* ⑤ 내가 한 일 */}
+      {secT('🧾 내가 한 일', '최신순 · 매일 자동 기록')}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+        {tl.map((t, i) => { const cm = catMeta(t.category); return (
+          <div key={i} data-av-tl style={{ border: '1px solid #E7E4E0', borderRadius: 10, background: 'white', padding: '10px 13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, color: '#A29C95' }}>{String(t.date).slice(5)}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: cm.col, background: '#F7F6F4', border: '1px solid #E3E0DC', borderRadius: 5, padding: '1px 7px' }}>{cm.i} {t.category}</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>{t.what}</span>
+            </div>
+            {t.detail ? <div style={{ fontSize: 11.5, color: '#6E6863', marginTop: 4, lineHeight: 1.6 }}>{t.detail}</div> : null}
+            {t.why ? <div style={{ fontSize: 11, color: '#8B5CF6', marginTop: 3, lineHeight: 1.5 }}>왜 — {t.why}</div> : null}
+          </div>
+        ); })}
+      </div>
+
+      <div style={{ fontSize: 10.5, color: '#A29C95', lineHeight: 1.6 }}>출처: data/advoost-agent.json (광고 에이전트 매일 자동 갱신 · 읽기 전용). 실구매 ROAS = 실제 구매 완료 기준 — 장바구니 포함 표기 ROAS와 다릅니다.{status === 'seed' ? ' 파일이 올라오면 실데이터로 자동 갱신됩니다.' : ''}</div>
+    </div>
+  );
+}
+
 function TabProductSeo() {
   const [seo, setSeo] = React.useState(null);
   const [status, setStatus] = React.useState('loading');
@@ -10105,6 +10259,7 @@ function App() {
     { icon: '🧭', label: '판단 대기', C: TabDecisions, badge: decPending },
     { icon: '🔗', label: 'N.파워링크', C: TabPowerlink },
     { icon: '🛒', label: 'N.쇼핑검색', C: TabShopping },
+    { icon: '🚀', label: '애드부스트', C: TabAdvoost },
     { icon: '🧪', label: '상품 최적화', C: TabProductSeo },
     { icon: '📅', label: '데일리/주간', C: TabWeekly },
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
@@ -10129,7 +10284,7 @@ function App() {
 
   const GROUPS = TAB_GROUPS_ON ? [
     { icon: '🏠', label: '홈', tabs: ['홈'] },
-    { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색', '상품 최적화'] },
+    { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색', '애드부스트', '상품 최적화'] },
     { icon: '📋', label: '업무', tabs: ['데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
     { icon: '📊', label: '성과', tabs: ['주간 보고', 'KPI', '매출', '카카오', '광고', '인스타 광고', '쇼핑커넥트'] },
     { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드', '키워드 총합본'] },
