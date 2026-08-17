@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_169';
+const BUILD_TAG = 'index_170';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -8431,7 +8431,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
 
   // ── 점검 목록 ──
   const noRes = doneWk.filter(s => !(s.resultNote || '').trim());
-  const emptyNotes = [['sales', '매출'], ['ads', '광고'], ['content', '콘텐츠']].filter(([k]) => !(ins[k + '_note'] || '').trim());
+  const emptyNotes = [['sales', '매출'], ['ads', '네이버 광고'], ['iads', '인스타 광고'], ['content', '콘텐츠']].filter(([k]) => !(ins[k + '_note'] || '').trim());
   const checks = [];
   if (noRes.length) checks.push({ tag: '결과 미기록', c: '#DC2626', bg: '#FEF2F2', nm: '완료 ' + noRes.length + '건에 결과 한 줄 붙이기', act: '아래 완료 목록에서 →', go: () => { const el = document.querySelector('[data-wr2-donecol]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } });
   if (emptyNotes.length) checks.push({ tag: '보고 미완성', c: '#DC2626', bg: '#FEF2F2', nm: emptyNotes.map(x => x[1]).join('·') + ' 블록 담당자 한 줄 비어 있음', act: '쓰기 →', go: () => { const el = document.querySelector('[data-wr2-note="' + emptyNotes[0][0] + '"]'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); } } });
@@ -8578,48 +8578,59 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
         {noteRow('sales', '📦 담당자', '잘된 것 · 아쉬운 것 · 다음 — 한 줄')}
       </div>
 
-      {/* 광고 */}
+      {/* 광고 — 네이버 */}
       <div data-wr2-perf="ads" style={perfBox}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 18 }}>📣</span><span style={{ fontSize: 15.5, fontWeight: 800 }}>광고 — 네이버 + 인스타</span>
-          <span style={{ display: 'inline-flex', gap: 8, marginLeft: 'auto' }}>
-            <button onClick={() => goTab && goTab('광고')} style={{ border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>광고 탭 →</button>
-            <button onClick={() => goTab && goTab('인스타 광고')} style={{ border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>인스타 광고 탭 →</button>
-          </span>
+          <span style={{ fontSize: 18 }}>📣</span><span style={{ fontSize: 15.5, fontWeight: 800 }}>네이버 광고</span>
+          <button onClick={() => goTab && goTab('광고')} style={{ marginLeft: 'auto', border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>자세히 → 광고 탭</button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 14 }}>
-          <div>
-            {colHead('네이버 (주간)')}
-            {ads ? (
-              <div>
-                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 6 }}>
-                  <div><div style={{ fontSize: 22, fontWeight: 800 }}>{manF(adAgg.spend)}원</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>광고비</div></div>
-                  <div><div style={{ fontSize: 22, fontWeight: 800, color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas}%</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>ROAS · 전환매출 {manF(adAgg.rev)}</div></div>
-                </div>
-                <div style={{ margin: '2px 0 8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#6E6863', marginBottom: 3 }}><span>ROAS</span><span>목표 330%</span></div>
-                  <div style={{ height: 8, background: '#EEF1EF', borderRadius: 5, overflow: 'hidden' }}><div style={{ height: 8, width: Math.min(100, Math.round(wkRoas / 330 * 100)) + '%', background: wkRoas >= 330 ? '#047857' : '#DC2626', borderRadius: 5 }} /></div>
-                </div>
-                {mrRow('디스플레이', <span>{manF(adAgg.ch.display.spend)} · ROAS {roasOf(adAgg.ch.display.spend, adAgg.ch.display.rev)}%</span>, 'd')}
-                {mrRow('검색', <span>{manF(adAgg.ch.search.spend)} · ROAS {roasOf(adAgg.ch.search.spend, adAgg.ch.search.rev)}%</span>, 'e')}
-                {lowGroups.map((g, i) => mrRow(<span style={{ color: '#DC2626' }}>⚠ 저효율: {g.name}</span>, <span style={{ color: '#DC2626' }}>{manF(g.spend)} · {g.roas}%</span>, 'l' + i))}
+        {ads ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 14 }}>
+            <div>
+              {colHead('주간 요약')}
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 6 }}>
+                <div><div style={{ fontSize: 22, fontWeight: 800 }}>{manF(adAgg.spend)}원</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>광고비</div></div>
+                <div><div style={{ fontSize: 22, fontWeight: 800, color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas}%</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>ROAS · 전환매출 {manF(adAgg.rev)}</div></div>
               </div>
-            ) : <div style={{ fontSize: 12, color: '#A29C95' }}>광고 데이터(naver-ads.json) 불러오는 중이거나 없습니다.</div>}
-          </div>
-          <div>
-            {colHead('인스타 광고 — 라이브 소재 ' + (iads && iads.window ? '(' + iads.window + ')' : ''))}
-            {iAdsArr.length ? (
-              <div>
-                <div style={{ display: 'flex', gap: 6 }}>{iThumbs.map((a, i) => thumbTile(a.thumb, (a.name || '').slice(0, 16), a === iBest ? '★ CTR ' + (a.ctr || 0).toFixed(2) + '%' : null, false, 'ia' + i))}</div>
-                <div style={{ marginTop: 7 }}>
-                  {mrRow('지출 / 도달', manF(iSpend) + ' · ' + nf(iReach), 'f')}
-                  {iTop && (iTop.ctr || 0) < iAvgCtr ? mrRow(<span style={{ color: '#B45309' }}>⚠ 지출 최대 소재가 평균 CTR 밑</span>, <span style={{ color: '#B45309' }}>{(iTop.ctr || 0).toFixed(2)}% · 교체 검토</span>, 'g') : null}
-                </div>
+              <div style={{ margin: '2px 0 8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#6E6863', marginBottom: 3 }}><span>ROAS</span><span>목표 330%</span></div>
+                <div style={{ height: 8, background: '#EEF1EF', borderRadius: 5, overflow: 'hidden' }}><div style={{ height: 8, width: Math.min(100, Math.round(wkRoas / 330 * 100)) + '%', background: wkRoas >= 330 ? '#047857' : '#DC2626', borderRadius: 5 }} /></div>
               </div>
-            ) : <div style={{ fontSize: 12, color: '#A29C95' }}>인스타 광고 데이터 준비 중.</div>}
+            </div>
+            <div>
+              {colHead('채널 · 저효율')}
+              {mrRow('디스플레이', <span>{manF(adAgg.ch.display.spend)} · ROAS {roasOf(adAgg.ch.display.spend, adAgg.ch.display.rev)}%</span>, 'd')}
+              {mrRow('검색', <span>{manF(adAgg.ch.search.spend)} · ROAS {roasOf(adAgg.ch.search.spend, adAgg.ch.search.rev)}%</span>, 'e')}
+              {lowGroups.map((g, i) => mrRow(<span style={{ color: '#DC2626' }}>⚠ 저효율: {g.name}</span>, <span style={{ color: '#DC2626' }}>{manF(g.spend)} · {g.roas}%</span>, 'l' + i))}
+            </div>
           </div>
+        ) : <div style={{ fontSize: 12, color: '#A29C95' }}>광고 데이터(naver-ads.json) 불러오는 중이거나 없습니다.</div>}
+        {noteRow('ads', '📦 담당자', '네이버 광고 효율 판단 · 다음 방향 — 한 줄')}
+      </div>
+
+      {/* 광고 — 인스타 */}
+      <div data-wr2-perf="iads" style={perfBox}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 18 }}>📸</span><span style={{ fontSize: 15.5, fontWeight: 800 }}>인스타 광고</span>
+          <span style={{ fontSize: 11, color: '#A29C95' }}>{iads && iads.window ? iads.window : ''}</span>
+          <button onClick={() => goTab && goTab('인스타 광고')} style={{ marginLeft: 'auto', border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>자세히 → 인스타 광고 탭</button>
         </div>
-        {noteRow('ads', '📦 담당자', '효율에 대한 판단 · 다음 방향 — 한 줄')}
+        {iAdsArr.length ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 14 }}>
+            <div>
+              {colHead('라이브 소재 (썸네일)')}
+              <div style={{ display: 'flex', gap: 6 }}>{iThumbs.map((a, i) => thumbTile(a.thumb, (a.name || '').slice(0, 16), a === iBest ? '★ CTR ' + (a.ctr || 0).toFixed(2) + '%' : null, false, 'ia' + i))}</div>
+            </div>
+            <div>
+              {colHead('효율 요약')}
+              {mrRow('지출 / 도달', manF(iSpend) + ' · ' + nf(iReach), 'f')}
+              {mrRow('광고 수 / 평균 CTR', iAdsArr.length + '개 · ' + iAvgCtr.toFixed(2) + '%', 'f2')}
+              {iBest ? mrRow(<span style={{ color: '#047857' }}>★ 효율 1위</span>, <span>{(iBest.name || '').slice(0, 14)} · {(iBest.ctr || 0).toFixed(2)}%</span>, 'f3') : null}
+              {iTop && (iTop.ctr || 0) < iAvgCtr ? mrRow(<span style={{ color: '#B45309' }}>⚠ 지출 최대 소재가 평균 CTR 밑</span>, <span style={{ color: '#B45309' }}>{(iTop.ctr || 0).toFixed(2)}% · 교체 검토</span>, 'g') : null}
+            </div>
+          </div>
+        ) : <div style={{ fontSize: 12, color: '#A29C95' }}>인스타 광고 데이터 준비 중.</div>}
+        {noteRow('iads', '📦 담당자', '인스타 광고 소재 판단 · 다음 방향 — 한 줄')}
       </div>
 
       {/* 콘텐츠 */}
@@ -10162,6 +10173,7 @@ function App() {
         <div data-nav-groups style={{ background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflowX: 'auto' }}>
           <div style={{ display: 'flex', minWidth: 'max-content' }}>
             {GROUPS.map((g, gi) => <button key={gi} data-nav-group={g.label} onClick={() => goLabel(g.tabs[0])} style={{ padding: '12px 20px', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: activeGroup === gi ? 800 : 600, color: activeGroup === gi ? G : '#6E6863', background: 'transparent', borderBottom: activeGroup === gi ? '3px solid ' + G : '3px solid transparent', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{g.icon} {g.label}{g.label === 'AI 에이전트' && decPending > 0 ? <span style={{ background: '#C62828', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{decPending}</span> : null}</button>)}
+            <a data-nav-popup href="https://miraclead2026.github.io/lifemeal-popup/" target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', margin: '0 12px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🎪 용산팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
           </div>
         </div>
         {activeGroup >= 0 && (GROUPS[activeGroup].tabs.length > 1 || ORPHAN_PARENT[curLabel] === GROUPS[activeGroup].label) ? (
