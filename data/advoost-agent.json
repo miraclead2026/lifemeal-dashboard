@@ -1,0 +1,179 @@
+{
+ "updatedAt": "2026-08-17",
+ "goal": {
+  "goal": "애드부스트 쇼핑으로 라이프밀 상품을 팔되, 실구매 ROAS를 다시 목표선까지 올린다.",
+  "goalNote": "표기 ROAS(장바구니 포함)는 640%대로 좋아 보이지만, 실제 돈이 되는 실구매 ROAS는 200% 안팎으로 목표 미달.",
+  "targets": [
+   {
+    "label": "실구매 ROAS",
+    "value": "~200% → 330%"
+   },
+   {
+    "label": "구조",
+    "value": "1개 캠페인 → 신규+리타겟 2트랙"
+   },
+   {
+    "label": "장바구니 회수",
+    "value": "담고 안 산 사람 되잡기(현재 회수광고 없음)"
+   }
+  ],
+  "stance": "선조치 후보고 · 실구매 ROAS로 판단(표기 ROAS 착시 배제) · 집행은 화면작업(소재는 유니)."
+ },
+ "problems": [
+  {
+   "title": "장바구니 회수(리타겟) 광고가 죽어있다",
+   "status": "고치는 중",
+   "detail": "카탈로그 판매 캠페인이 ①클릭 최적화(구매 아님) ②잠재고객 미설정(전체에 노출) ③소재 없음 으로 집행 0. 하루 장바구니 19~41건이 회수 안 됨."
+  },
+  {
+   "title": "ADVoost 하나가 신규+전체를 다 떠안는다",
+   "status": "대기",
+   "detail": "단일 캠페인에 예산만 키워(40만→90만/일) 모수 소진 → 실구매 ROAS 300%대→200%대 하락."
+  },
+  {
+   "title": "표기 ROAS가 실구매를 가린다",
+   "status": "인지",
+   "detail": "표기 644% vs 실구매 163%. 장바구니 전환까지 포함돼 부풀려짐 → 실구매 ROAS로 판단."
+  },
+  {
+   "title": "애셋그룹이 무차별",
+   "status": "대기",
+   "detail": "모든 아이템·시그널 미설정 → AI가 최적 상품·구매자를 못 좁힘."
+  }
+ ],
+ "plan": [
+  {
+   "step": 1,
+   "title": "죽은 리타겟 광고 되살리기",
+   "status": "진행중",
+   "actions": [
+    "입찰목표 클릭→전환수 최대화",
+    "잠재고객=방문·장바구니 이탈 + 구매자 제외",
+    "소재 등록(유니)",
+    "예산 이전"
+   ]
+  },
+  {
+   "step": 2,
+   "title": "ADVoost 신규트랙 정리",
+   "status": "대기",
+   "actions": [
+    "애셋그룹 시그널 설정",
+    "예산 2주 고정(학습리셋 방지)",
+    "판단을 실구매 ROAS로"
+   ]
+  },
+  {
+   "step": 3,
+   "title": "상품별 세분화",
+   "status": "대기(2주 뒤 데이터)",
+   "actions": [
+    "잘 팔리는 상품군끼리 애셋그룹 분리",
+    "시그널 차별화"
+   ]
+  }
+ ],
+ "performance": {
+  "latest": {
+   "date": "2026-08-16",
+   "spend": 354972,
+   "purchaseSales": 579130,
+   "purchaseRoas": 163
+  },
+  "trend14d": [
+   {
+    "date": "2026-08-03",
+    "spend": 801416,
+    "purchaseSales": 1541560,
+    "purchaseRoas": 192
+   },
+   {
+    "date": "2026-08-04",
+    "spend": 896873,
+    "purchaseSales": 1043470,
+    "purchaseRoas": 116
+   },
+   {
+    "date": "2026-08-05",
+    "spend": 884528,
+    "purchaseSales": 1718580,
+    "purchaseRoas": 194
+   },
+   {
+    "date": "2026-08-06",
+    "spend": 885581,
+    "purchaseSales": 1647370,
+    "purchaseRoas": 186
+   },
+   {
+    "date": "2026-08-07",
+    "spend": 904408,
+    "purchaseSales": 2281940,
+    "purchaseRoas": 252
+   },
+   {
+    "date": "2026-08-08",
+    "spend": 887817,
+    "purchaseSales": 1806600,
+    "purchaseRoas": 203
+   },
+   {
+    "date": "2026-08-09",
+    "spend": 900716,
+    "purchaseSales": 1395740,
+    "purchaseRoas": 155
+   },
+   {
+    "date": "2026-08-10",
+    "spend": 702126,
+    "purchaseSales": 1716690,
+    "purchaseRoas": 244
+   },
+   {
+    "date": "2026-08-11",
+    "spend": 694704,
+    "purchaseSales": 2033320,
+    "purchaseRoas": 293
+   },
+   {
+    "date": "2026-08-12",
+    "spend": 660152,
+    "purchaseSales": 2346700,
+    "purchaseRoas": 355
+   },
+   {
+    "date": "2026-08-13",
+    "spend": 660219,
+    "purchaseSales": 1131780,
+    "purchaseRoas": 171
+   },
+   {
+    "date": "2026-08-14",
+    "spend": 700614,
+    "purchaseSales": 2228330,
+    "purchaseRoas": 318
+   },
+   {
+    "date": "2026-08-15",
+    "spend": 684438,
+    "purchaseSales": 1711450,
+    "purchaseRoas": 250
+   },
+   {
+    "date": "2026-08-16",
+    "spend": 354972,
+    "purchaseSales": 579130,
+    "purchaseRoas": 163
+   }
+  ]
+ },
+ "timeline": [
+  {
+   "date": "2026-08-17",
+   "category": "진단",
+   "what": "애드부스트 쇼핑 세분화 조사·계정 실측 완료",
+   "detail": "공식 도움말+실화면 분석. 세분화 캠페인들이 만들어졌으나 다 죽어있음을 확인 — ADVoost 하나가 신규+전체를 떠안는 구조.",
+   "why": "실구매 ROAS가 예산 증액과 함께 300%대→200%대로 하락. 세분화 필요를 데이터로 확인."
+  }
+ ]
+}
