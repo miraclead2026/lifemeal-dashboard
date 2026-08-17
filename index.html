@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_166';
+const BUILD_TAG = 'index_167';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -8675,6 +8675,8 @@ function TabShoppingConnect() {
 
   const dchron = daily.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
   const dmax = Math.max(1, ...dchron.map(x => Number(x[dailyK]) || 0));
+  const totalDirect = daily.reduce((a, x) => a + (Number(x.directVisits) || 0), 0);
+  const directRatio = totalDirect ? Math.round((Number(s.accessCnt) || 0) / totalDirect * 100) : 0;
 
   const keyTile = (label, val, sub, accent) => (
     <div data-sc-tile data-sc-key style={{ border: '1.5px solid ' + accent, background: '#FBFAF9', borderRadius: 12, padding: '13px 15px', minWidth: 150, flex: 1 }}>
@@ -8705,7 +8707,7 @@ function TabShoppingConnect() {
       <div style={{ fontSize: 11.5, color: '#A29C95', marginBottom: 14 }}>목적은 유입 창출 · 수수료는 의도적 고율 집행. 전환율은 참고값으로만 봅니다.</div>
 
       <div data-sc-insights style={{ display: 'flex', gap: 9, flexWrap: 'wrap', marginBottom: 12 }}>
-        {keyTile('유입수', num(s.accessCnt) + '회', '커넥트 방문 · 직유입에 포함', BLUE)}
+        {keyTile('유입수', num(s.accessCnt) + '회', '커넥트 링크 클릭 기준', BLUE)}
         {keyTile('수수료 집행액', won(s.commissionAmount), '집행 수수료율 ' + (s.commissionRate || 0) + '%', GOLD)}
         {tile('판매금액', won(s.salesAmount), '네이버 총매출에 포함 · 별도 가산 아님', '#6E6863')}
         {tile('판매개수', num(s.salesCnt) + '개', '주문 ' + num(s.productOrderCnt) + '건')}
@@ -8717,6 +8719,23 @@ function TabShoppingConnect() {
         {recent3Pct >= 40 ? <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6 }}>· 유입이 최근 3일(<b>{recent3Days.join('·')}</b>)에 <b>{num(recent3)}회({recent3Pct}%)</b> 집중 — 커넥트 본격 가동 구간.</div> : null}
         {maxRate && minRate ? <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6, marginTop: 3 }}>· 수수료율 최고 <b style={{ color: GOLD }}>{maxRate.r.toFixed(0)}%</b>({short(maxRate.nm)}) · 최저 {minRate.r.toFixed(0)}%({short(minRate.nm)}) — 상품별 고율 집행.</div> : null}
         <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6, marginTop: 3 }}>· 판매금액 <b>{won(s.salesAmount)}</b>은 스마트스토어 결제 → <b>네이버 총매출에 이미 포함</b>(별도 가산 아님).</div>
+      </Card>
+
+      <Card style={{ marginBottom: 16 }}>
+        <div data-sc-benchmark style={{ fontSize: 12, fontWeight: 800, color: '#1A1614', marginBottom: 8 }}>🔀 방문분석 직유입과 대조 <span style={{ fontSize: 10.5, fontWeight: 600, color: '#A29C95' }}>· 기간 합계 · 집계기준 상이 · 단순 차감 불가</span></div>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'stretch' }}>
+          <div style={{ ...box('#E3E0DC', '#FBFAF9'), flex: 1, minWidth: 150 }}>
+            <div style={{ fontSize: 10.5, color: '#6E6863' }}>직유입 <span style={{ color: '#A29C95' }}>(방문분석·세션 기준)</span></div>
+            <div style={{ fontSize: 19, fontWeight: 800, marginTop: 2, color: '#1A1614' }}>{num(totalDirect)}회</div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', color: '#A29C95', fontSize: 14, fontWeight: 800 }}>⟷</div>
+          <div style={{ ...box('#DCEAF7', '#F5F9FE'), flex: 1, minWidth: 150 }}>
+            <div style={{ fontSize: 10.5, color: '#6E6863' }}>쇼핑커넥트 유입 <span style={{ color: '#A29C95' }}>(링크 클릭 기준)</span></div>
+            <div style={{ fontSize: 19, fontWeight: 800, marginTop: 2, color: BLUE }}>{num(s.accessCnt)}회</div>
+            <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>직유입 대비 {directRatio}%</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 8, lineHeight: 1.55 }}>클릭 후 이탈·중복으로 약 10% 차이 — <b>서로 빼거나 포함으로 계산하지 않습니다</b>. 커넥트 이전 기저 직유입(하루 20~30회 안팎)은 계속 유지됩니다.</div>
       </Card>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -8774,7 +8793,7 @@ function TabShoppingConnect() {
         })}
       </div>
 
-      <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 14, lineHeight: 1.6 }}>출처: 네이버 브랜드커넥트(쇼핑커넥트) 어필리에이트. {meta.basis || ''} · 매출·유입은 스마트스토어 총매출/직유입에 이미 포함(중복 가산 아님).{status === 'seed' ? ' data/shopping-connect.json 이 올라오면 실데이터로 자동 갱신됩니다.' : ''}</div>
+      <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 14, lineHeight: 1.6 }}>출처: 네이버 브랜드커넥트(쇼핑커넥트) 어필리에이트. {meta.basis || ''} · 매출은 스마트스토어 총매출에 포함(별도 가산 아님) · 유입은 직유입과 집계기준 상이(클릭 vs 세션)·단순 차감 불가.{status === 'seed' ? ' data/shopping-connect.json 이 올라오면 실데이터로 자동 갱신됩니다.' : ''}</div>
     </div>
   );
 }
