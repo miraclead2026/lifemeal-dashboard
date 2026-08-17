@@ -166,13 +166,24 @@ const list = o => Object.entries(obj(o)).map(([id, v]) => ({ id, ...v }));
 const avg = xs => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
 
 /* 게시물 1건의 감점(음수). 추가글은 감점 미적용(2026-06-29 정책).
-   미디어·글자수·해시태그 감점은 블로그 전용이다. */
+   감점 폭은 채널마다 다르다 — 인스타 기준은 4기에 생겼고, instagramPenaltyEnabled
+   가 꺼져 있으면(3기처럼) 감점하지 않는다.
+   ★ scripts/verify_formula.py 의 post_deduction() 과 동일해야 한다. */
 function postDeduction(post, channel, R) {
-  if (post.type === '추가' || channel !== 'blog') return 0;
+  if (post.type === '추가') return 0;
   const f = obj(post.flags);
+  let penMedia, penChars;
+  if (channel === 'instagram') {
+    if (!R.instagramPenaltyEnabled) return 0;
+    penMedia = R.instagramPenaltyImages ?? -10;
+    penChars = R.instagramPenaltyChars ?? -10;
+  } else {
+    penMedia = R.penaltyMedia;
+    penChars = R.penaltyChars;
+  }
   let t = 0;
-  if (f.image_insufficient) t += R.penaltyMedia;
-  if (f.char_insufficient) t += R.penaltyChars;
+  if (f.image_insufficient) t += penMedia;
+  if (f.char_insufficient) t += penChars;
   t += R.penaltyPerMissingTag * (f.missing_tags || []).length;
   return t;
 }
@@ -545,6 +556,26 @@ function addExtra(kind) {
   });
 }
 
+/* 자동 처리 요청의 진행 상태 — 러너가 status 를 pending→running→done 으로 바꾼다 */
+function requestStatus() {
+  const reqs = list(DATA.intakeRequests)
+    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  if (!reqs.length) return null;
+  const badge = s => s === 'done' ? el('span', { class: 'tag ok' }, '처리완료')
+    : s === 'running' ? el('span', { class: 'tag warn' }, '처리중')
+      : s === 'error' ? el('span', { class: 'tag bad' }, '오류')
+        : el('span', { class: 'tag warn' }, '대기중');
+  return el('div', { style: 'margin-top:14px' },
+    el('div', { class: 'sub', style: 'margin-bottom:6px' }, '자동 처리 요청 내역'),
+    el('table', {}, el('tbody', {}, ...reqs.slice(0, 8).map(r => el('tr', {},
+      el('td', { class: 'sub', style: 'white-space:nowrap' },
+        (r.createdAt || '').slice(0, 16).replace('T', ' ')),
+      el('td', {}, badge(r.status)),
+      el('td', { class: 'sub' }, `${(r.text || '').length}자`),
+      el('td', { class: 'sub', style: 'white-space:pre-wrap;max-width:430px' },
+        (r.result || '').slice(0, 240)))))));
+}
+
 function showKakao(wrap) {
   const box = wrap.querySelector('#kakaoBox');
   if (box.children.length) { box.innerHTML = ''; return; }
@@ -602,8 +633,29 @@ function showKakao(wrap) {
                 .map(h => el('th', {}, h)))), tb)));
         }
       }, '분석'),
+      el('button', {
+        onclick: async () => {
+          const text = ta.value.trim();
+          if (text.length < 40) return alert('대화 내용을 붙여넣어 주세요.');
+          const id = 'R' + Date.now().toString(36);
+          try {
+            await guard(db.ref(`/trials/${COHORT}/intakeRequests/${id}`).set({
+              text, createdAt: new Date().toISOString(), status: 'pending'
+            }));
+            await writeLog('decision', `자동 처리 요청 등록 (${text.length}자)`);
+            alert('접수했습니다.\n\n자동화 PC가 게시물 등록 → 블로그 자동체크 → '
+              + '인스타 수집까지 처리합니다.\n내용·진정성 채점은 사진을 직접 확인해야 하므로 '
+              + '이어서 별도로 진행됩니다.');
+            ta.value = ''; out.innerHTML = '';
+          } catch (e) { /* guard 가 이미 알림 */ }
+        }
+      }, '자동 처리 요청'),
       el('button', { onclick: () => { ta.value = ''; out.innerHTML = ''; } }, '지우기')),
-    out));
+    el('div', { class: 'sub', style: 'margin-top:8px' },
+      '「분석」은 이 화면에서 직접 골라 접수할 때, 「자동 처리 요청」은 맡겨둘 때 씁니다. ' +
+      '요청하면 접수·자동체크·인스타 수집이 자동으로 돌고, 결과는 이 페이지에 그대로 반영됩니다.'),
+    out,
+    requestStatus()));
 }
 
 /* ══════════════════════ 탭: 채점 현황 ═══════════════════════════════════ */
