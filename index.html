@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_167';
+const BUILD_TAG = 'index_169';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -1432,7 +1432,7 @@ function EditModal({ target, data, setData, onClose, onSwitch, canBack, onBack }
   const addChildPlan = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, plans: [...d.plans, { id: d.nid + 1, outputId: item.id, name: newChild.trim(), start: '', due: '', owner: ['현수'], support: [], kpis: [], dep: null, resolved: false, hold: false }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'plan', id: nv }); };
   const addChildSub = () => { if (!newChild.trim()) return; const nv = data.nid + 1; setData(d => ({ ...d, nid: d.nid + 1, subplans: [...d.subplans, { id: d.nid + 1, planId: item.id, name: newChild.trim(), stage: '예정', start: '', due: '', owner: (ownersOf(item).length ? ownersOf(item) : ['현수']), support: [], dep: null, resolved: false, files: [], perfRecorded: false, kpis: [] }] })); setNewChild(''); onSwitch && onSwitch({ kind: 'subplan', id: nv }); };
   const movePlanChild = (id, dir) => setData(d => ({ ...d, plans: reorderSiblings(d.plans, id, 'outputId', dir) }));
-  const toggleSubChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
+  const toggleSubChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done, doneAt: !c.done ? TODAY : null } : c) }));
   const delSubChk = id => setData(d => ({ ...d, checklists: d.checklists.filter(c => c.id !== id) }));
   const setSubChkDate = (id, date) => setData(d => applyChklDate(d, id, date));
   const setSubChkOwner = (id, m) => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, owner: toggleIn(ownersOf(c), m) } : c) }));
@@ -1772,7 +1772,7 @@ function ChecklistModal({ chkId, data, setData, onClose }) {
   const tone = chkTone(c);
   const chks = solo ? [c] : sortChksByDate((data.checklists || []).filter(x => x.subplanId === c.subplanId));
   const chkDrag = useDragOrder((from, to) => setData(d => moveChkInGroup(d, from, to)), (from, to) => sameChkGroup(data.checklists, from, to));
-  const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done } : x) }));
+  const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done, doneAt: !x.done ? TODAY : null } : x) }));
   const setText = (id, text) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, text } : x) }));
   const setOwner = (id, m) => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, owner: toggleIn(ownersOf(x), m) } : x) }));
   const setDate = (id, date) => setData(d => applyChklDate(d, id, date));
@@ -1949,7 +1949,7 @@ function DayDetailModal({ date, data, setData, onEdit, onClose, owner }) {
   const doneCnt = dayChks.filter(c => c.done).length;
   const WDN = ['일', '월', '화', '수', '목', '금', '토'];
   const wd = WDN[new Date(date + 'T00:00:00').getDay()] || '';
-  const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done } : x) }));
+  const toggleDone = id => setData(d => ({ ...d, checklists: d.checklists.map(x => x.id === id ? { ...x, done: !x.done, doneAt: !x.done ? TODAY : null } : x) }));
   const addChk = kind => {
     const t = newText.trim(); if (!t) return;
     const meet = kind === 'meeting';
@@ -2729,7 +2729,7 @@ function TabKanban({ data, setData, onEdit }) {
     if (ns.stage === '완료' && !ns.completedAt) ns = { ...ns, completedAt: TODAY };
     return ns;
   }) }));
-  const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
+  const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done, doneAt: !c.done ? TODAY : null } : c) }));
   const toggleHold = id => setData(d => ({ ...d, plans: d.plans.map(p => p.id === id ? { ...p, hold: !p.hold } : p) }));
   const rollup = (p, subs) => { if (p.hold) return '보류'; if (!subs.length) return '예정'; const act = subs.filter(s => s.stage !== '보류'); if (act.length && act.every(s => s.stage === '완료')) return '완료'; if (subs.some(s => s.stage === '검토중')) return '검토중'; if (subs.some(s => s.stage === '진행중')) return '진행중'; if (subs.some(s => s.stage === '완료')) return '진행중'; return '예정'; };
   const plansForCol = stage => data.plans.filter(p => { const subs = subsOfPlanAll(data, p.id); if (rollup(p, subs) !== stage) return false; return filter === '전체' || matchOwner(p, filter) || subs.some(s => matchOwner(s, filter)); });
@@ -2791,7 +2791,7 @@ function TabWeekly({ data, setData, onEdit }) {
   const monday = (() => { const d = new Date(TODAY); const wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd + offset * 7); return d; })();
   const weekDates = DAYS.map((_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); return x.toISOString().slice(0, 10); });
   const diffDays = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
-  const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done } : c) }));
+  const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done, doneAt: !c.done ? TODAY : null } : c) }));
   const addChk = id => { const t = (newChk[id] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: id, text: t, done: false, date: '', owner: [], memo: '' }] })); setNewChk(n => ({ ...n, [id]: '' })); };
   const planName = id => { const p = data.plans.find(x => x.id === id); return p ? p.name : ''; };
   const onDragStart = (e, s, isSpan) => {
@@ -7897,7 +7897,7 @@ function TabSchedule({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통', 'n.파워링크': 'N.파워링크', 'powerlink': 'N.파워링크', 'n.쇼핑검색': 'N.쇼핑검색', 'shopping': 'N.쇼핑검색', '키워드 총합본': '키워드 총합본', '키워드총합본': '키워드 총합본', keyworddict: '키워드 총합본', keywords: '키워드 총합본', '상품 최적화': '상품 최적화', '상품최적화': '상품 최적화', productseo: '상품 최적화', seo: '상품 최적화' };
+const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통', 'n.파워링크': 'N.파워링크', 'powerlink': 'N.파워링크', 'n.쇼핑검색': 'N.쇼핑검색', 'shopping': 'N.쇼핑검색', '키워드 총합본': '키워드 총합본', '키워드총합본': '키워드 총합본', keyworddict: '키워드 총합본', keywords: '키워드 총합본', '상품 최적화': '상품 최적화', '상품최적화': '상품 최적화', productseo: '상품 최적화', seo: '상품 최적화', '업무보고': '주간 보고', '주간보고': '주간 보고', workreport: '주간 보고', report: '주간 보고' };
 
 const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 
@@ -8278,186 +8278,421 @@ function PsSection({ title, sub, children }) {
 }
 
 function TabWorkReport({ data, setData, onEdit, goTab }) {
-  const [rep, setRep] = React.useState(null);
-  const [rstat, setRstat] = React.useState('loading');
-  const [openP, setOpenP] = React.useState({});
-  const [kf, setKf] = React.useState(false);
-  const [kName, setKName] = React.useState('');
-  const [kTarget, setKTarget] = React.useState('');
-  const [kUnit, setKUnit] = React.useState('');
-  const [kMonth, setKMonth] = React.useState(TODAY.slice(0, 7));
+  // ── 주간 보고 (index_168 · v4 껍데기) ─────────────────────────────────
+  // ① 성과(매출·광고·콘텐츠, 강조) ② 업무(프로젝트에서) ③ 최신화 점검
+  // AI 제안·판단 카드는 다루지 않는다(판단 대기 탭 유지).
+  const [sales, setSales] = React.useState(null);
+  const [ads, setAds] = React.useState(null);
+  const [iads, setIads] = React.useState(null);
+  const [ipos, setIpos] = React.useState(null);
+  const [kwAdd, setKwAdd] = React.useState(null);
+  const [wIdx, setWIdx] = React.useState(0);
+  const [odOpen, setOdOpen] = React.useState(false);
+  const [resEdit, setResEdit] = React.useState(null);   // { id, text }
+
   React.useEffect(() => {
     let alive = true;
-    ghFetch('data/work-report.json').then(r => (r.ok ? r.json() : null)).then(j => { if (!alive) return; if (j && Array.isArray(j.weeks) && j.weeks.length) { setRep(j); setRstat('ok'); } else setRstat('none'); }).catch(() => { if (alive) setRstat('none'); });
+    const grab = (path, ok) => ghFetch(path).then(r => (r.ok ? r.json() : null)).then(j => { if (alive) ok(j); }).catch(() => { if (alive) ok(null); });
+    grab('data/naver-sales.json', j => setSales(j && (j.weeks || j.days) ? j : null));
+    grab('data/naver-ads.json', j => setAds(j && Array.isArray(j.days) ? j : null));
+    grab('data/insta-ads.json', j => setIads(j && Array.isArray(j.ads) ? j : null));
+    grab('data/insta-posts.json', j => setIpos(j && Array.isArray(j.posts) ? j : null));
+    grab('data/keyword-additions.json', j => setKwAdd(j && Array.isArray(j.days) ? j : null));
     return () => { alive = false; };
   }, []);
 
-  const curMonth = TODAY.slice(0, 7);
-  const box = (bd, bg) => ({ border: '1px solid ' + bd, background: bg, borderRadius: 10, padding: '11px 13px' });
-  const sec = t => <div style={{ fontSize: 10.5, color: '#A29C95', fontWeight: 800, letterSpacing: '.04em', margin: '20px 0 8px' }}>{t}</div>;
-  const stageCol = st => (st === '진행중' ? '#047857' : st === '검토중' ? '#B45309' : st === '보류' ? '#6E6863' : '#3A3631');
-  const inp = { width: '100%', boxSizing: 'border-box', border: '1px solid #D6D0C8', borderRadius: 8, padding: '7px 9px', fontSize: 12.5, fontFamily: 'inherit' };
+  // ── 공통 포맷/스타일 ──
+  const nf = n => Number(n || 0).toLocaleString();
+  const wonF = n => nf(n) + '원';
+  const manF = n => { const v = Number(n || 0); return v >= 10000000 ? (Math.round(v / 100000) / 100).toLocaleString() + '천만' : Math.round(v / 10000).toLocaleString() + '만'; };
+  const dch = (d, invert) => { if (!d || d.deltaPct == null) return null; const up = d.deltaPct > 0; const good = invert ? !up : up; return <span style={{ fontSize: 10.5, fontWeight: 700, color: d.deltaPct === 0 ? '#8A837C' : good ? '#047857' : '#DC2626' }}>{d.deltaPct === 0 ? '–' : (up ? '▲' : '▼') + Math.abs(d.deltaPct) + '%'}</span>; };
+  const secHead = (badge, bg, title, hint, right) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 9, margin: '20px 4px 9px', flexWrap: 'wrap' }}>
+      <span style={{ height: 24, borderRadius: 8, color: 'white', fontSize: 12.5, fontWeight: 800, display: 'inline-flex', alignItems: 'center', padding: '0 10px', background: bg }}>{badge}</span>
+      <span style={{ fontSize: 16, fontWeight: 800 }}>{title}</span>
+      {hint ? <span style={{ fontSize: 11, color: '#A29C95' }}>{hint}</span> : null}
+      {right ? <span style={{ marginLeft: 'auto' }}>{right}</span> : null}
+    </div>
+  );
+  const colHead = t => <div style={{ fontSize: 11, fontWeight: 800, color: '#6E6863', marginBottom: 6 }}>{t}</div>;
+  const mrRow = (k, v, i) => <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12, padding: '3px 0', borderBottom: '1px dashed #F1EFEC' }}><span style={{ color: '#3A3631', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{k}</span><span style={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{v}</span></div>;
+  const imgSrc = t => (/^https?:/.test(String(t || '')) ? t : GH_PAGES + t);
+  const perfBox = { background: 'white', border: '1.5px solid #D8E3DC', borderRadius: 14, padding: '16px 18px', marginBottom: 12, boxShadow: '0 2px 6px rgba(27,77,62,.06)' };
 
-  const w0 = (rep && rep.weeks && rep.weeks[0]) || null;
-  const metrics = (w0 && Array.isArray(w0.metrics)) ? w0.metrics : [];
+  // ── 주차 선택 (+ 진행 중인 이번 주 합성) ──
+  const weeksSrc = latestFirst(((sales && sales.weeks) || []).slice(), 'key');
+  const daysAllS = (sales && sales.days) || [];
+  const curWkKey = weekKeyOf(TODAY);
+  const latestWKey = weeksSrc.length && /^\d{4}-\d{2}-\d{2}$/.test(weeksSrc[0].key) ? weeksSrc[0].key : null;
+  const synth = (latestWKey && curWkKey > latestWKey) ? (() => {
+    const s0 = curWkKey, e0 = addDay(curWkKey, 6);
+    const inR = daysAllS.filter(d => d.key >= s0 && d.key <= e0);
+    if (!inR.length) return null;
+    const sumv = k => inR.reduce((a, d) => a + (((d.summary || {})[k] || {}).value || 0), 0);
+    const rev = sumv('revenue'), ord = sumv('orders');
+    const chM = {}; inR.forEach(d => (d.channels || []).forEach(c => { const m = chM[c.name] || (chM[c.name] = { name: c.name, revenue: 0 }); m.revenue += c.revenue || 0; }));
+    const prM = {}; inR.forEach(d => (d.products || []).forEach(p => { const kk = p.productId || p.name; const m = prM[kk] || (prM[kk] = { name: p.name, revenue: 0 }); m.revenue += p.revenue || 0; }));
+    return { key: s0, label: s0.slice(5).replace('-', '/') + '~ 이번 주 (집계 중)', partial: true, summary: { revenue: { value: rev }, orders: { value: ord }, aov: { value: ord ? Math.round(rev / ord) : 0 }, refund: { value: sumv('refund') }, visitors: { value: sumv('visitors') } }, daily: inR.map(d => ({ key: d.key })), channels: Object.values(chM), products: Object.values(prM) };
+  })() : null;
+  const weeks = synth ? [synth].concat(weeksSrc) : weeksSrc;
+  const wSel = Math.min(wIdx, Math.max(0, weeks.length - 1));
+  const cw = weeks[wSel] || null;
+  const wkS = cw ? (/^\d{4}-\d{2}-\d{2}$/.test(cw.key) ? cw.key : ((cw.daily || [])[0] || {}).key || TODAY) : weekKeyOf(TODAY);
+  const wkE = cw && /^\d{4}-\d{2}-\d{2}$/.test(wkS) ? addDay(wkS, 6) : TODAY;
+  const wkLabel = cw ? (cw.label || wkS.slice(5) + '~' + wkE.slice(5)) : '이번 주';
+  const isLatest = wSel === 0;
+  const wkWorkE = isLatest && TODAY > wkE ? TODAY : wkE;   // 최신 주 화면의 '업무' 창은 오늘까지 — 월요일에 체크한 게 사라지지 않게
+  const sum = (cw && cw.summary) || {};
+  const gv = k => ((sum[k] || {}).value) || 0;
 
-  const projs = (data.outputs || []).map(o => {
-    const plans = plansOfOut(data, o.id);
-    const rows = plans.map(p => {
-      const subs = (data.subplans || []).filter(s => isLinkedPlan(s, p.id));
-      const open = subs.filter(s => s.stage !== '완료');
-      return { it: p, subs: open, doneN: subs.length - open.length };
-    });
-    const todo = rows.reduce((a, r) => a + (r.subs.length || (r.it.hold ? 0 : 1)), 0);
-    return { o, plans, rows, todo };
-  }).filter(x => x.plans.length);
+  // ── 매출 파생 ──
+  const chAll = (cw && cw.channels) || [];
+  const chSum = chAll.reduce((a, c) => a + (c.revenue || 0), 0);
+  const chTop = chAll.slice().sort((a, b) => (b.revenue || 0) - (a.revenue || 0)).slice(0, 3);
+  const prTop = ((cw && cw.products) || []).slice().sort((a, b) => (b.revenue || 0) - (a.revenue || 0)).slice(0, 3);
 
-  const kpis = (data.mainKpis || []);
-  const kpiTargetOf = k => { const t = (k.targets || {})[curMonth]; return (t != null) ? t : (k.target != null ? k.target : null); };
-  const kpiLogged = k => (data.kpiLogs || []).some(l => l.kpiId === k.id) || (Array.isArray(k.manuals) && k.manuals.length > 0);
-  const addKpi = () => {
-    const nm = kName.trim(); if (!nm) return;
-    const tv = (kTarget === '' ? null : Number(kTarget));
-    const kpi = { id: 'mk' + Date.now(), name: nm, unit: kUnit.trim(), linkedPlanIds: [], linkedKpiIds: [], targets: (tv != null && kMonth) ? { [kMonth]: tv } : {}, manuals: [] };
-    setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), kpi] }));
-    setKName(''); setKTarget(''); setKUnit(''); setKf(false);
+  // ── 광고 파생 (주간 범위 집계) ──
+  const adRows = ads ? sortByDate(ads.days).filter(x => x.date >= wkS && x.date <= wkE) : [];
+  const adAgg = (() => { const t = { spend: 0, rev: 0, conv: 0, clicks: 0, imp: 0, ch: { display: { spend: 0, rev: 0 }, search: { spend: 0, rev: 0 } } }; adRows.forEach(x => (x.groups || []).forEach(g => { const c = g.channel === 'search' ? 'search' : 'display'; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.purchaseConv || 0; t.clicks += g.clicks || 0; t.imp += g.impressions || 0; t.ch[c].spend += g.spend || 0; t.ch[c].rev += g.convRevenue || 0; })); return t; })();
+  const roasOf = (s, r) => (s ? Math.round(r / s * 1000) / 10 : 0);
+  const wkRoas = roasOf(adAgg.spend, adAgg.rev);
+  const lowGroups = (() => { const m = {}; adRows.forEach(x => (x.groups || []).forEach(g => { const k = String(g.adGroupId || g.campaignId || g.adGroupName); if (!m[k]) m[k] = { name: g.adGroupName || g.campaignName || '(그룹)', spend: 0, rev: 0 }; m[k].spend += g.spend || 0; m[k].rev += g.convRevenue || 0; })); return Object.values(m).filter(g => g.spend >= 12500).map(g => ({ ...g, roas: roasOf(g.spend, g.rev) })).sort((a, b) => a.roas - b.roas).slice(0, 2); })();
+
+  // ── 인스타 광고 파생 ──
+  const iAdsArr = (iads && iads.ads) || [];
+  const iSpend = iAdsArr.reduce((a, x) => a + (x.spend || 0), 0);
+  const iReach = iAdsArr.reduce((a, x) => a + (x.reach || 0), 0);
+  const iBest = iAdsArr.slice().sort((a, b) => (b.ctr || 0) - (a.ctr || 0))[0] || null;
+  const iTop = iAdsArr.slice().sort((a, b) => (b.spend || 0) - (a.spend || 0))[0] || null;
+  const iAvgCtr = (() => { const im = iAdsArr.reduce((a, x) => a + (x.impressions || 0), 0), ck = iAdsArr.reduce((a, x) => a + (x.clicks || 0), 0); return im ? ck / im * 100 : 0; })();
+  const iThumbs = (iBest ? [iBest] : []).concat(iAdsArr.filter(x => x !== iBest).sort((a, b) => (b.spend || 0) - (a.spend || 0))).slice(0, 4);
+
+  // ── 콘텐츠(오가닉) 파생 ──
+  const posts = (ipos && ipos.posts) || [];
+  const inWk = p => { const d = String(p.timestamp || '').slice(0, 10); return d >= wkS && d <= wkE; };
+  const wkPosts = posts.filter(inWk);
+  const showPosts = (wkPosts.length ? wkPosts : posts.slice()).sort((a, b) => ((b.likes || 0) + (b.comments || 0)) - ((a.likes || 0) + (a.comments || 0)));
+  const pAvg = arr => arr.length ? [Math.round(arr.reduce((a, p) => a + (p.likes || 0), 0) / arr.length), Math.round(arr.reduce((a, p) => a + (p.comments || 0), 0) / arr.length)] : [0, 0];
+  const [avgL, avgC] = pAvg(wkPosts.length ? wkPosts : posts);
+  const pTop = showPosts[0] || null;
+
+  // ── 키워드 트렌드 → 반영 추적 ──
+  const kwDay = kwAdd ? (kwAdd.days || []).slice().sort((a, b) => (a.date < b.date ? 1 : -1))[0] : null;
+  const kwAdded = (kwDay && kwDay.added) || [];
+  const kwContent = ((kwDay && kwDay.rejected) || []).filter(k => /콘텐츠/.test(k.reason || ''));
+  const kwMade = k => posts.some(p => (String(p.caption || '') + ' ' + ((p.hashtags || []).join(' '))).indexOf(k.keyword) >= 0);
+  const kwMiss = kwContent.filter(k => !kwMade(k));
+
+  // ── 업무 (프로젝트에서) ──
+  const planById = id => (data.plans || []).find(p => p.id === id);
+  const outOfPlan = p => p ? (data.outputs || []).find(o => o.id === p.outputId) : null;
+  const groupByOut = list => { const m = {}; list.forEach(s => { const o = outOfPlan(planById(s.planId)); const k = o ? o.id : 0; if (!m[k]) m[k] = { o, items: [] }; m[k].items.push(s); }); return Object.values(m); };
+  const doneWk = (data.subplans || []).filter(s => s.stage === '완료' && s.completedAt && s.completedAt >= wkS && s.completedAt <= wkWorkE);
+  const chkWk = (data.checklists || []).filter(c => c.done && c.doneAt && c.doneAt >= wkS && c.doneAt <= wkWorkE);
+  const touchedSubs = (() => { const seen = {}; const out = []; chkWk.forEach(c => { if (seen[c.subplanId]) return; seen[c.subplanId] = 1; const s = (data.subplans || []).find(x => x.id === c.subplanId); if (s && !(s.stage === '완료' && s.completedAt && s.completedAt >= wkS && s.completedAt <= wkWorkE)) out.push(s); }); return out; })();
+  const wkGroups = (() => { const m = {}; const add = (s, kind) => { const o = outOfPlan(planById(s.planId)); const k = o ? o.id : 0; if (!m[k]) m[k] = { o, rows: [] }; m[k].rows.push({ s, kind }); }; doneWk.forEach(s => add(s, 'done')); touchedSubs.forEach(s => add(s, 'prog')); return Object.values(m); })();
+  const upcoming = (data.subplans || []).filter(s => s.stage !== '완료' && s.due && s.due <= addDay(wkWorkE, 7)).sort((a, b) => (a.due < b.due ? -1 : 1));
+  const upG = groupByOut(upcoming.slice(0, 12)).slice(0, 4);
+  const overdue = (data.subplans || []).filter(s => s.stage !== '완료' && s.due && s.due < TODAY).sort((a, b) => (a.due < b.due ? -1 : 1));
+
+  // ── KPI 자동 바인딩 (월 누적) ──
+  const month = wkE.slice(0, 7);
+  const mDays = ((sales && sales.days) || []).filter(d => String(d.key || '').slice(0, 7) === month);
+  const mtd = mDays.reduce((t, d) => { const s = d.summary || {}; t.rev += ((s.revenue || {}).value) || 0; t.ord += ((s.orders || {}).value) || 0; t.vis += ((s.visitors || {}).value) || 0; return t; }, { rev: 0, ord: 0, vis: 0 });
+  const mAds = ads ? ads.days.filter(x => String(x.date).slice(0, 7) === month) : [];
+  const mAd = mAds.reduce((t, x) => { (x.groups || []).forEach(g => { t.spend += g.spend || 0; t.rev += g.convRevenue || 0; }); return t; }, { spend: 0, rev: 0 });
+  const kpiFind = re => (data.mainKpis || []).find(k => re.test(k.name || ''));
+  const kTarget = k => { if (!k) return null; const t = (k.targets || {})[month]; return t != null ? t : (k.target != null ? k.target : null); };
+  const kpiDefs = [
+    { re: /매출/, label: '매출', val: mtd.rev, fmt: manF },
+    { re: /roas/i, label: 'ROAS', val: roasOf(mAd.spend, mAd.rev), fmt: v => v + '%', low: true },
+    { re: /객단가/, label: '객단가', val: mtd.ord ? Math.round(mtd.rev / mtd.ord) : 0, fmt: wonF },
+    { re: /방문/, label: '방문', val: mtd.vis, fmt: nf },
+    { re: /CRM|고객/i, label: 'CRM', val: null, fmt: nf, manual: true },
+  ].map(d => { const k = kpiFind(d.re); return { ...d, kpi: k, target: kTarget(k) }; }).filter(d => d.kpi);
+  const kpiBad = kpiDefs.filter(d => !d.manual && (d.target == null || d.target === 0));
+
+  // ── 담당자 한 줄 (insights[wkS]) ──
+  const ins = ((data.insights || {})[wkS]) || {};
+  const insSet = (f, v) => setData(d => ({ ...d, insights: { ...(d.insights || {}), [wkS]: { ...((d.insights || {})[wkS] || {}), [f]: v } } }));
+  const noteRow = (noteKey, who, ph) => (
+    <div style={{ borderTop: '1px dashed #E3E0DC', marginTop: 12, paddingTop: 10, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px,1fr))', gap: 8 }}>
+      <div><div style={{ fontSize: 10.5, fontWeight: 800, color: '#6E6863', marginBottom: 4 }}>{who} 한 줄 ✍️</div>
+        <textarea data-wr2-note={noteKey} value={ins[noteKey + '_note'] || ''} onChange={e => insSet(noteKey + '_note', e.target.value)} rows={2} placeholder={ph}
+          style={{ width: '100%', boxSizing: 'border-box', border: '1px solid ' + (ins[noteKey + '_note'] ? '#EEECE8' : '#FDE68A'), background: ins[noteKey + '_note'] ? '#FBFAF9' : '#FFFBEB', borderRadius: 8, padding: '7px 10px', fontSize: 11.5, fontFamily: 'inherit', resize: 'vertical', lineHeight: 1.55 }} /></div>
+      <div><div style={{ fontSize: 10.5, fontWeight: 800, color: '#6E6863', marginBottom: 4 }}>💬 피드백</div>
+        <textarea data-wr2-reply={noteKey} value={ins[noteKey + '_reply'] || ''} onChange={e => insSet(noteKey + '_reply', e.target.value)} rows={2} placeholder="담당자 한 줄에 대한 방향·의견"
+          style={{ width: '100%', boxSizing: 'border-box', border: '1px solid #E4DDFA', background: '#F7F5FE', borderRadius: 8, padding: '7px 10px', fontSize: 11.5, fontFamily: 'inherit', resize: 'vertical', lineHeight: 1.55, color: '#4C3A99' }} /></div>
+    </div>
+  );
+
+  // ── 결과 한 줄 (subplan.resultNote) ──
+  const saveRes = () => { if (!resEdit) return; const { id, text } = resEdit; setData(d => ({ ...d, subplans: (d.subplans || []).map(s => s.id === id ? { ...s, resultNote: text.trim() } : s) })); setResEdit(null); };
+
+  // ── 점검 목록 ──
+  const noRes = doneWk.filter(s => !(s.resultNote || '').trim());
+  const emptyNotes = [['sales', '매출'], ['ads', '광고'], ['content', '콘텐츠']].filter(([k]) => !(ins[k + '_note'] || '').trim());
+  const checks = [];
+  if (noRes.length) checks.push({ tag: '결과 미기록', c: '#DC2626', bg: '#FEF2F2', nm: '완료 ' + noRes.length + '건에 결과 한 줄 붙이기', act: '아래 완료 목록에서 →', go: () => { const el = document.querySelector('[data-wr2-donecol]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } });
+  if (emptyNotes.length) checks.push({ tag: '보고 미완성', c: '#DC2626', bg: '#FEF2F2', nm: emptyNotes.map(x => x[1]).join('·') + ' 블록 담당자 한 줄 비어 있음', act: '쓰기 →', go: () => { const el = document.querySelector('[data-wr2-note="' + emptyNotes[0][0] + '"]'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); } } });
+  kwMiss.forEach(k => checks.push({ tag: '트렌드 미반영', c: '#B45309', bg: '#FFF7ED', nm: "'" + k.keyword + "' 콘텐츠 기획 없음 (콘텐츠 자리 판정)", act: '계획에 추가 →', go: () => goTab && goTab('프로젝트 진행 상황') }));
+  if (overdue.length) checks.push({ tag: '기한 초과', c: '#B45309', bg: '#FFF7ED', nm: '기한 지난 미완료 ' + overdue.length + '건 정리 (완료/보류/폐기)', act: '목록 →', go: () => setOdOpen(true) });
+  if (kpiBad.length) checks.push({ tag: 'KPI 설정', c: '#2D5FE0', bg: '#EFF6FF', nm: kpiBad.map(d => "'" + d.kpi.name + "'").join('·') + ' 목표가 비어 있거나 0', act: 'KPI 탭 →', go: () => goTab && goTab('KPI') });
+
+  const tile = (l, v, d, vc) => (
+    <div data-wr2-tile style={{ flex: 1, minWidth: 128, border: '1px solid #E3E0DC', borderRadius: 10, padding: '9px 12px' }}>
+      <div style={{ fontSize: 10.5, color: '#6E6863' }}>{l}</div>
+      <div style={{ fontSize: 18, fontWeight: 800, marginTop: 1, color: vc || '#1A1614' }}>{v}</div>
+      {d ? <div style={{ marginTop: 1 }}>{d}</div> : null}
+    </div>
+  );
+  const thumbTile = (src, cap, star, sq, key) => (
+    <div key={key} style={{ flex: 1, aspectRatio: sq ? '1' : '3/4', background: '#E8E4DE', borderRadius: 9, position: 'relative', overflow: 'hidden', minWidth: 0 }}>
+      <img data-wr2-thumb src={imgSrc(src)} alt="" loading="lazy" onError={e => { e.target.style.display = 'none'; }} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+      {star ? <span style={{ position: 'absolute', top: 5, left: 5, fontSize: 9, fontWeight: 800, color: '#1A1614', background: '#FDE68A', borderRadius: 5, padding: '1px 5px' }}>{star}</span> : null}
+      <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, fontSize: 9, fontWeight: 700, color: 'white', background: 'rgba(0,0,0,.55)', padding: '2px 5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{cap}</span>
+    </div>
+  );
+  const wiRow = (s, done) => {
+    const res = (s.resultNote || '').trim();
+    return (
+      <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#3A3631', padding: '3px 0 3px 8px', borderLeft: '2px solid #EEECE8', marginLeft: 4, flexWrap: 'wrap' }}>
+        {done ? <span style={{ color: '#047857', fontWeight: 800 }}>✓</span> : <span style={{ fontSize: 9.5, fontWeight: 700, border: '1px solid #E3E0DC', borderRadius: 5, padding: '0 5px', background: '#fff', color: s.due && s.due < TODAY ? '#DC2626' : (s.stage === '진행중' ? '#047857' : '#3A3631') }}>{s.due && s.due < TODAY ? '기한 ' + String(s.due).slice(5) : s.stage}</span>}
+        <span data-wr2-item onClick={() => onEdit && onEdit({ kind: 'subplan', id: s.id })} style={{ cursor: 'pointer', fontWeight: 600 }}>{s.name}</span>
+        <span style={{ fontSize: 10, color: '#A29C95' }}>{ownerAv(s)}{!done && s.due && s.due >= TODAY ? ' ~' + String(s.due).slice(5) : ''}</span>
+        {done ? (resEdit && resEdit.id === s.id ? (
+          <span style={{ display: 'inline-flex', gap: 4, alignItems: 'center', marginLeft: 'auto', minWidth: 180, flex: 1 }}>
+            <input data-wr2-resinput autoFocus value={resEdit.text} onChange={e => setResEdit({ id: s.id, text: e.target.value })} onKeyDown={e => { if (e.key === 'Enter') saveRes(); }} placeholder="이 일이 뭘 바꿨나 — 한 줄"
+              style={{ flex: 1, border: '1px solid #CFE0D8', borderRadius: 7, padding: '4px 8px', fontSize: 11, fontFamily: 'inherit' }} />
+            <button data-wr2-ressave onClick={saveRes} style={{ border: 0, background: '#1B4D3E', color: 'white', borderRadius: 6, padding: '4px 9px', fontSize: 10.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>저장</button>
+          </span>
+        ) : (
+          res ? <span data-wr2-res onClick={() => setResEdit({ id: s.id, text: res })} title={res} style={{ marginLeft: 'auto', fontSize: 10.5, color: '#047857', fontWeight: 700, cursor: 'pointer', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>→ {res}</span>
+            : <button data-wr2-resadd onClick={() => setResEdit({ id: s.id, text: '' })} style={{ marginLeft: 'auto', border: '1px dashed #FCA5A5', background: '#FFF6F6', color: '#DC2626', borderRadius: 6, padding: '2px 8px', fontSize: 10, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>결과 한 줄 없음 — 쓰기</button>
+        )) : null}
+      </div>
+    );
   };
+  const chkToggle = id => setData(d => ({ ...d, checklists: (d.checklists || []).map(c => c.id === id ? { ...c, done: !c.done, doneAt: !c.done ? TODAY : null } : c) }));
+  const chkRow = c => (
+    <div key={c.id} data-wr2-chk={c.done ? 'on' : 'off'} onClick={() => chkToggle(c.id)} title={c.done ? '클릭하면 체크 해제' : '클릭하면 완료 체크'} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, padding: '2px 0 2px 26px', cursor: 'pointer' }}>
+      <span style={{ fontSize: 12.5, color: c.done ? '#047857' : '#C9C3BC', fontWeight: 800 }}>{c.done ? '☑' : '☐'}</span>
+      <span style={{ color: c.done ? '#3A3631' : '#8A837C' }}>{c.text}</span>
+      {c.done && c.doneAt ? <span style={{ fontSize: 9.5, color: '#A29C95' }}>{String(c.doneAt).slice(5)}</span> : null}
+    </div>
+  );
+  const progRow = s => {
+    const mine = (data.checklists || []).filter(c => c.subplanId === s.id);
+    const wkOn = mine.filter(c => c.done && c.doneAt && c.doneAt >= wkS && c.doneAt <= wkWorkE);
+    const off = mine.filter(c => !c.done);
+    return (
+      <div key={'p' + s.id}>
+        {wiRow(s, false)}
+        {wkOn.map(chkRow)}
+        {off.slice(0, 3).map(chkRow)}
+        {off.length > 3 ? <div style={{ fontSize: 10, color: '#A29C95', paddingLeft: 26 }}>+ 미체크 {off.length - 3}건</div> : null}
+      </div>
+    );
+  };
+  const projHead = o => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
+      <span style={{ fontSize: 10.5, fontWeight: 800, color: '#1B4D3E', background: '#EAF1EE', border: '1px solid #CFE0D8', borderRadius: 6, padding: '1px 7px' }}>{o ? o.code : '—'}</span>
+      <span style={{ fontSize: 12, fontWeight: 800 }}>{o ? o.name : '(프로젝트 미지정)'}</span>
+    </div>
+  );
 
-  const wk = (w0 && w0.weekKey) || curMonth;
-  const teamSaved = (data.insights && data.insights[wk]) || {};
-  const teamVal = f => (teamSaved[f] != null ? teamSaved[f] : '');
-  const teamSet = (f, v) => setData(d => ({ ...d, insights: { ...(d.insights || {}), [wk]: { ...((d.insights || {})[wk] || {}), [f]: v } } }));
-
-  const doneNoPerf = (data.subplans || []).filter(s => s.stage === '완료' && !s.perfRecorded).length;
-  const kpiNoTarget = kpis.filter(k => kpiTargetOf(k) == null).length;
+  const headline = cw ? (
+    <span>매출 <b style={{ color: '#1B4D3E' }}>{manF(gv('revenue'))}원{sum.revenue && sum.revenue.deltaPct != null ? ' (' + (sum.revenue.deltaPct > 0 ? '▲' : '▼') + Math.abs(sum.revenue.deltaPct) + '%)' : ''}</b> · 방문 <b style={{ color: '#1B4D3E' }}>{nf(gv('visitors'))}{sum.visitors && sum.visitors.deltaPct != null ? ' (' + (sum.visitors.deltaPct > 0 ? '▲' : '▼') + Math.abs(sum.visitors.deltaPct) + '%)' : ''}</b>{ads ? <span>. ROAS <b style={{ color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas}%</b>{wkRoas < 330 ? ' — 목표(330%) 미달' : ''}</span> : null}{checks.length ? <span> · 점검 <b style={{ color: '#B45309' }}>{checks.length}건</b></span> : null}</span>
+  ) : <span style={{ color: '#A29C95' }}>매출 주간 데이터를 불러오면 요약이 채워집니다.</span>;
 
   return (
-    <div style={{ padding: '16px 20px', maxWidth: 1040, margin: '0 auto' }}>
-      {sec('이번 주 한눈에 · 효율')}
+    <div style={{ padding: '16px 20px', maxWidth: 1080, margin: '0 auto' }}>
+      {/* ── 헤더 ── */}
       <Card>
-        {rstat === 'loading' ? <div style={{ fontSize: 12, color: '#A29C95' }}>불러오는 중…</div> :
-          (metrics.length ? (
-            <div>
-              {w0.headline ? <div style={{ fontSize: 13.5, fontWeight: 700, color: '#1A1614', marginBottom: 10, lineHeight: 1.5 }}>{w0.headline}</div> : null}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px,1fr))', gap: 9 }}>
-                {metrics.map((m, i) => {
-                  const up = m.delta != null && Number(m.delta) >= 0;
-                  const good = String(m.label).indexOf('광고비') < 0;
-                  const col = m.delta == null ? '#6E6863' : (!good ? '#6E6863' : (up ? '#047857' : '#DC2626'));
-                  return <div key={i} data-wr-metric style={box('#E3E0DC', 'white')}>
-                    <div style={{ fontSize: 11, color: '#6E6863' }}>{m.label}</div>
-                    <div style={{ fontSize: 16, fontWeight: 800, marginTop: 2 }}>{m.value}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: col, marginTop: 2 }}>{m.delta != null ? (up ? '▲ +' : '▼ ') + m.delta + '%' : ''}{m.note ? <span style={{ color: '#A29C95', fontWeight: 400 }}> {m.note}</span> : ''}</div>
-                  </div>;
-                })}
-              </div>
-              {w0.label ? <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 8 }}>{w0.label}</div> : null}
-            </div>
-          ) : <div data-wr-empty style={{ fontSize: 12, color: '#6E6863' }}>효율 데이터(work-report.json) 없음 — 자동화PC가 올리면 채워집니다. <span style={{ color: '#A29C95' }}>(오류가 아닙니다)</span></div>)}
-      </Card>
-
-      {sec('진행 중인 프로젝트 · 클릭하면 다음 할 일')}
-      <Card>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 6 }}>
-          <div style={{ fontSize: 13, fontWeight: 800 }}>프로젝트</div>
-          <button onClick={() => goTab && goTab('프로젝트 진행 상황')} style={{ marginLeft: 'auto', cursor: 'pointer', border: '1px solid #E3E0DC', background: 'white', color: '#6E6863', borderRadius: 8, padding: '4px 10px', fontSize: 11.5, fontFamily: 'inherit' }}>전체 보기 →</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 20, fontWeight: 800, color: G }}>📋 주간 보고</div>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, background: '#F7F6F4', border: '1px solid #E3E0DC', borderRadius: 999, padding: '3px 8px', fontSize: 12 }}>
+            <button data-wr2-prev onClick={() => setWIdx(i => Math.min(i + 1, Math.max(0, weeks.length - 1)))} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 13, color: '#6E6863' }}>◀</button>
+            <b>{wkLabel}</b>
+            <button data-wr2-next onClick={() => setWIdx(i => Math.max(i - 1, 0))} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 13, color: '#6E6863' }}>▶</button>
+          </div>
         </div>
-        <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 10 }}>줄을 클릭하면 다음 할 일이 펼쳐집니다. 할 일을 클릭하면 바로 수정(다른 탭과 연동).</div>
-        {projs.length ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-            {projs.map(({ o, rows, todo }) => {
-              const on = !!openP[o.id];
-              return <div key={o.id} data-wr-proj={o.code} style={{ border: '1px solid #E3E0DC', borderRadius: 11, overflow: 'hidden' }}>
-                <div data-wr-proj-head onClick={() => setOpenP(m => Object.assign({}, m, { [o.id]: !m[o.id] }))} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '11px 13px', cursor: 'pointer', background: on ? '#F0F4F1' : 'white', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 800, color: G, background: '#EAF1EE', border: '1px solid #CFE0D8', borderRadius: 6, padding: '2px 8px' }}>{o.code}</span>
-                  <span style={{ fontSize: 13.5, fontWeight: 700, color: '#1A1614' }}>{o.name}</span>
-                  <span style={{ fontSize: 11.5, color: todo ? '#B45309' : '#A29C95', fontWeight: 700 }}>{todo ? '다음 할 일 ' + todo + '건' : '남은 할 일 없음'}</span>
-                  <span style={{ marginLeft: 'auto', color: '#A29C95', fontSize: 13 }}>{on ? '▾' : '▸'}</span>
+        <div style={{ fontSize: 13.5, marginTop: 10, color: '#3A3631', lineHeight: 1.6 }}>{headline}</div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+          {tile('매출', cw ? manF(gv('revenue')) : '—', dch(sum.revenue))}
+          {tile('주문 / 객단가', cw ? nf(gv('orders')) + '건' : '—', sum.aov ? <span style={{ fontSize: 10.5 }}>객단가 {wonF(gv('aov'))} {dch(sum.aov)}</span> : null)}
+          {tile('방문', cw ? nf(gv('visitors')) : '—', dch(sum.visitors))}
+          {tile('ROAS (목표 330%)', ads ? wkRoas + '%' : '—', ads ? <span style={{ fontSize: 10.5, fontWeight: 700, color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas >= 330 ? '달성' : '미달'}</span> : null, ads && wkRoas < 330 ? '#DC2626' : undefined)}
+        </div>
+        {kpiDefs.length ? (
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10, borderTop: '1px dashed #E7E4E0', paddingTop: 11 }}>
+            {kpiDefs.map((d, i) => {
+              const p = d.manual || d.val == null || !d.target ? 0 : Math.min(100, Math.round(d.val / d.target * 100));
+              return (
+                <div key={i} data-wr2-kpi style={{ flex: 1, minWidth: 150 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#6E6863' }}>
+                    <span>{month.slice(5)}월 {d.label} 목표 {d.target ? (d.label === '매출' ? manF(d.target) : nf(d.target) + (d.kpi.unit || '')) : '미설정'}</span>
+                    <b style={{ color: d.manual ? '#B45309' : '#1A1614' }}>{d.manual ? '수동 입력' : d.fmt(d.val) + ' 누적'}</b>
+                  </div>
+                  <div style={{ height: 6, background: '#EEF1EF', borderRadius: 4, marginTop: 4, overflow: 'hidden' }}><div style={{ height: 6, borderRadius: 4, width: p + '%', background: d.low && p < 100 ? '#DC2626' : '#1B4D3E' }} /></div>
                 </div>
-                {on ? <div style={{ padding: '2px 13px 12px', background: '#FBFCFB', borderTop: '1px solid #EEF1EF' }}>
-                  {rows.map(({ it, subs, doneN }) => (
-                    <div key={it.id} style={{ marginTop: 9 }}>
-                      <div data-wr-task onClick={() => onEdit && onEdit({ kind: 'plan', id: it.id })} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', padding: '4px 0' }}>
-                        <span style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614' }}>{it.name}</span>
-                        {it.hold ? <span style={{ fontSize: 10, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 5, padding: '0 5px' }}>보류</span> : null}
-                        <span style={{ fontSize: 11, color: '#A29C95' }}>{ownerAv(it)} {ownerNm(it)}{it.due ? ' · ~' + String(it.due).slice(5) : ''}</span>
-                        <span style={{ marginLeft: 'auto', fontSize: 10.5, color: '#1B4D3E' }}>수정 ✎</span>
-                      </div>
-                      {subs.map(sp => (
-                        <div key={sp.id} data-wr-task onClick={() => onEdit && onEdit({ kind: 'subplan', id: sp.id })} style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', padding: '3px 0 3px 14px', borderLeft: '2px solid #E3E0DC', marginLeft: 3 }}>
-                          <span style={{ fontSize: 10.5, fontWeight: 700, color: stageCol(sp.stage), background: '#fff', border: '1px solid #E3E0DC', borderRadius: 5, padding: '0 5px' }}>{sp.stage}</span>
-                          <span style={{ fontSize: 12, color: '#3A3631' }}>{sp.name}</span>
-                          <span style={{ fontSize: 10.5, color: '#A29C95' }}>{ownerAv(sp)}{sp.due ? ' ~' + String(sp.due).slice(5) : ''}</span>
-                          <span style={{ marginLeft: 'auto', fontSize: 10, color: '#1B4D3E' }}>✎</span>
-                        </div>
-                      ))}
-                      {doneN ? <div style={{ fontSize: 10.5, color: '#A29C95', padding: '2px 0 0 16px' }}>완료 {doneN}건</div> : null}
-                    </div>
-                  ))}
-                </div> : null}
-              </div>;
+              );
             })}
           </div>
-        ) : <div style={{ fontSize: 12, color: '#A29C95' }}>표시할 프로젝트가 없습니다. (프로젝트 진행 상황에서 추가하면 여기 뜹니다.)</div>}
+        ) : null}
       </Card>
 
-      {sec('목표 (KPI) · 만들고 추가')}
-      <Card>
-        <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 2 }}>이번 달 목표</div>
-        <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 10 }}>목표를 세우고 실적을 붙이면 프로젝트 결과와 이어집니다. KPI 탭과 연동됩니다.</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {kpis.map(k => { const tg = kpiTargetOf(k); const lg = kpiLogged(k); return (
-            <div key={k.id} data-wr-kpi onClick={() => goTab && goTab('KPI')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, border: '1px solid #E3E0DC', borderRadius: 10, padding: '9px 12px', cursor: 'pointer', flexWrap: 'wrap' }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700 }}>{k.name}</div>
-              <div style={{ fontSize: 11.5, color: '#6E6863' }}>목표 {tg != null ? Number(tg).toLocaleString() + (k.unit || '') : <span style={{ color: '#DC2626' }}>미설정</span>} · 실적 {lg ? <span style={{ color: '#047857' }}>기록됨</span> : <span style={{ color: '#DC2626' }}>미기록</span>}</div>
+      {/* ── ① 성과 ── */}
+      {secHead('① 성과', '#1B4D3E', '매출 · 광고 · 콘텐츠', '인사이트 추출의 세 축', null)}
+
+      {/* 매출 */}
+      <div data-wr2-perf="sales" style={perfBox}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 18 }}>💵</span><span style={{ fontSize: 15.5, fontWeight: 800 }}>매출</span>
+          <button onClick={() => goTab && goTab('매출')} style={{ marginLeft: 'auto', border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>자세히 → 매출 탭</button>
+        </div>
+        {cw ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px,1fr))', gap: 14 }}>
+            <div>
+              {colHead('주간 요약')}
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
+                <div><div style={{ fontSize: 22, fontWeight: 800 }}>{wonF(gv('revenue'))}</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>매출 {dch(sum.revenue)}</div></div>
+                <div><div style={{ fontSize: 22, fontWeight: 800 }}>{nf(gv('orders'))}건</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>주문 {dch(sum.orders)}</div></div>
+              </div>
+              <div>
+                {mrRow('객단가', <span>{wonF(gv('aov'))} {dch(sum.aov)}</span>, 'a')}
+                {mrRow('환불', <span style={{ color: '#DC2626' }}>{wonF(gv('refund'))} {dch(sum.refund, true)}</span>, 'b')}
+                {mrRow('방문', <span>{nf(gv('visitors'))}명 {dch(sum.visitors)}</span>, 'c')}
+              </div>
             </div>
-          ); })}
-          {!kpis.length ? <div style={{ fontSize: 12, color: '#A29C95' }}>아직 목표가 없습니다. 아래에서 추가하세요.</div> : null}
-        </div>
-        <div style={{ marginTop: 9 }}>
-          {!kf ? <button data-wr-kpi-add onClick={() => setKf(true)} style={{ width: '100%', cursor: 'pointer', border: '1px dashed ' + G, color: G, background: '#F3F8F5', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 800, fontFamily: 'inherit' }}>＋ 목표 추가하기</button> :
-            <div style={{ border: '1px solid #CFE0D8', background: '#F7FAF8', borderRadius: 11, padding: 12 }}>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-                <div style={{ flex: 2, minWidth: 150 }}><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>지표명</div><input data-wr-kpi-name value={kName} onChange={e => setKName(e.target.value)} placeholder="예: 인스타 도달수" style={inp} /></div>
-                <div style={{ flex: 1, minWidth: 90 }}><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>목표값</div><input data-wr-kpi-target value={kTarget} onChange={e => setKTarget(e.target.value)} placeholder="50000" style={inp} /></div>
-                <div style={{ minWidth: 70 }}><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>단위</div><input value={kUnit} onChange={e => setKUnit(e.target.value)} placeholder="회/원/%" style={Object.assign({}, inp, { width: 70 })} /></div>
-                <div><div style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', marginBottom: 4 }}>목표 월</div><input value={kMonth} onChange={e => setKMonth(e.target.value)} placeholder="2026-08" style={Object.assign({}, inp, { width: 100 })} /></div>
-              </div>
-              <div style={{ marginTop: 11, display: 'flex', gap: 8 }}>
-                <button data-wr-kpi-go onClick={addKpi} style={{ background: G, color: 'white', border: 0, borderRadius: 8, padding: '8px 16px', fontSize: 12.5, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>목표 추가</button>
-                <button onClick={() => setKf(false)} style={{ background: 'white', color: '#6E6863', border: '1px solid #D6D0C8', borderRadius: 8, padding: '8px 13px', fontSize: 12.5, cursor: 'pointer', fontFamily: 'inherit' }}>취소</button>
-              </div>
-            </div>}
-        </div>
-      </Card>
-
-      {sec('팀 판단 · 회의에서 함께')}
-      <Card>
-        <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 2 }}>이번 주 팀 판단</div>
-        <div style={{ fontSize: 11, color: '#A29C95', marginBottom: 10 }}>회의 때 다 같이 채우는 칸 (담당자 구분 없음). 입력하면 자동 저장.</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 10 }}>
-          {[{ k: 'teamWorked', l: '✅ 효과적이었던 것' }, { k: 'teamDidnt', l: '△ 아쉬운 것' }, { k: 'teamNext', l: '→ 다음 방향' }].map(f => (
-            <div key={f.k}><div style={{ fontSize: 11, fontWeight: 800, color: '#6E6863', marginBottom: 4 }}>{f.l}</div>
-              <textarea data-wr-team={f.k} value={teamVal(f.k)} onChange={e => teamSet(f.k, e.target.value)} rows={3} placeholder="회의에서 함께…" style={Object.assign({}, inp, { resize: 'vertical', lineHeight: 1.5 })} /></div>
-          ))}
-        </div>
-      </Card>
-
-      {sec('보고가 살려면 · 채워야 할 것')}
-      <Card style={{ borderColor: '#FDE68A' }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: '#B45309', marginBottom: 8 }}>⚠️ 지금 비어 있어 보고가 얕은 곳</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12.5, color: '#3A3631' }}>
-          <div>· 완료했는데 성과 기록이 안 된 세부업무 <b>{doneNoPerf}건</b></div>
-          <div>· 목표(KPI)가 없는 지표 <b>{kpiNoTarget}개</b></div>
-          <div>· 인스타 콘텐츠 성과 · 광고 썸네일 — <b style={{ color: '#B45309' }}>수집 경로 없음(자동화PC)</b></div>
-        </div>
-      </Card>
-
-      {sec('가장 중요 · 데이터 준비 중')}
-      <div style={{ border: '1px dashed #C9C3BC', background: '#FAF9F7', borderRadius: 12, padding: '14px 16px', marginBottom: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: '#6E6863' }}>📸 콘텐츠 · 광고 효율 (썸네일 + 성과)</div>
-        <div style={{ fontSize: 11.5, color: '#A29C95', marginTop: 6, lineHeight: 1.6 }}>인스타 콘텐츠 성과(도달·저장·전환) + 썸네일 + 네이버 광고 소재 썸네일. 자동화PC가 수집을 붙이면 여기에 썸네일+효율로 채워집니다.</div>
+            <div>
+              {colHead('채널 TOP 3 (매출 귀속)')}
+              <div>{chTop.map((c, i) => mrRow(<span><span style={{ fontSize: 10, fontWeight: 800, color: '#A29C95', marginRight: 4 }}>{i + 1}</span>{c.name}</span>, <span>{manF(c.revenue)} · {chSum ? Math.round((c.revenue || 0) / chSum * 1000) / 10 : 0}%</span>, i))}</div>
+            </div>
+            <div>
+              {colHead('상품 TOP 3')}
+              <div>{prTop.map((p, i) => mrRow(<span><span style={{ fontSize: 10, fontWeight: 800, color: '#A29C95', marginRight: 4 }}>{i + 1}</span>{p.name}</span>, manF(p.revenue), i))}</div>
+            </div>
+          </div>
+        ) : <div style={{ fontSize: 12, color: '#A29C95' }}>매출 데이터(naver-sales.json) 불러오는 중이거나 없습니다.</div>}
+        {noteRow('sales', '📦 담당자', '잘된 것 · 아쉬운 것 · 다음 — 한 줄')}
       </div>
+
+      {/* 광고 */}
+      <div data-wr2-perf="ads" style={perfBox}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 18 }}>📣</span><span style={{ fontSize: 15.5, fontWeight: 800 }}>광고 — 네이버 + 인스타</span>
+          <span style={{ display: 'inline-flex', gap: 8, marginLeft: 'auto' }}>
+            <button onClick={() => goTab && goTab('광고')} style={{ border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>광고 탭 →</button>
+            <button onClick={() => goTab && goTab('인스타 광고')} style={{ border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>인스타 광고 탭 →</button>
+          </span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 14 }}>
+          <div>
+            {colHead('네이버 (주간)')}
+            {ads ? (
+              <div>
+                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 6 }}>
+                  <div><div style={{ fontSize: 22, fontWeight: 800 }}>{manF(adAgg.spend)}원</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>광고비</div></div>
+                  <div><div style={{ fontSize: 22, fontWeight: 800, color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas}%</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>ROAS · 전환매출 {manF(adAgg.rev)}</div></div>
+                </div>
+                <div style={{ margin: '2px 0 8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#6E6863', marginBottom: 3 }}><span>ROAS</span><span>목표 330%</span></div>
+                  <div style={{ height: 8, background: '#EEF1EF', borderRadius: 5, overflow: 'hidden' }}><div style={{ height: 8, width: Math.min(100, Math.round(wkRoas / 330 * 100)) + '%', background: wkRoas >= 330 ? '#047857' : '#DC2626', borderRadius: 5 }} /></div>
+                </div>
+                {mrRow('디스플레이', <span>{manF(adAgg.ch.display.spend)} · ROAS {roasOf(adAgg.ch.display.spend, adAgg.ch.display.rev)}%</span>, 'd')}
+                {mrRow('검색', <span>{manF(adAgg.ch.search.spend)} · ROAS {roasOf(adAgg.ch.search.spend, adAgg.ch.search.rev)}%</span>, 'e')}
+                {lowGroups.map((g, i) => mrRow(<span style={{ color: '#DC2626' }}>⚠ 저효율: {g.name}</span>, <span style={{ color: '#DC2626' }}>{manF(g.spend)} · {g.roas}%</span>, 'l' + i))}
+              </div>
+            ) : <div style={{ fontSize: 12, color: '#A29C95' }}>광고 데이터(naver-ads.json) 불러오는 중이거나 없습니다.</div>}
+          </div>
+          <div>
+            {colHead('인스타 광고 — 라이브 소재 ' + (iads && iads.window ? '(' + iads.window + ')' : ''))}
+            {iAdsArr.length ? (
+              <div>
+                <div style={{ display: 'flex', gap: 6 }}>{iThumbs.map((a, i) => thumbTile(a.thumb, (a.name || '').slice(0, 16), a === iBest ? '★ CTR ' + (a.ctr || 0).toFixed(2) + '%' : null, false, 'ia' + i))}</div>
+                <div style={{ marginTop: 7 }}>
+                  {mrRow('지출 / 도달', manF(iSpend) + ' · ' + nf(iReach), 'f')}
+                  {iTop && (iTop.ctr || 0) < iAvgCtr ? mrRow(<span style={{ color: '#B45309' }}>⚠ 지출 최대 소재가 평균 CTR 밑</span>, <span style={{ color: '#B45309' }}>{(iTop.ctr || 0).toFixed(2)}% · 교체 검토</span>, 'g') : null}
+                </div>
+              </div>
+            ) : <div style={{ fontSize: 12, color: '#A29C95' }}>인스타 광고 데이터 준비 중.</div>}
+          </div>
+        </div>
+        {noteRow('ads', '📦 담당자', '효율에 대한 판단 · 다음 방향 — 한 줄')}
+      </div>
+
+      {/* 콘텐츠 */}
+      <div data-wr2-perf="content" style={perfBox}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 18 }}>📸</span><span style={{ fontSize: 15.5, fontWeight: 800 }}>콘텐츠 — 인스타 오가닉</span>
+          <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>{posts.length ? posts.length + '개 포스트 수집됨' : ''}</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 14 }}>
+          <div>
+            {colHead('이번 주 업로드 · 참여')}
+            {posts.length ? (
+              <div>
+                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginBottom: 6 }}>
+                  <div><div style={{ fontSize: 22, fontWeight: 800 }}>{wkPosts.length}건</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>업로드{wkPosts.length ? '' : ' (이번 주 없음 — 최근 포스트 표시)'}</div></div>
+                  <div><div style={{ fontSize: 22, fontWeight: 800 }}>{avgL} · {avgC}</div><div style={{ fontSize: 10.5, color: '#6E6863' }}>평균 좋아요 · 댓글</div></div>
+                </div>
+                {pTop ? mrRow('참여 1위', <span>♥{nf(pTop.likes)} · 💬{nf(pTop.comments)}{pTop.videoViews ? ' · 조회 ' + nf(pTop.videoViews) : ''}</span>, 'h') : null}
+              </div>
+            ) : <div style={{ fontSize: 12, color: '#A29C95' }}>인스타 포스트 데이터 준비 중.</div>}
+            {(kwAdded.length || kwContent.length) ? (
+              <div style={{ marginTop: 10 }}>
+                {colHead('키워드 트렌드 → 반영 추적')}
+                {kwAdded.slice(0, 2).map((k, i) => <div key={'a' + i} data-wr2-link="ok" style={{ display: 'flex', gap: 7, alignItems: 'center', fontSize: 11.5, padding: '6px 9px', borderRadius: 8, marginTop: 4, background: '#F4FCF8', border: '1px solid #A7F3D0', color: '#047857' }}>✓ '{k.keyword}' — 광고 등록됨{k.group ? ' (' + k.group + ')' : ''}</div>)}
+                {kwContent.map((k, i) => { const made = kwMade(k); return <div key={'c' + i} data-wr2-link={made ? 'ok' : 'miss'} style={{ display: 'flex', gap: 7, alignItems: 'center', fontSize: 11.5, padding: '6px 9px', borderRadius: 8, marginTop: 4, background: made ? '#F4FCF8' : '#FFF6F6', border: '1px solid ' + (made ? '#A7F3D0' : '#FCA5A5'), color: made ? '#047857' : '#DC2626' }}>{made ? '✓' : '✗'} '{k.keyword}' — 콘텐츠 자리 판정{made ? ' → 제작됨' : ', 아직 미제작'}</div>; })}
+              </div>
+            ) : null}
+          </div>
+          <div>
+            {colHead('포스트 (썸네일 실물 · 저장소 보관)')}
+            {showPosts.length ? <div style={{ display: 'flex', gap: 6 }}>{showPosts.slice(0, 4).map((p, i) => thumbTile(p.thumb, '♥' + nf(p.likes) + ' · 💬' + nf(p.comments), i === 0 ? '★ 참여 1위' : null, true, 'po' + i))}</div> : <div style={{ fontSize: 12, color: '#A29C95' }}>표시할 포스트 없음.</div>}
+          </div>
+        </div>
+        {noteRow('content', '🌿 담당자', '콘텐츠 판단·평가 · 이후 방향 — 한 줄')}
+      </div>
+
+      {/* ── ② 업무 ── */}
+      {secHead('② 업무', '#2D5FE0', '프로젝트에서 자동으로', '완료·예정 전부 실행계획에서 — 클릭하면 바로 수정', null)}
+      <Card style={{ padding: '10px 16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px,1fr))', gap: '0 22px' }}>
+          <div data-wr2-donecol style={{ padding: '8px 0' }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, marginBottom: 8 }}>✅ 이번 주 한 일 <span style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 999, padding: '1px 8px' }}>세부업무 {doneWk.length} · 체크 {chkWk.length}{wkWorkE > wkE ? ' · ~오늘' : ''}</span></div>
+            {wkGroups.length ? wkGroups.map((g, i) => <div key={i} style={{ marginBottom: 10 }}>{projHead(g.o)}{g.rows.map(r => r.kind === 'done' ? wiRow(r.s, true) : progRow(r.s))}</div>) : <div style={{ fontSize: 12, color: '#A29C95' }}>이번 주 완료·체크한 항목이 없습니다. 세부업무를 완료하거나 체크리스트에 체크하면 여기 쌓입니다.</div>}
+          </div>
+          <div style={{ padding: '8px 0' }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, marginBottom: 8 }}>→ 다음 주 예정·기한 <span style={{ fontSize: 10.5, fontWeight: 700, color: '#6E6863', background: '#F5F4F2', border: '1px solid #E3E0DC', borderRadius: 999, padding: '1px 8px' }}>{upcoming.length}건</span></div>
+            {upG.length ? upG.map((g, i) => <div key={i} style={{ marginBottom: 10 }}>{projHead(g.o)}{g.items.slice(0, 3).map(s => wiRow(s, false))}{g.items.length > 3 ? <div style={{ fontSize: 10.5, color: '#A29C95', paddingLeft: 14 }}>+ {g.items.length - 3}건</div> : null}</div>) : <div style={{ fontSize: 12, color: '#A29C95' }}>다음 주 기한 업무가 없습니다.</div>}
+          </div>
+        </div>
+        {overdue.length ? (
+          <div data-wr2-overdue style={{ margin: '6px 0 10px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '9px 12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, fontWeight: 800, color: '#B45309' }}>⚠ 기한 지난 미완료 {overdue.length}건</span>
+              <span style={{ fontSize: 11, color: '#6E6863' }}>최장 {String((overdue[0] || {}).due || '').slice(5)}부터 — 완료/보류/폐기 정리 (회의 안건)</span>
+              <button data-wr2-odbtn onClick={() => setOdOpen(v => !v)} style={{ marginLeft: 'auto', border: 0, background: '#B45309', color: 'white', borderRadius: 7, padding: '5px 11px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{odOpen ? '접기' : '목록 열기 →'}</button>
+            </div>
+            {odOpen ? <div style={{ marginTop: 8 }}>{overdue.slice(0, 15).map(s => { const o = outOfPlan(planById(s.planId)); return <div key={s.id} data-wr2-oditem onClick={() => onEdit && onEdit({ kind: 'subplan', id: s.id })} style={{ display: 'flex', gap: 7, alignItems: 'center', fontSize: 11.5, padding: '3px 0', cursor: 'pointer', flexWrap: 'wrap' }}><span style={{ color: '#DC2626', fontWeight: 700, fontSize: 10 }}>{String(s.due).slice(5)}</span><span style={{ fontSize: 9.5, fontWeight: 800, color: '#1B4D3E' }}>{o ? o.code : ''}</span><span>{s.name}</span><span style={{ fontSize: 10, color: '#A29C95' }}>{ownerAv(s)} · {s.stage}</span></div>; })}{overdue.length > 15 ? <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 4 }}>+ {overdue.length - 15}건 — 프로젝트 진행 상황 탭에서 전체</div> : null}</div> : null}
+          </div>
+        ) : null}
+      </Card>
+
+      {/* ── ③ 점검 ── */}
+      {secHead('③ 점검', '#DC2626', '보고가 정확하려면 — 지금 어긋난 곳', '처리하면 이 보고가 실시간으로 바뀝니다', null)}
+      <Card style={{ padding: '6px 16px', marginBottom: 8 }}>
+        {checks.length ? checks.map((c, i) => (
+          <div key={i} data-wr2-check style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '10px 0', borderBottom: i < checks.length - 1 ? '1px dashed #EFEDEA' : 'none', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 9.5, fontWeight: 800, padding: '2px 7px', borderRadius: 5, whiteSpace: 'nowrap', color: c.c, background: c.bg }}>{c.tag}</span>
+            <span style={{ fontSize: 12, fontWeight: 600 }}>{c.nm}</span>
+            <button onClick={c.go} style={{ marginLeft: 'auto', border: 0, background: '#1B4D3E', color: 'white', borderRadius: 7, padding: '5px 11px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>{c.act}</button>
+          </div>
+        )) : <div data-wr2-clean style={{ fontSize: 12.5, color: '#047857', fontWeight: 700, padding: '12px 0' }}>✓ 어긋난 곳 없음 — 보고가 최신 상태입니다.</div>}
+      </Card>
+      <div style={{ fontSize: 10.5, color: '#A29C95', margin: '0 4px', lineHeight: 1.55 }}>점검 항목은 새 업무가 아니라 기존 탭(프로젝트·KPI·성과)의 미처리 상태입니다. 처리 = 최신화 = 보고 갱신. AI 제안·판단 카드는 판단 대기 탭에서.</div>
     </div>
   );
 }
@@ -9864,7 +10099,7 @@ function App() {
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
     { icon: '🗂️', label: '단계별 보기', C: TabKanban },
     { icon: '🏆', label: '업무 성과', C: TabPerformance },
-    { icon: '📝', label: '업무보고', C: TabWorkReport },
+    { icon: '📋', label: '주간 보고', C: TabWorkReport },
     { icon: '📊', label: 'KPI', C: TabKpi },
     { icon: '💵', label: '매출', C: TabSales },
     { icon: '🔎', label: '네이버 채널 추적', C: TabChannel },
@@ -9885,7 +10120,7 @@ function App() {
     { icon: '🏠', label: '홈', tabs: ['홈'] },
     { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색', '상품 최적화'] },
     { icon: '📋', label: '업무', tabs: ['데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
-    { icon: '📊', label: '성과', tabs: ['업무보고', 'KPI', '매출', '카카오', '광고', '인스타 광고', '쇼핑커넥트'] },
+    { icon: '📊', label: '성과', tabs: ['주간 보고', 'KPI', '매출', '카카오', '광고', '인스타 광고', '쇼핑커넥트'] },
     { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드', '키워드 총합본'] },
     { icon: '💰', label: '예산', tabs: ['예산'] },
   ] : null;
