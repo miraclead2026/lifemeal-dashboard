@@ -34,7 +34,7 @@ firebase.initializeApp({
 const db = firebase.database();
 // 쓰기 권한용 익명 로그인 (Firebase 규칙: 읽기 공개, 쓰기 auth 필요)
 firebase.auth().signInAnonymously().catch(e => console.warn('익명 로그인 실패 — 저장이 안 될 수 있습니다:', e.message));
-const DB_PATH = '/dashboard';   // 운영
+const DB_PATH = '/dashboard';   // 테스트용. 운영 배포 시 '/dashboard' 로 변경
 // 판단 큐(index_141). 테스트는 이 값만 '/decisions_test' 로 바꾼다 — DB_PATH 는 건드리지 않는다.
 const DEC_PATH = '/decisions';
 const { useState, useEffect, useRef } = React;
@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_165';
+const BUILD_TAG = 'index_166';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -8577,6 +8577,208 @@ function TabInstaAds() {
   );
 }
 
+const SHOP_CONNECT_SEED = {
+  updatedAt: '2026-08-17 04:25',
+  meta: {
+    source: 'brandconnect.naver.com 어필리에이트(쇼핑커넥트)',
+    periodStart: '2026-07-17', periodEnd: '2026-08-15',
+    basis: '주문 발생 기준·부가세 포함(구매확정 정산액과 다를 수 있음)',
+    revenueOverlap: '이 매출은 naver-sales 총매출에 이미 포함됨 — 더하지 말 것',
+    inflowPath: "커넥트 유입은 방문분석의 '직유입'으로 집계됨(08-05~15 실측)",
+    intent: '목적은 유입 창출. 수수료는 의도적 고율 집행.'
+  },
+  summary: { accessCnt: 3771, productOrderCnt: 10, salesConversionRate: 0.3, salesCnt: 15, salesAmount: 753330, commissionAmount: 148683, commissionRate: 19.7 },
+  daily: [
+    { date: '2026-08-15', access: 1309, sales: 283490, directVisits: 1220 },
+    { date: '2026-08-14', access: 919, sales: 273430, directVisits: 848 },
+    { date: '2026-08-13', access: 780, sales: 30600, directVisits: 702 },
+    { date: '2026-08-12', access: 191, sales: 0, directVisits: 204 },
+    { date: '2026-08-11', access: 481, sales: 138990, directVisits: 456 },
+    { date: '2026-08-10', access: 64, sales: 0, directVisits: 76 },
+    { date: '2026-08-09', access: 3, sales: 0, directVisits: 16 },
+    { date: '2026-08-08', access: 7, sales: 0, directVisits: 21 },
+    { date: '2026-08-07', access: 4, sales: 0, directVisits: 22 },
+    { date: '2026-08-06', access: 9, sales: 26820, directVisits: 30 },
+    { date: '2026-08-05', access: 4, sales: 0, directVisits: 30 },
+    { date: '2026-08-04', access: 0, sales: 0, directVisits: 16 },
+    { date: '2026-08-03', access: 0, sales: 0, directVisits: 3 },
+    { date: '2026-08-02', access: 0, sales: 0, directVisits: 11 },
+    { date: '2026-08-01', access: 0, sales: 0, directVisits: 17 },
+    { date: '2026-07-31', access: 0, sales: 0, directVisits: 9 },
+    { date: '2026-07-30', access: 0, sales: 0, directVisits: 11 },
+    { date: '2026-07-29', access: 0, sales: 0, directVisits: 12 },
+    { date: '2026-07-28', access: 0, sales: 0, directVisits: 10 },
+    { date: '2026-07-27', access: 0, sales: 0, directVisits: 12 },
+    { date: '2026-07-26', access: 0, sales: 0, directVisits: 14 },
+    { date: '2026-07-25', access: 0, sales: 0, directVisits: 6 },
+    { date: '2026-07-24', access: 0, sales: 0, directVisits: 19 },
+    { date: '2026-07-23', access: 0, sales: 0, directVisits: 24 },
+    { date: '2026-07-22', access: 0, sales: 0, directVisits: 36 },
+    { date: '2026-07-21', access: 0, sales: 0, directVisits: 41 },
+    { date: '2026-07-20', access: 0, sales: 0, directVisits: 16 },
+    { date: '2026-07-19', access: 0, sales: 0, directVisits: 59 },
+    { date: '2026-07-18', access: 0, sales: 0, directVisits: 8 },
+    { date: '2026-07-17', access: 0, sales: 0, directVisits: 6 }
+  ],
+  products: [
+    { connectProductId: '981216820329027', storeProductId: '12747389906', name: '황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개', salesCnt: 6, salesAmount: 200980, commissionAmount: 61897, imageUrl: 'https://shop-phinf.pstatic.net/20260721_42/1784619023403mPqCm_PNG/118751833461374326_1439503214.png' },
+    { connectProductId: '981216820329034', storeProductId: '12808019284', name: '황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개', salesCnt: 2, salesAmount: 140410, commissionAmount: 24091, imageUrl: 'https://shop-phinf.pstatic.net/20260629_268/1782712861361u9m4a_PNG/116121071349625928_43675388.png' },
+    { connectProductId: '981216820329028', storeProductId: '12763789807', name: '황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개', salesCnt: 1, salesAmount: 132570, commissionAmount: 40830, imageUrl: 'https://shop-phinf.pstatic.net/20260629_231/17827128725861yCXq_PNG/11223078557684640_607398669.png' },
+    { connectProductId: '981216820333129', storeProductId: '13635293181', name: '황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개', salesCnt: 1, salesAmount: 112500, commissionAmount: 2250, imageUrl: 'https://shop-phinf.pstatic.net/20260706_29/17833032351373rlx7_PNG/117436211184585600_2109757645.png' },
+    { connectProductId: '981216820329039', storeProductId: '13447249282', name: '황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개', salesCnt: 2, salesAmount: 64600, commissionAmount: 11083, imageUrl: 'https://shop-phinf.pstatic.net/20260719_37/1784427090411C9eE9_JPEG/57247144560892610_646081959.jpg' },
+    { connectProductId: '981216820329036', storeProductId: '12894778669', name: '황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 2개', salesCnt: 1, salesAmount: 39000, commissionAmount: 780, imageUrl: 'https://shop-phinf.pstatic.net/20260706_3/1783302670265LMRtC_PNG/117435519376113363_1387657755.png' },
+    { connectProductId: '981216820329029', storeProductId: '12763906780', name: '황성주박사의 영양식 황성주생식 식사대용 30포, 1개', salesCnt: 1, salesAmount: 36450, commissionAmount: 7217, imageUrl: 'https://shop-phinf.pstatic.net/20260706_39/17833031636115T5kr_PNG/19078756466849499_1512964038.png' },
+    { connectProductId: '981216820329032', storeProductId: '12764948626', name: '갓 구운 하루견과 다이어트 간식 아몬드 사무실간식 20g, 30개입, 1개', salesCnt: 1, salesAmount: 26820, commissionAmount: 535, imageUrl: 'https://shop-phinf.pstatic.net/20260706_58/1783302620033fxyQm_PNG/45790295889693195_1033289651.png' }
+  ]
+};
+
+function TabShoppingConnect() {
+  const [d, setD] = React.useState(null);
+  const [status, setStatus] = React.useState('loading');
+  const [prodSort, setProdSort] = React.useState('salesAmount');
+  const [dailyK, setDailyK] = React.useState('access');
+  React.useEffect(() => {
+    let alive = true;
+    ghFetch('data/shopping-connect.json').then(r => (r.ok ? r.json() : null)).then(j => {
+      if (!alive) return;
+      if (j && j.summary && Array.isArray(j.products)) { setD(j); setStatus('live'); }
+      else { setD(SHOP_CONNECT_SEED); setStatus('seed'); }
+    }).catch(() => { if (alive) { setD(SHOP_CONNECT_SEED); setStatus('seed'); } });
+    return () => { alive = false; };
+  }, []);
+
+  const won = n => '₩' + Number(n || 0).toLocaleString();
+  const num = n => Number(n || 0).toLocaleString();
+  const box = (bd, bg) => ({ border: '1px solid ' + bd, background: bg, borderRadius: 10, padding: '11px 13px' });
+  const BLUE = '#2D5FE0', GOLD = '#B45309';
+
+  if (!d) return <div style={{ padding: 20 }}><Card style={{ textAlign: 'center', padding: 40, color: '#A29C95' }}>쇼핑커넥트 데이터를 불러오는 중…</Card></div>;
+
+  const s = d.summary || {};
+  const meta = d.meta || {};
+  const daily = Array.isArray(d.daily) ? d.daily : [];
+  const products0 = Array.isArray(d.products) ? d.products : [];
+  const rateOf = p => (Number(p.salesAmount) > 0 ? Number(p.commissionAmount) / Number(p.salesAmount) * 100 : 0);
+  const short = nm => { const t = String(nm || '').replace(/^황성주\s?박사의\s?/, '').replace(/^갓 구운 /, ''); return t.length > 16 ? t.slice(0, 16) + '…' : t; };
+
+  const products = products0.slice().sort((a, b) => prodSort === 'rate' ? rateOf(b) - rateOf(a) : (Number(b[prodSort]) || 0) - (Number(a[prodSort]) || 0));
+  const pmax = Math.max(1, ...products0.map(p => Number(p.salesAmount) || 0));
+
+  const dsorted = daily.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+  const totalAcc = Number(s.accessCnt) || daily.reduce((a, x) => a + (Number(x.access) || 0), 0);
+  const recent3 = dsorted.slice(0, 3).reduce((a, x) => a + (Number(x.access) || 0), 0);
+  const recent3Pct = totalAcc ? Math.round(recent3 / totalAcc * 100) : 0;
+  const recent3Days = dsorted.slice(0, 3).map(x => (x.date || '').slice(5)).reverse();
+  const withRate = products0.filter(p => Number(p.salesAmount) > 0).map(p => ({ nm: p.name, r: rateOf(p) }));
+  const maxRate = withRate.slice().sort((a, b) => b.r - a.r)[0] || null;
+  const minRate = withRate.slice().sort((a, b) => a.r - b.r)[0] || null;
+
+  const dchron = daily.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+  const dmax = Math.max(1, ...dchron.map(x => Number(x[dailyK]) || 0));
+
+  const keyTile = (label, val, sub, accent) => (
+    <div data-sc-tile data-sc-key style={{ border: '1.5px solid ' + accent, background: '#FBFAF9', borderRadius: 12, padding: '13px 15px', minWidth: 150, flex: 1 }}>
+      <div style={{ fontSize: 11, color: accent, fontWeight: 800, letterSpacing: '.02em' }}>★ {label}</div>
+      <div style={{ fontSize: 22, fontWeight: 800, marginTop: 3, color: '#1A1614' }}>{val}</div>
+      {sub ? <div style={{ fontSize: 10.5, color: '#6E6863', marginTop: 3 }}>{sub}</div> : null}
+    </div>
+  );
+  const tile = (label, val, sub, subColor) => (
+    <div data-sc-tile style={{ ...box('#E3E0DC', 'white'), minWidth: 118, flex: 1 }}>
+      <div style={{ fontSize: 11, color: '#6E6863' }}>{label}</div>
+      <div style={{ fontSize: 18, fontWeight: 800, marginTop: 2, color: '#1A1614' }}>{val}</div>
+      {sub ? <div style={{ fontSize: 10.5, color: subColor || '#A29C95', marginTop: 2 }}>{sub}</div> : null}
+    </div>
+  );
+  const toggle = (cur, set, opts) => opts.map(o => (
+    <button key={o.k} onClick={() => set(o.k)} style={{ cursor: 'pointer', border: '1px solid ' + (cur === o.k ? G : '#E3E0DC'), background: cur === o.k ? G : 'white', color: cur === o.k ? 'white' : '#6E6863', borderRadius: 999, padding: '3px 11px', fontSize: 11.5, fontWeight: cur === o.k ? 800 : 600, fontFamily: 'inherit' }}>{o.l}</button>
+  ));
+
+  return (
+    <div style={{ padding: '16px 20px', maxWidth: 1120, margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+        <div style={{ fontSize: 21, fontWeight: 800, color: G }}>🛍️ 쇼핑커넥트</div>
+        <span style={{ fontSize: 12, color: '#A29C95' }}>{(meta.periodStart || '').slice(5)}~{(meta.periodEnd || '').slice(5)} · 네이버 브랜드커넥트</span>
+        {status === 'seed' ? <span style={{ fontSize: 10.5, fontWeight: 700, color: '#B45309', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 6, padding: '1px 7px' }}>스냅샷(파이프라인 연결 전)</span> : null}
+        {d.updatedAt ? <span style={{ marginLeft: 'auto', fontSize: 11, color: '#A29C95' }}>갱신 {d.updatedAt}</span> : null}
+      </div>
+      <div style={{ fontSize: 11.5, color: '#A29C95', marginBottom: 14 }}>목적은 유입 창출 · 수수료는 의도적 고율 집행. 전환율은 참고값으로만 봅니다.</div>
+
+      <div data-sc-insights style={{ display: 'flex', gap: 9, flexWrap: 'wrap', marginBottom: 12 }}>
+        {keyTile('유입수', num(s.accessCnt) + '회', '커넥트 방문 · 직유입에 포함', BLUE)}
+        {keyTile('수수료 집행액', won(s.commissionAmount), '집행 수수료율 ' + (s.commissionRate || 0) + '%', GOLD)}
+        {tile('판매금액', won(s.salesAmount), '네이버 총매출에 포함 · 별도 가산 아님', '#6E6863')}
+        {tile('판매개수', num(s.salesCnt) + '개', '주문 ' + num(s.productOrderCnt) + '건')}
+        {tile('전환율', (s.salesConversionRate || 0) + '%', '참고값')}
+      </div>
+
+      <Card data-sc-insight style={{ marginBottom: 16, background: '#F0F4F1', borderColor: '#D8E3DC' }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: G, marginBottom: 6 }}>💡 이번 인사이트</div>
+        {recent3Pct >= 40 ? <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6 }}>· 유입이 최근 3일(<b>{recent3Days.join('·')}</b>)에 <b>{num(recent3)}회({recent3Pct}%)</b> 집중 — 커넥트 본격 가동 구간.</div> : null}
+        {maxRate && minRate ? <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6, marginTop: 3 }}>· 수수료율 최고 <b style={{ color: GOLD }}>{maxRate.r.toFixed(0)}%</b>({short(maxRate.nm)}) · 최저 {minRate.r.toFixed(0)}%({short(minRate.nm)}) — 상품별 고율 집행.</div> : null}
+        <div style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.6, marginTop: 3 }}>· 판매금액 <b>{won(s.salesAmount)}</b>은 스마트스토어 결제 → <b>네이버 총매출에 이미 포함</b>(별도 가산 아님).</div>
+      </Card>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <span style={{ fontSize: 13.5, fontWeight: 800, color: '#1A1614' }}>일별 추이</span>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>최근 30일</span>
+        <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 6 }}>{toggle(dailyK, setDailyK, [{ k: 'access', l: '유입' }, { k: 'sales', l: '매출' }])}</span>
+      </div>
+      <Card style={{ marginBottom: 16, padding: '14px 14px 10px' }}>
+        <div data-sc-daily style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 96 }}>
+          {dchron.map(x => {
+            const v = Number(x[dailyK]) || 0;
+            const h = Math.round(v / dmax * 92);
+            return (
+              <div key={x.date} data-sc-bar title={x.date + ' · ' + (dailyK === 'access' ? '유입 ' + num(v) + '회' : '매출 ' + won(v))} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '100%' }}>
+                <div style={{ height: v > 0 ? Math.max(3, h) : 0, background: dailyK === 'access' ? BLUE : GOLD, borderRadius: '3px 3px 0 0', transition: 'height .2s' }} />
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9.5, color: '#A29C95', marginTop: 6 }}>
+          <span>{dchron[0] ? dchron[0].date.slice(5) : ''}</span>
+          <span>{dailyK === 'access' ? '유입 회 · 막대 높이 = 일별 유입' : '매출 원 · 막대 높이 = 일별 매출'}</span>
+          <span>{dchron.length ? dchron[dchron.length - 1].date.slice(5) : ''}</span>
+        </div>
+      </Card>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <span style={{ fontSize: 13.5, fontWeight: 800, color: '#1A1614' }}>상품별</span>
+        <span style={{ fontSize: 11, color: '#A29C95' }}>{products0.length}개 · 스토어ID 매칭</span>
+        <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 6 }}>{toggle(prodSort, setProdSort, [{ k: 'salesAmount', l: '매출순' }, { k: 'commissionAmount', l: '수수료순' }, { k: 'rate', l: '수수료율순' }, { k: 'salesCnt', l: '판매수순' }])}</span>
+      </div>
+      <div data-sc-prods style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {products.map(p => {
+          const r = rateOf(p);
+          const rp = Math.round((Number(p.salesAmount) || 0) / pmax * 100);
+          const rateCol = r >= 20 ? GOLD : r >= 10 ? '#6E6863' : '#A29C95';
+          return (
+            <div key={p.connectProductId} data-sc-prod style={{ display: 'flex', alignItems: 'center', gap: 12, border: '1px solid #E7E4E0', borderRadius: 10, background: 'white', padding: '10px 12px', boxShadow: '0 1px 2px rgba(0,0,0,.03)' }}>
+              <div style={{ width: 46, height: 46, borderRadius: 8, background: '#EFEDEA', flexShrink: 0, overflow: 'hidden' }}>
+                <img src={p.imageUrl} alt="" loading="lazy" onError={e => { e.target.style.display = 'none'; }} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+              <div style={{ flex: 1, minWidth: 120 }}>
+                <div title={p.name} style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614', lineHeight: 1.35, maxHeight: 34, overflow: 'hidden' }}>{p.name}</div>
+                <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2 }}>스토어 {p.storeProductId}</div>
+                <div style={{ marginTop: 5, height: 4, background: '#F0EEEB', borderRadius: 3, overflow: 'hidden' }}><div style={{ height: 4, width: rp + '%', background: '#CFC9C2', borderRadius: 3 }} /></div>
+              </div>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <div style={{ textAlign: 'right' }}><div style={{ fontSize: 9.5, color: '#A29C95' }}>판매</div><div style={{ fontSize: 12.5, fontWeight: 700 }}>{num(p.salesCnt)}개</div></div>
+                <div style={{ textAlign: 'right', minWidth: 72 }}><div style={{ fontSize: 9.5, color: '#A29C95' }}>매출</div><div style={{ fontSize: 12.5, fontWeight: 700 }}>{won(p.salesAmount)}</div></div>
+                <div style={{ textAlign: 'right', minWidth: 66 }}><div style={{ fontSize: 9.5, color: '#A29C95' }}>수수료</div><div style={{ fontSize: 12.5, fontWeight: 700, color: GOLD }}>{won(p.commissionAmount)}</div></div>
+                <div style={{ textAlign: 'right', minWidth: 46 }}><div style={{ fontSize: 9.5, color: '#A29C95' }}>수수료율</div><div style={{ fontSize: 13, fontWeight: 800, color: rateCol }}>{r.toFixed(1)}%</div></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 14, lineHeight: 1.6 }}>출처: 네이버 브랜드커넥트(쇼핑커넥트) 어필리에이트. {meta.basis || ''} · 매출·유입은 스마트스토어 총매출/직유입에 이미 포함(중복 가산 아님).{status === 'seed' ? ' data/shopping-connect.json 이 올라오면 실데이터로 자동 갱신됩니다.' : ''}</div>
+    </div>
+  );
+}
+
 function TabProductSeo() {
   const [seo, setSeo] = React.useState(null);
   const [status, setStatus] = React.useState('loading');
@@ -9650,6 +9852,7 @@ function App() {
     { icon: '💬', label: '카카오', C: TabKakao },
     { icon: '📣', label: '광고', C: TabAds },
     { icon: '📸', label: '인스타 광고', C: TabInstaAds },
+    { icon: '🛍️', label: '쇼핑커넥트', C: TabShoppingConnect },
     { icon: '🔥', label: '키워드 트렌드', C: TabTrends },
     { icon: '🧩', label: '키워드 총합본', C: TabKeywordDict },
     { icon: '📨', label: '발송 스케줄', C: TabSchedule },
@@ -9663,7 +9866,7 @@ function App() {
     { icon: '🏠', label: '홈', tabs: ['홈'] },
     { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색', '상품 최적화'] },
     { icon: '📋', label: '업무', tabs: ['데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
-    { icon: '📊', label: '성과', tabs: ['업무보고', 'KPI', '매출', '카카오', '광고', '인스타 광고'] },
+    { icon: '📊', label: '성과', tabs: ['업무보고', 'KPI', '매출', '카카오', '광고', '인스타 광고', '쇼핑커넥트'] },
     { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드', '키워드 총합본'] },
     { icon: '💰', label: '예산', tabs: ['예산'] },
   ] : null;
