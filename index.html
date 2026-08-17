@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_170';
+const BUILD_TAG = 'index_171';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -10173,7 +10173,8 @@ function App() {
         <div data-nav-groups style={{ background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflowX: 'auto' }}>
           <div style={{ display: 'flex', minWidth: 'max-content' }}>
             {GROUPS.map((g, gi) => <button key={gi} data-nav-group={g.label} onClick={() => goLabel(g.tabs[0])} style={{ padding: '12px 20px', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: activeGroup === gi ? 800 : 600, color: activeGroup === gi ? G : '#6E6863', background: 'transparent', borderBottom: activeGroup === gi ? '3px solid ' + G : '3px solid transparent', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{g.icon} {g.label}{g.label === 'AI 에이전트' && decPending > 0 ? <span style={{ background: '#C62828', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{decPending}</span> : null}</button>)}
-            <a data-nav-popup href="https://miraclead2026.github.io/lifemeal-popup/" target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', margin: '0 12px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🎪 용산팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
+            <a data-nav-popup href="https://miraclead2026.github.io/lifemeal-popup/" target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', marginRight: 6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🎪 용산팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
+            <a data-nav-trial href="https://miraclead2026.github.io/lifemeal-dashboard/trial/" target="_blank" rel="noreferrer" style={{ marginRight: 14, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 13px', borderRadius: 999, background: 'white', color: G, border: '1.5px solid ' + G, fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>🎁 루티너(체험단) <span style={{ fontSize: 11 }}>↗</span></a>
           </div>
         </div>
         {activeGroup >= 0 && (GROUPS[activeGroup].tabs.length > 1 || ORPHAN_PARENT[curLabel] === GROUPS[activeGroup].label) ? (
