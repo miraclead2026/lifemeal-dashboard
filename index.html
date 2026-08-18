@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_172';
+const BUILD_TAG = 'index_175';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -384,7 +384,7 @@ const migrateData = raw => { const _mem = (raw.members && raw.members.length) ? 
   ...raw,
   rev: (typeof raw.rev === 'number') ? raw.rev : 0,
   categories: raw.categories || [{ name: 'MD출력', prefix: 'MD' }, { name: '기타추가', prefix: 'P' }, { name: '반복지원', prefix: 'R' }],
-  mainKpis: (raw.mainKpis || []).map(mk => ({ ...mk, linkedKpiIds: mk.linkedKpiIds || (mk.linkedPlanIds || []).map(pid => 'k' + pid) })),
+  mainKpis: (raw.mainKpis || []).map(mk => ({ ...mk, kpiType: mk.kpiType || 'monthly', linkedKpiIds: mk.linkedKpiIds || (mk.linkedPlanIds || []).map(pid => 'k' + pid) })),
   kpiLogs: (raw.kpiLogs || []).map(l => ({ kpiId: 'k' + l.planId, ...l })),
   outputs: (raw.outputs || []).map(o => ({ kpi: null, ...o })),
   plans: (raw.plans || []).map(p => { const b = { hold: false, desc: '', extraOutputIds: [], ...p }; if (!b.kpis) b.kpis = b.kpi ? [{ id: (b.kpi.id || ('k' + p.id)), name: b.kpi.name, unit: b.kpi.unit, target: b.kpi.target, targets: b.kpi.targets || {} }] : []; delete b.kpi; b.extraOutputIds = (b.extraOutputIds || []).filter(x => x !== b.outputId); return b; }),
@@ -3255,18 +3255,30 @@ function MainKpiModal({ data, setData, onClose, edit }) {
   const [startMonth, setStartMonth] = useState(edit ? (edit.startMonth || '') : '');
   const [endMonth, setEndMonth] = useState(edit ? (edit.endMonth || '') : '');
   const [salesMetric, setSalesMetric] = useState(edit ? (edit.salesMetric || '') : '');
+  const [kpiType, setKpiType] = useState(edit ? (edit.kpiType || 'monthly') : 'monthly');
   const save = () => {
     if (!name.trim()) { alert('KPI 이름을 입력하세요'); return; }
     const u = roasAuto ? '%' : (unit.trim() || '개');
     if (startMonth && endMonth && startMonth > endMonth) { alert('적용 시작월이 종료월보다 늦습니다'); return; }
-    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, salesAuto, kakaoAuto, roasAuto, salesMetric, startMonth, endMonth } : mk) }));
-    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto, roasAuto, salesMetric, startMonth, endMonth }] }));
+    if (edit) setData(d => ({ ...d, mainKpis: d.mainKpis.map(mk => mk.id === edit.id ? { ...mk, name: name.trim(), unit: u, kpiType, salesAuto, kakaoAuto, roasAuto, salesMetric, startMonth, endMonth } : mk) }));
+    else setData(d => ({ ...d, mainKpis: [...(d.mainKpis || []), { id: 'm' + Date.now(), name: name.trim(), unit: u, kpiType, linkedKpiIds: [], targets: {}, manuals: [], salesAuto, kakaoAuto, roasAuto, salesMetric, startMonth, endMonth }] }));
     onClose();
   };
   return (
     <ModalShell title={edit ? '메인 KPI 수정' : '메인 KPI 추가'} onClose={onClose}>
       <div><Lbl c="KPI 이름" /><Inp value={name} onChange={setName} placeholder="예: 총매출 / 신규고객 / 전환율" /></div>
       <div><Lbl c="단위" /><Inp value={unit} onChange={setUnit} placeholder="원 / 명 / % / 건" /></div>
+      <div style={{ background: '#F5F4F2', borderRadius: 10, padding: '10px 12px' }}>
+        <Lbl c="유형 — 이 목표를 어떻게 가져가나요?" />
+        <div style={{ display: 'flex', gap: 8 }}>
+          {[{ v: 'monthly', l: '🔁 매달 반복', d: '월별 목표를 계속 가져가는 지표 (매출·ROAS 등)' }, { v: 'once', l: '1️⃣ 일회성', d: '끝나면 보관함으로 보내는 목표 (모집·이벤트 등)' }].map(o => (
+            <button key={o.v} data-mk-type={o.v} onClick={() => setKpiType(o.v)} style={{ flex: 1, textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', border: '1.5px solid ' + (kpiType === o.v ? G : '#E3E0DC'), background: kpiType === o.v ? '#F3F8F5' : 'white', borderRadius: 9, padding: '8px 11px' }}>
+              <div style={{ fontSize: 12.5, fontWeight: 800, color: kpiType === o.v ? G : '#6E6863' }}>{o.l}</div>
+              <div style={{ fontSize: 10, color: '#A29C95', marginTop: 2, lineHeight: 1.4 }}>{o.d}</div>
+            </button>
+          ))}
+        </div>
+      </div>
       <div style={{ background: '#F5F4F2', borderRadius: 10, padding: '10px 12px' }}>
         <Lbl c="📅 적용 기간 (월 단위 · 선택)" />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 8 }}>
@@ -3655,6 +3667,13 @@ function TabKpi({ data, setData }) {
   useEffect(() => { let alive = true; ghFetch('data/naver-ads.json').then(r => r.ok ? r.json() : null).then(j => { if (!alive || !j || !Array.isArray(j.days)) return; setAdsDays(sortByDate(j.days.map(x => { let sp = 0, rv = 0, pc = 0, cl = 0, im = 0; let spS = 0, rvS = 0, spB = 0, rvB = 0; let spR = 0, rvR = 0, clR = 0, imR = 0, pcR = 0; (x.groups || []).forEach(g => { const s = g.spend || 0, r = g.convRevenue || 0, c = g.clicks || 0, ip = g.impressions || 0, pv = g.purchaseConv || 0; sp += s; rv += r; pc += pv; cl += c; im += ip; const cn = (g.campaignName || '') + ' ' + (g.adGroupName || '') + ' ' + (g.campaignType || ''); if (/브랜드\s*검색|브랜드검색|brand\s*search|brandsearch|BRAND_SEARCH/i.test(cn)) { spR += s; rvR += r; clR += c; imR += ip; pcR += pv; } else if (/advoost|애드부스트/i.test(cn)) { spB += s; rvB += r; } else if (/쇼핑\s*검색|쇼핑검색/.test(cn)) { spS += s; rvS += r; } }); return { date: x.date, spend: sp, rev: rv, conv: pc, clicks: cl, imp: im, spendShop: spS, revShop: rvS, spendBoost: spB, revBoost: rvB, spendBrand: spR, revBrand: rvR, clicksBrand: clR, impBrand: imR, convBrand: pcR }; }))); }).catch(() => {}); return () => { alive = false; }; }, []);
   const logs = data.kpiLogs || [];
   const mainKpis = data.mainKpis || [];
+  // [174] 완료 보관함 — 일회성 KPI를 끝내고도 기록으로 남긴다
+  const kpiDone = mk => !!(mk && mk.done && mk.done.at);
+  const doneKpis = mainKpis.filter(kpiDone);
+  const [showDone, setShowDone] = useState(false);
+  const archiveKpi = id => setData(d => ({ ...d, mainKpis: (d.mainKpis || []).map(mk => mk.id === id ? { ...mk, done: { at: TODAY } } : mk) }));
+  const unarchiveKpi = id => setData(d => ({ ...d, mainKpis: (d.mainKpis || []).map(mk => { if (mk.id !== id) return mk; const n = { ...mk }; delete n.done; return n; }) }));
+  const typeBadge = mk => <span style={{ fontSize: 10, fontWeight: 700, color: mk.kpiType === 'once' ? '#7C3AED' : '#2D5FE0', background: mk.kpiType === 'once' ? '#F5F3FF' : '#EFF6FF', border: '1px solid ' + (mk.kpiType === 'once' ? '#DDD6FE' : '#BFDBFE'), borderRadius: 5, padding: '1px 7px', whiteSpace: 'nowrap' }}>{mk.kpiType === 'once' ? '1️⃣ 일회성' : '🔁 매달'}</span>;
   const naverInRange = naverDaily.filter(d => d.date && d.date >= pStart && d.date <= pEnd).reduce((a, d) => a + (d.revenue || 0), 0);
   const isSalesKpi = mk => (mk.name || '').indexOf('매출') >= 0;
   const subInRange = naverSubDays.filter(d => d.date && d.date >= pStart && d.date <= pEnd);
@@ -3864,7 +3883,7 @@ function TabKpi({ data, setData }) {
         {mkEdit !== undefined && <MainKpiModal data={data} setData={setData} edit={mkEdit} onClose={() => setMkEdit(undefined)} />}
         {kpiEdit && <KpiEditModal data={data} setData={setData} planId={kpiEdit.planId} kpiId={kpiEdit.kpiId} onClose={() => setKpiEdit(null)} />}
         {linkCfg && (() => { const lp = data.plans.find(x => x.id === linkCfg.planId); if (linkCfg.subId != null) { const sub = data.subplans.find(s => s.id === linkCfg.subId); const ck = sub && (sub.kpis || []).find(c => c.id === linkCfg.ckId); return ck ? <KpiLinkPanel kpi={ck} days={naverDays} kakaoCoupons={kakaoCoupons} adsDays={adsDays} data={data} setData={setData} onSave={l => { setSubKpiLink(linkCfg.subId, linkCfg.ckId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; } const lkpi = lp && (lp.kpis || []).find(x => x.id === linkCfg.kpiId); return lkpi ? <KpiLinkPanel kpi={lkpi} days={naverDays} kakaoCoupons={kakaoCoupons} adsDays={adsDays} data={data} setData={setData} onSave={l => { setPlanKpiLink(linkCfg.planId, linkCfg.kpiId, l); setLinkCfg(null); }} onClose={() => setLinkCfg(null)} /> : null; })()}
-        {mainKpis.filter(kpiActive).map(mk => {
+        {mainKpis.filter(mk => !kpiDone(mk)).filter(kpiActive).map(mk => {
           const linkedIds = mk.linkedKpiIds || [];
           const linked = linkedIds.map(kid => findKpi(kid)).filter(Boolean);
           const linkedSum = linkedIds.reduce((a, kid) => a + sumForKpi(kid), 0);
@@ -3882,7 +3901,7 @@ function TabKpi({ data, setData }) {
               <KpiHeader title={mk.name} achieved={achieved} target={target} unit={mk.unit} openKey={'main-' + mk.id} accent={GO} sub={mk.roasAuto ? `📊 마케팅 ROAS · 매출 ÷ 실결제 비용` : (mKey ? `📡 네이버 매출탭 ${SALES_AUTO_LABEL[mKey]} 자동 연동 (기간 합산)` : `연결 ${linked.length}개${manuals.length > 0 ? ` · 수동 ${manuals.length}건` : ''}${isSalesKpi(mk) ? ' · 📡 네이버 매출 연동' : ''}${isSubKpi(mk) ? ' · 📡 네이버 구독자 연동' : ''}${mk.kakaoAuto ? ' · 💬 카카오 친구 연동' : ''}`)} />
               {expanded === 'main-' + mk.id && (
                 <div style={{ marginTop: 12, borderTop: '1px solid #F5F4F2', paddingTop: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginBottom: 10 }}><button onClick={() => setMkEdit(mk)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✏️ 수정</button><button onClick={() => setData(d => moveToTrash(d, 'mainKpi', mk.id))} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #E53935', background: 'white', color: '#E53935', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🗑 삭제 (휴지통)</button></div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, marginBottom: 10 }}><span style={{ marginRight: 'auto' }}>{typeBadge(mk)}</span><button data-kpi-arch={mk.id} onClick={() => archiveKpi(mk.id)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #047857', background: 'white', color: '#047857', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✔ 완료 보관</button><button onClick={() => setMkEdit(mk)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>✏️ 수정</button><button onClick={() => setData(d => moveToTrash(d, 'mainKpi', mk.id))} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #E53935', background: 'white', color: '#E53935', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>🗑 삭제 (휴지통)</button></div>
                   <TargetEditor targets={mk.targets} onSet={(k, v) => setMainMonth(mk.id, k, v)} unit={mk.unit} />
                   <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
                     <div style={{ flex: 1, minWidth: 130, background: '#F5F4F2', borderRadius: 8, padding: '8px 12px' }}><div style={{ fontSize: 10, color: '#6E6863' }}>연결 KPI 합산</div><div style={{ fontSize: 15, fontWeight: 700, color: G }}>{linkedSum.toLocaleString()}</div></div>
@@ -3952,8 +3971,23 @@ function TabKpi({ data, setData }) {
             </Card>
           );
         })}
-        {mainKpis.length > 0 && mainKpis.filter(kpiActive).length === 0 && <div style={{ fontSize: 12, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 기간에 적용되는 메인 KPI가 없습니다</div>}
+        {mainKpis.length > 0 && mainKpis.filter(mk => !kpiDone(mk)).filter(kpiActive).length === 0 && <div style={{ fontSize: 12, color: '#A29C95', textAlign: 'center', padding: '18px 0' }}>이 기간에 적용되는 메인 KPI가 없습니다{doneKpis.length ? ' — 완료된 KPI는 아래 보관함에' : ''}</div>}
       </div>
+
+      {(
+        <div style={{ marginBottom: 24 }} data-kpi-archive>
+          <button onClick={() => setShowDone(!showDone)} style={{ width: '100%', textAlign: 'left', background: '#F5F4F2', border: '1px solid #EDEBE7', borderRadius: 10, padding: '10px 14px', fontSize: 13, fontWeight: 700, color: '#3A3631', cursor: 'pointer', fontFamily: 'inherit' }}>{showDone ? '▾' : '▸'} 🗂 완료된 KPI 보관함 ({doneKpis.length}) — 우리가 가져갔던 목표의 기록</button>
+          {showDone && !doneKpis.length ? <div style={{ fontSize: 12, color: '#A29C95', padding: '10px 6px', lineHeight: 1.6 }}>아직 보관된 KPI가 없어요 — 각 KPI 카드를 펼쳐 <b>[✔ 완료 보관]</b>을 누르면 여기에 기록으로 쌓입니다. (일회성 KPI를 끝냈을 때 쓰세요)</div> : null}
+          {showDone && doneKpis.map(mk => (
+            <div key={mk.id} data-kpi-donerow style={{ background: 'white', borderLeft: '4px solid #C4BFB8', borderRadius: '0 10px 10px 0', boxShadow: '0 1px 4px rgba(0,0,0,0.05)', padding: '10px 14px', marginTop: 8, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              {typeBadge(mk)}
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{mk.name}</span>
+              <span style={{ fontSize: 11, color: '#6E6863' }}>목표 {effTarget(mk) ? effTarget(mk).toLocaleString() + (mk.unit || '') : '—'} · 완료 {mk.done.at}{mk.startMonth ? ' · 기간 ' + mk.startMonth + (mk.endMonth ? '~' + mk.endMonth : '~') : ''}</span>
+              <button data-kpi-restore={mk.id} onClick={() => unarchiveKpi(mk.id)} style={{ marginLeft: 'auto', fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}>↩ 복원</button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -6101,7 +6135,7 @@ function TabSales({ data, setData }) {
   }, [reloadKey]);
 
   const won2 = n => (Number(n) || 0).toLocaleString() + '원';
-  const deltaChip = (d, invert, suffix) => { if (!d || d.deltaValue == null) return null; const up = d.deltaValue > 0; const zero = d.deltaValue === 0; const good = invert ? !up : up; const color = zero ? '#A29C95' : good ? '#1FA463' : '#E53935'; return <span style={{ fontSize: 11, color, fontWeight: 700 }}>{zero ? '–' : up ? '▲' : '▼'} {Math.abs(d.deltaValue).toLocaleString()}{suffix || ''}{d.deltaPct != null ? ' (' + (d.deltaPct > 0 ? '+' : '') + d.deltaPct + '%)' : ''}</span>; };
+  const deltaChip = (d, invert, suffix) => { if (!d || d.deltaValue == null) return null; if (d.deltaValue === 0 && d.deltaPct == null) return null; /* [173] 신통계 진행중 기간 — 델타 미계산(0/null)은 '–0'으로 그리지 않음 */ const up = d.deltaValue > 0; const zero = d.deltaValue === 0; const good = invert ? !up : up; const color = zero ? '#A29C95' : good ? '#1FA463' : '#E53935'; return <span style={{ fontSize: 11, color, fontWeight: 700 }}>{zero ? '–' : up ? '▲' : '▼'} {Math.abs(d.deltaValue).toLocaleString()}{suffix || ''}{d.deltaPct != null ? ' (' + (d.deltaPct > 0 ? '+' : '') + d.deltaPct + '%)' : ''}</span>; };
   const th = { padding: '8px 10px', textAlign: 'left', color: '#6E6863', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' };
   const td = { padding: '8px 10px', whiteSpace: 'nowrap' };
   const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -8337,8 +8371,11 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
   const weeks = synth ? [synth].concat(weeksSrc) : weeksSrc;
   const wSel = Math.min(wIdx, Math.max(0, weeks.length - 1));
   const cw = weeks[wSel] || null;
-  const wkS = cw ? (/^\d{4}-\d{2}-\d{2}$/.test(cw.key) ? cw.key : ((cw.daily || [])[0] || {}).key || TODAY) : weekKeyOf(TODAY);
-  const wkE = cw && /^\d{4}-\d{2}-\d{2}$/.test(wkS) ? addDay(wkS, 6) : TODAY;
+  // 주 시작일 — 날짜 키('2026-08-10') · ISO 주 키('2026-W34') · daily[] 최솟값 순으로 해석 (신통계 v2가 W-형식 키를 쓰고 daily를 안 줌)
+  const isoWeekStart = k => { const m = String(k || '').match(/^(\d{4})-W(\d{1,2})$/); if (!m) return null; const j4 = new Date(Date.UTC(+m[1], 0, 4)); const mon = new Date(j4); mon.setUTCDate(j4.getUTCDate() - ((j4.getUTCDay() + 6) % 7) + (+m[2] - 1) * 7); return mon.toISOString().slice(0, 10); };
+  const dailyKeys = cw ? (cw.daily || []).map(x => x.key || x.date).filter(Boolean).sort() : [];
+  const wkS = cw ? (/^\d{4}-\d{2}-\d{2}$/.test(cw.key) ? cw.key : (isoWeekStart(cw.key) || dailyKeys[0] || weekKeyOf(TODAY))) : weekKeyOf(TODAY);
+  const wkE = addDay(wkS, 6);
   const wkLabel = cw ? (cw.label || wkS.slice(5) + '~' + wkE.slice(5)) : '이번 주';
   const isLatest = wSel === 0;
   const wkWorkE = isLatest && TODAY > wkE ? TODAY : wkE;   // 최신 주 화면의 '업무' 창은 오늘까지 — 월요일에 체크한 게 사라지지 않게
@@ -8352,7 +8389,9 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
   const prTop = ((cw && cw.products) || []).slice().sort((a, b) => (b.revenue || 0) - (a.revenue || 0)).slice(0, 3);
 
   // ── 광고 파생 (주간 범위 집계) ──
-  const adRows = ads ? sortByDate(ads.days).filter(x => x.date >= wkS && x.date <= wkE) : [];
+  const adDays = ads ? sortByDate(ads.days) : [];
+  const adsLast = adDays.length ? adDays[adDays.length - 1].date : null;
+  const adRows = adDays.filter(x => x.date >= wkS && x.date <= wkE);
   const adAgg = (() => { const t = { spend: 0, rev: 0, conv: 0, clicks: 0, imp: 0, ch: { display: { spend: 0, rev: 0 }, search: { spend: 0, rev: 0 } } }; adRows.forEach(x => (x.groups || []).forEach(g => { const c = g.channel === 'search' ? 'search' : 'display'; t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.purchaseConv || 0; t.clicks += g.clicks || 0; t.imp += g.impressions || 0; t.ch[c].spend += g.spend || 0; t.ch[c].rev += g.convRevenue || 0; })); return t; })();
   const roasOf = (s, r) => (s ? Math.round(r / s * 1000) / 10 : 0);
   const wkRoas = roasOf(adAgg.spend, adAgg.rev);
@@ -8401,7 +8440,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
   const mtd = mDays.reduce((t, d) => { const s = d.summary || {}; t.rev += ((s.revenue || {}).value) || 0; t.ord += ((s.orders || {}).value) || 0; t.vis += ((s.visitors || {}).value) || 0; return t; }, { rev: 0, ord: 0, vis: 0 });
   const mAds = ads ? ads.days.filter(x => String(x.date).slice(0, 7) === month) : [];
   const mAd = mAds.reduce((t, x) => { (x.groups || []).forEach(g => { t.spend += g.spend || 0; t.rev += g.convRevenue || 0; }); return t; }, { spend: 0, rev: 0 });
-  const kpiFind = re => (data.mainKpis || []).find(k => re.test(k.name || ''));
+  const kpiFind = re => (data.mainKpis || []).filter(k => !(k.done && k.done.at)).find(k => re.test(k.name || ''));
   const kTarget = k => { if (!k) return null; const t = (k.targets || {})[month]; return t != null ? t : (k.target != null ? k.target : null); };
   const kpiDefs = [
     { re: /매출/, label: '매출', val: mtd.rev, fmt: manF },
@@ -8502,7 +8541,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
   );
 
   const headline = cw ? (
-    <span>매출 <b style={{ color: '#1B4D3E' }}>{manF(gv('revenue'))}원{sum.revenue && sum.revenue.deltaPct != null ? ' (' + (sum.revenue.deltaPct > 0 ? '▲' : '▼') + Math.abs(sum.revenue.deltaPct) + '%)' : ''}</b> · 방문 <b style={{ color: '#1B4D3E' }}>{nf(gv('visitors'))}{sum.visitors && sum.visitors.deltaPct != null ? ' (' + (sum.visitors.deltaPct > 0 ? '▲' : '▼') + Math.abs(sum.visitors.deltaPct) + '%)' : ''}</b>{ads ? <span>. ROAS <b style={{ color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas}%</b>{wkRoas < 330 ? ' — 목표(330%) 미달' : ''}</span> : null}{checks.length ? <span> · 점검 <b style={{ color: '#B45309' }}>{checks.length}건</b></span> : null}</span>
+    <span>매출 <b style={{ color: '#1B4D3E' }}>{manF(gv('revenue'))}원{sum.revenue && sum.revenue.deltaPct != null ? ' (' + (sum.revenue.deltaPct > 0 ? '▲' : '▼') + Math.abs(sum.revenue.deltaPct) + '%)' : ''}</b> · 방문 <b style={{ color: '#1B4D3E' }}>{nf(gv('visitors'))}{sum.visitors && sum.visitors.deltaPct != null ? ' (' + (sum.visitors.deltaPct > 0 ? '▲' : '▼') + Math.abs(sum.visitors.deltaPct) + '%)' : ''}</b>{ads && adRows.length ? <span>. ROAS <b style={{ color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas}%</b>{wkRoas < 330 ? ' — 목표(330%) 미달' : ''}</span> : null}{checks.length ? <span> · 점검 <b style={{ color: '#B45309' }}>{checks.length}건</b></span> : null}</span>
   ) : <span style={{ color: '#A29C95' }}>매출 주간 데이터를 불러오면 요약이 채워집니다.</span>;
 
   return (
@@ -8514,6 +8553,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, background: '#F7F6F4', border: '1px solid #E3E0DC', borderRadius: 999, padding: '3px 8px', fontSize: 12 }}>
             <button data-wr2-prev onClick={() => setWIdx(i => Math.min(i + 1, Math.max(0, weeks.length - 1)))} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 13, color: '#6E6863' }}>◀</button>
             <b>{wkLabel}</b>
+            {TODAY <= wkE ? <span data-wr2-inprog style={{ fontSize: 10, fontWeight: 800, color: '#047857', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 5, padding: '0 6px' }}>진행 중</span> : null}
             <button data-wr2-next onClick={() => setWIdx(i => Math.max(i - 1, 0))} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 13, color: '#6E6863' }}>▶</button>
           </div>
         </div>
@@ -8522,7 +8562,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
           {tile('매출', cw ? manF(gv('revenue')) : '—', dch(sum.revenue))}
           {tile('주문 / 객단가', cw ? nf(gv('orders')) + '건' : '—', sum.aov ? <span style={{ fontSize: 10.5 }}>객단가 {wonF(gv('aov'))} {dch(sum.aov)}</span> : null)}
           {tile('방문', cw ? nf(gv('visitors')) : '—', dch(sum.visitors))}
-          {tile('ROAS (목표 330%)', ads ? wkRoas + '%' : '—', ads ? <span style={{ fontSize: 10.5, fontWeight: 700, color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas >= 330 ? '달성' : '미달'}</span> : null, ads && wkRoas < 330 ? '#DC2626' : undefined)}
+          {tile('ROAS (목표 330%)', ads && adRows.length ? wkRoas + '%' : '—', ads && adRows.length ? <span style={{ fontSize: 10.5, fontWeight: 700, color: wkRoas >= 330 ? '#047857' : '#DC2626' }}>{wkRoas >= 330 ? '달성' : '미달'}</span> : (ads ? <span style={{ fontSize: 10.5, color: '#A29C95' }}>이번 주 집계 전</span> : null), ads && adRows.length && wkRoas < 330 ? '#DC2626' : undefined)}
         </div>
         {kpiDefs.length ? (
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10, borderTop: '1px dashed #E7E4E0', paddingTop: 11 }}>
@@ -8584,7 +8624,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
           <span style={{ fontSize: 18 }}>📣</span><span style={{ fontSize: 15.5, fontWeight: 800 }}>네이버 광고</span>
           <button onClick={() => goTab && goTab('광고')} style={{ marginLeft: 'auto', border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>자세히 → 광고 탭</button>
         </div>
-        {ads ? (
+        {ads && adRows.length ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px,1fr))', gap: 14 }}>
             <div>
               {colHead('주간 요약')}
@@ -8604,7 +8644,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
               {lowGroups.map((g, i) => mrRow(<span style={{ color: '#DC2626' }}>⚠ 저효율: {g.name}</span>, <span style={{ color: '#DC2626' }}>{manF(g.spend)} · {g.roas}%</span>, 'l' + i))}
             </div>
           </div>
-        ) : <div style={{ fontSize: 12, color: '#A29C95' }}>광고 데이터(naver-ads.json) 불러오는 중이거나 없습니다.</div>}
+        ) : <div data-wr2-adwait style={{ fontSize: 12, color: '#A29C95' }}>{ads ? '이번 주 광고 집계 전 — 광고 데이터는 하루 늦게 잡힙니다 (최신 ' + (adsLast || '?') + '). 지난주는 ◀ 로 볼 수 있어요.' : '광고 데이터(naver-ads.json) 불러오는 중이거나 없습니다.'}</div>}
         {noteRow('ads', '📦 담당자', '네이버 광고 효율 판단 · 다음 방향 — 한 줄')}
       </div>
 
@@ -9133,6 +9173,27 @@ function TabAdvoost() {
           </div>
         ); })}
       </div>
+
+      {/* ②-1 ★유니 실행 체크리스트 (todoForUni — 파일에 생기면 자동 표시) */}
+      {Array.isArray(d.todoForUni) && d.todoForUni.length ? (
+        <React.Fragment>
+          {secT('⭐ 유니 실행 체크리스트', '광고 에이전트가 화면 경로까지 잡아둔 실행 항목 — 번호 순서대로')}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {d.todoForUni.slice().sort((a, b) => (a.no || 0) - (b.no || 0)).map((t, i) => (
+              <div key={i} data-av-todo style={{ border: '1.5px solid #F5D98F', background: '#FFFDF6', borderRadius: 11, padding: '11px 13px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <span style={{ width: 22, height: 22, borderRadius: 7, background: '#B45309', color: 'white', fontSize: 12, fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{t.no}</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1614' }}>{t.title}</span>
+                </div>
+                {t.screen ? <div style={{ fontSize: 11, color: '#6E6863', marginTop: 6 }}>📍 화면 — <b>{t.screen}</b></div> : null}
+                {t.do ? <div style={{ fontSize: 12, color: '#3A3631', marginTop: 3, lineHeight: 1.55 }}>✅ 할 일 — {t.do}</div> : null}
+                {t.why ? <div style={{ fontSize: 11, color: '#8B5CF6', marginTop: 3, lineHeight: 1.5 }}>왜 — {t.why}</div> : null}
+                {t.measure ? <div style={{ fontSize: 10.5, color: '#A29C95', marginTop: 3, lineHeight: 1.5 }}>📏 측정(광고 에이전트) — {t.measure}</div> : null}
+              </div>
+            ))}
+          </div>
+        </React.Fragment>
+      ) : null}
 
       {/* ③ 앞으로 계획 */}
       {secT('🗺 앞으로 계획', '단계 순서대로 — 0단계가 선행 조건')}
