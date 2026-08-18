@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_175';
+const BUILD_TAG = 'index_178';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -2677,6 +2677,220 @@ function UpdateCenterModal({ data, setData, onClose }) {
       <div style={{ fontSize: 16, color: '#6E6863', marginTop: -4 }}>대시보드에 새로 반영된 기능·변경 사항이에요. 자세히 보려면 항목을 누르세요.</div>
       <UpdateBoard data={data} setData={setData} embedded={true} />
     </ModalShell>
+  );
+}
+
+// ===== 업무관리 탭 (index_176) — 기존 데이터·탭은 그대로, 같은 plans/subplans/checklists 를 긴급도 순으로 관리 =====
+function TabWork({ data, setData, onEdit, onRecord, goTab }) {
+  const [filter, setFilter] = useState('전체');
+  const [openSec, setOpenSec] = useState({ overdue: true, week: true, active: true, perf: true, dormant: false, empty: false, done: false });
+  const [openChk, setOpenChk] = useState({});
+  const [newChk, setNewChk] = useState({});
+  const toggleSec = k => setOpenSec(m => ({ ...m, [k]: !m[k] }));
+  const isDate = v => /^\d{4}-\d{2}-\d{2}/.test(String(v || ''));
+  const dLate = due => Math.round((new Date(TODAY) - new Date(due)) / 86400000);
+  const WEEK_END = addDay(TODAY, 7);
+
+  // ── 쓰기 3종 — 기존 탭(칸반·수정모달)과 같은 규약으로만 만진다
+  const setStage = (sid, stage) => setData(d => resolveAll({ ...d, subplans: d.subplans.map(s => { if (s.id !== sid) return s; let ns = { ...s, stage }; if (stage === '완료' && !ns.completedAt) ns.completedAt = TODAY; return ns; }) }));
+  const setDue = (sid, v) => setData(d => ({ ...d, subplans: d.subplans.map(s => s.id === sid ? { ...s, due: v } : s) }));
+  const toggleChk = id => setData(d => ({ ...d, checklists: d.checklists.map(c => c.id === id ? { ...c, done: !c.done, doneAt: !c.done ? TODAY : null } : c) }));
+  const addChk = sid => { const t = (newChk[sid] || '').trim(); if (!t) return; setData(d => ({ ...d, nid: d.nid + 1, checklists: [...d.checklists, { id: d.nid + 1, subplanId: sid, standalone: false, kind: 'task', text: t, done: false, date: '', owner: [], memo: '' }] })); setNewChk(m => ({ ...m, [sid]: '' })); };
+  const toggleHold = pid => setData(d => ({ ...d, plans: d.plans.map(p => p.id === pid ? { ...p, hold: !p.hold } : p) }));
+
+  // ── 계획별 분류 (읽기 전용 파생값 — 저장하지 않는다)
+  const outOf = id => data.outputs.find(o => o.id === id);
+  const rows = data.plans.map(p => {
+    const subs = subsOfPlanAll(data, p.id);
+    const open = subs.filter(s => s.stage !== '완료' && s.stage !== '보류');
+    const done = subs.filter(s => s.stage === '완료').length;
+    const overdue = open.filter(s => isDate(s.due) && s.due < TODAY).sort((a, b) => a.due < b.due ? -1 : 1);
+    const week = open.filter(s => isDate(s.due) && s.due >= TODAY && s.due <= WEEK_END);
+    const noDue = open.filter(s => !isDate(s.due));
+    const dates = [];
+    subs.forEach(s => { if (isDate(s.completedAt)) dates.push(s.completedAt); if (isDate(s.start)) dates.push(s.start); if (isDate(s.due)) dates.push(s.due); });
+    const last = dates.length ? dates.reduce((a, b) => a > b ? a : b) : null;
+    const stale = last ? Math.round((new Date(TODAY) - new Date(last)) / 86400000) : null;
+    let band;
+    if (p.hold) band = 'hold';
+    else if (subs.length === 0) band = 'empty';
+    else if (subs.length > 0 && done === subs.length) band = 'done';
+    else if (overdue.length) band = 'overdue';
+    else if (week.length || open.some(s => s.stage === '진행중')) band = 'active';
+    else if (stale == null || stale >= 30) band = 'dormant';
+    else band = 'active';
+    return { p, subs, open, done, overdue, week, noDue, stale, band };
+  });
+  const vis = rows.filter(r => filter === '전체' || matchOwner(r.p, filter) || r.subs.some(s => matchOwner(s, filter)));
+  const by = b => vis.filter(r => r.band === b);
+  const ovPlans = by('overdue').sort((a, b) => (a.overdue[0] ? a.overdue[0].due : '9999') < (b.overdue[0] ? b.overdue[0].due : '9999') ? -1 : 1);
+  const acPlans = by('active'); const dmPlans = by('dormant'); const emPlans = by('empty'); const dnPlans = by('done');
+  const holdN = by('hold').length;
+  const subVisible = (r, s) => filter === '전체' || matchOwner(s, filter) || matchOwner(r.p, filter);
+  const ovSubN = ovPlans.reduce((n, r) => n + r.overdue.filter(s => subVisible(r, s)).length, 0);
+  const weekSubN = vis.reduce((n, r) => n + (r.band === 'done' ? 0 : r.week.filter(s => subVisible(r, s)).length), 0);
+  const noDueN = vis.reduce((n, r) => n + (r.band === 'done' || r.band === 'hold' ? 0 : r.noDue.filter(s => subVisible(r, s)).length), 0);
+  const perfPend = data.subplans.filter(s => s.stage === '완료' && !s.perfRecorded && (filter === '전체' || matchOwner(s, filter)));
+
+  // ── 부품
+  const Tile = ({ n, label, color, bg, onClick }) => (
+    <div onClick={onClick} style={{ flex: '1 1 130px', minWidth: 130, background: bg || 'white', border: '1px solid #EDEBE7', borderRadius: 12, padding: '10px 14px', cursor: onClick ? 'pointer' : 'default' }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: color || '#3A3631' }}>{n}</div>
+      <div style={{ fontSize: 13, color: '#6E6863' }}>{label}</div>
+    </div>
+  );
+  const SecHead = ({ k, icon, title, count, hint }) => (
+    <div onClick={() => toggleSec(k)} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none', margin: '18px 0 8px' }}>
+      <span style={{ fontSize: 14, color: '#A29C95', transform: openSec[k] ? 'rotate(90deg)' : 'none', display: 'inline-block', transition: 'transform .12s' }}>▸</span>
+      <span style={{ fontSize: 17, fontWeight: 800, color: G }}>{icon} {title}</span>
+      <span style={{ fontSize: 13, fontWeight: 700, color: '#6E6863', background: '#EDEBE7', borderRadius: 10, padding: '1px 8px' }}>{count}</span>
+      {hint && <span style={{ fontSize: 12.5, color: '#A29C95', marginLeft: 'auto' }}>{hint}</span>}
+    </div>
+  );
+  const DueEdit = ({ s }) => (
+    <input type="date" value={isDate(s.due) ? s.due.slice(0, 10) : ''} onChange={e => setDue(s.id, e.target.value)} title="기한 변경 — 모든 탭에 즉시 반영됩니다" style={{ border: '1px solid #E3E0DC', borderRadius: 6, padding: '2px 5px', fontSize: 12.5, color: '#6E6863', background: 'white', fontFamily: 'inherit' }} />
+  );
+  const SubRow = ({ r, s }) => {
+    const chks = data.checklists.filter(c => c.subplanId === s.id);
+    const cd = chks.filter(c => c.done).length;
+    const late = isDate(s.due) && s.due < TODAY && s.stage !== '완료' && s.stage !== '보류';
+    const isDone = s.stage === '완료';
+    const co = openChk[s.id];
+    return (
+      <div style={{ borderTop: '1px dashed #EDEBE7', padding: '5px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+          <span onClick={() => setStage(s.id, isDone ? '진행중' : '완료')} title={isDone ? '완료 해제 → 진행중' : '완료 처리'} style={{ cursor: 'pointer', display: 'inline-flex' }}><Chk on={isDone} /></span>
+          {late && <span style={{ fontSize: 11.5, fontWeight: 800, color: '#C62828', background: '#FDECEA', borderRadius: 5, padding: '1px 6px', whiteSpace: 'nowrap' }}>D+{dLate(s.due)}</span>}
+          {!late && !isDate(s.due) && !isDone && <span style={{ fontSize: 11.5, fontWeight: 700, color: '#8A6A12', background: '#FFF9E8', borderRadius: 5, padding: '1px 6px', whiteSpace: 'nowrap' }}>기한 없음</span>}
+          <Badge label={s.stage} color={stC(s.stage)} />
+          <span style={{ fontSize: 15, flex: 1, minWidth: 110, color: isDone ? '#A29C95' : '#3A3631', textDecoration: isDone ? 'line-through' : 'none' }}>{s.name}</span>
+          <span style={{ fontSize: 12.5, color: '#A29C95', whiteSpace: 'nowrap' }}>{ownerAv(s)} {ownerNm(s)}</span>
+          <DueEdit s={s} />
+          <button onClick={() => setOpenChk(m => ({ ...m, [s.id]: !m[s.id] }))} style={{ border: '1px solid #E3E0DC', background: co ? '#F0F4F1' : 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 12.5, padding: '2px 7px', fontWeight: 600 }}>☑ {cd}/{chks.length}</button>
+          {isDone && !s.perfRecorded && <button onClick={() => onRecord(s.id)} style={{ border: 'none', background: GO, color: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 12.5, padding: '3px 9px', fontWeight: 700 }}>성과 기록</button>}
+          <EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id, from: r.p.id })} />
+        </div>
+        {co && (
+          <div style={{ margin: '6px 0 4px 24px', background: '#FAFAF9', border: '1px solid #F0EEEA', borderRadius: 8, padding: '7px 10px' }}>
+            {chks.length === 0 && <div style={{ fontSize: 13, color: '#A29C95', marginBottom: 5 }}>체크리스트가 없습니다</div>}
+            {chks.map(c => (
+              <div key={c.id} onClick={() => toggleChk(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '3px 0', cursor: 'pointer' }}>
+                <Chk on={c.done} /><span style={{ fontSize: 14, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span>
+                {c.date && <span style={{ fontSize: 12, color: '#A29C95' }}>{c.date}</span>}
+              </div>
+            ))}
+            <div style={{ display: 'flex', gap: 6, marginTop: 5 }}>
+              <input value={newChk[s.id] || ''} onChange={e => setNewChk(m => ({ ...m, [s.id]: e.target.value }))} onKeyDown={e => { if (e.key === 'Enter') addChk(s.id); }} placeholder="체크리스트 추가 후 Enter" style={{ flex: 1, border: '1px solid #E3E0DC', borderRadius: 6, padding: '4px 8px', fontSize: 13.5, fontFamily: 'inherit' }} />
+              <button onClick={() => addChk(s.id)} style={{ border: 'none', background: G, color: 'white', borderRadius: 6, padding: '4px 11px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>추가</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+  const PlanCard = ({ r, accent, showSubs }) => {
+    const o = outOf(r.p.outputId);
+    const prog = r.subs.length ? pct(r.done, r.subs.length) : 0;
+    const list = (showSubs || []).filter(s => subVisible(r, s));
+    return (
+      <Card style={{ padding: '11px 14px', borderLeft: '4px solid ' + (accent || '#E3E0DC'), marginBottom: 9 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {o && <Badge label={o.code} color={clsC(o.type, data.categories)} />}
+          <span style={{ fontWeight: 800, fontSize: 16.5 }}>{r.p.name}</span>
+          {r.p.hold && <Badge label="⏸ 보류" color="#989088" />}
+          <span style={{ fontSize: 13, color: '#6E6863' }}>{ownerAv(r.p)} {ownerNm(r.p)}</span>
+          {r.noDue.length > 0 && r.band !== 'done' && <span style={{ fontSize: 12, fontWeight: 700, color: '#8A6A12', background: '#FFF9E8', borderRadius: 10, padding: '1px 8px' }}>기한 없음 {r.noDue.length}건</span>}
+          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 7 }}>
+            <span style={{ width: 80 }}><Bar v={r.done} m={r.subs.length || 1} h={6} /></span>
+            <span style={{ fontSize: 13.5, fontWeight: 700, color: prog >= 100 ? '#1FA463' : '#6E6863' }}>{r.done}/{r.subs.length}</span>
+            <EditBtn onClick={() => onEdit({ kind: 'plan', id: r.p.id, from: r.p.outputId })} />
+          </span>
+        </div>
+        {list.length > 0 && <div style={{ marginTop: 7 }}>{list.map(s => <SubRow key={s.id} r={r} s={s} />)}</div>}
+      </Card>
+    );
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+        <div style={{ fontSize: 21, fontWeight: 700, color: G }}>🧰 업무관리</div>
+        <button onClick={() => goTab && goTab('프로젝트 진행 상황')} style={{ padding: '5px 11px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 13.5, fontWeight: 700, fontFamily: 'inherit' }}>📈 프로젝트 보기</button>
+        <button onClick={() => goTab && goTab('업무 성과')} style={{ padding: '5px 11px', borderRadius: 8, border: '1px solid ' + G, background: 'white', color: G, cursor: 'pointer', fontSize: 13.5, fontWeight: 700, fontFamily: 'inherit' }}>🏆 업무 성과</button>
+      </div>
+      <div style={{ fontSize: 14.5, color: '#A29C95', marginBottom: 12 }}>기존 프로젝트·실행계획과 같은 데이터입니다 — 여기서 바꾸면 진행상황·칸반·캘린더·성과 탭에 그대로 반영됩니다. 긴급한 순서로 배치되고, 완료·휴면은 자동으로 아래로 접힙니다.</div>
+      <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap', marginBottom: 12 }}>
+        <Tile n={ovSubN} label={'기한 지난 미완료 (계획 ' + ovPlans.length + '개)'} color="#C62828" bg="#FDECEA" onClick={() => setOpenSec(m => ({ ...m, overdue: true }))} />
+        <Tile n={weekSubN} label="7일 내 마감" color="#E08700" bg="#FFF9E8" />
+        <Tile n={noDueN} label="기한 없는 미완료" color="#8A6A12" bg="#FFF9E8" />
+        <Tile n={perfPend.length} label="성과 미기록 완료" color={GO} onClick={() => setOpenSec(m => ({ ...m, perf: true }))} />
+        <Tile n={dmPlans.length + emPlans.length} label="휴면·빈 계획" color="#6E6863" />
+        <Tile n={dnPlans.length} label="완료된 계획" color="#1FA463" bg="#EDF9F2" />
+      </div>
+      <FilterBar value={filter} onChange={setFilter} />
+
+      <SecHead k="overdue" icon="🔴" title="기한 지남" count={ovPlans.length + '개 계획 · ' + ovSubN + '건'} hint="오래된 순 — 날짜를 고치거나 완료해야 내려갑니다" />
+      {openSec.overdue && (ovPlans.length ? ovPlans.map(r => <PlanCard key={r.p.id} r={r} accent="#C62828" showSubs={r.overdue.concat(r.open.filter(s => r.overdue.indexOf(s) < 0))} />) : <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 8 }}>없음 🎉</div>)}
+
+      <SecHead k="active" icon="🔵" title="진행 중" count={acPlans.length} hint="기한이 남았거나 진행중인 계획" />
+      {openSec.active && (acPlans.length ? acPlans.map(r => <PlanCard key={r.p.id} r={r} accent="#2D5FE0" showSubs={r.open} />) : <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 8 }}>없음</div>)}
+
+      <SecHead k="perf" icon="🏅" title="성과 미기록 완료" count={perfPend.length} hint="완료했는데 성과가 안 적힌 세부계획 — 기록하면 KPI에 잡힙니다" />
+      {openSec.perf && (perfPend.length ? (
+        <Card style={{ padding: '9px 14px', marginBottom: 9 }}>
+          {perfPend.map(s => { const pl = data.plans.find(p => p.id === s.planId); return (
+            <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderTop: '1px dashed #EDEBE7', flexWrap: 'wrap' }}>
+              <Badge label="완료" color={stC('완료')} />
+              <span style={{ fontSize: 15, flex: 1, minWidth: 120 }}>{s.name}</span>
+              <span style={{ fontSize: 12.5, color: '#A29C95' }}>{pl ? pl.name : ''} · {s.completedAt || ''}</span>
+              <button onClick={() => onRecord(s.id)} style={{ border: 'none', background: GO, color: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 12.5, padding: '3px 10px', fontWeight: 700 }}>성과 기록</button>
+              <EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id })} />
+            </div>
+          ); })}
+        </Card>
+      ) : <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 8 }}>없음 🎉</div>)}
+
+      <SecHead k="dormant" icon="💤" title="휴면 — 30일 이상 움직임 없음" count={dmPlans.length} hint="다시 살리려면 기한을 잡고, 아니면 보류로" />
+      {openSec.dormant && dmPlans.map(r => (
+        <Card key={r.p.id} style={{ padding: '10px 14px', marginBottom: 8, opacity: 0.8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {outOf(r.p.outputId) && <Badge label={outOf(r.p.outputId).code} color={clsC(outOf(r.p.outputId).type, data.categories)} />}
+            <span style={{ fontWeight: 700, fontSize: 16 }}>{r.p.name}</span>
+            <span style={{ fontSize: 13, color: '#6E6863' }}>{ownerAv(r.p)} {ownerNm(r.p)} · {r.done}/{r.subs.length} · {r.stale == null ? '날짜 기록 없음' : r.stale + '일째 활동 없음'}</span>
+            <span style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+              <button onClick={() => onEdit({ kind: 'plan', id: r.p.id })} style={{ border: 'none', background: G, color: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 12.5, padding: '3px 10px', fontWeight: 700 }}>부활 — 기한 잡기</button>
+              <button onClick={() => toggleHold(r.p.id)} style={{ border: '1px solid #E3E0DC', background: 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 12.5, padding: '3px 9px', fontWeight: 600 }}>⏸ 보류</button>
+            </span>
+          </div>
+        </Card>
+      ))}
+
+      <SecHead k="empty" icon="🗂" title="빈 계획 — 세부계획 0건" count={emPlans.length} hint="첫 세부계획을 넣거나 정리하세요" />
+      {openSec.empty && emPlans.map(r => (
+        <Card key={r.p.id} style={{ padding: '10px 14px', marginBottom: 8, opacity: 0.8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {outOf(r.p.outputId) && <Badge label={outOf(r.p.outputId).code} color={clsC(outOf(r.p.outputId).type, data.categories)} />}
+            <span style={{ fontWeight: 700, fontSize: 16 }}>{r.p.name}</span>
+            <span style={{ fontSize: 13, color: '#6E6863' }}>{ownerAv(r.p)} {ownerNm(r.p)}</span>
+            <span style={{ marginLeft: 'auto' }}><button onClick={() => onEdit({ kind: 'plan', id: r.p.id })} style={{ border: 'none', background: G, color: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 12.5, padding: '3px 10px', fontWeight: 700 }}>세부계획 넣기</button></span>
+          </div>
+        </Card>
+      ))}
+
+      <SecHead k="done" icon="✅" title="완료된 계획" count={dnPlans.length} hint="세부계획이 전부 완료된 계획" />
+      {openSec.done && dnPlans.map(r => (
+        <Card key={r.p.id} style={{ padding: '10px 14px', marginBottom: 8, opacity: 0.75 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {outOf(r.p.outputId) && <Badge label={outOf(r.p.outputId).code} color={clsC(outOf(r.p.outputId).type, data.categories)} />}
+            <span style={{ fontWeight: 700, fontSize: 16, color: '#6E6863' }}>{r.p.name}</span>
+            <span style={{ fontSize: 13, color: '#A29C95' }}>{ownerAv(r.p)} {ownerNm(r.p)} · ✅ {r.done}/{r.subs.length}</span>
+            <span style={{ marginLeft: 'auto' }}><EditBtn onClick={() => onEdit({ kind: 'plan', id: r.p.id })} /></span>
+          </div>
+        </Card>
+      ))}
+
+      {holdN > 0 && <div style={{ fontSize: 13.5, color: '#A29C95', marginTop: 14 }}>⏸ 보류 중인 계획 {holdN}건은 <span onClick={() => goTab && goTab('보류')} style={{ color: G, fontWeight: 700, cursor: 'pointer', textDecoration: 'underline' }}>보류 탭</span>에 있습니다.</div>}
+    </div>
   );
 }
 
@@ -7931,7 +8145,7 @@ function TabSchedule({ data, setData }) {
   );
 }
 
-const TAB_SLUG = { decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통', 'n.파워링크': 'N.파워링크', 'powerlink': 'N.파워링크', 'n.쇼핑검색': 'N.쇼핑검색', 'shopping': 'N.쇼핑검색', '키워드 총합본': '키워드 총합본', '키워드총합본': '키워드 총합본', keyworddict: '키워드 총합본', keywords: '키워드 총합본', '상품 최적화': '상품 최적화', '상품최적화': '상품 최적화', productseo: '상품 최적화', seo: '상품 최적화', '업무보고': '주간 보고', '주간보고': '주간 보고', workreport: '주간 보고', report: '주간 보고', advoost: '애드부스트', '애드부스트': '애드부스트' };
+const TAB_SLUG = { work: '업무관리', '업무관리': '업무관리', decisions: '판단 대기', dec: '판단 대기', '판단대기': '판단 대기', team: '홈', home: '홈', '팀 현황': '홈', '팀현황': '홈', weekly: '데일리/주간', progress: '프로젝트 진행 상황', kanban: '단계별 보기', '칸반': '단계별 보기', '단계별보기': '단계별 보기', performance: '업무 성과', kpi: 'KPI', sales: '매출', kakao: '카카오', ads: '광고', trends: '키워드 트렌드', schedule: '발송 스케줄', meeting: '회의', hold: '보류', budget: '예산', trash: '휴지통', 'n.파워링크': 'N.파워링크', 'powerlink': 'N.파워링크', 'n.쇼핑검색': 'N.쇼핑검색', 'shopping': 'N.쇼핑검색', '키워드 총합본': '키워드 총합본', '키워드총합본': '키워드 총합본', keyworddict: '키워드 총합본', keywords: '키워드 총합본', '상품 최적화': '상품 최적화', '상품최적화': '상품 최적화', productseo: '상품 최적화', seo: '상품 최적화', '업무보고': '주간 보고', '주간보고': '주간 보고', workreport: '주간 보고', report: '주간 보고', advoost: '애드부스트', '애드부스트': '애드부스트' };
 
 const sigOf = d => JSON.stringify({ ...(d || {}), rev: 0 });
 
@@ -8311,6 +8525,72 @@ function PsSection({ title, sub, children }) {
   );
 }
 
+// ===== 주간보고 · 네이버 광고 박스 내 광고 에이전트 주간 피드 (index_178) — data/naver-ads-weekly.json 읽기 전용 =====
+const WR_NA_TAGC = { '파워링크': { c: '#1B4D3E', bg: '#E8F0EC' }, '애드부스트': { c: '#B45309', bg: '#FFF7E6' }, '대시보드': { c: '#2D5FE0', bg: '#EFF6FF' } };
+function WrNaverAds({ goTab }) {
+  const [d, setD] = React.useState(null);
+  const [status, setStatus] = React.useState('loading');   // loading | ok | none
+  const [open, setOpen] = React.useState({});
+  React.useEffect(() => {
+    let alive = true;
+    ghFetch('data/naver-ads-weekly.json').then(r => (r.ok ? r.json() : null)).then(j => { if (!alive) return; if (j && (j.highlights || j.stats)) { setD(j); setStatus('ok'); } else setStatus('none'); }).catch(() => { if (alive) setStatus('none'); });
+    return () => { alive = false; };
+  }, []);
+  const tagB = t => { const tc = WR_NA_TAGC[t] || { c: '#6E6863', bg: '#F1EFEC' }; return <span style={{ fontSize: 9.5, fontWeight: 800, color: tc.c, background: tc.bg, borderRadius: 5, padding: '1px 6px', whiteSpace: 'nowrap' }}>{t || '기타'}</span>; };
+  const accRow = (sec, it, i) => {
+    const k = sec + i, on = !!open[k];
+    return (
+      <div key={k} data-wrna-item style={{ borderBottom: '1px dashed #EFEDEA' }}>
+        <div onClick={() => setOpen(m => ({ ...m, [k]: !m[k] }))} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 2px', cursor: 'pointer', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 10, color: '#A29C95', transform: on ? 'rotate(90deg)' : 'none', display: 'inline-block', transition: 'transform .12s' }}>▸</span>
+          {tagB(it.tag)}
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: '#1A1614', flex: 1, minWidth: 130 }}>{it.key}</span>
+        </div>
+        {on && it.detail ? <div data-wrna-detail style={{ fontSize: 11.5, color: '#3A3631', lineHeight: 1.6, background: '#FAFAF8', border: '1px solid #F0EEEA', borderRadius: 8, padding: '8px 11px', margin: '0 0 8px 22px' }}>{it.detail}</div> : null}
+      </div>
+    );
+  };
+  const wrap = inner => <div data-wrna style={{ borderTop: '1px dashed #E7E4E0', marginTop: 12, paddingTop: 11 }}>{inner}</div>;
+  if (status === 'loading') return wrap(<div style={{ fontSize: 11.5, color: '#A29C95' }}>광고 에이전트 주간 보고를 불러오는 중…</div>);
+  if (status === 'none') return wrap(<div data-wrna-none style={{ fontSize: 11.5, color: '#A29C95', lineHeight: 1.6 }}>광고 에이전트 주간 보고가 아직 없습니다 — <b>data/naver-ads-weekly.json</b> 이 올라오면 여기가 자동으로 채워집니다. (오류 아님)</div>);
+  return wrap(
+    <React.Fragment>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+        <span style={{ fontSize: 12.5, fontWeight: 800, color: G }}>🤖 광고 에이전트 주간 보고</span>
+        <span data-wrna-period style={{ fontSize: 10.5, color: '#6E6863', background: '#F7F6F4', border: '1px solid #E3E0DC', borderRadius: 999, padding: '1px 8px' }}>{d.period || ''}</span>
+        {d.updatedAt ? <span style={{ fontSize: 10, color: '#A29C95' }}>갱신 {d.updatedAt}</span> : null}
+        <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 8 }}>
+          <button onClick={() => goTab && goTab('N.파워링크')} style={{ border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 10.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>N.파워링크 →</button>
+          <button onClick={() => goTab && goTab('애드부스트')} style={{ border: 0, background: 'transparent', color: '#1B4D3E', fontSize: 10.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>애드부스트 →</button>
+        </span>
+      </div>
+      {d.headline ? <div data-wrna-headline style={{ fontSize: 12.5, color: '#3A3631', lineHeight: 1.55, fontWeight: 600, marginBottom: 8 }}>{d.headline}</div> : null}
+      {(d.stats || []).length ? (
+        <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 8 }}>
+          {(d.stats || []).map((s, i) => (
+            <div key={i} data-wrna-stat style={{ flex: 1, minWidth: 104, border: '1px solid #EDEBE7', background: '#FBFAF9', borderRadius: 9, padding: '6px 10px' }}>
+              <div style={{ fontSize: 9.5, color: '#6E6863' }}>{s.label}</div>
+              <div style={{ fontSize: 14.5, fontWeight: 800, marginTop: 1 }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {(d.highlights || []).length ? (
+        <div style={{ marginBottom: 6 }}>
+          <div style={{ fontSize: 10.5, fontWeight: 800, color: '#6E6863', padding: '2px 2px 3px' }}>이번 주 한 일 <span style={{ fontWeight: 600, color: '#A29C95' }}>— 항목을 누르면 상세</span></div>
+          {(d.highlights || []).map((it, i) => accRow('h', it, i))}
+        </div>
+      ) : null}
+      {(d.next || []).length ? (
+        <div>
+          <div style={{ fontSize: 10.5, fontWeight: 800, color: '#6E6863', padding: '4px 2px 3px' }}>다음 주</div>
+          {(d.next || []).map((it, i) => accRow('n', it, i))}
+        </div>
+      ) : null}
+    </React.Fragment>
+  );
+}
+
 function TabWorkReport({ data, setData, onEdit, goTab }) {
   // ── 주간 보고 (index_168 · v4 껍데기) ─────────────────────────────────
   // ① 성과(매출·광고·콘텐츠, 강조) ② 업무(프로젝트에서) ③ 최신화 점검
@@ -8645,6 +8925,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
             </div>
           </div>
         ) : <div data-wr2-adwait style={{ fontSize: 12, color: '#A29C95' }}>{ads ? '이번 주 광고 집계 전 — 광고 데이터는 하루 늦게 잡힙니다 (최신 ' + (adsLast || '?') + '). 지난주는 ◀ 로 볼 수 있어요.' : '광고 데이터(naver-ads.json) 불러오는 중이거나 없습니다.'}</div>}
+        <WrNaverAds goTab={goTab} />
         {noteRow('ads', '📦 담당자', '네이버 광고 효율 판단 · 다음 방향 — 한 줄')}
       </div>
 
@@ -10322,6 +10603,7 @@ function App() {
     { icon: '🛒', label: 'N.쇼핑검색', C: TabShopping },
     { icon: '🚀', label: '애드부스트', C: TabAdvoost },
     { icon: '🧪', label: '상품 최적화', C: TabProductSeo },
+    { icon: '🧰', label: '업무관리', C: TabWork },
     { icon: '📅', label: '데일리/주간', C: TabWeekly },
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
     { icon: '🗂️', label: '단계별 보기', C: TabKanban },
@@ -10346,7 +10628,7 @@ function App() {
   const GROUPS = TAB_GROUPS_ON ? [
     { icon: '🏠', label: '홈', tabs: ['홈'] },
     { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색', '애드부스트', '상품 최적화'] },
-    { icon: '📋', label: '업무', tabs: ['데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
+    { icon: '📋', label: '업무', tabs: ['업무관리', '데일리/주간', '프로젝트 진행 상황', '업무 성과', '회의', '발송 스케줄'] },
     { icon: '📊', label: '성과', tabs: ['주간 보고', 'KPI', '매출', '카카오', '광고', '인스타 광고', '쇼핑커넥트'] },
     { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드', '키워드 총합본'] },
     { icon: '💰', label: '예산', tabs: ['예산'] },
