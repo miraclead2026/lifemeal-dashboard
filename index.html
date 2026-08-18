@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_178';
+const BUILD_TAG = 'index_180';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -2683,7 +2683,7 @@ function UpdateCenterModal({ data, setData, onClose }) {
 // ===== 업무관리 탭 (index_176) — 기존 데이터·탭은 그대로, 같은 plans/subplans/checklists 를 긴급도 순으로 관리 =====
 function TabWork({ data, setData, onEdit, onRecord, goTab }) {
   const [filter, setFilter] = useState('전체');
-  const [openSec, setOpenSec] = useState({ overdue: true, week: true, active: true, perf: true, dormant: false, empty: false, done: false });
+  const [openSec, setOpenSec] = useState({ overdue: true, chkLate: true, week: true, active: true, perf: true, alone: true, dormant: false, empty: false, done: false });
   const [openChk, setOpenChk] = useState({});
   const [newChk, setNewChk] = useState({});
   const toggleSec = k => setOpenSec(m => ({ ...m, [k]: !m[k] }));
@@ -2731,6 +2731,25 @@ function TabWork({ data, setData, onEdit, onRecord, goTab }) {
   const weekSubN = vis.reduce((n, r) => n + (r.band === 'done' ? 0 : r.week.filter(s => subVisible(r, s)).length), 0);
   const noDueN = vis.reduce((n, r) => n + (r.band === 'done' || r.band === 'hold' ? 0 : r.noDue.filter(s => subVisible(r, s)).length), 0);
   const perfPend = data.subplans.filter(s => s.stage === '완료' && !s.perfRecorded && (filter === '전체' || matchOwner(s, filter)));
+  // ── 체크리스트 파생 (179) — 체크에도 기한·담당이 있다 (실데이터: date 147 · owner 148)
+  const subById = id => data.subplans.find(x => x.id === id);
+  const chkVisible = c => { if (filter === '전체') return true; if (Array.isArray(c.owner) && c.owner.length) return matchOwner(c, filter); const sb = subById(c.subplanId); return sb ? matchOwner(sb, filter) : false; };
+  const chkLate = data.checklists.filter(c => !c.done && isDate(c.date) && c.date < TODAY && chkVisible(c)).sort((a, b) => a.date < b.date ? -1 : 1);
+  const aloneAll = data.checklists.filter(c => (c.subplanId == null || c.subplanId === '') && chkVisible(c));
+  const aloneOpen = aloneAll.filter(c => !c.done); const aloneDone = aloneAll.filter(c => c.done);
+  const ChkLine = ({ c, showPath }) => { const sb = subById(c.subplanId); const pl = sb ? data.plans.find(p => p.id === sb.planId) : null; const oo = pl ? outOf(pl.outputId) : null; const lateC = !c.done && isDate(c.date) && c.date < TODAY; return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '3px 0', flexWrap: 'wrap' }}>
+      <span onClick={() => toggleChk(c.id)} title={c.done ? '체크 해제' : '완료 체크'} style={{ cursor: 'pointer', display: 'inline-flex' }}><Chk on={c.done} /></span>
+      {lateC && <span style={{ fontSize: 11, fontWeight: 800, color: '#C62828', background: '#FDECEA', borderRadius: 5, padding: '0 6px', whiteSpace: 'nowrap' }}>D+{dLate(c.date)}</span>}
+      <span onClick={() => toggleChk(c.id)} style={{ fontSize: 14, cursor: 'pointer', color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none', minWidth: 100, flex: showPath ? 1 : 'none' }}>{c.text}</span>
+      {c.kind === 'meeting' && <span style={{ fontSize: 11, fontWeight: 700, color: '#7C3AED', background: '#F5F3FF', borderRadius: 5, padding: '0 6px' }}>회의</span>}
+      {showPath && <span style={{ fontSize: 12.5, color: '#A29C95', whiteSpace: 'nowrap' }}>{oo ? oo.code + ' · ' : ''}{pl ? pl.name : (c.subplanId == null || c.subplanId === '' ? '개별' : '')}{sb ? ' ▸ ' + sb.name : ''}</span>}
+      {isDate(c.date) && !lateC && <span style={{ fontSize: 12, color: '#A29C95' }}>{String(c.date).slice(5)}</span>}
+      {lateC && <span style={{ fontSize: 12, color: '#A29C95' }}>{c.date}</span>}
+      {ownerAv(c) ? <span style={{ fontSize: 12 }}>{ownerAv(c)}</span> : null}
+      {showPath && sb ? <EditBtn onClick={() => onEdit({ kind: 'subplan', id: sb.id })} /> : null}
+    </div>
+  ); };
 
   // ── 부품
   const Tile = ({ n, label, color, bg, onClick }) => (
@@ -2752,7 +2771,8 @@ function TabWork({ data, setData, onEdit, onRecord, goTab }) {
   );
   const SubRow = ({ r, s }) => {
     const chks = data.checklists.filter(c => c.subplanId === s.id);
-    const cd = chks.filter(c => c.done).length;
+    const cOpen = chks.filter(c => !c.done);
+    const cDone = chks.filter(c => c.done);
     const late = isDate(s.due) && s.due < TODAY && s.stage !== '완료' && s.stage !== '보류';
     const isDone = s.stage === '완료';
     const co = openChk[s.id];
@@ -2766,23 +2786,24 @@ function TabWork({ data, setData, onEdit, onRecord, goTab }) {
           <span style={{ fontSize: 15, flex: 1, minWidth: 110, color: isDone ? '#A29C95' : '#3A3631', textDecoration: isDone ? 'line-through' : 'none' }}>{s.name}</span>
           <span style={{ fontSize: 12.5, color: '#A29C95', whiteSpace: 'nowrap' }}>{ownerAv(s)} {ownerNm(s)}</span>
           <DueEdit s={s} />
-          <button onClick={() => setOpenChk(m => ({ ...m, [s.id]: !m[s.id] }))} style={{ border: '1px solid #E3E0DC', background: co ? '#F0F4F1' : 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 12.5, padding: '2px 7px', fontWeight: 600 }}>☑ {cd}/{chks.length}</button>
+          {isDone && chks.length > 0 && <button onClick={() => setOpenChk(m => ({ ...m, [s.id]: !m[s.id] }))} style={{ border: '1px solid #E3E0DC', background: co ? '#F0F4F1' : 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 12.5, padding: '2px 7px', fontWeight: 600 }}>☑ {cDone.length}/{chks.length}</button>}
           {isDone && !s.perfRecorded && <button onClick={() => onRecord(s.id)} style={{ border: 'none', background: GO, color: 'white', borderRadius: 6, cursor: 'pointer', fontSize: 12.5, padding: '3px 9px', fontWeight: 700 }}>성과 기록</button>}
           <EditBtn onClick={() => onEdit({ kind: 'subplan', id: s.id, from: r.p.id })} />
         </div>
-        {co && (
-          <div style={{ margin: '6px 0 4px 24px', background: '#FAFAF9', border: '1px solid #F0EEEA', borderRadius: 8, padding: '7px 10px' }}>
-            {chks.length === 0 && <div style={{ fontSize: 13, color: '#A29C95', marginBottom: 5 }}>체크리스트가 없습니다</div>}
-            {chks.map(c => (
-              <div key={c.id} onClick={() => toggleChk(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '3px 0', cursor: 'pointer' }}>
-                <Chk on={c.done} /><span style={{ fontSize: 14, color: c.done ? '#A29C95' : '#3A3631', textDecoration: c.done ? 'line-through' : 'none' }}>{c.text}</span>
-                {c.date && <span style={{ fontSize: 12, color: '#A29C95' }}>{c.date}</span>}
-              </div>
-            ))}
-            <div style={{ display: 'flex', gap: 6, marginTop: 5 }}>
-              <input value={newChk[s.id] || ''} onChange={e => setNewChk(m => ({ ...m, [s.id]: e.target.value }))} onKeyDown={e => { if (e.key === 'Enter') addChk(s.id); }} placeholder="체크리스트 추가 후 Enter" style={{ flex: 1, border: '1px solid #E3E0DC', borderRadius: 6, padding: '4px 8px', fontSize: 13.5, fontFamily: 'inherit' }} />
+        {!isDone && (
+          <div data-tw-chks style={{ margin: '4px 0 3px 24px' }}>
+            {cOpen.map(c => <ChkLine key={c.id} c={c} showPath={false} />)}
+            <div style={{ display: 'flex', gap: 6, marginTop: cOpen.length ? 4 : 2, alignItems: 'center' }}>
+              <input value={newChk[s.id] || ''} onChange={e => setNewChk(m => ({ ...m, [s.id]: e.target.value }))} onKeyDown={e => { if (e.key === 'Enter') addChk(s.id); }} placeholder="체크리스트 추가 후 Enter" style={{ flex: 1, minWidth: 140, maxWidth: 320, border: '1px solid #E3E0DC', borderRadius: 6, padding: '4px 8px', fontSize: 13, fontFamily: 'inherit' }} />
               <button onClick={() => addChk(s.id)} style={{ border: 'none', background: G, color: 'white', borderRadius: 6, padding: '4px 11px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>추가</button>
+              {cDone.length > 0 && <button onClick={() => setOpenChk(m => ({ ...m, [s.id]: !m[s.id] }))} style={{ border: '1px solid #E3E0DC', background: co ? '#F0F4F1' : 'white', borderRadius: 6, color: '#6E6863', cursor: 'pointer', fontSize: 12, padding: '3px 8px', fontWeight: 600 }}>✔ 완료 {cDone.length}{co ? ' 접기' : ''}</button>}
             </div>
+            {co && cDone.map(c => <ChkLine key={c.id} c={c} showPath={false} />)}
+          </div>
+        )}
+        {isDone && co && (
+          <div style={{ margin: '6px 0 4px 24px', background: '#FAFAF9', border: '1px solid #F0EEEA', borderRadius: 8, padding: '7px 10px' }}>
+            {chks.map(c => <ChkLine key={c.id} c={c} showPath={false} />)}
           </div>
         )}
       </div>
@@ -2821,6 +2842,7 @@ function TabWork({ data, setData, onEdit, onRecord, goTab }) {
       <div style={{ fontSize: 14.5, color: '#A29C95', marginBottom: 12 }}>기존 프로젝트·실행계획과 같은 데이터입니다 — 여기서 바꾸면 진행상황·칸반·캘린더·성과 탭에 그대로 반영됩니다. 긴급한 순서로 배치되고, 완료·휴면은 자동으로 아래로 접힙니다.</div>
       <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap', marginBottom: 12 }}>
         <Tile n={ovSubN} label={'기한 지난 미완료 (계획 ' + ovPlans.length + '개)'} color="#C62828" bg="#FDECEA" onClick={() => setOpenSec(m => ({ ...m, overdue: true }))} />
+        <Tile n={chkLate.length} label="기한 지난 체크리스트" color="#C62828" bg="#FDECEA" onClick={() => setOpenSec(m => ({ ...m, chkLate: true }))} />
         <Tile n={weekSubN} label="7일 내 마감" color="#E08700" bg="#FFF9E8" />
         <Tile n={noDueN} label="기한 없는 미완료" color="#8A6A12" bg="#FFF9E8" />
         <Tile n={perfPend.length} label="성과 미기록 완료" color={GO} onClick={() => setOpenSec(m => ({ ...m, perf: true }))} />
@@ -2831,6 +2853,13 @@ function TabWork({ data, setData, onEdit, onRecord, goTab }) {
 
       <SecHead k="overdue" icon="🔴" title="기한 지남" count={ovPlans.length + '개 계획 · ' + ovSubN + '건'} hint="오래된 순 — 날짜를 고치거나 완료해야 내려갑니다" />
       {openSec.overdue && (ovPlans.length ? ovPlans.map(r => <PlanCard key={r.p.id} r={r} accent="#C62828" showSubs={r.overdue.concat(r.open.filter(s => r.overdue.indexOf(s) < 0))} />) : <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 8 }}>없음 🎉</div>)}
+
+      <SecHead k="chkLate" icon="⏰" title="기한 지난 체크리스트" count={chkLate.length + '건'} hint="세부계획 속 체크 항목 — 여기서 바로 체크하세요" />
+      {openSec.chkLate && (chkLate.length ? (
+        <Card style={{ padding: '9px 14px', marginBottom: 9 }}>
+          <div data-tw-chklate>{chkLate.map(c => <div key={c.id} style={{ borderTop: '1px dashed #EDEBE7' }}><ChkLine c={c} showPath={true} /></div>)}</div>
+        </Card>
+      ) : <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 8 }}>없음 🎉</div>)}
 
       <SecHead k="active" icon="🔵" title="진행 중" count={acPlans.length} hint="기한이 남았거나 진행중인 계획" />
       {openSec.active && (acPlans.length ? acPlans.map(r => <PlanCard key={r.p.id} r={r} accent="#2D5FE0" showSubs={r.open} />) : <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 8 }}>없음</div>)}
@@ -2876,6 +2905,16 @@ function TabWork({ data, setData, onEdit, onRecord, goTab }) {
           </div>
         </Card>
       ))}
+
+      <SecHead k="alone" icon="📌" title="개별 체크리스트" count={aloneOpen.length + '건 미완료 · 전체 ' + aloneAll.length} hint="세부계획에 묶이지 않은 항목 (회의·단발 작업)" />
+      {openSec.alone && (aloneAll.length ? (
+        <Card style={{ padding: '9px 14px', marginBottom: 9 }}>
+          <div data-tw-alone>
+            {aloneOpen.map(c => <div key={c.id} style={{ borderTop: '1px dashed #EDEBE7' }}><ChkLine c={c} showPath={false} /></div>)}
+            {aloneDone.length > 0 && <div style={{ fontSize: 12.5, color: '#A29C95', paddingTop: 5 }}>✔ 완료 {aloneDone.length}건</div>}
+          </div>
+        </Card>
+      ) : <div style={{ fontSize: 14, color: '#A29C95', marginBottom: 8 }}>없음</div>)}
 
       <SecHead k="done" icon="✅" title="완료된 계획" count={dnPlans.length} hint="세부계획이 전부 완료된 계획" />
       {openSec.done && dnPlans.map(r => (
@@ -10672,6 +10711,7 @@ function App() {
           <div style={{ display: 'flex', minWidth: 'max-content' }}>
             {GROUPS.map((g, gi) => <button key={gi} data-nav-group={g.label} onClick={() => goLabel(g.tabs[0])} style={{ padding: '12px 20px', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: activeGroup === gi ? 800 : 600, color: activeGroup === gi ? G : '#6E6863', background: 'transparent', borderBottom: activeGroup === gi ? '3px solid ' + G : '3px solid transparent', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{g.icon} {g.label}{g.label === 'AI 에이전트' && decPending > 0 ? <span style={{ background: '#C62828', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{decPending}</span> : null}</button>)}
             <a data-nav-popup href="https://miraclead2026.github.io/lifemeal-popup/" target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', marginRight: 6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🎪 용산팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
+            <a data-nav-ges href="https://miraclead2026.github.io/lifemeal-ges/" target="_blank" rel="noreferrer" style={{ marginRight: 6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🌏 GES팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
             <a data-nav-trial href="https://miraclead2026.github.io/lifemeal-dashboard/trial/" target="_blank" rel="noreferrer" style={{ marginRight: 14, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 13px', borderRadius: 999, background: 'white', color: G, border: '1.5px solid ' + G, fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>🎁 루티너(체험단) <span style={{ fontSize: 11 }}>↗</span></a>
           </div>
         </div>
