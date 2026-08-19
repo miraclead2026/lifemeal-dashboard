@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-18",
+ "updatedAt": "2026-08-19",
  "days": [
   {
    "date": "2026-08-17",
@@ -239,6 +239,121 @@
    "summary": {
     "added": 2,
     "rejected": 6,
+    "held": 2
+   }
+  },
+  {
+   "date": "2026-08-19",
+   "trendDate": "2026-08-19",
+   "committed": true,
+   "added": [],
+   "rejected": [
+    {
+     "keyword": "단백질쉐이크",
+     "intentType": "shopping",
+     "monthlyPc": 18400,
+     "monthlyMobile": 96100,
+     "priorityScore": 9.52,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "유산균",
+     "intentType": "shopping",
+     "monthlyPc": 19200,
+     "monthlyMobile": 89000,
+     "priorityScore": 9.49,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "그릭요거트",
+     "intentType": "shopping",
+     "monthlyPc": 14400,
+     "monthlyMobile": 84900,
+     "priorityScore": 9.44,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "견과류",
+     "intentType": "shopping",
+     "monthlyPc": 8220,
+     "monthlyMobile": 41000,
+     "priorityScore": 9.01,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "프로틴",
+     "intentType": "shopping",
+     "monthlyPc": 6690,
+     "monthlyMobile": 34400,
+     "priorityScore": 8.9,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "하루견과",
+     "intentType": "shopping",
+     "monthlyPc": 6840,
+     "monthlyMobile": 28100,
+     "priorityScore": 8.8,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "단백질보충제",
+     "intentType": "shopping",
+     "monthlyPc": 7260,
+     "monthlyMobile": 27600,
+     "priorityScore": 8.8,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "컴플라이언스 제외(정보성/타제형)"
+    },
+    {
+     "keyword": "황성주생식",
+     "intentType": "shopping",
+     "monthlyPc": 1100,
+     "monthlyMobile": 14800,
+     "priorityScore": 8.32,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "브랜드 방어(defend) — 등록대상 아님"
+    }
+   ],
+   "held": [
+    {
+     "keyword": "두유",
+     "intentType": "shopping",
+     "monthlyPc": 9940,
+     "monthlyMobile": 39700,
+     "priorityScore": 9.01,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "productHints 없음/저신뢰(low) — 임의배치 금지"
+    },
+    {
+     "keyword": "차전자피",
+     "intentType": "shopping",
+     "monthlyPc": 6210,
+     "monthlyMobile": 28500,
+     "priorityScore": 8.8,
+     "source": "keyword-trend",
+     "date": "2026-08-19",
+     "reason": "productHints 없음/저신뢰(low) — 임의배치 금지"
+    }
+   ],
+   "summary": {
+    "added": 0,
+    "rejected": 8,
     "held": 2
    }
   }
