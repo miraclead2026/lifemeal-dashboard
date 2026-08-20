@@ -214,7 +214,7 @@ const UP_TAGS = { '신규기능': '#1FA463', '개선': '#2D5FE0', '수정': '#E0
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_180';
+const BUILD_TAG = 'index_181';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -8639,6 +8639,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
   const [iads, setIads] = React.useState(null);
   const [ipos, setIpos] = React.useState(null);
   const [kwAdd, setKwAdd] = React.useState(null);
+  const [brandS, setBrandS] = React.useState(null);
   const [wIdx, setWIdx] = React.useState(0);
   const [odOpen, setOdOpen] = React.useState(false);
   const [resEdit, setResEdit] = React.useState(null);   // { id, text }
@@ -8651,6 +8652,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
     grab('data/insta-ads.json', j => setIads(j && Array.isArray(j.ads) ? j : null));
     grab('data/insta-posts.json', j => setIpos(j && Array.isArray(j.posts) ? j : null));
     grab('data/keyword-additions.json', j => setKwAdd(j && Array.isArray(j.days) ? j : null));
+    grab('data/brand-search.json', j => setBrandS(j && j.windows ? j : null));
     return () => { alive = false; };
   }, []);
 
@@ -8658,6 +8660,7 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
   const nf = n => Number(n || 0).toLocaleString();
   const wonF = n => nf(n) + '원';
   const manF = n => { const v = Number(n || 0); return v >= 10000000 ? (Math.round(v / 100000) / 100).toLocaleString() + '천만' : Math.round(v / 10000).toLocaleString() + '만'; };
+  const box = (bd, bg) => ({ border: '1px solid ' + bd, background: bg, borderRadius: 10, padding: '9px 12px' });
   const dch = (d, invert) => { if (!d || d.deltaPct == null) return null; const up = d.deltaPct > 0; const good = invert ? !up : up; return <span style={{ fontSize: 10.5, fontWeight: 700, color: d.deltaPct === 0 ? '#8A837C' : good ? '#047857' : '#DC2626' }}>{d.deltaPct === 0 ? '–' : (up ? '▲' : '▼') + Math.abs(d.deltaPct) + '%'}</span>; };
   const secHead = (badge, bg, title, hint, right) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 9, margin: '20px 4px 9px', flexWrap: 'wrap' }}>
@@ -8759,6 +8762,19 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
   const mtd = mDays.reduce((t, d) => { const s = d.summary || {}; t.rev += ((s.revenue || {}).value) || 0; t.ord += ((s.orders || {}).value) || 0; t.vis += ((s.visitors || {}).value) || 0; return t; }, { rev: 0, ord: 0, vis: 0 });
   const mAds = ads ? ads.days.filter(x => String(x.date).slice(0, 7) === month) : [];
   const mAd = mAds.reduce((t, x) => { (x.groups || []).forEach(g => { t.spend += g.spend || 0; t.rev += g.convRevenue || 0; }); return t; }, { spend: 0, rev: 0 });
+  // [181] 월간 광고 실적 + 전월 동기(경과일 매칭) — 컷오버 후에도 대시보드가 월간을 잃지 않게
+  const adSum = rows => rows.reduce((t, x) => { (x.groups || []).forEach(g => { t.spend += g.spend || 0; t.rev += g.convRevenue || 0; t.conv += g.purchaseConv || 0; }); return t; }, { spend: 0, rev: 0, conv: 0 });
+  const mLastDay = mAds.length ? mAds.map(x => x.date).sort().slice(-1)[0] : null;      // 광고는 D-1~D-2 확정 → 실제 확보된 마지막 날 기준
+  const mElapsed = mLastDay ? Number(mLastDay.slice(8, 10)) : 0;
+  const prevMonth = (() => { const y = Number(month.slice(0, 4)), mm = Number(month.slice(5, 7)); const d = new Date(Date.UTC(y, mm - 2, 1)); return d.toISOString().slice(0, 7); })();
+  const pmRows = ads && mElapsed ? adDays.filter(x => String(x.date).slice(0, 7) === prevMonth && Number(String(x.date).slice(8, 10)) <= mElapsed) : [];
+  const mCur = adSum(mAds), mPrev = adSum(pmRows);
+  const mRoas = roasOf(mCur.spend, mCur.rev), pmRoas = roasOf(mPrev.spend, mPrev.rev);
+  const dPct = (c, p) => (p ? Math.round((c - p) / p * 1000) / 10 : null);
+  const mDelta = { spend: dPct(mCur.spend, mPrev.spend), rev: dPct(mCur.rev, mPrev.rev), roas: dPct(mRoas, pmRoas) };
+  const adRoasKpi = (data.mainKpis || []).filter(k => !(k.done && k.done.at)).find(k => /광고/.test(k.name || '') && /roas/i.test(k.name || ''));
+  const adRoasTarget = adRoasKpi ? (((adRoasKpi.targets || {})[month] != null) ? adRoasKpi.targets[month] : adRoasKpi.target) : null;
+  const dChip = (v, invert) => v == null ? null : <span style={{ fontSize: 10.5, fontWeight: 700, color: v === 0 ? '#8A837C' : ((v > 0) !== !!invert ? '#047857' : '#DC2626') }}>{v > 0 ? '▲' : v < 0 ? '▼' : '–'}{Math.abs(v)}%</span>;
   const kpiFind = re => (data.mainKpis || []).filter(k => !(k.done && k.done.at)).find(k => re.test(k.name || ''));
   const kTarget = k => { if (!k) return null; const t = (k.targets || {})[month]; return t != null ? t : (k.target != null ? k.target : null); };
   const kpiDefs = [
@@ -8964,6 +8980,36 @@ function TabWorkReport({ data, setData, onEdit, goTab }) {
             </div>
           </div>
         ) : <div data-wr2-adwait style={{ fontSize: 12, color: '#A29C95' }}>{ads ? '이번 주 광고 집계 전 — 광고 데이터는 하루 늦게 잡힙니다 (최신 ' + (adsLast || '?') + '). 지난주는 ◀ 로 볼 수 있어요.' : '광고 데이터(naver-ads.json) 불러오는 중이거나 없습니다.'}</div>}
+        {ads && mAds.length ? (
+          <div data-wr2-admonth style={{ marginTop: 12, borderTop: '1px dashed #E3E0DC', paddingTop: 11 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap', marginBottom: 7 }}>
+              <span style={{ fontSize: 12.5, fontWeight: 800, color: '#1A1614' }}>📆 이번 달 누적 <span style={{ color: '#6E6863', fontWeight: 600 }}>{month.slice(5)}월 1~{mElapsed}일</span></span>
+              <span style={{ fontSize: 10.5, color: '#A29C95' }}>전월 같은 기간({prevMonth.slice(5)}월 1~{mElapsed}일) 대비</span>
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <div style={{ ...box('#E3E0DC', 'white'), flex: 1, minWidth: 120 }}><div style={{ fontSize: 10.5, color: '#6E6863' }}>광고비</div><div style={{ fontSize: 17, fontWeight: 800 }}>{manF(mCur.spend)}원</div><div>{dChip(mDelta.spend, true)}</div></div>
+              <div style={{ ...box('#E3E0DC', 'white'), flex: 1, minWidth: 120 }}><div style={{ fontSize: 10.5, color: '#6E6863' }}>전환매출</div><div style={{ fontSize: 17, fontWeight: 800 }}>{manF(mCur.rev)}원</div><div>{dChip(mDelta.rev)}</div></div>
+              <div style={{ ...box(adRoasTarget && mRoas >= adRoasTarget ? '#A7F3D0' : '#E3E0DC', '#FBFAF9'), flex: 1, minWidth: 150 }}>
+                <div style={{ fontSize: 10.5, color: '#6E6863' }}>광고 ROAS <span style={{ color: '#A29C95' }}>전환매출÷광고비</span></div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: adRoasTarget ? (mRoas >= adRoasTarget ? '#047857' : '#DC2626') : '#1A1614' }}>{mRoas}% {dChip(mDelta.roas)}</div>
+                {adRoasTarget ? (
+                  <div style={{ marginTop: 4 }}>
+                    <div style={{ height: 6, background: '#EEF1EF', borderRadius: 4, overflow: 'hidden' }}><div style={{ height: 6, width: Math.min(100, Math.round(mRoas / adRoasTarget * 100)) + '%', background: mRoas >= adRoasTarget ? '#047857' : '#DC2626', borderRadius: 4 }} /></div>
+                    <div style={{ fontSize: 10, color: '#6E6863', marginTop: 2 }}>목표 {Number(adRoasTarget).toLocaleString()}% · 달성 {adRoasTarget ? Math.round(mRoas / adRoasTarget * 100) : 0}%</div>
+                  </div>
+                ) : <div data-wr2-adnotarget style={{ fontSize: 10, color: '#B45309', marginTop: 3, lineHeight: 1.45 }}>광고 ROAS 목표 미설정 — KPI 탭에서 이름에 <b>‘광고’와 ‘ROAS’</b>가 든 KPI를 만들면 여기 목표선이 붙어요. (전사 「목표 ROAS」 330%는 <b>매출÷실결제비용</b>이라 정의가 달라 쓰지 않습니다)</div>}
+              </div>
+              {brandS && brandS.windows ? (
+                <div data-wr2-brandsearch style={{ ...box('#E3E0DC', 'white'), flex: 1, minWidth: 150 }}>
+                  <div style={{ fontSize: 10.5, color: '#6E6863' }}>브랜드검색 <span style={{ color: '#A29C95' }}>최근 28일</span></div>
+                  <div style={{ fontSize: 17, fontWeight: 800 }}>CTR {((brandS.windows['28'] || {}).ctr) || 0}%</div>
+                  <div style={{ fontSize: 10, color: '#6E6863', marginTop: 2 }}>노출 {nf((brandS.windows['28'] || {}).imp)} · 클릭 {nf((brandS.windows['28'] || {}).clk)} · 전환매출 {manF((brandS.windows['28'] || {}).convRevenue)}</div>
+                  <div style={{ fontSize: 9.5, color: '#A29C95', marginTop: 2 }}>정액제 — 일별 광고비 없음</div>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
         <WrNaverAds goTab={goTab} />
         {noteRow('ads', '📦 담당자', '네이버 광고 효율 판단 · 다음 방향 — 한 줄')}
       </div>
@@ -10710,7 +10756,8 @@ function App() {
         <div data-nav-groups style={{ background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', overflowX: 'auto' }}>
           <div style={{ display: 'flex', minWidth: 'max-content' }}>
             {GROUPS.map((g, gi) => <button key={gi} data-nav-group={g.label} onClick={() => goLabel(g.tabs[0])} style={{ padding: '12px 20px', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: activeGroup === gi ? 800 : 600, color: activeGroup === gi ? G : '#6E6863', background: 'transparent', borderBottom: activeGroup === gi ? '3px solid ' + G : '3px solid transparent', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>{g.icon} {g.label}{g.label === 'AI 에이전트' && decPending > 0 ? <span style={{ background: '#C62828', color: 'white', borderRadius: 10, padding: '1px 6px', fontSize: 10, fontWeight: 700 }}>{decPending}</span> : null}</button>)}
-            <a data-nav-popup href="https://miraclead2026.github.io/lifemeal-popup/" target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', marginRight: 6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🎪 용산팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
+            <a data-nav-ads href="https://miraclead2026.github.io/lifemeal-naver-ads/" target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', marginRight: 6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 999, background: '#0B8F6A', color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>📣 네이버 광고 <span style={{ fontSize: 11 }}>↗</span></a>
+            <a data-nav-popup href="https://miraclead2026.github.io/lifemeal-popup/" target="_blank" rel="noreferrer" style={{ marginRight: 6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🎪 용산팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
             <a data-nav-ges href="https://miraclead2026.github.io/lifemeal-ges/" target="_blank" rel="noreferrer" style={{ marginRight: 6, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 999, background: G, color: 'white', fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 1px 3px rgba(0,0,0,.15)' }}>🌏 GES팝업 보러가기 <span style={{ fontSize: 11 }}>↗</span></a>
             <a data-nav-trial href="https://miraclead2026.github.io/lifemeal-dashboard/trial/" target="_blank" rel="noreferrer" style={{ marginRight: 14, alignSelf: 'center', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 13px', borderRadius: 999, background: 'white', color: G, border: '1.5px solid ' + G, fontSize: 12.5, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>🎁 루티너(체험단) <span style={{ fontSize: 11 }}>↗</span></a>
           </div>
