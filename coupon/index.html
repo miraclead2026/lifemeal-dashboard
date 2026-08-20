@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>라이프밀 쿠폰 이벤트 대상</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<style>
+  :root{
+    --green:#2e7d32; --green-bg:#f0faf2; --orange:#e65100; --red:#c62828;
+    --line:#e3e6ec; --ink:#222; --mute:#767b85; --bg:#f2f4f8; --card:#fff;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);
+       color:var(--ink);line-height:1.55;font-size:14px;margin:0}
+  header{background:var(--green);color:#fff;padding:14px 20px;display:flex;
+         align-items:center;gap:14px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;font-weight:800}
+  header .sp{flex:1}
+  header a.home{color:#fff;text-decoration:none;font-size:12.5px;opacity:.9;
+                border:1px solid rgba(255,255,255,.4);padding:4px 10px;border-radius:6px}
+  header a.home:hover{background:rgba(255,255,255,.15)}
+  #status{font-size:12px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.2)}
+  main{padding:18px;max-width:960px;margin:0 auto}
+  button{font-family:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);
+         border-radius:6px;background:#fff;cursor:pointer}
+  button:hover{background:#f7f8fa}
+  button.primary{background:var(--green);color:#fff;border-color:var(--green);font-weight:700}
+  button.primary:hover{filter:brightness(1.08)}
+  button.small{padding:3px 9px;font-size:11.5px;color:var(--mute)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+        padding:18px;margin-bottom:16px}
+  .card h2{font-size:16px;margin:0 0 4px;font-weight:800}
+  .card .meta{font-size:12.5px;color:var(--mute);margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+  .box{border:1px solid var(--line);border-radius:9px;padding:14px;background:#fafbfc}
+  .box .lbl{font-weight:800;font-size:13px;margin-bottom:2px}
+  .box .cnt{font-size:26px;font-weight:800;color:var(--green);line-height:1.1}
+  .box .cnt small{font-size:13px;color:var(--mute);font-weight:600}
+  .box .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .kv{display:flex;gap:8px;font-size:12.5px;margin:2px 0}
+  .kv b{color:#444;min-width:78px;display:inline-block}
+  .tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11.5px;
+       background:#eef1f5;color:#555;margin:1px 3px 1px 0}
+  .tag.warn{background:#fff4e5;color:var(--orange)}
+  .cmd{margin-top:10px;font-family:"Consolas",monospace;font-size:11.5px;color:#444;
+       background:#f4f6f9;border:1px solid var(--line);border-radius:6px;padding:8px 10px;
+       word-break:break-all;max-height:64px;overflow:auto;display:none}
+  .banner{padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:12.5px}
+  .banner.warn{background:#fff4e5;color:#8a4b00;border:1px solid #ffd9a8}
+  .banner.info{background:var(--green-bg);color:#1b5e20;border:1px solid #bfe3c6}
+  .banner.err{background:#fdecec;color:#8a1c1c;border:1px solid #f3c2c2}
+  .empty{color:var(--mute);padding:40px;text-align:center}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);
+         background:#222;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;
+         opacity:0;transition:opacity .18s;pointer-events:none;z-index:9}
+  .toast.on{opacity:.94}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎁 라이프밀 쿠폰 이벤트 대상</h1>
+  <span class="sp"></span>
+  <a class="home" href="../">← 대시보드</a>
+  <span id="status">연결 중…</span>
+</header>
+
+<main id="view"><div class="empty">불러오는 중…</div></main>
+<div class="toast" id="toast"></div>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDwMAa-vs5zRZd2Y5SHfYh67TXfRcECTBA",
+  databaseURL: "https://lifemeal-f0d71-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "lifemeal-f0d71"
+});
+const db = firebase.database();
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove("on"), 1400);
+}
+function copy(text, label){
+  const done = ()=>toast(label + " 복사됨");
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text, done));
+  } else fallback(text, done);
+}
+function fallback(text, done){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){ toast("복사 실패 — 직접 선택하세요"); }
+  document.body.removeChild(ta);
+}
+const cmdOf = codes => "python lookup.py " + (codes||[]).join(" ");
+
+function boxHTML(evId, key, lbl, obj, limitNote){
+  const codes = (obj && obj.codes) || [];
+  const n = (obj && obj.count) != null ? obj.count : codes.length;
+  const uid = evId + "_" + key;
+  return `<div class="box">
+    <div class="lbl">${esc(lbl)}</div>
+    <div class="cnt">${n}<small> 명${limitNote?" "+esc(limitNote):""}</small></div>
+    <div class="btns">
+      <button class="primary" data-cmd="${uid}">🔎 조회명령어 복사</button>
+      <button class="small" data-codes="${uid}">코드만</button>
+      <button class="small" data-toggle="${uid}">명령어 보기</button>
+    </div>
+    <div class="cmd" id="cmd_${uid}">${esc(cmdOf(codes))}</div>
+  </div>`;
+}
+
+function cardHTML(evId, e){
+  const fc = e.firstcome || {}, all = e.all || {};
+  const cp = e.coupon || {};
+  const periodWarn = e.realOrderPeriod && e.statedPeriod && e.realOrderPeriod !== e.statedPeriod;
+  return `<div class="card">
+    <h2>${esc(e.title || evId)}</h2>
+    <div class="meta">${esc(e.eventName || "")} · <span style="font-family:monospace">${esc(evId)}</span></div>
+    <div class="kv"><b>쿠폰</b><span>${esc(cp.rate||"")} 할인${cp.cap?` (최대 ${Number(cp.cap).toLocaleString()}원)`:""} · ${esc(cp.rule||"")}</span></div>
+    <div class="kv"><b>상품 기준</b><span>${esc(e.productFilter||"")}</span></div>
+    <div class="kv"><b>기획 기간</b><span>${esc(e.statedPeriod||"-")}</span></div>
+    <div class="kv"><b>실주문 기간</b><span>${esc(e.realOrderPeriod||"-")} ${periodWarn?'<span class="tag warn">기획과 상이</span>':""}</span></div>
+    ${e.excludedCancelledCount ? `<div class="kv"><b>제외</b><span>취소/반품만 한 구매자 ${e.excludedCancelledCount}명 (쿠폰 대상 아님)</span></div>`:""}
+    ${(all.count!=null && fc.limit!=null && all.count<=fc.limit) ?
+      `<div class="banner info">유효 구매자 ${all.count}명이 선착순 한도(${fc.limit}명) 미만이라 <b>선착순 = 전체 동일</b>합니다.</div>` : ""}
+    <div class="grid">
+      ${boxHTML(evId, "fc", "선착순 " + (fc.limit||"") + "명", fc, "(선착순)")}
+      ${boxHTML(evId, "all", "전체 구매자", all, "")}
+    </div>
+    <div style="margin-top:12px;font-size:11.5px;color:var(--mute)">
+      복사한 명령어를 <b>재구매메시지 폴더</b>에서 터미널(또는 run_lookup.bat)에 붙여넣으면 네이버 ID가 나옵니다.
+      화면엔 코드(LM####)만 표시되고 실제 ID는 로컬에서만 복원됩니다.
+      마지막 갱신 ${esc(e.updatedAt||"")}
+    </div>
+  </div>`;
+}
+
+const STORE = {};   // uid -> {codes}
+function render(events){
+  const view = $("#view");
+  const entries = Object.entries(events || {});
+  if (!entries.length){ view.innerHTML = `<div class="empty">등록된 쿠폰 이벤트가 없습니다.</div>`; return; }
+  entries.sort((a,b)=>String(b[1].updatedAt||"").localeCompare(String(a[1].updatedAt||"")));
+  view.innerHTML = entries.map(([id,e])=>{
+    STORE[id+"_fc"]  = (e.firstcome||{}).codes || [];
+    STORE[id+"_all"] = (e.all||{}).codes || [];
+    return cardHTML(id, e);
+  }).join("");
+  view.querySelectorAll("[data-cmd]").forEach(b=>b.onclick=()=>copy(cmdOf(STORE[b.dataset.cmd]), "조회명령어"));
+  view.querySelectorAll("[data-codes]").forEach(b=>b.onclick=()=>copy((STORE[b.dataset.codes]||[]).join(" "), "코드"));
+  view.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{
+    const el = $("#cmd_"+b.dataset.toggle);
+    el.style.display = el.style.display==="block" ? "none" : "block";
+  });
+}
+
+firebase.auth().signInAnonymously().catch(e=>{
+  $("#status").textContent = "인증 실패";
+  $("#view").innerHTML = `<div class="banner err">Firebase 인증 실패: ${esc(e.message||e)}</div>`;
+});
+firebase.auth().onAuthStateChanged(user=>{
+  if (!user) return;
+  $("#status").textContent = "연결됨";
+  db.ref("/dashboard/couponEvents").on("value", snap=>{
+    render(snap.val() || {});
+  }, err=>{
+    $("#status").textContent = "읽기 실패";
+    $("#view").innerHTML = `<div class="banner warn">데이터 읽기 실패: ${esc(err.message||err)}</div>`;
+  });
+});
+</script>
+</body>
+</html>
