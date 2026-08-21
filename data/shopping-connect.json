@@ -1,12 +1,11 @@
 {
-  "updatedAt": "2026-08-21 12:21",
+  "updatedAt": "2026-08-21 12:36",
   "meta": {
-    "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트)",
-    "periodStart": "2026-07-22",
-    "periodEnd": "2026-08-20",
+    "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
     "revenueOverlap": "이 매출은 naver-sales 총매출에 이미 포함됨 — 더하지 말 것",
-    "inflowPath": "커넥트 유입은 방문분석의 '직유입'으로 집계됨(08-05~15 실측)",
+    "inflowPath": "커넥트 유입은 방문분석 '직유입'으로 집계되나 1:1 아님(직유입/커넥트 90~95%, 클릭 vs 세션) — 차감 금지, 병기",
+    "seriesMetrics": "days/weeks/months 는 유입수·매출만 제공. 주문건수·판매개수·수수료는 기간 요약(summary)에만 있음",
     "intent": "목적은 유입 창출. 수수료는 의도적 고율 집행."
   },
   "summary": {
@@ -18,218 +17,6 @@
     "commissionAmount": 461624,
     "commissionRate": 18.0
   },
-  "daily": [
-    {
-      "date": "2026-08-20",
-      "access": 2644,
-      "sales": 319260,
-      "directVisits": 2533
-    },
-    {
-      "date": "2026-08-19",
-      "access": 1532,
-      "sales": 329030,
-      "directVisits": 1279
-    },
-    {
-      "date": "2026-08-18",
-      "access": 1524,
-      "sales": 577630,
-      "directVisits": 1428
-    },
-    {
-      "date": "2026-08-17",
-      "access": 919,
-      "sales": 223570,
-      "directVisits": 845
-    },
-    {
-      "date": "2026-08-16",
-      "access": 926,
-      "sales": 359390,
-      "directVisits": 837
-    },
-    {
-      "date": "2026-08-15",
-      "access": 1309,
-      "sales": 283490,
-      "directVisits": 1220
-    },
-    {
-      "date": "2026-08-14",
-      "access": 919,
-      "sales": 273430,
-      "directVisits": 848
-    },
-    {
-      "date": "2026-08-13",
-      "access": 780,
-      "sales": 30600,
-      "directVisits": 702
-    },
-    {
-      "date": "2026-08-12",
-      "access": 191,
-      "sales": 0,
-      "directVisits": 204
-    },
-    {
-      "date": "2026-08-11",
-      "access": 481,
-      "sales": 138990,
-      "directVisits": 456
-    },
-    {
-      "date": "2026-08-10",
-      "access": 64,
-      "sales": 0,
-      "directVisits": 76
-    },
-    {
-      "date": "2026-08-09",
-      "access": 3,
-      "sales": 0,
-      "directVisits": 16
-    },
-    {
-      "date": "2026-08-08",
-      "access": 7,
-      "sales": 0,
-      "directVisits": 21
-    },
-    {
-      "date": "2026-08-07",
-      "access": 4,
-      "sales": 0,
-      "directVisits": 22
-    },
-    {
-      "date": "2026-08-06",
-      "access": 9,
-      "sales": 26820,
-      "directVisits": 30
-    },
-    {
-      "date": "2026-08-05",
-      "access": 4,
-      "sales": 0,
-      "directVisits": 30
-    },
-    {
-      "date": "2026-08-04",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 16
-    },
-    {
-      "date": "2026-08-03",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 3
-    },
-    {
-      "date": "2026-08-02",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 11
-    },
-    {
-      "date": "2026-08-01",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 17
-    },
-    {
-      "date": "2026-07-31",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 9
-    },
-    {
-      "date": "2026-07-30",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 11
-    },
-    {
-      "date": "2026-07-29",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 12
-    },
-    {
-      "date": "2026-07-28",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 10
-    },
-    {
-      "date": "2026-07-27",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 12
-    },
-    {
-      "date": "2026-07-26",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 14
-    },
-    {
-      "date": "2026-07-25",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 6
-    },
-    {
-      "date": "2026-07-24",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 19
-    },
-    {
-      "date": "2026-07-23",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 24
-    },
-    {
-      "date": "2026-07-22",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 36
-    },
-    {
-      "date": "2026-07-21",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 41
-    },
-    {
-      "date": "2026-07-20",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 16
-    },
-    {
-      "date": "2026-07-19",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 59
-    },
-    {
-      "date": "2026-07-18",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 8
-    },
-    {
-      "date": "2026-07-17",
-      "access": 0,
-      "sales": 0,
-      "directVisits": 6
-    }
-  ],
   "products": [
     {
       "connectProductId": "981216820329027",
@@ -322,5 +109,2405 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_182/1787210849102X1h3I_PNG/26041091275390979_973413170.png"
     }
   ],
-  "unmappedProducts": []
+  "unmappedProducts": [],
+  "days": [
+    {
+      "key": "2026-08-20",
+      "label": "8월 20일",
+      "periodStart": "2026-08-20",
+      "periodEnd": "2026-08-20",
+      "summary": {
+        "access": {
+          "value": 2644,
+          "deltaValue": 1112,
+          "deltaPct": 72.6
+        },
+        "sales": {
+          "value": 319260,
+          "deltaValue": -9770,
+          "deltaPct": -3.0
+        }
+      },
+      "directVisits": 2533
+    },
+    {
+      "key": "2026-08-19",
+      "label": "8월 19일",
+      "periodStart": "2026-08-19",
+      "periodEnd": "2026-08-19",
+      "summary": {
+        "access": {
+          "value": 1532,
+          "deltaValue": 8,
+          "deltaPct": 0.5
+        },
+        "sales": {
+          "value": 329030,
+          "deltaValue": -248600,
+          "deltaPct": -43.0
+        }
+      },
+      "directVisits": 1279
+    },
+    {
+      "key": "2026-08-18",
+      "label": "8월 18일",
+      "periodStart": "2026-08-18",
+      "periodEnd": "2026-08-18",
+      "summary": {
+        "access": {
+          "value": 1524,
+          "deltaValue": 605,
+          "deltaPct": 65.8
+        },
+        "sales": {
+          "value": 577630,
+          "deltaValue": 354060,
+          "deltaPct": 158.4
+        }
+      },
+      "directVisits": 1428
+    },
+    {
+      "key": "2026-08-17",
+      "label": "8월 17일",
+      "periodStart": "2026-08-17",
+      "periodEnd": "2026-08-17",
+      "summary": {
+        "access": {
+          "value": 919,
+          "deltaValue": -7,
+          "deltaPct": -0.8
+        },
+        "sales": {
+          "value": 223570,
+          "deltaValue": -135820,
+          "deltaPct": -37.8
+        }
+      },
+      "directVisits": 845
+    },
+    {
+      "key": "2026-08-16",
+      "label": "8월 16일",
+      "periodStart": "2026-08-16",
+      "periodEnd": "2026-08-16",
+      "summary": {
+        "access": {
+          "value": 926,
+          "deltaValue": -383,
+          "deltaPct": -29.3
+        },
+        "sales": {
+          "value": 359390,
+          "deltaValue": 75900,
+          "deltaPct": 26.8
+        }
+      },
+      "directVisits": 837
+    },
+    {
+      "key": "2026-08-15",
+      "label": "8월 15일",
+      "periodStart": "2026-08-15",
+      "periodEnd": "2026-08-15",
+      "summary": {
+        "access": {
+          "value": 1309,
+          "deltaValue": 390,
+          "deltaPct": 42.4
+        },
+        "sales": {
+          "value": 283490,
+          "deltaValue": 10060,
+          "deltaPct": 3.7
+        }
+      },
+      "directVisits": 1220
+    },
+    {
+      "key": "2026-08-14",
+      "label": "8월 14일",
+      "periodStart": "2026-08-14",
+      "periodEnd": "2026-08-14",
+      "summary": {
+        "access": {
+          "value": 919,
+          "deltaValue": 139,
+          "deltaPct": 17.8
+        },
+        "sales": {
+          "value": 273430,
+          "deltaValue": 242830,
+          "deltaPct": 793.6
+        }
+      },
+      "directVisits": 848
+    },
+    {
+      "key": "2026-08-13",
+      "label": "8월 13일",
+      "periodStart": "2026-08-13",
+      "periodEnd": "2026-08-13",
+      "summary": {
+        "access": {
+          "value": 780,
+          "deltaValue": 589,
+          "deltaPct": 308.4
+        },
+        "sales": {
+          "value": 30600,
+          "deltaValue": 30600,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 702
+    },
+    {
+      "key": "2026-08-12",
+      "label": "8월 12일",
+      "periodStart": "2026-08-12",
+      "periodEnd": "2026-08-12",
+      "summary": {
+        "access": {
+          "value": 191,
+          "deltaValue": -290,
+          "deltaPct": -60.3
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": -138990,
+          "deltaPct": -100.0
+        }
+      },
+      "directVisits": 204
+    },
+    {
+      "key": "2026-08-11",
+      "label": "8월 11일",
+      "periodStart": "2026-08-11",
+      "periodEnd": "2026-08-11",
+      "summary": {
+        "access": {
+          "value": 481,
+          "deltaValue": 417,
+          "deltaPct": 651.6
+        },
+        "sales": {
+          "value": 138990,
+          "deltaValue": 138990,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 456
+    },
+    {
+      "key": "2026-08-10",
+      "label": "8월 10일",
+      "periodStart": "2026-08-10",
+      "periodEnd": "2026-08-10",
+      "summary": {
+        "access": {
+          "value": 64,
+          "deltaValue": 61,
+          "deltaPct": 2033.3
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 76
+    },
+    {
+      "key": "2026-08-09",
+      "label": "8월 9일",
+      "periodStart": "2026-08-09",
+      "periodEnd": "2026-08-09",
+      "summary": {
+        "access": {
+          "value": 3,
+          "deltaValue": -4,
+          "deltaPct": -57.1
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 16
+    },
+    {
+      "key": "2026-08-08",
+      "label": "8월 8일",
+      "periodStart": "2026-08-08",
+      "periodEnd": "2026-08-08",
+      "summary": {
+        "access": {
+          "value": 7,
+          "deltaValue": 3,
+          "deltaPct": 75.0
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 21
+    },
+    {
+      "key": "2026-08-07",
+      "label": "8월 7일",
+      "periodStart": "2026-08-07",
+      "periodEnd": "2026-08-07",
+      "summary": {
+        "access": {
+          "value": 4,
+          "deltaValue": -5,
+          "deltaPct": -55.6
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": -26820,
+          "deltaPct": -100.0
+        }
+      },
+      "directVisits": 22
+    },
+    {
+      "key": "2026-08-06",
+      "label": "8월 6일",
+      "periodStart": "2026-08-06",
+      "periodEnd": "2026-08-06",
+      "summary": {
+        "access": {
+          "value": 9,
+          "deltaValue": 5,
+          "deltaPct": 125.0
+        },
+        "sales": {
+          "value": 26820,
+          "deltaValue": 26820,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 30
+    },
+    {
+      "key": "2026-08-05",
+      "label": "8월 5일",
+      "periodStart": "2026-08-05",
+      "periodEnd": "2026-08-05",
+      "summary": {
+        "access": {
+          "value": 4,
+          "deltaValue": 4,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 30
+    },
+    {
+      "key": "2026-08-04",
+      "label": "8월 4일",
+      "periodStart": "2026-08-04",
+      "periodEnd": "2026-08-04",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 16
+    },
+    {
+      "key": "2026-08-03",
+      "label": "8월 3일",
+      "periodStart": "2026-08-03",
+      "periodEnd": "2026-08-03",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 3
+    },
+    {
+      "key": "2026-08-02",
+      "label": "8월 2일",
+      "periodStart": "2026-08-02",
+      "periodEnd": "2026-08-02",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 11
+    },
+    {
+      "key": "2026-08-01",
+      "label": "8월 1일",
+      "periodStart": "2026-08-01",
+      "periodEnd": "2026-08-01",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 17
+    },
+    {
+      "key": "2026-07-31",
+      "label": "7월 31일",
+      "periodStart": "2026-07-31",
+      "periodEnd": "2026-07-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 9
+    },
+    {
+      "key": "2026-07-30",
+      "label": "7월 30일",
+      "periodStart": "2026-07-30",
+      "periodEnd": "2026-07-30",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 11
+    },
+    {
+      "key": "2026-07-29",
+      "label": "7월 29일",
+      "periodStart": "2026-07-29",
+      "periodEnd": "2026-07-29",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 12
+    },
+    {
+      "key": "2026-07-28",
+      "label": "7월 28일",
+      "periodStart": "2026-07-28",
+      "periodEnd": "2026-07-28",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 10
+    },
+    {
+      "key": "2026-07-27",
+      "label": "7월 27일",
+      "periodStart": "2026-07-27",
+      "periodEnd": "2026-07-27",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 12
+    },
+    {
+      "key": "2026-07-26",
+      "label": "7월 26일",
+      "periodStart": "2026-07-26",
+      "periodEnd": "2026-07-26",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 14
+    },
+    {
+      "key": "2026-07-25",
+      "label": "7월 25일",
+      "periodStart": "2026-07-25",
+      "periodEnd": "2026-07-25",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 6
+    },
+    {
+      "key": "2026-07-24",
+      "label": "7월 24일",
+      "periodStart": "2026-07-24",
+      "periodEnd": "2026-07-24",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 19
+    },
+    {
+      "key": "2026-07-23",
+      "label": "7월 23일",
+      "periodStart": "2026-07-23",
+      "periodEnd": "2026-07-23",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 24
+    },
+    {
+      "key": "2026-07-22",
+      "label": "7월 22일",
+      "periodStart": "2026-07-22",
+      "periodEnd": "2026-07-22",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 36
+    },
+    {
+      "key": "2026-07-21",
+      "label": "7월 21일",
+      "periodStart": "2026-07-21",
+      "periodEnd": "2026-07-21",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 41
+    },
+    {
+      "key": "2026-07-20",
+      "label": "7월 20일",
+      "periodStart": "2026-07-20",
+      "periodEnd": "2026-07-20",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 16
+    },
+    {
+      "key": "2026-07-19",
+      "label": "7월 19일",
+      "periodStart": "2026-07-19",
+      "periodEnd": "2026-07-19",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 59
+    },
+    {
+      "key": "2026-07-18",
+      "label": "7월 18일",
+      "periodStart": "2026-07-18",
+      "periodEnd": "2026-07-18",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 8
+    },
+    {
+      "key": "2026-07-17",
+      "label": "7월 17일",
+      "periodStart": "2026-07-17",
+      "periodEnd": "2026-07-17",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 6
+    },
+    {
+      "key": "2026-07-16",
+      "label": "7월 16일",
+      "periodStart": "2026-07-16",
+      "periodEnd": "2026-07-16",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 11
+    },
+    {
+      "key": "2026-07-15",
+      "label": "7월 15일",
+      "periodStart": "2026-07-15",
+      "periodEnd": "2026-07-15",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 24
+    },
+    {
+      "key": "2026-07-14",
+      "label": "7월 14일",
+      "periodStart": "2026-07-14",
+      "periodEnd": "2026-07-14",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 13
+    },
+    {
+      "key": "2026-07-13",
+      "label": "7월 13일",
+      "periodStart": "2026-07-13",
+      "periodEnd": "2026-07-13",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 28
+    },
+    {
+      "key": "2026-07-12",
+      "label": "7월 12일",
+      "periodStart": "2026-07-12",
+      "periodEnd": "2026-07-12",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 9
+    },
+    {
+      "key": "2026-07-11",
+      "label": "7월 11일",
+      "periodStart": "2026-07-11",
+      "periodEnd": "2026-07-11",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 18
+    },
+    {
+      "key": "2026-07-10",
+      "label": "7월 10일",
+      "periodStart": "2026-07-10",
+      "periodEnd": "2026-07-10",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 14
+    },
+    {
+      "key": "2026-07-09",
+      "label": "7월 9일",
+      "periodStart": "2026-07-09",
+      "periodEnd": "2026-07-09",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 24
+    },
+    {
+      "key": "2026-07-08",
+      "label": "7월 8일",
+      "periodStart": "2026-07-08",
+      "periodEnd": "2026-07-08",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 18
+    },
+    {
+      "key": "2026-07-07",
+      "label": "7월 7일",
+      "periodStart": "2026-07-07",
+      "periodEnd": "2026-07-07",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": 15
+    },
+    {
+      "key": "2026-07-06",
+      "label": "7월 6일",
+      "periodStart": "2026-07-06",
+      "periodEnd": "2026-07-06",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-07-05",
+      "label": "7월 5일",
+      "periodStart": "2026-07-05",
+      "periodEnd": "2026-07-05",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-07-04",
+      "label": "7월 4일",
+      "periodStart": "2026-07-04",
+      "periodEnd": "2026-07-04",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-07-03",
+      "label": "7월 3일",
+      "periodStart": "2026-07-03",
+      "periodEnd": "2026-07-03",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-07-02",
+      "label": "7월 2일",
+      "periodStart": "2026-07-02",
+      "periodEnd": "2026-07-02",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-07-01",
+      "label": "7월 1일",
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-01",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-30",
+      "label": "6월 30일",
+      "periodStart": "2026-06-30",
+      "periodEnd": "2026-06-30",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-29",
+      "label": "6월 29일",
+      "periodStart": "2026-06-29",
+      "periodEnd": "2026-06-29",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-28",
+      "label": "6월 28일",
+      "periodStart": "2026-06-28",
+      "periodEnd": "2026-06-28",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-27",
+      "label": "6월 27일",
+      "periodStart": "2026-06-27",
+      "periodEnd": "2026-06-27",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-26",
+      "label": "6월 26일",
+      "periodStart": "2026-06-26",
+      "periodEnd": "2026-06-26",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-25",
+      "label": "6월 25일",
+      "periodStart": "2026-06-25",
+      "periodEnd": "2026-06-25",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-24",
+      "label": "6월 24일",
+      "periodStart": "2026-06-24",
+      "periodEnd": "2026-06-24",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-23",
+      "label": "6월 23일",
+      "periodStart": "2026-06-23",
+      "periodEnd": "2026-06-23",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-22",
+      "label": "6월 22일",
+      "periodStart": "2026-06-22",
+      "periodEnd": "2026-06-22",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-21",
+      "label": "6월 21일",
+      "periodStart": "2026-06-21",
+      "periodEnd": "2026-06-21",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-20",
+      "label": "6월 20일",
+      "periodStart": "2026-06-20",
+      "periodEnd": "2026-06-20",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-19",
+      "label": "6월 19일",
+      "periodStart": "2026-06-19",
+      "periodEnd": "2026-06-19",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-18",
+      "label": "6월 18일",
+      "periodStart": "2026-06-18",
+      "periodEnd": "2026-06-18",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-17",
+      "label": "6월 17일",
+      "periodStart": "2026-06-17",
+      "periodEnd": "2026-06-17",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-16",
+      "label": "6월 16일",
+      "periodStart": "2026-06-16",
+      "periodEnd": "2026-06-16",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-15",
+      "label": "6월 15일",
+      "periodStart": "2026-06-15",
+      "periodEnd": "2026-06-15",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-14",
+      "label": "6월 14일",
+      "periodStart": "2026-06-14",
+      "periodEnd": "2026-06-14",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-13",
+      "label": "6월 13일",
+      "periodStart": "2026-06-13",
+      "periodEnd": "2026-06-13",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-12",
+      "label": "6월 12일",
+      "periodStart": "2026-06-12",
+      "periodEnd": "2026-06-12",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-11",
+      "label": "6월 11일",
+      "periodStart": "2026-06-11",
+      "periodEnd": "2026-06-11",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-10",
+      "label": "6월 10일",
+      "periodStart": "2026-06-10",
+      "periodEnd": "2026-06-10",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-09",
+      "label": "6월 9일",
+      "periodStart": "2026-06-09",
+      "periodEnd": "2026-06-09",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-08",
+      "label": "6월 8일",
+      "periodStart": "2026-06-08",
+      "periodEnd": "2026-06-08",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-07",
+      "label": "6월 7일",
+      "periodStart": "2026-06-07",
+      "periodEnd": "2026-06-07",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-06",
+      "label": "6월 6일",
+      "periodStart": "2026-06-06",
+      "periodEnd": "2026-06-06",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-05",
+      "label": "6월 5일",
+      "periodStart": "2026-06-05",
+      "periodEnd": "2026-06-05",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-04",
+      "label": "6월 4일",
+      "periodStart": "2026-06-04",
+      "periodEnd": "2026-06-04",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-03",
+      "label": "6월 3일",
+      "periodStart": "2026-06-03",
+      "periodEnd": "2026-06-03",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-02",
+      "label": "6월 2일",
+      "periodStart": "2026-06-02",
+      "periodEnd": "2026-06-02",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-06-01",
+      "label": "6월 1일",
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-06-01",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-31",
+      "label": "5월 31일",
+      "periodStart": "2026-05-31",
+      "periodEnd": "2026-05-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-30",
+      "label": "5월 30일",
+      "periodStart": "2026-05-30",
+      "periodEnd": "2026-05-30",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-29",
+      "label": "5월 29일",
+      "periodStart": "2026-05-29",
+      "periodEnd": "2026-05-29",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-28",
+      "label": "5월 28일",
+      "periodStart": "2026-05-28",
+      "periodEnd": "2026-05-28",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-27",
+      "label": "5월 27일",
+      "periodStart": "2026-05-27",
+      "periodEnd": "2026-05-27",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-26",
+      "label": "5월 26일",
+      "periodStart": "2026-05-26",
+      "periodEnd": "2026-05-26",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-25",
+      "label": "5월 25일",
+      "periodStart": "2026-05-25",
+      "periodEnd": "2026-05-25",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-24",
+      "label": "5월 24일",
+      "periodStart": "2026-05-24",
+      "periodEnd": "2026-05-24",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    },
+    {
+      "key": "2026-05-23",
+      "label": "5월 23일",
+      "periodStart": "2026-05-23",
+      "periodEnd": "2026-05-23",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      },
+      "directVisits": null
+    }
+  ],
+  "weeks": [
+    {
+      "key": "2026-W34",
+      "label": "8/17~8/20",
+      "periodStart": "2026-08-17",
+      "periodEnd": "2026-08-20",
+      "summary": {
+        "access": {
+          "value": 6619,
+          "deltaValue": 1949,
+          "deltaPct": 41.7
+        },
+        "sales": {
+          "value": 1449490,
+          "deltaValue": 363590,
+          "deltaPct": 33.5
+        }
+      }
+    },
+    {
+      "key": "2026-W33",
+      "label": "8/10~8/16",
+      "periodStart": "2026-08-10",
+      "periodEnd": "2026-08-16",
+      "summary": {
+        "access": {
+          "value": 4670,
+          "deltaValue": 4643,
+          "deltaPct": 17196.3
+        },
+        "sales": {
+          "value": 1085900,
+          "deltaValue": 1059080,
+          "deltaPct": 3948.8
+        }
+      }
+    },
+    {
+      "key": "2026-W32",
+      "label": "8/3~8/9",
+      "periodStart": "2026-08-03",
+      "periodEnd": "2026-08-09",
+      "summary": {
+        "access": {
+          "value": 27,
+          "deltaValue": 27,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 26820,
+          "deltaValue": 26820,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W31",
+      "label": "7/27~8/2",
+      "periodStart": "2026-07-27",
+      "periodEnd": "2026-08-02",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W30",
+      "label": "7/20~7/26",
+      "periodStart": "2026-07-20",
+      "periodEnd": "2026-07-26",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W29",
+      "label": "7/13~7/19",
+      "periodStart": "2026-07-13",
+      "periodEnd": "2026-07-19",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W28",
+      "label": "7/6~7/12",
+      "periodStart": "2026-07-06",
+      "periodEnd": "2026-07-12",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W27",
+      "label": "6/29~7/5",
+      "periodStart": "2026-06-29",
+      "periodEnd": "2026-07-05",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W26",
+      "label": "6/22~6/28",
+      "periodStart": "2026-06-22",
+      "periodEnd": "2026-06-28",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W25",
+      "label": "6/15~6/21",
+      "periodStart": "2026-06-15",
+      "periodEnd": "2026-06-21",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W24",
+      "label": "6/8~6/14",
+      "periodStart": "2026-06-08",
+      "periodEnd": "2026-06-14",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W23",
+      "label": "6/1~6/7",
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-06-07",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W22",
+      "label": "5/25~5/31",
+      "periodStart": "2026-05-25",
+      "periodEnd": "2026-05-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W21",
+      "label": "5/18~5/24",
+      "periodStart": "2026-05-18",
+      "periodEnd": "2026-05-24",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W20",
+      "label": "5/11~5/17",
+      "periodStart": "2026-05-11",
+      "periodEnd": "2026-05-17",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W19",
+      "label": "5/4~5/10",
+      "periodStart": "2026-05-04",
+      "periodEnd": "2026-05-10",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W18",
+      "label": "4/27~5/3",
+      "periodStart": "2026-04-27",
+      "periodEnd": "2026-05-03",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W17",
+      "label": "4/20~4/26",
+      "periodStart": "2026-04-20",
+      "periodEnd": "2026-04-26",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W16",
+      "label": "4/13~4/19",
+      "periodStart": "2026-04-13",
+      "periodEnd": "2026-04-19",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W15",
+      "label": "4/6~4/12",
+      "periodStart": "2026-04-06",
+      "periodEnd": "2026-04-12",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W14",
+      "label": "3/30~4/5",
+      "periodStart": "2026-03-30",
+      "periodEnd": "2026-04-05",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W13",
+      "label": "3/23~3/29",
+      "periodStart": "2026-03-23",
+      "periodEnd": "2026-03-29",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W12",
+      "label": "3/16~3/22",
+      "periodStart": "2026-03-16",
+      "periodEnd": "2026-03-22",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W11",
+      "label": "3/9~3/15",
+      "periodStart": "2026-03-09",
+      "periodEnd": "2026-03-15",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W10",
+      "label": "3/2~3/8",
+      "periodStart": "2026-03-02",
+      "periodEnd": "2026-03-08",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-W09",
+      "label": "2/23~3/1",
+      "periodStart": "2026-02-23",
+      "periodEnd": "2026-03-01",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    }
+  ],
+  "months": [
+    {
+      "key": "2026-08",
+      "label": "8월",
+      "periodStart": "2026-08-01",
+      "periodEnd": "2026-08-20",
+      "summary": {
+        "access": {
+          "value": 11316,
+          "deltaValue": 11316,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 2562210,
+          "deltaValue": 2562210,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-07",
+      "label": "7월",
+      "periodStart": "2026-07-01",
+      "periodEnd": "2026-07-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-06",
+      "label": "6월",
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-06-30",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-05",
+      "label": "5월",
+      "periodStart": "2026-05-01",
+      "periodEnd": "2026-05-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-04",
+      "label": "4월",
+      "periodStart": "2026-04-01",
+      "periodEnd": "2026-04-30",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-03",
+      "label": "3월",
+      "periodStart": "2026-03-01",
+      "periodEnd": "2026-03-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-02",
+      "label": "2월",
+      "periodStart": "2026-02-01",
+      "periodEnd": "2026-02-28",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2026-01",
+      "label": "1월",
+      "periodStart": "2026-01-01",
+      "periodEnd": "2026-01-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2025-12",
+      "label": "12월",
+      "periodStart": "2025-12-01",
+      "periodEnd": "2025-12-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2025-11",
+      "label": "11월",
+      "periodStart": "2025-11-01",
+      "periodEnd": "2025-11-30",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2025-10",
+      "label": "10월",
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-10-31",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    },
+    {
+      "key": "2025-09",
+      "label": "9월",
+      "periodStart": "2025-09-01",
+      "periodEnd": "2025-09-30",
+      "summary": {
+        "access": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        },
+        "sales": {
+          "value": 0,
+          "deltaValue": 0,
+          "deltaPct": null
+        }
+      }
+    }
+  ]
 }
