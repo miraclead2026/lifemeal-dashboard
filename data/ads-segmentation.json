@@ -2,24 +2,24 @@
  "updatedAt": "2026-08-22",
  "goal": "개별 상품은 ROAS 330 우선(효율) · 통합 ROAS가 330 넘으면 볼륨 확대(증액)",
  "note": "일일 리포트=오늘 조치 / 세분화 전략=제안·진행·된것·안된것 누적 추적",
- "combinedRoas": 243,
+ "combinedRoas": 237,
  "mode": "효율우선",
  "budgetProposal": null,
- "modeNote": "통합 ROAS 243% < 330 → 효율 우선(저효율부터 정리·개선, 증액은 통합 330 넘으면)",
+ "modeNote": "통합 ROAS 237% < 330 → 효율 우선(저효율부터 정리·개선, 증액은 통합 330 넘으면)",
  "cards": [
   {
    "channel": "애드부스트",
    "product": "애셋 그룹#2606191823",
-   "spend": 9660402,
-   "imp": 478901,
-   "clk": 3374,
-   "conv": 316,
+   "spend": 9361137,
+   "imp": 480808,
+   "clk": 3315,
+   "conv": 306,
    "ctr": 0.7,
-   "cvr": 9.4,
-   "roas": 266,
-   "bottleneck": "ROAS 266% 미달",
+   "cvr": 9.2,
+   "roas": 262,
+   "bottleneck": "ROAS 262% 미달",
    "verdict": "개선",
-   "direction": "클릭·전환은 나는데 ROAS 266% 미달 — 제외검색어로 저효율 유입 컷 + 가격 점검.",
+   "direction": "클릭·전환은 나는데 ROAS 262% 미달 — 제외검색어로 저효율 유입 컷 + 가격 점검.",
    "levers": [
     {
      "who": "내가",
@@ -198,6 +198,37 @@
    ]
   },
   {
+   "channel": "애드부스트",
+   "product": "광고 그룹#2608151604",
+   "spend": 104266,
+   "imp": 2843,
+   "clk": 65,
+   "conv": 3,
+   "ctr": 2.3,
+   "cvr": 4.6,
+   "roas": 220,
+   "bottleneck": "ROAS 220% 미달",
+   "verdict": "개선",
+   "direction": "클릭·전환은 나는데 ROAS 220% 미달 — 제외검색어로 저효율 유입 컷 + 가격 점검.",
+   "levers": [
+    {
+     "who": "내가",
+     "what": "제외검색어·가격"
+    }
+   ],
+   "status": "신규",
+   "daysTracked": 0,
+   "statusNote": "",
+   "firstProposed": "2026-08-22",
+   "roasFrom": 0,
+   "history": [
+    {
+     "date": "2026-08-22",
+     "roas": 0
+    }
+   ]
+  },
+  {
    "channel": "쇼핑검색",
    "product": "황성주 박사의 데이 크런치 프로틴바 에너지바 칼로리 간식 초코, 10개입, 8개",
    "spend": 79987,
@@ -280,41 +311,6 @@
    "bottleneck": "전환 0",
    "verdict": "개선",
    "direction": "클릭 26인데 전환 0 — 상세·가격·리뷰 발목. 나쁜 유입 제외검색어로 컷.",
-   "levers": [
-    {
-     "who": "유니",
-     "what": "상세·리뷰·가격"
-    },
-    {
-     "who": "내가",
-     "what": "제외검색어"
-    }
-   ],
-   "status": "신규",
-   "daysTracked": 0,
-   "statusNote": "",
-   "firstProposed": "2026-08-22",
-   "roasFrom": 0,
-   "history": [
-    {
-     "date": "2026-08-22",
-     "roas": 0
-    }
-   ]
-  },
-  {
-   "channel": "애드부스트",
-   "product": "광고 그룹#2608151604",
-   "spend": 70102,
-   "imp": 1756,
-   "clk": 43,
-   "conv": 0,
-   "ctr": 2.4,
-   "cvr": 0.0,
-   "roas": 0,
-   "bottleneck": "전환 0",
-   "verdict": "개선",
-   "direction": "클릭 43인데 전환 0 — 상세·가격·리뷰 발목. 나쁜 유입 제외검색어로 컷.",
    "levers": [
     {
      "who": "유니",
