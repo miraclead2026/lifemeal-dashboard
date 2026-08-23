@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-22",
+ "updatedAt": "2026-08-23",
  "days": [
   {
    "date": "2026-08-17",
@@ -699,6 +699,125 @@
    "summary": {
     "added": 0,
     "rejected": 8,
+    "held": 2
+   }
+  },
+  {
+   "date": "2026-08-23",
+   "trendDate": "2026-08-23",
+   "committed": true,
+   "added": [
+    {
+     "keyword": "호두",
+     "intentType": "shopping",
+     "monthlyPc": 2830,
+     "monthlyMobile": 18000,
+     "priorityScore": 8.06,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "group": "하루견과",
+     "reason": "shopping 의도·하루견과 배정",
+     "applied": true,
+     "keywordRef": "nkw-a001-01-000008532109635"
+    }
+   ],
+   "rejected": [
+    {
+     "keyword": "단백질쉐이크",
+     "intentType": "shopping",
+     "monthlyPc": 17400,
+     "monthlyMobile": 93200,
+     "priorityScore": 9.1,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "그릭요거트",
+     "intentType": "shopping",
+     "monthlyPc": 14000,
+     "monthlyMobile": 84600,
+     "priorityScore": 9.03,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "견과류",
+     "intentType": "shopping",
+     "monthlyPc": 7990,
+     "monthlyMobile": 41000,
+     "priorityScore": 8.61,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "하루견과",
+     "intentType": "shopping",
+     "monthlyPc": 6710,
+     "monthlyMobile": 28100,
+     "priorityScore": 8.39,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "황성주생식",
+     "intentType": "shopping",
+     "monthlyPc": 1080,
+     "monthlyMobile": 15300,
+     "priorityScore": 7.91,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "브랜드 방어(defend) — 등록대상 아님"
+    },
+    {
+     "keyword": "그래놀라",
+     "intentType": "shopping",
+     "monthlyPc": 5190,
+     "monthlyMobile": 18400,
+     "priorityScore": 7.27,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "유기농생식",
+     "intentType": "shopping",
+     "monthlyPc": 100,
+     "monthlyMobile": 2540,
+     "priorityScore": 5.95,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "이미 등록됨(중복)"
+    }
+   ],
+   "held": [
+    {
+     "keyword": "두유",
+     "intentType": "shopping",
+     "monthlyPc": 9570,
+     "monthlyMobile": 39500,
+     "priorityScore": 8.61,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "productHints 없음/저신뢰(low) — 임의배치 금지"
+    },
+    {
+     "keyword": "검은콩두유",
+     "intentType": "shopping",
+     "monthlyPc": 3230,
+     "monthlyMobile": 23400,
+     "priorityScore": 8.22,
+     "source": "keyword-trend",
+     "date": "2026-08-23",
+     "reason": "productHints 없음/저신뢰(low) — 임의배치 금지"
+    }
+   ],
+   "summary": {
+    "added": 1,
+    "rejected": 7,
     "held": 2
    }
   }
