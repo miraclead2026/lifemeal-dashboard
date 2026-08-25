@@ -1,22 +1,31 @@
 {
- "updatedAt": "2026-08-25",
+ "updatedAt": "2026-08-26",
  "channel": "파워링크(사이트검색광고)",
- "totalExtensions": 55,
- "activeExtensions": 42,
+ "totalExtensions": 68,
+ "activeExtensions": 55,
  "typeCounts": {
   "홍보문구": 26,
+  "이미지형 서브링크": 13,
   "추가제목": 13,
   "이미지": 16
  },
  "groups": [
   {
    "group": "1일1생식",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -32,29 +41,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "데일리생식",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -70,24 +87,24 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "닥터샐러드",
-   "count": 5,
+   "count": 6,
    "extensions": [
     {
      "type": "이미지",
@@ -101,6 +118,14 @@
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -116,29 +141,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "영양식",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -154,29 +187,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "발효건강식",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -192,29 +233,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "하루견과",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -230,29 +279,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "그래놀라",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -268,24 +325,24 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "데이크런치",
-   "count": 5,
+   "count": 6,
    "extensions": [
     {
      "type": "이미지",
@@ -299,6 +356,14 @@
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -314,24 +379,24 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "데이업",
-   "count": 5,
+   "count": 6,
    "extensions": [
     {
      "type": "이미지",
@@ -345,6 +410,14 @@
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -360,29 +433,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "프로틴골드",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -398,29 +479,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "알로에젤리",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -436,29 +525,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "푸룬젤리",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -474,29 +571,37 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
   },
   {
    "group": "콜라겐젤리",
-   "count": 4,
+   "count": 5,
    "extensions": [
     {
      "type": "이미지",
      "typeRaw": "POWER_LINK_IMAGE",
      "content": "(이미지 소재)",
+     "status": "승인",
+     "on": true,
+     "hasSchedule": false
+    },
+    {
+     "type": "이미지형 서브링크",
+     "typeRaw": "IMAGE_SUB_LINKS",
+     "content": "🖼 1일1생식 / 닥터샐러드 / 프로틴골드",
      "status": "승인",
      "on": true,
      "hasSchedule": false
@@ -512,17 +617,17 @@
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "발효건강식 5포 증정",
+     "content": "알림받기 10% 무료배송",
      "status": "승인",
-     "on": true,
+     "on": false,
      "hasSchedule": false
     },
     {
      "type": "홍보문구",
      "typeRaw": "DESCRIPTION",
-     "content": "알림받기 10% 무료배송",
+     "content": "영양식 5포 증정",
      "status": "승인",
-     "on": false,
+     "on": true,
      "hasSchedule": false
     }
    ]
