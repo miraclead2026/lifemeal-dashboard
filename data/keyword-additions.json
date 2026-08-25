@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-23",
+ "updatedAt": "2026-08-25",
  "days": [
   {
    "date": "2026-08-17",
@@ -819,6 +819,130 @@
     "added": 1,
     "rejected": 7,
     "held": 2
+   }
+  },
+  {
+   "date": "2026-08-25",
+   "trendDate": "2026-08-25",
+   "committed": true,
+   "added": [
+    {
+     "keyword": "식이섬유",
+     "intentType": "shopping",
+     "monthlyPc": 3440,
+     "monthlyMobile": 16000,
+     "priorityScore": 8.03,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "group": "푸룬젤리",
+     "reason": "shopping 의도·푸룬젤리 배정",
+     "applied": true,
+     "keywordRef": "nkw-a001-01-000008538205692"
+    },
+    {
+     "keyword": "선식",
+     "intentType": "shopping",
+     "monthlyPc": 1210,
+     "monthlyMobile": 5910,
+     "priorityScore": 7.38,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "group": "1일1생식",
+     "reason": "shopping 의도·1일1생식 배정",
+     "applied": true,
+     "keywordRef": "nkw-a001-01-000008538205839"
+    },
+    {
+     "keyword": "파이버맥싱",
+     "intentType": "mixed",
+     "monthlyPc": 350,
+     "monthlyMobile": 310,
+     "priorityScore": 5.83,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "group": "닥터샐러드",
+     "reason": "mixed 의도·닥터샐러드 배정",
+     "applied": true,
+     "keywordRef": "nkw-a001-01-000008538205962"
+    }
+   ],
+   "rejected": [
+    {
+     "keyword": "단백질쉐이크",
+     "intentType": "shopping",
+     "monthlyPc": 17800,
+     "monthlyMobile": 95200,
+     "priorityScore": 9.18,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "견과류",
+     "intentType": "shopping",
+     "monthlyPc": 8320,
+     "monthlyMobile": 42300,
+     "priorityScore": 8.66,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "황성주생식",
+     "intentType": "shopping",
+     "monthlyPc": 1120,
+     "monthlyMobile": 15600,
+     "priorityScore": 7.93,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "reason": "브랜드 방어(defend) — 등록대상 아님"
+    },
+    {
+     "keyword": "식물성단백질",
+     "intentType": "shopping",
+     "monthlyPc": 740,
+     "monthlyMobile": 3630,
+     "priorityScore": 7.06,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "식사대용",
+     "intentType": "mixed",
+     "monthlyPc": 610,
+     "monthlyMobile": 2550,
+     "priorityScore": 6.35,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "저속노화",
+     "intentType": "mixed",
+     "monthlyPc": 700,
+     "monthlyMobile": 2130,
+     "priorityScore": 6.28,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "reason": "컴플라이언스 제외(효능/질병)"
+    },
+    {
+     "keyword": "저속노화식단",
+     "intentType": "shopping",
+     "monthlyPc": 270,
+     "monthlyMobile": 1170,
+     "priorityScore": 5.84,
+     "source": "keyword-trend",
+     "date": "2026-08-25",
+     "reason": "컴플라이언스 제외(효능/질병)"
+    }
+   ],
+   "held": [],
+   "summary": {
+    "added": 3,
+    "rejected": 7,
+    "held": 0
    }
   }
  ]
