@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-08-23",
+ "updatedAt": "2026-08-25",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 1368074,
-   "roas": 136,
+   "spend": 1209280,
+   "roas": 142,
    "conv": 18,
    "options": 4,
-   "action": "상품군 통합 ROAS 136% (매우 낮음) (옵션 4개 합산) — OFF/개선 검토",
+   "action": "상품군 통합 ROAS 142% (매우 낮음) (옵션 4개 합산) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
@@ -27,17 +27,14 @@
   {
    "channel": "쇼핑검색",
    "item": "라이프밀 데일리 30g 14포",
-   "spend": 542791,
-   "roas": 183,
-   "conv": 9,
+   "spend": 481083,
+   "roas": 193,
+   "conv": 8,
    "options": 4,
-   "action": "상품군 통합 ROAS 183% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "action": "상품군 통합 ROAS 193% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
    "severity": "medium",
    "executor": "watch",
    "nccAdIds": [
-    "nad-a001-02-000000541753966",
-    "nad-a001-02-000000541753967",
-    "nad-a001-02-000000541753968",
     "nad-a001-02-000000541753988"
    ],
    "matched": true
@@ -45,11 +42,11 @@
   {
    "channel": "쇼핑검색",
    "item": "갓 구운 하루견과 20g 30개입",
-   "spend": 281091,
-   "roas": 75,
-   "conv": 5,
+   "spend": 343929,
+   "roas": 128,
+   "conv": 10,
    "options": 3,
-   "action": "상품군 통합 ROAS 75% (매우 낮음) (옵션 3개 합산) — OFF/개선 검토",
+   "action": "상품군 통합 ROAS 128% (매우 낮음) (옵션 3개 합산) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
@@ -62,24 +59,23 @@
   {
    "channel": "쇼핑검색",
    "item": "프로틴 골드 HIGH5",
-   "spend": 148966,
-   "roas": 47,
-   "conv": 1,
+   "spend": 145764,
+   "roas": 0,
+   "conv": 0,
    "options": 3,
-   "action": "상품군 통합 ROAS 47% (매우 낮음) (옵션 3개 합산) — OFF/개선 검토",
+   "action": "상품군 전체 전환 0인데 광고비 소진 (옵션 3개 합산) — 상품군 광고 OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
     "nad-a001-02-000000494209013",
-    "nad-a001-02-000000553654562",
-    "nad-a001-02-000000553654563"
+    "nad-a001-02-000000553654562"
    ],
    "matched": true
   },
   {
    "channel": "쇼핑검색",
    "item": "데이 업 프로틴 쉐이크 45g",
-   "spend": 98548,
+   "spend": 56932,
    "roas": 0,
    "conv": 0,
    "options": 16,
@@ -92,20 +88,17 @@
   {
    "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 60740,
-   "roas": 0,
-   "conv": 0,
+   "spend": 43323,
+   "roas": 90,
+   "conv": 1,
    "options": 8,
-   "action": "상품군 전체 전환 0인데 광고비 소진 (옵션 8개 합산) — 상품군 광고 OFF/개선 검토",
+   "action": "상품군 통합 ROAS 90% (매우 낮음) (옵션 8개 합산) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
     "nad-a001-02-000000494208903",
     "nad-a001-02-000000494208904",
-    "nad-a001-02-000000541753991",
     "nad-a001-02-000000553654554",
-    "nad-a001-02-000000553654555",
-    "nad-a001-02-000000553654557",
     "nad-a001-02-000000553654558",
     "nad-a001-02-000000553654559"
    ],
@@ -113,26 +106,24 @@
   },
   {
    "channel": "쇼핑검색",
-   "item": "발효건강식 황성주생식 30포",
-   "spend": 20672,
-   "roas": 213,
-   "conv": 1,
-   "options": 3,
-   "action": "상품군 통합 ROAS 213% 목표 미달 (옵션 3개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "item": "홀그레인 저당 그래놀라",
+   "spend": 40353,
+   "roas": 0,
+   "conv": 0,
+   "options": 1,
+   "action": "상품군 통합 ROAS 0% — 이미 집행중단(소재 OFF/삭제됨)",
    "severity": "medium",
-   "executor": "watch",
-   "nccAdIds": [
-    "nad-a001-02-000000494209020"
-   ],
-   "matched": true
+   "executor": "done",
+   "nccAdIds": [],
+   "matched": false
   },
   {
    "channel": "애드부스트",
    "item": "애셋 그룹#2606191823",
-   "spend": 4077535,
-   "roas": 301,
-   "conv": 161,
-   "action": "ROAS 301% 미달 — 예산 축소·소재 교체",
+   "spend": 4297492,
+   "roas": 317,
+   "conv": 175,
+   "action": "ROAS 317% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -140,20 +131,20 @@
   {
    "channel": "애드부스트",
    "item": "광고 그룹#2608151604",
-   "spend": 137851,
-   "roas": 198,
-   "conv": 5,
-   "action": "ROAS 198% 미달 — 예산 축소·소재 교체",
+   "spend": 239457,
+   "roas": 173,
+   "conv": 8,
+   "action": "ROAS 173% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
   }
  ],
  "powerlinkAuto": {
-  "date": "2026-08-22",
-  "changed": 26,
+  "date": "2026-08-23",
+  "changed": 95,
   "downs": 0,
-  "deleteReview": 15
+  "deleteReview": 12
  },
  "summary": {
   "shopping": 7,
@@ -170,6 +161,12 @@
   {
    "date": null,
    "shopping": 8,
+   "advoost": 2,
+   "approveNeeded": 4
+  },
+  {
+   "date": null,
+   "shopping": 7,
    "advoost": 2,
    "approveNeeded": 4
   },
