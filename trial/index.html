@@ -71,6 +71,13 @@
   .fld input,.fld select,.fld textarea{width:100%}
   #status{font-size:12px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.2)}
   .muted-row{opacity:.5}
+  .thumb{width:58px;height:58px;border-radius:7px;object-fit:cover;display:block;
+         background:#eef1f5;border:1px solid var(--line)}
+  .thumb.big{width:84px;height:84px}
+  .thumb-none{width:58px;height:58px;border-radius:7px;background:#f2f4f8;
+              border:1px dashed var(--line);display:flex;align-items:center;
+              justify-content:center;font-size:10px;color:#aab0b8}
+  a.thumb-link{display:inline-block;line-height:0}
 </style>
 </head>
 <body>
@@ -221,6 +228,25 @@ function computeTotal(pid) {
 
 const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0$/, '');
 
+/* 게시물 썸네일. thumb 은 이 페이지 기준 상대경로(thumbs/<기수>/<postId>.jpg)로,
+   fetch_thumbs.py 가 레포에 올려둔 파일이다. 인스타 CDN 주소를 그대로 쓰면
+   하루 만에 만료돼 깨지므로 반드시 내려받은 사본을 쓴다. */
+function thumbOf(post, big) {
+  if (!post || !post.thumb) {
+    return el('div', { class: 'thumb-none' + (big ? ' big' : '') }, '없음');
+  }
+  const img = el('img', {
+    class: 'thumb' + (big ? ' big' : ''), src: post.thumb, loading: 'lazy',
+    alt: '', title: '클릭하면 원본 게시물이 열립니다'
+  });
+  img.addEventListener('error', () => {
+    img.replaceWith(el('div', { class: 'thumb-none' + (big ? ' big' : '') }, '없음'));
+  });
+  return post.url
+    ? el('a', { class: 'thumb-link', href: post.url, target: '_blank' }, img)
+    : img;
+}
+
 /* 채점이 아직 안 끝난 게시물이 있으면 총점은 잠정이다. */
 const isProvisional = pid => list(DATA.posts)
   .filter(x => x.pid === pid)
@@ -324,8 +350,12 @@ function viewParticipants() {
     const tb = el('tbody');
     rows.forEach(({ p, t }, i) => {
       const prov = isProvisional(p.id);
+      // 대표 썸네일 = 가장 최근 게시물. 이름만 보면 누가 뭘 올렸는지 알기 어렵다.
+      const mine = list(DATA.posts).filter(x => x.pid === p.id && x.thumb)
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       tb.append(el('tr', { class: p.status === '중도이탈' ? 'muted-row' : '' },
         el('td', { class: 'num' }, i + 1),
+        el('td', {}, thumbOf(mine[0])),
         el('td', {},
           el('div', { style: 'font-weight:700' }, p.name),
           el('a', {
@@ -370,7 +400,7 @@ function viewParticipants() {
       el('h2', {}, ch === 'instagram' ? '📸 인스타그램' : '📝 블로그'),
       el('table', {},
         el('thead', {}, el('tr', {},
-          ...['#', '이름 / 계정', '활동', '배송', '상태', '현재 점수', ''].map(h =>
+          ...['#', '', '이름 / 계정', '활동', '배송', '상태', '현재 점수', ''].map(h =>
             el('th', {}, h)))), tb)));
   }
   return wrap;
@@ -469,6 +499,7 @@ function viewPosts() {
             : el('span', { class: 'tag warn' }, '미채점');
     const ac = obj(p.autoCheck);
     tb.append(el('tr', {},
+      el('td', {}, thumbOf(p)),
       el('td', {}, who ? who.name : el('span', { class: 'sub' }, p.pid)),
       el('td', {}, `${p.week}주`, ' ',
         el('span', { class: 'tag' }, p.type || '의무')),
@@ -504,7 +535,7 @@ function viewPosts() {
 
   wrap.append(el('div', { class: 'card' },
     posts.length ? el('table', {},
-      el('thead', {}, el('tr', {}, ...['참가자', '주차', 'URL', '게시일', '채점', '자동체크', '']
+      el('thead', {}, el('tr', {}, ...['', '참가자', '주차', 'URL', '게시일', '채점', '자동체크', '']
         .map(h => el('th', {}, h)))), tb)
       : el('div', { class: 'empty' }, '접수된 게시물이 없습니다.')));
 
@@ -691,6 +722,7 @@ function viewScoring() {
       const who = obj(DATA.participants)[p.pid];
       const ac = obj(p.autoCheck);
       tb.append(el('tr', {},
+        el('td', {}, thumbOf(p)),
         el('td', {}, who ? who.name : p.pid),
         el('td', {}, `${p.week}주 ${p.type || '의무'}`),
         el('td', {}, el('a', { href: p.url, target: '_blank', style: 'color:#5b7fb5;font-size:12px' },
@@ -703,7 +735,7 @@ function viewScoring() {
     wrap.append(el('div', { class: 'card' },
       el('h2', {}, `채점 대기 ${waiting.length}건`),
       el('table', {}, el('thead', {}, el('tr', {},
-        ...['참가자', '주차', 'URL', '접수일', '진행'].map(h => el('th', {}, h)))), tb)));
+        ...['', '참가자', '주차', 'URL', '접수일', '진행'].map(h => el('th', {}, h)))), tb)));
   }
 
   if (blocked.length) {
@@ -724,6 +756,7 @@ function viewScoring() {
     const who = obj(DATA.participants)[p.pid];
     const c = obj(p.scores).content, a = obj(p.scores).authenticity || {};
     dtb.append(el('tr', {},
+      el('td', {}, thumbOf(p)),
       el('td', {}, who ? who.name : p.pid),
       el('td', {}, `${p.week}주 ${p.type || '의무'}`),
       el('td', { class: 'num' }, el('b', {}, `${c.total ?? '—'}`), '/30',
@@ -739,7 +772,7 @@ function viewScoring() {
     wrap.append(el('div', { class: 'card' },
       el('h2', {}, '채점 세부 (내부용)'),
       el('table', {}, el('thead', {}, el('tr', {},
-        ...['참가자', '주차', '내용', '진정성', '채점 근거'].map(h => el('th', {}, h)))), dtb)));
+        ...['', '참가자', '주차', '내용', '진정성', '채점 근거'].map(h => el('th', {}, h)))), dtb)));
   }
   return wrap;
 }
