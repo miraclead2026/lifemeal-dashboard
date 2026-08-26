@@ -382,10 +382,24 @@ function viewParticipants() {
           prov ? el('div', { class: 'sub', style: 'color:#e65100' }, '잠정') : null),
         el('td', {},
           el('button', {
-            onclick: () => askForm(`${p.name} 메모`, [
-              { key: 'memo', label: '메모', type: 'textarea', value: p.memo || '' }
-            ], v => guard(db.ref(`/trials/${COHORT}/participants/${p.id}/memo`)
-              .set(v.memo || null)))
+            onclick: () => askForm(`${p.name} 메모 · MVP 자격`, [
+              { key: 'memo', label: '메모', type: 'textarea', value: p.memo || '' },
+              {
+                key: 'mvpExcluded', label: 'MVP 선정', type: 'select',
+                value: p.mvpExcluded ? '제외' : '대상',
+                options: ['대상', '제외']
+              },
+              {
+                key: 'mvpExcludedReason', label: 'MVP 제외 사유',
+                value: p.mvpExcludedReason || ''
+              }
+            ], v => guard(setFields(`/trials/${COHORT}/participants/${p.id}`, {
+              memo: v.memo || null,
+              // 점수는 그대로 두고 순위에서만 뺀다
+              mvpExcluded: v.mvpExcluded === '제외' ? true : null,
+              mvpExcludedReason: v.mvpExcluded === '제외'
+                ? (v.mvpExcludedReason || 'MVP 제외') : null
+            })))
           }, p.memo ? '메모✓' : '메모'),
           el('button', {
             class: 'danger', onclick: async () => {
@@ -793,6 +807,12 @@ function viewReport() {
     .map(p => ({ p, t: computeTotal(p.id) }))
     .sort((a, b) => b.t.total - a.t.total);
 
+  /* MVP 자격. 점수는 그대로 매기되 순위에서만 뺀다 — 활동은 다 했는데 방을
+     나간 사람이 있고, 공지가 "MVP 발표까지 방에서 나가지 말아달라" 였다.
+     담당자가 개별로 뺄 수도 있어야 해서 mvpExcluded 필드도 함께 본다. */
+  const mvpBlock = p => p.mvpExcluded ? (p.mvpExcludedReason || 'MVP 제외')
+    : p.status === '중도이탈' ? '중도이탈' : '';
+
   wrap.append(el('div', { class: 'card' },
     el('h2', {}, info.name || COHORT),
     el('div', { class: 'sub' },
@@ -806,7 +826,8 @@ function viewReport() {
   for (const ch of ['instagram', 'blog']) {
     const rows = ranked(ch);
     if (!rows.length) continue;
-    const top = rows.slice(0, info.mvpCount || 3);
+    const top = rows.filter(r => !mvpBlock(r.p)).slice(0, info.mvpCount || 3);
+    const excluded = rows.filter(r => mvpBlock(r.p) && r.t.parts.nPosts);
 
     wrap.append(el('div', { class: 'card' },
       el('h2', {}, ch === 'instagram' ? '📸 인스타그램 MVP' : '📝 블로그 MVP'),
@@ -823,12 +844,18 @@ function viewReport() {
             (t.parts.ded ? ` · 감점 ${t.parts.ded}` : '') +
             (t.parts.stories ? ` · 스토리 ${t.parts.stories}건` : '') +
             (t.parts.cross ? ` · 크로스 ${t.parts.cross}건` : ''))))),
+      excluded.length ? el('div', { class: 'banner warn', style: 'margin-top:10px' },
+        'MVP 선정에서 제외: ' + excluded
+          .map(({ p, t }) => `${p.name}(${fmt(t.total)}점 · ${mvpBlock(p)})`).join(', ')
+        + ' — 점수는 그대로 집계되며 아래 표에 있습니다.') : null,
       el('table', { style: 'margin-top:12px' },
         el('thead', {}, el('tr', {}, ...['#', '이름', '게시물', '내용', '진정성', '감점', '가산', '총점']
           .map(h => el('th', {}, h)))),
         el('tbody', {}, ...rows.map(({ p, t }, i) => el('tr', {},
           el('td', { class: 'num' }, i + 1),
-          el('td', {}, p.name, el('div', { class: 'sub' }, p.handle)),
+          el('td', {}, p.name,
+            mvpBlock(p) ? el('span', { class: 'tag bad' }, `MVP 제외 · ${mvpBlock(p)}`) : null,
+            el('div', { class: 'sub' }, p.handle)),
           el('td', { class: 'num' }, `${t.parts.nPosts}건`,
             t.parts.nExtra ? el('div', { class: 'sub' }, `추가 ${t.parts.nExtra}`) : null),
           el('td', { class: 'num' }, fmt(t.parts.content)),
