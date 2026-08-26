@@ -1003,6 +1003,24 @@ function stat(label, value, sub) {
     sub ? el('div', { class: 'sub' }, sub) : null);
 }
 
+/* 총점 동점이라 사람이 맞대결로 정한 건의 판단문. tiebreak 기록이 있을 때만 뜬다. */
+function tieNote(ch, top) {
+  const note = obj(obj(obj(DATA.summary).mvpNote)[ch]);
+  if (!note.winner) return null;
+  const names = (note.tie || []).join(' · ');
+  return el('div', {
+    style: 'margin-top:12px;border:1px solid #f0c14b;background:#fffdf3;' +
+      'border-radius:9px;padding:12px'
+  },
+    el('div', { style: 'font-weight:800;font-size:13px' },
+      `동점 판단 — ${names} 중 ${note.winner}`),
+    el('ul', { class: 'sub', style: 'margin:8px 0 0;padding-left:18px;line-height:1.7' },
+      ...(note.reason || []).map(r => el('li', {}, r))),
+    note.excluded ? el('div', {
+      class: 'sub', style: 'margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)'
+    }, el('b', {}, '기준에서 뺀 것 · '), note.excluded) : null);
+}
+
 function viewSummary() {
   const wrap = el('div');
   const s = obj(DATA.summary), info = obj(DATA.info);
@@ -1078,9 +1096,13 @@ function viewSummary() {
             (t.parts.stories ? `, 스토리 ${t.parts.stories}건` : '') +
             (t.parts.cross ? `, 크로스채널 ${t.parts.cross}건` : '')))))),
       el('div', { class: 'sub', style: 'margin-top:8px' },
-        `기본점수는 게시물 수로 정해집니다(인스타 의무 ${R.basePerPost}점·추가 ` +
-        `${R.perExtraPost.instagram}점 / 블로그 ${R.basePerPost}점). ` +
-        '많이 올릴수록 내용·진정성보다 기본점수가 순위를 좌우합니다.')));
+        `기본점수는 게시물 수로 정해집니다 — 의무 ${R.basePerPost}점, 추가 ` +
+        `${ch === 'instagram' ? R.perExtraPost.instagram : R.perExtraPost.blog}점. ` +
+        '2026-08-26에 추가 게시물 배점을 절반으로 내렸습니다(인스타 10→5·블로그 20→10). ' +
+        '상한이 없어 물량이 내용·진정성 합계(최대 60점)를 넘어서는 구조였기 때문입니다.'),
+      /* 총점이 같아 사람이 붙여 판단한 건은 그 근거를 화면에 남긴다.
+         "왜 저 사람이냐"는 질문은 반드시 나오고, 그때 답이 화면에 있어야 한다. */
+      tieNote(ch, top)));
   }
 
   /* ── 의무 미제출 ── */
