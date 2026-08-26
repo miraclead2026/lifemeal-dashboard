@@ -502,7 +502,11 @@ function viewPosts() {
       el('td', {}, thumbOf(p)),
       el('td', {}, who ? who.name : el('span', { class: 'sub' }, p.pid)),
       el('td', {}, `${p.week}주`, ' ',
-        el('span', { class: 'tag' }, p.type || '의무')),
+        el('span', { class: 'tag' }, p.type || '의무'),
+        /* 접수 때 주차·날짜를 어떻게 정했는지. 본인이 적은 주차와 카톡 날짜가
+           어긋난 건이 4기에만 14건 있어서, 근거를 화면에 보여줘야 담당자가
+           카톡 원문을 다시 뒤지지 않는다. */
+        p.memo ? el('div', { class: 'sub', style: 'margin-top:3px;line-height:1.35' }, p.memo) : null),
       el('td', {}, el('a', {
         href: p.url, target: '_blank',
         style: 'color:#5b7fb5;font-size:12px;word-break:break-all'
@@ -519,9 +523,11 @@ function viewPosts() {
             { key: 'url', label: 'URL', value: p.url },
             { key: 'date', label: '게시일', type: 'date', value: p.date },
             { key: 'week', label: '주차', type: 'number', value: p.week },
-            { key: 'type', label: '구분', type: 'select', value: p.type, options: ['의무', '추가'] }
+            { key: 'type', label: '구분', type: 'select', value: p.type, options: ['의무', '추가'] },
+            { key: 'memo', label: '메모', type: 'textarea', value: p.memo || '' }
           ], v => guard(setFields(`/trials/${COHORT}/posts/${p.id}`, {
-            url: v.url, date: v.date, week: Number(v.week), type: v.type
+            url: v.url, date: v.date, week: Number(v.week), type: v.type,
+            memo: v.memo || null
           })))
         }, '수정'),
         el('button', {
