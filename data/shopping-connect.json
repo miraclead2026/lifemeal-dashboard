@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-26 09:47",
+  "updatedAt": "2026-08-27 08:38",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,13 +10,13 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 27072,
-    "productOrderCnt": 90,
+    "accessCnt": 28014,
+    "productOrderCnt": 96,
     "salesConversionRate": 0.3,
-    "salesCnt": 132,
-    "salesAmount": 6292890,
-    "commissionAmount": 1047419,
-    "commissionRate": 16.6
+    "salesCnt": 144,
+    "salesAmount": 7129700,
+    "commissionAmount": 1137759,
+    "commissionRate": 16.0
   },
   "products": [
     {
@@ -32,9 +32,9 @@
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 33,
-      "salesAmount": 1138720,
-      "commissionAmount": 341058,
+      "salesCnt": 36,
+      "salesAmount": 1242880,
+      "commissionAmount": 373137,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -50,28 +50,37 @@
       "connectProductId": "981216820329032",
       "storeProductId": "12764948626",
       "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개",
-      "salesCnt": 26,
-      "salesAmount": 727120,
-      "commissionAmount": 139170,
+      "salesCnt": 27,
+      "salesAmount": 756920,
+      "commissionAmount": 145070,
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_183/1787211060405gCvbO_PNG/2733617515550951_2053253457.png"
     },
     {
       "connectProductId": "981216820329034",
       "storeProductId": "12808019284",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
-      "salesCnt": 8,
-      "salesAmount": 554250,
-      "commissionAmount": 70673,
+      "salesCnt": 10,
+      "salesAmount": 687270,
+      "commissionAmount": 111641,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
       "connectProductId": "981216820333124",
       "storeProductId": "13616691087",
       "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
-      "salesCnt": 5,
-      "salesAmount": 457580,
-      "commissionAmount": 25202,
+      "salesCnt": 6,
+      "salesAmount": 547670,
+      "commissionAmount": 27003,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_216/1787302768754tEtCj_PNG/2825325869590978_1319965125.png"
+    },
+    {
+      "connectProductId": "981216820333132",
+      "storeProductId": "13638665039",
+      "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 3개",
+      "salesCnt": 5,
+      "salesAmount": 364500,
+      "commissionAmount": 20262,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260821_111/1787302719123Hxtvm_PNG/71758079881645370_682695672.png"
     },
     {
       "connectProductId": "981216820329039",
@@ -81,15 +90,6 @@
       "salesAmount": 309740,
       "commissionAmount": 33604,
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_46/1787211127304X5csH_JPEG/71666487942674219_193671377.jpg"
-    },
-    {
-      "connectProductId": "981216820333132",
-      "storeProductId": "13638665039",
-      "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 3개",
-      "salesCnt": 4,
-      "salesAmount": 291600,
-      "commissionAmount": 18805,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260821_111/1787302719123Hxtvm_PNG/71758079881645370_682695672.png"
     },
     {
       "connectProductId": "981216820329026",
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-08-26",
+      "label": "8월 26일",
+      "periodStart": "2026-08-26",
+      "periodEnd": "2026-08-26",
+      "summary": {
+        "access": {
+          "value": 942,
+          "deltaValue": -364,
+          "deltaPct": -27.9
+        },
+        "sales": {
+          "value": 836810,
+          "deltaValue": 445760,
+          "deltaPct": 114.0
+        }
+      },
+      "directVisits": 46
+    },
     {
       "key": "2026-08-25",
       "label": "8월 25일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 9
+      "directVisits": null
     },
     {
       "key": "2026-07-11",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-05-28",
-      "label": "5월 28일",
-      "periodStart": "2026-05-28",
-      "periodEnd": "2026-05-28",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W35",
-      "label": "8/24~8/25",
+      "label": "8/24~8/26",
       "periodStart": "2026-08-24",
-      "periodEnd": "2026-08-25",
+      "periodEnd": "2026-08-26",
       "summary": {
         "access": {
-          "value": 4067,
-          "deltaValue": -14241,
-          "deltaPct": -77.8
+          "value": 5009,
+          "deltaValue": -13299,
+          "deltaPct": -72.6
         },
         "sales": {
-          "value": 1202880,
-          "deltaValue": -2774410,
-          "deltaPct": -69.8
+          "value": 2039690,
+          "deltaValue": -1937600,
+          "deltaPct": -48.7
         }
       }
     },
@@ -2298,16 +2298,16 @@
       "key": "2026-08",
       "label": "8월",
       "periodStart": "2026-08-01",
-      "periodEnd": "2026-08-25",
+      "periodEnd": "2026-08-26",
       "summary": {
         "access": {
-          "value": 27072,
-          "deltaValue": 27072,
+          "value": 28014,
+          "deltaValue": 28014,
           "deltaPct": null
         },
         "sales": {
-          "value": 6292890,
-          "deltaValue": 6292890,
+          "value": 7129700,
+          "deltaValue": 7129700,
           "deltaPct": null
         }
       }
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 18,
-      "salesAmount": 969210,
-      "commissionAmount": 294137,
+      "salesCnt": 21,
+      "salesAmount": 1135710,
+      "commissionAmount": 345416,
       "isDeleted": false,
       "channels": [
         {
@@ -2589,9 +2589,9 @@
       "name": "obo1221님의 블로그",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjAyMDVfMjky/MDAxNzcwMjU3Mzg5MjMz.m-1PZ-2vD4JgSZoY9xJKl5S2aDK6HJT2JMtpwqTw-NAg.HM27vjR3C58nx_JyawwcaqYwqW5CjR5n-tIj4tjNgqcg.PNG/1000035674.png",
       "performanceType": "DIRECT",
-      "salesCnt": 25,
-      "salesAmount": 746380,
-      "commissionAmount": 147760,
+      "salesCnt": 26,
+      "salesAmount": 776180,
+      "commissionAmount": 153660,
       "isDeleted": false,
       "channels": [
         {
@@ -2637,8 +2637,8 @@
           "followerCount": 206,
           "contentCount": 115,
           "averageVisitCount": null,
-          "averageViewCount": 57137,
-          "averageLikeCount": 72,
+          "averageViewCount": 57295,
+          "averageLikeCount": 74,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2659,9 +2659,9 @@
       "name": "_lilys_home",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNTA4MTlfMjgx/MDAxNzU1NTY3MTM2ODQ4.YZdPBwB7aRSFSWGoyQvaL_2b012fXxiDl2HKIfXHU-Ig.hdkE8bjHFFBZsjQhCuOQbRABFPK37PYQwabc56NWckog.PNG/%EB%A6%B4%EB%A6%AC%ED%99%88%EB%A1%9C%EA%B3%A0.png",
       "performanceType": "DIRECT",
-      "salesCnt": 8,
-      "salesAmount": 317820,
-      "commissionAmount": 89062,
+      "salesCnt": 9,
+      "salesAmount": 355020,
+      "commissionAmount": 100519,
       "isDeleted": false,
       "channels": [
         {
@@ -2694,9 +2694,9 @@
       "name": "홍's",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA3MDdfODQg/MDAxNzgzNDE4NzQ3ODE1.dovh2FG10xhls0fTryC1Ow8CWtIFAy7w8f2e75WnuTYg.gRc79l1lfxEe4otYZGfMEjpSju2fbD2v0PWeilPHZbUg.JPEG/%ED%99%8D%EC%BA%90%EB%A6%AD.jpg",
       "performanceType": "DIRECT",
-      "salesCnt": 1,
-      "salesAmount": 132570,
-      "commissionAmount": 40830,
+      "salesCnt": 2,
+      "salesAmount": 166050,
+      "commissionAmount": 51141,
       "isDeleted": false,
       "channels": [
         {
@@ -2802,12 +2802,18 @@
     "name": "기타(간접 실적)",
     "profileImageUrl": null,
     "performanceType": "INDIRECT",
-    "salesCnt": 38,
-    "salesAmount": 2394610,
-    "commissionAmount": 47866,
+    "salesCnt": 44,
+    "salesAmount": 2964440,
+    "commissionAmount": 59259,
     "isDeleted": false
   },
   "daily": [
+    {
+      "date": "2026-08-26",
+      "access": 942,
+      "sales": 836810,
+      "directVisits": 46
+    },
     {
       "date": "2026-08-25",
       "access": 1306,
@@ -3076,7 +3082,7 @@
       "date": "2026-07-12",
       "access": 0,
       "sales": 0,
-      "directVisits": 9
+      "directVisits": null
     },
     {
       "date": "2026-07-11",
@@ -3338,12 +3344,6 @@
     },
     {
       "date": "2026-05-29",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-05-28",
       "access": 0,
       "sales": 0,
       "directVisits": null
