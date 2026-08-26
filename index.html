@@ -3166,7 +3166,7 @@ const UP_TAGS = { '신규기능': 'var(--em)', '개선': 'var(--cool)', '수정'
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_183_K5_v3';
+const BUILD_TAG = 'index_183_K5_v4';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
@@ -9382,7 +9382,7 @@ function TabSales({ data, setData }) {
   const curMonth = pickLatestPeriod(monthsArr, ymNow);
   const monthRev = curMonth && curMonth.summary && curMonth.summary.revenue ? curMonth.summary.revenue.value : 0;
   const autoKpis = (data.mainKpis || []).filter(mk => (mk.name || '').indexOf('매출') >= 0);
-  const subs = (() => { const raw = (r && r.subscribers) || null; if (!raw) return null; const dA = (full && full.days) || []; const end = r ? r.periodEnd : null; const fill = f => { const rec = raw[f]; if (!rec) return rec; if (rec.total != null) return rec; const arr = dA.filter(d => d.key && (!end || d.key <= end) && d.subscribers && d.subscribers[f] && d.subscribers[f].total != null).sort((a, b) => a.key < b.key ? -1 : 1); if (arr.length) { const L = arr[arr.length - 1]; return { total: L.subscribers[f].total, added: rec.added || 0, _asOf: L.key }; } return rec; }; return { ...raw, notify: raw.notify ? fill('notify') : raw.notify, interest: raw.interest ? fill('interest') : raw.interest }; })();
+  const subs = (() => { const raw = (r && r.subscribers) || null; if (!raw) return null; const dA = (full && full.days) || []; const end = r ? r.periodEnd : null; const fill = f => { const rec = raw[f]; if (!rec) return rec; const arr = dA.filter(d => d.key && (!end || d.key <= end) && d.subscribers && d.subscribers[f] && d.subscribers[f].total != null).sort((a, b) => a.key < b.key ? -1 : 1); const L = arr.length ? arr[arr.length - 1] : null; if (rec.total != null) return (L && end && L.key < end) ? { ...rec, _asOf: L.key } : rec; if (L) { return { total: L.subscribers[f].total, added: rec.added || 0, _asOf: L.key }; } return rec; }; return { ...raw, notify: raw.notify ? fill('notify') : raw.notify, interest: raw.interest ? fill('interest') : raw.interest }; })();
   const daysArr = (full && full.days) || [];
   const subDaily = r ? daysArr.filter(d => d.key && d.key >= r.periodStart && d.key <= r.periodEnd).map(d => ({ date: d.key, added: (d.subscribers && d.subscribers.notify ? d.subscribers.notify.added : 0) || 0, total: (d.subscribers && d.subscribers.notify ? d.subscribers.notify.total : 0) || 0 })).sort((a, b) => a.date < b.date ? -1 : 1) : [];
   const subMax = Math.max(1, ...subDaily.map(z => z.added || 0));
@@ -9529,10 +9529,10 @@ function TabSales({ data, setData }) {
 
         {(() => {
           const cuRaw = r && r.customers && r.customers.total != null ? r.customers : null;
-          let cu = cuRaw, isAgg = false, aggDays = 0;
+          let cu = cuRaw, isAgg = false, aggDays = 0, aggThru = '';
           if (!cu && mode !== 'day' && r && r.periodStart && r.periodEnd) {
             const ds = ((full && full.days) || []).filter(d => d.key && d.key >= r.periodStart && d.key <= r.periodEnd && d.customers && d.customers.total != null);
-            if (ds.length > 0) { let t = 0, n = 0, rr = 0; ds.forEach(d => { t += d.customers.total || 0; n += d.customers.new || 0; rr += d.customers.returning || 0; }); cu = { total: t, new: n, returning: rr }; isAgg = true; aggDays = ds.length; }
+            if (ds.length > 0) { let t = 0, n = 0, rr = 0; ds.forEach(d => { t += d.customers.total || 0; n += d.customers.new || 0; rr += d.customers.returning || 0; }); cu = { total: t, new: n, returning: rr }; isAgg = true; aggDays = ds.length; aggThru = ds.map(d => d.key).sort().pop(); }
           }
           if (!cu || cu.total == null) {
             return (mode !== 'day') ? <div style={{ fontSize: 11, color: 'var(--tx3)', background: 'var(--surf2)', border: '1px solid var(--line)', borderRadius: 8, padding: '9px 12px', marginBottom: 16 }}>👥 주문 고객(신규/재구매) 구성은 이 기간의 일간 고객 데이터가 있으면 실시간 합산으로 표시됩니다 — 아직 해당 일간 데이터가 없습니다.</div> : null;
@@ -9552,7 +9552,7 @@ function TabSales({ data, setData }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: G }}>👥 주문 고객</div>
                 {isAgg
-                  ? <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--warn)', background: 'var(--warnBg)', border: '1px solid var(--warnLn)', borderRadius: 5, padding: '2px 7px' }}>실시간 · 일간 합산 ({aggDays}일)</span>
+                  ? <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--warn)', background: 'var(--warnBg)', border: '1px solid var(--warnLn)', borderRadius: 5, padding: '2px 7px' }} title={aggThru && r && r.periodEnd && aggThru < r.periodEnd ? '이 기간의 일간 고객 데이터가 ' + aggThru + ' 까지만 있습니다 — 이후는 빠져 있습니다' : ''}>실시간 · 일간 합산 ({aggDays}일{aggThru && r && r.periodEnd && aggThru < r.periodEnd ? ' · ' + (+aggThru.slice(5,7)) + '/' + (+aggThru.slice(8,10)) + '까지' : ''})</span>
                   : <span style={{ fontSize: 11, color: 'var(--tx3)' }}>{modeLabel[mode]} · 결제일 기준 · 네이버 고객현황</span>}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 10, marginBottom: 12 }}>
