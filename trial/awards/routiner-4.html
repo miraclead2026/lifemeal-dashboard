@@ -6,8 +6,10 @@
 <!-- 참가자 이름이 실려 있어 검색에 잡히면 안 된다 -->
 <meta name="robots" content="noindex, nofollow">
 <title>🎉 라이프밀 루티너 4기 MVP 발표</title>
+<!-- ⚠️ firebase-auth 는 일부러 넣지 않는다. 이 페이지는 링크로 뿌리는 공개 페이지라
+     익명 로그인을 하면 방문자마다 'auth != null' 토큰이 생기고, /trials 의 읽기 조건이
+     바로 그것이라 참가자 명단·채점 결과가 통째로 열린다(2026-08-27 실측). 로그인하지 않는다. -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 :root{
@@ -661,8 +663,9 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
 
   <p class="note">
     🔒 <b>적어주신 아이디는 여러분과 담당자만 볼 수 있습니다.</b>
-    이 페이지를 여는 순간 브라우저마다 다른 열쇠가 만들어지고, 신청 내용은 그 열쇠로 잠깁니다.
-    다른 사람이 이 페이지에서 남의 명단을 보거나 전체 목록을 불러오는 것은 규칙상 차단돼 있습니다.<br><br>
+    이 페이지를 처음 여는 순간 브라우저 안에만 저장되는 열쇠가 하나 만들어지고,
+    신청 내용은 그 열쇠로 잠깁니다. 열쇠는 이 기기 밖으로 나가지 않습니다.
+    다른 분이 이 페이지에서 남의 명단을 보거나 전체 목록을 불러오는 것은 규칙으로 차단돼 있습니다.<br><br>
     ※ 다른 기기나 시크릿 창에서 열면 열쇠가 달라져 이전 신청 내역이 보이지 않을 수 있습니다.
     접수는 정상적으로 남아 있으니 중복해서 적지 않으셔도 됩니다.<br>
     ※ 잘못 적으셨다면 목록에서 🗑 를 눌러 지우고 다시 추가해 주세요.
@@ -738,10 +741,16 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
 
 /* ══════════════════════════════════════════════════════════════
    쿠폰 신청 — 한 사람이 여러 명을 등록한다
-   저장 위치는 익명 로그인이 만든 **본인 uid 자리**(/coupons/{기수}/{uid}/{신청id})다.
-   보안규칙이 .read/.write 를 auth.uid === $uid 로만 열어두어,
-   남의 자리를 읽는 것도 목록을 통째로 불러오는 것도 서버에서 막힌다.
-   전체를 보는 건 규칙을 우회하는 서비스계정(담당자)뿐이다.
+
+   저장 위치는 이 브라우저가 만든 **추측 불가능한 열쇠 자리**
+   (/coupons/{기수}/{열쇠}/{신청id}) 다. 열쇠는 localStorage 에만 있다.
+
+   ⚠️ 로그인을 하지 않는 이유:
+      이 페이지는 링크로 뿌리는 공개 페이지다. 익명 로그인을 하면 방문자마다
+      'auth != null' 토큰이 생기는데, /trials 의 읽기 조건이 바로 그것이라
+      링크를 받은 누구나 참가자 명단·채점 결과를 콘솔로 읽을 수 있게 된다.
+      그래서 인증을 아예 쓰지 않고, 열쇠를 아는 사람만 그 한 칸을 열게 했다.
+      목록 조회는 관리 페이지(담당자)에만 열려 있다.
    ══════════════════════════════════════════════════════════════ */
 firebase.initializeApp({
   apiKey: "AIzaSyDwMAa-vs5zRZd2Y5SHfYh67TXfRcECTBA",
@@ -749,11 +758,31 @@ firebase.initializeApp({
   projectId: "lifemeal-f0d71"
 });
 const COHORT = 'routiner-4';
+
+/* 이 브라우저의 열쇠. 없으면 만들고, 있으면 이어 쓴다. */
+function myKey() {
+  const K = 'lm_coupon_key_' + COHORT;
+  try {
+    let k = localStorage.getItem(K);
+    if (!k) {
+      k = (crypto.randomUUID ? crypto.randomUUID()
+        : String(Date.now()) + Math.random().toString(36).slice(2)).replace(/[.#$/\[\]]/g, '');
+      localStorage.setItem(K, k);
+    }
+    return k;
+  } catch (e) {
+    /* 저장이 막힌 브라우저(시크릿 등)에서도 신청은 되게 한다. 다만 이 창을 닫으면
+       목록을 다시 못 본다 — 안내문에 적어두었다. */
+    return (crypto.randomUUID ? crypto.randomUUID()
+      : String(Date.now()) + Math.random().toString(36).slice(2)).replace(/[.#$/\[\]]/g, '');
+  }
+}
 const MAX = 30;                       /* 한 브라우저에서 등록할 수 있는 최대 인원 */
 const $ = s => document.querySelector(s);
 const msg = $('#msg'), btn = $('#submit'), nid = $('#nid'), whoIn = $('#who');
 const listEl = $('#entries'), counter = $('#counter');
-let UID = null, MINE = {};
+const KEY = myKey();
+let MINE = {};
 
 const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g,
   c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -785,31 +814,21 @@ function render() {
 async function remove(key, id) {
   if (!confirm(`'${id}' 신청을 지울까요?`)) return;
   try {
-    await firebase.database().ref(`/coupons/${COHORT}/${UID}/${key}`).remove();
+    await firebase.database().ref(`/coupons/${COHORT}/${KEY}/${key}`).remove();
     delete MINE[key]; render();
     say(`<b>${escapeHtml(id)}</b> 신청을 지웠습니다.`);
   } catch (e) { say('삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.', true); }
 }
 
-firebase.auth().signInAnonymously().catch(e => {
-  say('연결에 실패했습니다. 새로고침 후 다시 시도해 주세요. (' + e.code + ')', true);
-  btn.disabled = true;
-});
-
-firebase.auth().onAuthStateChanged(u => {
-  if (!u) return;
-  UID = u.uid;
-  /* 본인 자리만 읽어 신청 목록을 되살린다. 상태가 바뀌면 실시간으로 반영된다. */
-  firebase.database().ref(`/coupons/${COHORT}/${UID}`).on('value', s => {
-    MINE = s.val() || {};
-    render();
-  }, () => { /* 못 읽어도 신청에는 지장 없다 */ });
-});
+/* 내 열쇠 자리만 구독한다. 담당자가 발급 처리하면 상태가 실시간으로 바뀐다. */
+firebase.database().ref(`/coupons/${COHORT}/${KEY}`).on('value', s => {
+  MINE = s.val() || {};
+  render();
+}, () => { /* 못 읽어도 신청에는 지장 없다 */ });
 
 btn.addEventListener('click', async () => {
   const id = nid.value.trim();
   const who = whoIn.value.trim();
-  if (!UID) return say('아직 연결 중입니다. 잠시 후 다시 눌러주세요.', true);
   if (id.length < 3) return say('네이버 아이디를 정확히 적어주세요.', true);
   if (/\s/.test(id)) return say('아이디에 공백이 들어가 있습니다. 다시 확인해 주세요.', true);
   if (Object.values(MINE).some(v => v.naverId === id))
@@ -823,7 +842,7 @@ btn.addEventListener('click', async () => {
   try {
     const rec = { naverId: id, submittedAt: new Date().toISOString(), agreed: true };
     if (who) rec.who = who;
-    await firebase.database().ref(`/coupons/${COHORT}/${UID}`).push(rec);
+    await firebase.database().ref(`/coupons/${COHORT}/${KEY}`).push(rec);
     say(`🎉 <b>${escapeHtml(id)}</b>${who ? ` (${escapeHtml(who)})` : ''} 접수 완료!<br>`
       + '알림받기 여부를 확인한 뒤 순차적으로 발급해 드릴게요. 더 있으시면 이어서 적어주세요.');
     nid.value = ''; whoIn.value = ''; $('#ag1').checked = false;
