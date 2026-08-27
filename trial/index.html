@@ -151,6 +151,9 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 let COHORT = null, DATA = {}, TAB = 'participants', READY = false;
+/* 쿠폰 신청은 /trials 밖의 별도 노드(/coupons)에 있다. 발표 페이지가 로그인 없이
+   쓰고, 목록 조회는 이 관리 페이지(익명 로그인)에만 열려 있다. */
+let COUPONS = {};
 
 const setStatus = (t, bad) => {
   const s = $('#status'); s.textContent = t;
@@ -1208,6 +1211,51 @@ function viewSummary() {
           el('td', { class: 'sub', style: 'white-space:nowrap' }, L.e))))))
       : el('div', { class: 'empty' }, '감점·지적 사유가 있는 참가자가 없습니다.')));
 
+  /* ── 쿠폰 신청 명단 ──
+     발표 페이지에서 루티너가 본인·가족·지인 아이디를 적어 넣은 것.
+     한 브라우저(열쇠) 아래에 여러 건이 쌓이므로 펼쳐서 한 줄씩 보여준다. */
+  const cRows = [];
+  for (const [key, entries] of Object.entries(COUPONS)) {
+    if (!entries || typeof entries !== 'object') continue;
+    for (const [eid, v] of Object.entries(entries)) {
+      if (v && v.naverId) cRows.push({ key, eid, ...v });
+    }
+  }
+  cRows.sort((a, b) => (a.submittedAt || '').localeCompare(b.submittedAt || ''));
+  const dupIds = new Set(cRows.map(r => r.naverId)
+    .filter((v, i, arr) => arr.indexOf(v) !== i));
+  const issued = cRows.filter(r => r.status === '발급완료').length;
+
+  wrap.append(el('div', { class: 'card' },
+    el('div', { class: 'row' },
+      el('h2', { style: 'margin:0;flex:1' }, `🎟️ 쿠폰 신청 ${cRows.length}건`),
+      el('span', { class: 'tag ok' }, `발급완료 ${issued}`),
+      el('span', { class: 'tag warn' }, `대기 ${cRows.length - issued}`),
+      el('span', { class: 'tag' }, `신청자 ${Object.keys(COUPONS).length}명`)),
+    el('div', { class: 'sub', style: 'margin:6px 0 12px;line-height:1.6' },
+      '한 분이 가족·지인까지 여러 명을 등록할 수 있습니다. ' +
+      '발급 처리는 자동화 PC에서 ',
+      el('code', { style: 'background:#eef1f5;padding:1px 6px;border-radius:5px' },
+        'python scripts/coupon_list.py --issue <아이디>'),
+      ' 로 하시면 신청자 화면에도 바로 반영됩니다.'),
+    dupIds.size ? el('div', { class: 'banner warn' },
+      `⚠ 여러 사람이 같은 아이디를 적었습니다 (${[...dupIds].join(', ')}). ` +
+      '중복 발급되지 않게 확인해 주세요.') : null,
+    cRows.length ? el('table', {},
+      el('thead', {}, el('tr', {},
+        ...['#', '네이버 아이디', '누구', '신청 시각', '상태'].map(h => el('th', {}, h)))),
+      el('tbody', {}, ...cRows.map((r, i) => el('tr', {},
+        el('td', { class: 'num' }, i + 1),
+        el('td', {}, el('b', { style: 'word-break:break-all' }, r.naverId),
+          dupIds.has(r.naverId) ? el('span', { class: 'tag bad' }, '중복') : null),
+        el('td', { class: 'sub' }, r.who || '—'),
+        el('td', { class: 'sub', style: 'white-space:nowrap' },
+          (r.submittedAt || '').slice(0, 16).replace('T', ' ')),
+        el('td', {}, r.status === '발급완료'
+          ? el('span', { class: 'tag ok' }, '발급완료')
+          : el('span', { class: 'tag warn' }, '대기'))))))
+      : el('div', { class: 'empty' }, '아직 신청이 없습니다.')));
+
   /* ── 설문 ── */
   const sv = obj(s.survey);
   wrap.append(el('div', { class: 'card' },
@@ -1253,10 +1301,17 @@ document.querySelectorAll('nav button').forEach(b => b.addEventListener('click',
   b.classList.add('on'); TAB = b.dataset.tab; render();
 }));
 
-let dataRef = null;
+let dataRef = null, couponRef = null;
 function subscribe(cohort) {
   if (dataRef) dataRef.off();
-  COHORT = cohort; location.hash = cohort; READY = false; render();
+  if (couponRef) couponRef.off();
+  COHORT = cohort; location.hash = cohort; READY = false; COUPONS = {}; render();
+
+  /* 쿠폰은 /trials 밖이라 따로 구독한다. 못 읽어도 나머지 화면은 그대로 돌아가야 한다. */
+  couponRef = db.ref(`/coupons/${cohort}`);
+  couponRef.on('value', s => { COUPONS = s.val() || {}; if (READY) render(); },
+    err => console.warn('쿠폰 명단을 읽지 못했습니다:', err.message));
+
   dataRef = db.ref(`/trials/${cohort}`);
   dataRef.on('value', snap => {
     DATA = snap.val() || {};
