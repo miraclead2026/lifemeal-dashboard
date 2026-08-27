@@ -114,6 +114,23 @@ section{position:relative;z-index:1}
   padding:2px 4px;line-height:1;flex:none}
 .entries .del:hover{color:#a13a3a}
 .counter{font-size:12.5px;color:var(--mute);margin-top:10px}
+/* 수상자 게시물 사진 — 실제로 올려주신 글의 첫 컷 */
+.shots{display:grid;gap:10px;margin:18px 0 4px;
+  grid-template-columns:repeat(auto-fit,minmax(128px,1fr))}
+.shot{position:relative;display:block;border-radius:15px;overflow:hidden;
+  aspect-ratio:1/1;background:#eef1f5;border:1px solid var(--line);
+  transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s}
+.shot img{width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .5s cubic-bezier(.2,.7,.3,1)}
+.shot:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 14px 28px rgba(47,59,68,.2);z-index:2}
+.shot:hover img{transform:scale(1.09)}
+.shot .cap{position:absolute;left:0;right:0;bottom:0;padding:16px 9px 7px;
+  font-size:11.5px;font-weight:800;color:#fff;
+  background:linear-gradient(transparent,rgba(0,0,0,.62))}
+.shot::after{content:'↗';position:absolute;top:8px;right:9px;color:#fff;font-size:14px;
+  font-weight:900;text-shadow:0 1px 5px rgba(0,0,0,.5);opacity:0;transition:opacity .25s}
+.shot:hover::after{opacity:1}
+.shots-note{font-size:12px;color:var(--mute);margin:2px 0 0}
 .row2{display:flex;gap:10px}
 .row2 > div:first-child{flex:1.6}
 .row2 > div:last-child{flex:1}
@@ -259,6 +276,15 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
     <span class="pill">14일 기록</span><span class="pill">6가지 섭취법</span>
     <span class="pill">사진 22장</span><span class="pill">협찬 고지 명시</span>
   </p>
+    <div class="shots">
+      <a class="shot" href="https://m.blog.naver.com/ddosini/224378941824" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/ddosini_w1_m1.jpg" alt="곽효신 1주차 게시물" loading="lazy">
+        <span class="cap">1주차</span></a>
+      <a class="shot" href="https://m.blog.naver.com/ddosini/224387025911" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/ddosini_w2_m1.jpg" alt="곽효신 2주차 게시물" loading="lazy">
+        <span class="cap">2주차</span></a>
+    </div>
+    <p class="shots-note">사진을 누르면 원문으로 이동합니다</p>
   <p style="margin-top:12px;font-size:13.5px">
     👉 <a class="post" href="https://m.blog.naver.com/ddosini/224378941824" target="_blank" rel="noopener">1주차 후기</a>
     &nbsp;·&nbsp;
@@ -286,6 +312,24 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
       <span class="pill">5편 연재</span><span class="pill">직장인 도시락 루틴</span>
       <span class="pill">'말차워터' 레시피</span>
     </p>
+    <div class="shots">
+      <a class="shot" href="https://m.blog.naver.com/keep_being/224378514722" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/keep_being_w1_m1.jpg" alt="차경민 1주차 게시물" loading="lazy">
+        <span class="cap">1주차</span></a>
+      <a class="shot" href="https://m.blog.naver.com/keep_being/224376663184" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/keep_being_w1_x2.jpg" alt="차경민 1주차 추가 게시물" loading="lazy">
+        <span class="cap">1주차 추가</span></a>
+      <a class="shot" href="https://m.blog.naver.com/keep_being/224380506598" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/keep_being_w1_x1.jpg" alt="차경민 1주차 추가 게시물" loading="lazy">
+        <span class="cap">1주차 추가</span></a>
+      <a class="shot" href="https://m.blog.naver.com/keep_being/224384872781" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/keep_being_w2_m1.jpg" alt="차경민 2주차 게시물" loading="lazy">
+        <span class="cap">2주차</span></a>
+      <a class="shot" href="https://m.blog.naver.com/keep_being/224387723011" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/keep_being_w2_x1.jpg" alt="차경민 2주차 추가 게시물" loading="lazy">
+        <span class="cap">2주차 추가</span></a>
+    </div>
+    <p class="shots-note">사진을 누르면 원문으로 이동합니다</p>
     <p style="margin-top:10px;font-size:13.5px">
       👉 <a class="post" href="https://m.blog.naver.com/keep_being/224378514722" target="_blank" rel="noopener">1주차</a>
       · <a class="post" href="https://m.blog.naver.com/keep_being/224384872781" target="_blank" rel="noopener">2주차</a>
@@ -315,6 +359,18 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
       <span class="pill">10일 치 식단일기</span><span class="pill">사진 53컷</span>
       <span class="pill">타 제품과 비교</span>
     </p>
+    <div class="shots">
+      <a class="shot" href="https://blog.naver.com/sooo_05/224380526195" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/sooo_05_w1_m1.jpg" alt="이수빈 1주차 게시물" loading="lazy">
+        <span class="cap">1주차</span></a>
+      <a class="shot" href="https://m.blog.naver.com/sooo_05/224374513689" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/sooo_05_w1_x1.jpg" alt="이수빈 1주차 추가 게시물" loading="lazy">
+        <span class="cap">1주차 추가</span></a>
+      <a class="shot" href="https://m.blog.naver.com/sooo_05/224386564841" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/sooo_05_w2_m1.jpg" alt="이수빈 2주차 게시물" loading="lazy">
+        <span class="cap">2주차</span></a>
+    </div>
+    <p class="shots-note">사진을 누르면 원문으로 이동합니다</p>
     <p style="margin-top:10px;font-size:13.5px">
       👉 <a class="post" href="https://blog.naver.com/sooo_05/224380526195" target="_blank" rel="noopener">1주차</a>
       · <a class="post" href="https://m.blog.naver.com/sooo_05/224386564841" target="_blank" rel="noopener">2주차</a>
@@ -365,6 +421,15 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
     <span class="pill">물 2L 루틴에 결합</span><span class="pill">계량 표기</span>
     <span class="pill">직접 만든 레시피</span><span class="pill">제품제공 고지</span>
   </p>
+    <div class="shots">
+      <a class="shot" href="https://www.instagram.com/p/DcD9J2zlPC6/?img_index=5&amp;igsh=MWNnb2d0Mnl5OGRnbQ==" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_이시은_w1_m1.jpg" alt="이시은 1주차 게시물" loading="lazy">
+        <span class="cap">1주차</span></a>
+      <a class="shot" href="https://www.instagram.com/p/DcZwEI2E9WZ/?img_index=3&amp;igsi=cHBmeG4zdThwaXNs" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_이시은_w2_m1.jpg" alt="이시은 2주차 게시물" loading="lazy">
+        <span class="cap">2주차</span></a>
+    </div>
+    <p class="shots-note">사진을 누르면 원문으로 이동합니다</p>
   <p style="margin-top:12px;font-size:13.5px">
     👉 <a class="post" href="https://www.instagram.com/p/DcD9J2zlPC6/" target="_blank" rel="noopener">1주차 게시물</a>
     &nbsp;·&nbsp;
@@ -398,6 +463,15 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
       <span class="pill">사진 20컷</span><span class="pill">단백질 쉐이크 조합</span>
       <span class="pill">솔직한 맛 평가</span>
     </p>
+    <div class="shots">
+      <a class="shot" href="https://www.instagram.com/p/Db591EdlHkC/?igsh=MTQ1OTJmemlwMmdvdA==" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_최재희_w1_m1.jpg" alt="최재희 1주차 게시물" loading="lazy">
+        <span class="cap">1주차</span></a>
+      <a class="shot" href="https://www.instagram.com/reel/DcJquYOuEK6/?igsh=N3ppdzgwY2EzNGdv" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_최재희_w2_m1.jpg" alt="최재희 2주차 게시물" loading="lazy">
+        <span class="cap">2주차</span></a>
+    </div>
+    <p class="shots-note">사진을 누르면 원문으로 이동합니다</p>
     <p style="margin-top:10px;font-size:13.5px">
       👉 <a class="post" href="https://www.instagram.com/p/Db591EdlHkC/" target="_blank" rel="noopener">1주차 게시물</a>
       · <a class="post" href="https://www.instagram.com/reel/DcJquYOuEK6/" target="_blank" rel="noopener">2주차 릴스</a>
@@ -429,6 +503,24 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
       <span class="pill">5편 기록</span><span class="pill">매번 다른 식탁</span>
       <span class="pill">가족이 함께</span>
     </p>
+    <div class="shots">
+      <a class="shot" href="https://www.instagram.com/p/Db1ehZxk9H0/?img_index=3&amp;igsh=MXFyOGd6ZzRkdmsycw==" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_황화진_w1_m1.jpg" alt="황화진 1주차 게시물" loading="lazy">
+        <span class="cap">1주차</span></a>
+      <a class="shot" href="https://www.instagram.com/p/Db4GTUPE64D/?igsh=a2xwdjJuanBldWZq" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_황화진_w1_x1.jpg" alt="황화진 1주차 추가 게시물" loading="lazy">
+        <span class="cap">1주차 추가</span></a>
+      <a class="shot" href="https://www.instagram.com/p/Db7JOrCiVIZ/?igsh=MXVnZ3hwOG41cmU5bQ==" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_황화진_w1_x2.jpg" alt="황화진 1주차 추가 게시물" loading="lazy">
+        <span class="cap">1주차 추가</span></a>
+      <a class="shot" href="https://www.instagram.com/p/DcKQoV2k_Z4/?igsh=ZjF5YmFldW04c3c2" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_황화진_w2_m1.jpg" alt="황화진 2주차 게시물" loading="lazy">
+        <span class="cap">2주차</span></a>
+      <a class="shot" href="https://www.instagram.com/p/DcN9J8viawW/?igsh=eHE5eTF5MGxoYzVq" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_황화진_w2_x1.jpg" alt="황화진 2주차 추가 게시물" loading="lazy">
+        <span class="cap">2주차 추가</span></a>
+    </div>
+    <p class="shots-note">사진을 누르면 원문으로 이동합니다</p>
     <p style="margin-top:10px;font-size:13.5px">
       👉 <a class="post" href="https://www.instagram.com/p/Db1ehZxk9H0/" target="_blank" rel="noopener">1주차</a>
       · <a class="post" href="https://www.instagram.com/p/DcKQoV2k_Z4/" target="_blank" rel="noopener">2주차</a>
@@ -478,6 +570,15 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
     <span class="pill">14일 개근</span><span class="pill">여행에도 동행</span>
     <span class="pill">자비 재구매</span><span class="pill">솔직 후기</span>
   </p>
+    <div class="shots">
+      <a class="shot" href="https://m.blog.naver.com/pinkjisun/224374718789" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_정지선_w1_m1.jpg" alt="정지선 1주차 게시물" loading="lazy">
+        <span class="cap">1주차</span></a>
+      <a class="shot" href="https://m.blog.naver.com/pinkjisun/224381871270" target="_blank" rel="noopener">
+        <img src="https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/img/n_정지선_w2_m1.jpg" alt="정지선 2주차 게시물" loading="lazy">
+        <span class="cap">2주차</span></a>
+    </div>
+    <p class="shots-note">사진을 누르면 원문으로 이동합니다</p>
   <p style="margin-top:12px;font-size:13.5px">
     👉 <a class="post" href="https://m.blog.naver.com/pinkjisun/224374718789" target="_blank" rel="noopener">1주차 후기</a>
     &nbsp;·&nbsp;
