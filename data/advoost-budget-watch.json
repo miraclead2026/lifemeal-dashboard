@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-25",
+ "updatedAt": "2026-08-27",
  "changeDate": "2026-08-25",
  "change": "적자 상품 제외 + 예산 100만 증액",
  "baselineAvgRoas": 289,
@@ -7,11 +7,26 @@
  "baselineDays": 14,
  "baselineMin": 163,
  "baselineMax": 454,
- "since": [],
- "sinceAvgRoas": null,
- "sinceAvgSpend": null,
- "status": "대기",
- "verdict": "2026-08-25(증액 첫날) 확정 집계 대기 — 내일 이 자리에 판정이 뜹니다.",
- "action": "오늘은 아직 판단 불가. 예산·상품 그대로 두기.",
+ "since": [
+  {
+   "date": "2026-08-25",
+   "roas": 198,
+   "spend": 1096828,
+   "conv": 27,
+   "provisional": false
+  },
+  {
+   "date": "2026-08-26",
+   "roas": 290,
+   "spend": 1001109,
+   "conv": 37,
+   "provisional": true
+  }
+ ],
+ "sinceAvgRoas": 244,
+ "sinceAvgSpend": 1048968,
+ "status": "관찰",
+ "verdict": "증액 후 244% — 증액 전(289%)보다 낮으나 적자권은 아님. 애매.",
+ "action": "며칠 더 관측. 계속 내려가거나 조기소진 지속되면 예산 낮추기.",
  "note": "이 계정은 실구매ROAS가 다음날 집계 후 며칠에 걸쳐 오르지 않음(과거 스냅샷 검증). 다음날 값이 최종."
 }
