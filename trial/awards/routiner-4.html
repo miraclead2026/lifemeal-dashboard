@@ -93,6 +93,31 @@ section{position:relative;z-index:1}
 @keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-13px) rotate(4deg)}}
 .who{font-size:27px;font-weight:900;margin:10px 0 2px;letter-spacing:-.5px}
 .handle{color:var(--mute);font-size:13px;margin:0 0 4px}
+/* 2·3위는 조금 작게 — 같은 MVP 이지만 순위는 보이게 */
+.sub-win{border-top:1px dashed var(--line);margin-top:26px;padding-top:22px}
+.sub-win .who{font-size:22px}
+.rank{font-size:30px;display:inline-block;vertical-align:-4px;margin-right:6px;
+  animation:bounce 2.2s ease-in-out infinite}
+/* 신청 목록 */
+.entries{margin:16px 0 0;padding:0;list-style:none}
+.entries li{display:flex;align-items:center;gap:10px;padding:11px 13px;margin-bottom:8px;
+  border:1px solid var(--line);border-radius:13px;background:#fbfcfd;font-size:14px;
+  animation:slidein .35s ease}
+@keyframes slidein{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.entries .id{font-weight:800;flex:1;word-break:break-all}
+.entries .who-tag{font-size:11.5px;color:var(--mute);background:#eef4f8;
+  padding:2px 9px;border-radius:99px;white-space:nowrap}
+.entries .st{font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.st.wait{background:#fff4e5;color:#a2650b}
+.st.done{background:#e9f8f1;color:#1f7355}
+.entries .del{border:none;background:none;color:#c98b8b;cursor:pointer;font-size:17px;
+  padding:2px 4px;line-height:1;flex:none}
+.entries .del:hover{color:#a13a3a}
+.counter{font-size:12.5px;color:var(--mute);margin-top:10px}
+.row2{display:flex;gap:10px}
+.row2 > div:first-child{flex:1.6}
+.row2 > div:last-child{flex:1}
+@media (max-width:480px){.row2{flex-direction:column;gap:0}}
 h2{font-size:17px;margin:26px 0 10px;letter-spacing:-.3px}
 h2 .em{font-size:20px;margin-right:6px}
 p{margin:0 0 13px;font-size:14.7px}
@@ -239,6 +264,63 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
     &nbsp;·&nbsp;
     <a class="post" href="https://m.blog.naver.com/ddosini/224387025911" target="_blank" rel="noopener">2주차 후기</a>
   </p>
+
+  <!-- 블로그 2위 -->
+  <div class="sub-win">
+    <span class="rank">🥈</span>
+    <span class="badge b-blog">블로그 MVP</span>
+    <div class="who">차경민 님</div>
+    <p class="handle">blog.naver.com/keep_being</p>
+    <p class="why">
+      2주 동안 <b>다섯 편을 쓰셨는데, 다섯 편이 전부 다른 이야기</b>였습니다.
+      매일 아침 만드시는 샌드위치 옆에, 김밥과 함께, 얼음물에 타서, 그릭요거트에 통밀빵과 무화과를 곁들여,
+      전날 과식한 다음 날의 정리까지. 같은 제품인데 매번 다른 장면이 나옵니다.
+      무엇보다 <b>본인 몸으로만 알 수 있는 비교</b>를 남겨주셨어요.
+    </p>
+    <blockquote>
+      "야채 빵빵 샌드위치를 좋아하지만 생야채는 종종 가스가 차 양껏 못 먹는 경우들이 있었는데
+      닥터샐러드는 그런 느낌이 전혀 없어 부담 없이 곁들이는 중!"
+      <span class="src">1주차 기록 중에서</span>
+    </blockquote>
+    <p style="margin-top:12px">
+      <span class="pill">5편 연재</span><span class="pill">직장인 도시락 루틴</span>
+      <span class="pill">'말차워터' 레시피</span>
+    </p>
+    <p style="margin-top:10px;font-size:13.5px">
+      👉 <a class="post" href="https://m.blog.naver.com/keep_being/224378514722" target="_blank" rel="noopener">1주차</a>
+      · <a class="post" href="https://m.blog.naver.com/keep_being/224384872781" target="_blank" rel="noopener">2주차</a>
+      · <a class="post" href="https://m.blog.naver.com/keep_being/224387723011" target="_blank" rel="noopener">추가 기록</a>
+    </p>
+  </div>
+
+  <!-- 블로그 3위 -->
+  <div class="sub-win">
+    <span class="rank">🥉</span>
+    <span class="badge b-blog">블로그 MVP</span>
+    <div class="who">이수빈 님</div>
+    <p class="handle">blog.naver.com/sooo_05</p>
+    <p class="why">
+      <b>닷새 치 아침·점심·저녁을 통째로 공개</b>하셨습니다. 끼니마다 "루틴 포인트"를 달아
+      왜 그렇게 먹었는지까지 적어주셨고요. 든든하게 먹은 날도, 치킨을 시킨 날도 그대로 적으셔서
+      꾸미지 않은 2주가 그대로 보입니다.
+      주말부부라 사실상 1인 가구인데 사둔 야채가 늘 상해서 버려진다는 이야기가,
+      이 제품이 왜 필요했는지를 설명해줍니다.
+    </p>
+    <blockquote>
+      "마음먹고 마트에서 샐러드용 야채를 사 두어도 매일 집에서 밥을 해 먹는 게 아니다 보니
+      금방 짓무르고 상해서 버리기 일쑤였는데요"
+      <span class="src">1주차 후기 중에서</span>
+    </blockquote>
+    <p style="margin-top:12px">
+      <span class="pill">10일 치 식단일기</span><span class="pill">사진 53컷</span>
+      <span class="pill">타 제품과 비교</span>
+    </p>
+    <p style="margin-top:10px;font-size:13.5px">
+      👉 <a class="post" href="https://blog.naver.com/sooo_05/224380526195" target="_blank" rel="noopener">1주차</a>
+      · <a class="post" href="https://m.blog.naver.com/sooo_05/224386564841" target="_blank" rel="noopener">2주차</a>
+      · <a class="post" href="https://m.blog.naver.com/sooo_05/224374513689" target="_blank" rel="noopener">제품 리뷰</a>
+    </p>
+  </div>
 </section>
 
 <!-- ══════════ 인스타 MVP ══════════ -->
@@ -288,6 +370,71 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
     &nbsp;·&nbsp;
     <a class="post" href="https://www.instagram.com/p/DcZwEI2E9WZ/" target="_blank" rel="noopener">2주차 게시물</a>
   </p>
+
+  <!-- 인스타 2위 -->
+  <div class="sub-win">
+    <span class="rank">🥈</span>
+    <span class="badge b-insta">인스타그램 MVP</span>
+    <div class="who">최재희 님</div>
+    <p class="handle">@__jaehee__</p>
+    <p class="why">
+      끝까지 <b>우열을 가리기 어려웠습니다.</b> 그만큼 좋았어요.
+      최재희 님은 "왜 지금 식이섬유인가"를 먼저 설명하고 들어오셨습니다.
+      권장량과 실제 섭취량의 차이를 짚고, 잎채소를 드시면 속이 더부룩한 본인 체질까지 밝히시며
+      <b>이 제품이 본인에게 왜 맞는지를 논리로 세우셨어요.</b>
+      그리고 제공받은 제품인데도 맛에 대해 하나도 포장하지 않으셨습니다.
+    </p>
+    <blockquote>
+      "맛있다도 아니고 맛없다도 아닌, 엄마 표현에 의하면 '니 맛도 내 맛도 아닌 맛'"
+      <span class="src">1주차 게시물 중에서</span>
+    </blockquote>
+    <p class="why">
+      그러면서도 포기하지 않고 <b>본인만의 해법</b>을 찾아내셨어요.
+      식물성 단백질 쉐이크에 한 포를 더해 드시는 방법인데,
+      쉐이크 하나로는 부족한 식이섬유를 채운다는 이유까지 붙여주셔서 그대로 따라 할 수 있습니다.
+      단맛에 익숙해진 입맛을 되돌리려 일부러 물에 타 드신다는 이야기도 이 후기에만 있었습니다.
+    </p>
+    <p style="margin-top:12px">
+      <span class="pill">사진 20컷</span><span class="pill">단백질 쉐이크 조합</span>
+      <span class="pill">솔직한 맛 평가</span>
+    </p>
+    <p style="margin-top:10px;font-size:13.5px">
+      👉 <a class="post" href="https://www.instagram.com/p/Db591EdlHkC/" target="_blank" rel="noopener">1주차 게시물</a>
+      · <a class="post" href="https://www.instagram.com/reel/DcJquYOuEK6/" target="_blank" rel="noopener">2주차 릴스</a>
+    </p>
+  </div>
+
+  <!-- 인스타 3위 -->
+  <div class="sub-win">
+    <span class="rank">🥉</span>
+    <span class="badge b-insta">인스타그램 MVP</span>
+    <div class="who">황화진 님</div>
+    <p class="handle">@mukkbbang_gram</p>
+    <p class="why">
+      2주 동안 <b>다섯 번 올려주셨는데 매번 다른 식탁</b>이었습니다.
+      그릭요거트에 복숭아를 곁들여, 야근이 이어지던 주엔 단호박·감자·닭가슴살과 함께,
+      브런치로 먹은 파스타와 토마토 위에 솔솔, 샌드위치 옆엔 우유에 타서.
+      제품을 소개하는 대신 <b>본인 식탁을 계속 보여주신 방식</b>이 좋았어요.
+    </p>
+    <p class="why">
+      마지막엔 아예 식탁 위에 꺼내두고 <b>온 가족이 자연스럽게 쓰게 만드셨습니다.</b>
+      2인 가구라 채소를 사두면 절반 이상 상한다는 현실도 솔직하게 적어주셨고요.
+    </p>
+    <blockquote>
+      "2인 가구라 채소를 다양하게 사놓으면 상하는게 반이상이여서
+      한포로 끼니마다 채울수 있어서 너무너무 좋다"
+      <span class="src">2주차 기록 중에서</span>
+    </blockquote>
+    <p style="margin-top:12px">
+      <span class="pill">5편 기록</span><span class="pill">매번 다른 식탁</span>
+      <span class="pill">가족이 함께</span>
+    </p>
+    <p style="margin-top:10px;font-size:13.5px">
+      👉 <a class="post" href="https://www.instagram.com/p/Db1ehZxk9H0/" target="_blank" rel="noopener">1주차</a>
+      · <a class="post" href="https://www.instagram.com/p/DcKQoV2k_Z4/" target="_blank" rel="noopener">2주차</a>
+      · <a class="post" href="https://www.instagram.com/p/DcN9J8viawW/" target="_blank" rel="noopener">추가 기록</a>
+    </p>
+  </div>
 </section>
 
 <!-- ══════════ 특별상 ══════════ -->
@@ -353,17 +500,20 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
 <section class="card c-event reveal" id="event">
   <span class="badge b-special">🎊 두 번째 이벤트</span>
   <h2 style="margin-top:14px;font-size:21px">
-    루티너 4기 전원께 <u>스마트스토어 30% 쿠폰</u>을 드립니다
+    <u>스마트스토어 30% 쿠폰</u>, 인원 제한 없이 드립니다
   </h2>
   <p class="why">
-    상을 받지 못하셔도 괜찮습니다. <b>2주를 함께해주신 모든 분께</b> 드리는 선물이에요.
-    아래에 네이버 아이디를 남겨주시면 확인 후 순차적으로 발급해 드립니다.
+    상을 받지 못하셔도 괜찮습니다. <b>2주를 함께해주신 모든 분께</b> 드리는 선물이에요.<br>
+    그리고 이번엔 <b>한 분당 하나가 아닙니다.</b>
+    가족도, 친구도, 직장 동료도 — <b>아는 분 네이버 아이디를 원하는 만큼 적어주세요.</b>
+    2주 내내 주변에 라이프밀을 이야기해주신 건 루티너 여러분이니까,
+    그 인심을 마음껏 쓰시라고 만든 자리입니다 🌿
   </p>
 
   <ol class="steps">
-    <li><b>라이프밀 스마트스토어 「알림받기」</b>를 눌러주세요.
-        <span style="color:var(--mute);font-size:13px">— 알림받기 고객에게만 발급되는 쿠폰이라, 이 단계를 건너뛰면 지급이 어렵습니다.</span></li>
-    <li>아래에 <b>네이버 아이디</b>를 적어주세요.</li>
+    <li>받으실 분이 <b>라이프밀 스마트스토어 「알림받기」</b>를 눌러주세요.
+        <span style="color:var(--mute);font-size:13px">— 알림받기 고객에게만 발급되는 쿠폰이라, 이 단계를 건너뛰면 지급이 어렵습니다. 본인뿐 아니라 <b>등록하시는 분 모두</b> 눌러주셔야 해요.</span></li>
+    <li>아래에 <b>네이버 아이디</b>를 적고 「추가」를 누르세요. 여러 명이면 반복하시면 됩니다.</li>
     <li>알림받기 여부를 확인한 뒤 <b>순차적으로 발급</b>해 드립니다.</li>
   </ol>
 
@@ -372,37 +522,49 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
       🔔 라이프밀 스마트스토어에서 알림받기 →</a>
   </p>
 
-  <label for="nid">네이버 아이디</label>
-  <input type="text" id="nid" placeholder="예: lifemeal_2026" autocomplete="off"
-         spellcheck="false" maxlength="40">
+  <div class="row2">
+    <div>
+      <label for="nid">네이버 아이디</label>
+      <input type="text" id="nid" placeholder="예: lifemeal_2026" autocomplete="off"
+             spellcheck="false" maxlength="40">
+    </div>
+    <div>
+      <label for="who">누구신가요 <span style="font-weight:500;color:var(--mute)">(선택)</span></label>
+      <input type="text" id="who" placeholder="예: 어머니, 직장동료" autocomplete="off" maxlength="20">
+    </div>
+  </div>
 
   <div class="chk">
     <input type="checkbox" id="ag1">
     <label for="ag1" style="margin:0;font-weight:600">
-      스마트스토어 「알림받기」를 완료했습니다.
+      이 아이디로 스마트스토어 「알림받기」가 완료됐습니다.
     </label>
   </div>
   <div class="chk">
     <input type="checkbox" id="ag2">
     <label for="ag2" style="margin:0;font-weight:600">
-      쿠폰 발급을 위해 네이버 아이디 수집·이용에 동의합니다.
+      쿠폰 발급을 위한 네이버 아이디 수집·이용에 동의합니다.
       <span style="display:block;color:var(--mute);font-weight:400;font-size:12.3px;margin-top:3px">
         수집 항목 : 네이버 아이디 &nbsp;/&nbsp; 이용 목적 : 쿠폰 발급 및 확인
-        &nbsp;/&nbsp; 보관 기간 : 발급 완료 후 1개월
+        &nbsp;/&nbsp; 보관 기간 : 발급 완료 후 1개월<br>
+        ※ 다른 분의 아이디를 적으실 때는 <b>그분의 동의를 받고</b> 적어주세요.
       </span>
     </label>
   </div>
 
-  <button class="go" id="submit">쿠폰 신청하기 🎁</button>
+  <button class="go" id="submit">＋ 추가하기 🎁</button>
   <div class="msg" id="msg"></div>
 
+  <ul class="entries" id="entries"></ul>
+  <div class="counter" id="counter"></div>
+
   <p class="note">
-    🔒 <b>적어주신 아이디는 본인과 담당자만 볼 수 있습니다.</b>
+    🔒 <b>적어주신 아이디는 여러분과 담당자만 볼 수 있습니다.</b>
     이 페이지를 여는 순간 브라우저마다 다른 열쇠가 만들어지고, 신청 내용은 그 열쇠로 잠깁니다.
-    다른 사람이 이 페이지에서 남의 아이디를 보거나 전체 목록을 불러오는 것은 규칙상 차단돼 있습니다.<br><br>
+    다른 사람이 이 페이지에서 남의 명단을 보거나 전체 목록을 불러오는 것은 규칙상 차단돼 있습니다.<br><br>
     ※ 다른 기기나 시크릿 창에서 열면 열쇠가 달라져 이전 신청 내역이 보이지 않을 수 있습니다.
-    신청은 정상 접수되어 있으니 걱정하지 않으셔도 됩니다.<br>
-    ※ 한 번 더 제출하시면 마지막에 적어주신 아이디로 덮어씁니다.
+    접수는 정상적으로 남아 있으니 중복해서 적지 않으셔도 됩니다.<br>
+    ※ 잘못 적으셨다면 목록에서 🗑 를 눌러 지우고 다시 추가해 주세요.
   </p>
 </section>
 
@@ -474,8 +636,8 @@ footer{text-align:center;color:var(--mute);font-size:12.5px;padding:34px 0 10px;
 })();
 
 /* ══════════════════════════════════════════════════════════════
-   쿠폰 신청
-   저장 위치는 익명 로그인이 만든 **본인 uid 자리**(/coupons/{기수}/{uid})다.
+   쿠폰 신청 — 한 사람이 여러 명을 등록한다
+   저장 위치는 익명 로그인이 만든 **본인 uid 자리**(/coupons/{기수}/{uid}/{신청id})다.
    보안규칙이 .read/.write 를 auth.uid === $uid 로만 열어두어,
    남의 자리를 읽는 것도 목록을 통째로 불러오는 것도 서버에서 막힌다.
    전체를 보는 건 규칙을 우회하는 서비스계정(담당자)뿐이다.
@@ -486,11 +648,47 @@ firebase.initializeApp({
   projectId: "lifemeal-f0d71"
 });
 const COHORT = 'routiner-4';
+const MAX = 30;                       /* 한 브라우저에서 등록할 수 있는 최대 인원 */
 const $ = s => document.querySelector(s);
-const msg = $('#msg'), btn = $('#submit'), nid = $('#nid');
-let UID = null;
+const msg = $('#msg'), btn = $('#submit'), nid = $('#nid'), whoIn = $('#who');
+const listEl = $('#entries'), counter = $('#counter');
+let UID = null, MINE = {};
 
+const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g,
+  c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 function say(text, bad) { msg.className = 'msg ' + (bad ? 'err' : 'ok'); msg.innerHTML = text; }
+
+function render() {
+  const keys = Object.keys(MINE).sort((a, b) =>
+    (MINE[a].submittedAt || '').localeCompare(MINE[b].submittedAt || ''));
+  listEl.innerHTML = '';
+  for (const k of keys) {
+    const v = MINE[k];
+    const done = v.status === '발급완료';
+    const li = document.createElement('li');
+    li.innerHTML =
+      `<span class="id">${escapeHtml(v.naverId)}</span>` +
+      (v.who ? `<span class="who-tag">${escapeHtml(v.who)}</span>` : '') +
+      `<span class="st ${done ? 'done' : 'wait'}">${done ? '발급완료' : '확인 중'}</span>`;
+    const del = document.createElement('button');
+    del.className = 'del'; del.textContent = '🗑'; del.title = '삭제';
+    del.addEventListener('click', () => remove(k, v.naverId));
+    li.appendChild(del);
+    listEl.appendChild(li);
+  }
+  counter.textContent = keys.length
+    ? `${keys.length}명 신청하셨습니다. 몇 명이든 더 추가하실 수 있어요 (최대 ${MAX}명).`
+    : '';
+}
+
+async function remove(key, id) {
+  if (!confirm(`'${id}' 신청을 지울까요?`)) return;
+  try {
+    await firebase.database().ref(`/coupons/${COHORT}/${UID}/${key}`).remove();
+    delete MINE[key]; render();
+    say(`<b>${escapeHtml(id)}</b> 신청을 지웠습니다.`);
+  } catch (e) { say('삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.', true); }
+}
 
 firebase.auth().signInAnonymously().catch(e => {
   say('연결에 실패했습니다. 새로고침 후 다시 시도해 주세요. (' + e.code + ')', true);
@@ -500,41 +698,40 @@ firebase.auth().signInAnonymously().catch(e => {
 firebase.auth().onAuthStateChanged(u => {
   if (!u) return;
   UID = u.uid;
-  /* 이 브라우저로 이미 신청했다면 본인 자리만 읽어와 보여준다 */
-  firebase.database().ref(`/coupons/${COHORT}/${UID}`).once('value').then(s => {
-    const v = s.val();
-    if (!v) return;
-    nid.value = v.naverId || '';
-    say(`이미 <b>${escapeHtml(v.naverId)}</b> 로 신청하셨습니다.`
-      + (v.status ? ` 현재 상태 : <b>${escapeHtml(v.status)}</b>` : ' 확인 후 순차 발급해 드릴게요.')
-      + '<br><span style="font-size:12.5px">아이디를 바꾸시려면 다시 적고 제출하시면 됩니다.</span>');
-  }).catch(() => { /* 못 읽어도 신청에는 지장 없다 */ });
+  /* 본인 자리만 읽어 신청 목록을 되살린다. 상태가 바뀌면 실시간으로 반영된다. */
+  firebase.database().ref(`/coupons/${COHORT}/${UID}`).on('value', s => {
+    MINE = s.val() || {};
+    render();
+  }, () => { /* 못 읽어도 신청에는 지장 없다 */ });
 });
-
-const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g,
-  c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 btn.addEventListener('click', async () => {
   const id = nid.value.trim();
+  const who = whoIn.value.trim();
   if (!UID) return say('아직 연결 중입니다. 잠시 후 다시 눌러주세요.', true);
   if (id.length < 3) return say('네이버 아이디를 정확히 적어주세요.', true);
   if (/\s/.test(id)) return say('아이디에 공백이 들어가 있습니다. 다시 확인해 주세요.', true);
-  if (!$('#ag1').checked) return say('스마트스토어 「알림받기」를 먼저 완료해 주세요. 알림받기 고객에게만 발급되는 쿠폰입니다.', true);
+  if (Object.values(MINE).some(v => v.naverId === id))
+    return say(`<b>${escapeHtml(id)}</b> 는 이미 목록에 있습니다.`, true);
+  if (Object.keys(MINE).length >= MAX)
+    return say(`한 번에 ${MAX}명까지 등록하실 수 있어요. 더 필요하시면 오픈채팅방으로 알려주세요.`, true);
+  if (!$('#ag1').checked) return say('이 아이디로 스마트스토어 「알림받기」를 먼저 완료해 주세요. 알림받기 고객에게만 발급되는 쿠폰입니다.', true);
   if (!$('#ag2').checked) return say('개인정보 수집·이용에 동의해 주셔야 발급이 가능합니다.', true);
 
-  btn.disabled = true; btn.textContent = '신청 중…';
+  btn.disabled = true; btn.textContent = '추가하는 중…';
   try {
-    await firebase.database().ref(`/coupons/${COHORT}/${UID}`).set({
-      naverId: id, submittedAt: new Date().toISOString(), agreed: true
-    });
-    try { localStorage.setItem('lm_coupon_' + COHORT, id); } catch (e) { }
-    say(`🎉 <b>${escapeHtml(id)}</b> 로 신청이 접수됐습니다!<br>`
-      + '알림받기 여부를 확인한 뒤 순차적으로 발급해 드릴게요. 조금만 기다려 주세요.');
-    btn.textContent = '신청 완료 ✓';
+    const rec = { naverId: id, submittedAt: new Date().toISOString(), agreed: true };
+    if (who) rec.who = who;
+    await firebase.database().ref(`/coupons/${COHORT}/${UID}`).push(rec);
+    say(`🎉 <b>${escapeHtml(id)}</b>${who ? ` (${escapeHtml(who)})` : ''} 접수 완료!<br>`
+      + '알림받기 여부를 확인한 뒤 순차적으로 발급해 드릴게요. 더 있으시면 이어서 적어주세요.');
+    nid.value = ''; whoIn.value = ''; $('#ag1').checked = false;
+    nid.focus();
   } catch (e) {
-    say('신청에 실패했습니다. 아이디를 다시 확인하시고 시도해 주세요.'
+    say('추가하지 못했습니다. 아이디를 다시 확인하시고 시도해 주세요.'
       + '<br><span style="font-size:12.3px">계속 안 되면 오픈채팅방으로 알려주세요. (' + escapeHtml(e.code || '') + ')</span>', true);
-    btn.disabled = false; btn.textContent = '쿠폰 신청하기 🎁';
+  } finally {
+    btn.disabled = false; btn.textContent = '＋ 추가하기 🎁';
   }
 });
 </script>
