@@ -1033,6 +1033,20 @@ function viewSummary() {
         'scripts/build_report.py --cohort ' + COHORT + ' --apply 를 실행하세요.')));
   }
 
+  /* 발표 페이지는 체험단원에게 링크로 뿌리는 자리라, 담당자가 여기서 바로 열 수 있게 둔다 */
+  wrap.append(el('div', { class: 'card' },
+    el('div', { class: 'row' },
+      el('div', { style: 'flex:1' },
+        el('h2', { style: 'margin:0' }, '🎉 MVP 발표 페이지'),
+        el('div', { class: 'sub' },
+          '체험단원에게 공유하는 공개 페이지입니다. 쿠폰 신청도 여기서 받습니다.')),
+      el('a', {
+        class: 'primary', target: '_blank', rel: 'noopener',
+        href: `https://miraclead2026.github.io/lifemeal-dashboard/trial/awards/${COHORT}.html`,
+        style: 'display:inline-block;padding:9px 16px;border-radius:8px;background:#2e7d32;' +
+          'color:#fff;text-decoration:none;font-size:13px;font-weight:700;white-space:nowrap'
+      }, '열어보기 ↗'))));
+
   wrap.append(el('div', { class: 'card' },
     el('h2', {}, (info.name || COHORT) + ' 결산'),
     el('div', { class: 'sub' },
