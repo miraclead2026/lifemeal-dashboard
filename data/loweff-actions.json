@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-08-27",
+ "updatedAt": "2026-08-28",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 1209280,
-   "roas": 142,
-   "conv": 18,
+   "spend": 805140,
+   "roas": 121,
+   "conv": 13,
    "options": 4,
-   "action": "상품군 통합 ROAS 142% (매우 낮음) (옵션 4개 합산) — OFF/개선 검토",
+   "action": "상품군 통합 ROAS 121% (매우 낮음) (옵션 4개 합산) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
@@ -26,27 +26,12 @@
   },
   {
    "channel": "쇼핑검색",
-   "item": "라이프밀 데일리 30g 14포",
-   "spend": 481083,
-   "roas": 193,
-   "conv": 8,
-   "options": 4,
-   "action": "상품군 통합 ROAS 193% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
-   "severity": "medium",
-   "executor": "watch",
-   "nccAdIds": [
-    "nad-a001-02-000000541753988"
-   ],
-   "matched": true
-  },
-  {
-   "channel": "쇼핑검색",
    "item": "갓 구운 하루견과 20g 30개입",
-   "spend": 343929,
-   "roas": 128,
-   "conv": 10,
+   "spend": 486437,
+   "roas": 134,
+   "conv": 16,
    "options": 3,
-   "action": "상품군 통합 ROAS 128% (매우 낮음) (옵션 3개 합산) — OFF/개선 검토",
+   "action": "상품군 통합 ROAS 134% (매우 낮음) (옵션 3개 합산) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
@@ -58,8 +43,23 @@
   },
   {
    "channel": "쇼핑검색",
+   "item": "라이프밀 데일리 30g 14포",
+   "spend": 197696,
+   "roas": 198,
+   "conv": 5,
+   "options": 4,
+   "action": "상품군 통합 ROAS 198% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "severity": "medium",
+   "executor": "watch",
+   "nccAdIds": [
+    "nad-a001-02-000000541753988"
+   ],
+   "matched": true
+  },
+  {
+   "channel": "쇼핑검색",
    "item": "프로틴 골드 HIGH5",
-   "spend": 145764,
+   "spend": 86088,
    "roas": 0,
    "conv": 0,
    "options": 3,
@@ -74,25 +74,12 @@
   },
   {
    "channel": "쇼핑검색",
-   "item": "데이 업 프로틴 쉐이크 45g",
-   "spend": 56932,
-   "roas": 0,
-   "conv": 0,
-   "options": 16,
-   "action": "상품군 통합 ROAS 0% — 이미 집행중단(소재 OFF/삭제됨) (옵션 16개 합산)",
-   "severity": "medium",
-   "executor": "done",
-   "nccAdIds": [],
-   "matched": false
-  },
-  {
-   "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 43323,
-   "roas": 90,
+   "spend": 47144,
+   "roas": 83,
    "conv": 1,
    "options": 8,
-   "action": "상품군 통합 ROAS 90% (매우 낮음) (옵션 8개 합산) — OFF/개선 검토",
+   "action": "상품군 통합 ROAS 83% (매우 낮음) (옵션 8개 합산) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
@@ -106,12 +93,25 @@
   },
   {
    "channel": "쇼핑검색",
-   "item": "홀그레인 저당 그래놀라",
-   "spend": 40353,
+   "item": "데이 업 프로틴 쉐이크 45g",
+   "spend": 43660,
    "roas": 0,
    "conv": 0,
+   "options": 16,
+   "action": "상품군 통합 ROAS 0% — 이미 집행중단(소재 OFF/삭제됨) (옵션 16개 합산)",
+   "severity": "medium",
+   "executor": "done",
+   "nccAdIds": [],
+   "matched": false
+  },
+  {
+   "channel": "쇼핑검색",
+   "item": "홀그레인 저당 그래놀라",
+   "spend": 40353,
+   "roas": 46,
+   "conv": 1,
    "options": 1,
-   "action": "상품군 통합 ROAS 0% — 이미 집행중단(소재 OFF/삭제됨)",
+   "action": "상품군 통합 ROAS 46% — 이미 집행중단(소재 OFF/삭제됨)",
    "severity": "medium",
    "executor": "done",
    "nccAdIds": [],
@@ -120,35 +120,24 @@
   {
    "channel": "애드부스트",
    "item": "애셋 그룹#2606191823",
-   "spend": 4297492,
-   "roas": 317,
-   "conv": 175,
-   "action": "ROAS 317% 미달 — 예산 축소·소재 교체",
-   "severity": "medium",
-   "executor": "human",
-   "nccAdIds": []
-  },
-  {
-   "channel": "애드부스트",
-   "item": "광고 그룹#2608151604",
-   "spend": 239457,
-   "roas": 173,
-   "conv": 8,
-   "action": "ROAS 173% 미달 — 예산 축소·소재 교체",
+   "spend": 5582609,
+   "roas": 255,
+   "conv": 182,
+   "action": "ROAS 255% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
   }
  ],
  "powerlinkAuto": {
-  "date": "2026-08-25",
-  "changed": 166,
+  "date": "2026-08-27",
+  "changed": 132,
   "downs": 0,
-  "deleteReview": 13
+  "deleteReview": 11
  },
  "summary": {
   "shopping": 7,
-  "advoost": 2,
+  "advoost": 1,
   "approveNeeded": 4
  },
  "days": [
@@ -180,6 +169,12 @@
    "date": null,
    "shopping": 7,
    "advoost": 2,
+   "approveNeeded": 4
+  },
+  {
+   "date": null,
+   "shopping": 7,
+   "advoost": 1,
    "approveNeeded": 4
   }
  ]
