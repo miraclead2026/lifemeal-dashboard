@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-29 09:42",
+  "updatedAt": "2026-08-30 08:37",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,15 +10,24 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 29233,
-    "productOrderCnt": 102,
-    "salesConversionRate": 0.3,
-    "salesCnt": 153,
-    "salesAmount": 7466970,
-    "commissionAmount": 1199438,
-    "commissionRate": 16.1
+    "accessCnt": 29885,
+    "productOrderCnt": 107,
+    "salesConversionRate": 0.4,
+    "salesCnt": 160,
+    "salesAmount": 7701730,
+    "commissionAmount": 1245568,
+    "commissionRate": 16.2
   },
   "products": [
+    {
+      "connectProductId": "981216820329027",
+      "storeProductId": "12747389906",
+      "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
+      "salesCnt": 45,
+      "salesAmount": 1551640,
+      "commissionAmount": 447871,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
+    },
     {
       "connectProductId": "981216820329028",
       "storeProductId": "12763789807",
@@ -29,30 +38,21 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_226/17873029909747u4iI_PNG/121435912860945417_912484346.png"
     },
     {
-      "connectProductId": "981216820329027",
-      "storeProductId": "12747389906",
-      "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 41,
-      "salesAmount": 1414000,
-      "commissionAmount": 416195,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
-    },
-    {
       "connectProductId": "981216820329029",
       "storeProductId": "12763906780",
       "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 22,
-      "salesAmount": 822150,
-      "commissionAmount": 162784,
+      "salesCnt": 23,
+      "salesAmount": 862650,
+      "commissionAmount": 170803,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_12/17873030836734Lqs3_PNG/121435927777226039_1074430072.png"
     },
     {
       "connectProductId": "981216820329032",
       "storeProductId": "12764948626",
       "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개",
-      "salesCnt": 28,
-      "salesAmount": 786720,
-      "commissionAmount": 145665,
+      "salesCnt": 30,
+      "salesAmount": 843340,
+      "commissionAmount": 152100,
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_183/1787211060405gCvbO_PNG/2733617515550951_2053253457.png"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-08-29",
+      "label": "8월 29일",
+      "periodStart": "2026-08-29",
+      "periodEnd": "2026-08-29",
+      "summary": {
+        "access": {
+          "value": 652,
+          "deltaValue": 56,
+          "deltaPct": 9.4
+        },
+        "sales": {
+          "value": 234760,
+          "deltaValue": 27820,
+          "deltaPct": 13.4
+        }
+      },
+      "directVisits": 42
+    },
     {
       "key": "2026-08-28",
       "label": "8월 28일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 24
+      "directVisits": null
     },
     {
       "key": "2026-07-14",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-05-31",
-      "label": "5월 31일",
-      "periodStart": "2026-05-31",
-      "periodEnd": "2026-05-31",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W35",
-      "label": "8/24~8/28",
+      "label": "8/24~8/29",
       "periodStart": "2026-08-24",
-      "periodEnd": "2026-08-28",
+      "periodEnd": "2026-08-29",
       "summary": {
         "access": {
-          "value": 6228,
-          "deltaValue": -12080,
-          "deltaPct": -66.0
+          "value": 6880,
+          "deltaValue": -11428,
+          "deltaPct": -62.4
         },
         "sales": {
-          "value": 2376960,
-          "deltaValue": -1600330,
-          "deltaPct": -40.2
+          "value": 2611720,
+          "deltaValue": -1365570,
+          "deltaPct": -34.3
         }
       }
     },
@@ -2298,16 +2298,16 @@
       "key": "2026-08",
       "label": "8월",
       "periodStart": "2026-08-01",
-      "periodEnd": "2026-08-28",
+      "periodEnd": "2026-08-29",
       "summary": {
         "access": {
-          "value": 29233,
-          "deltaValue": 29233,
+          "value": 29885,
+          "deltaValue": 29885,
           "deltaPct": null
         },
         "sales": {
-          "value": 7466970,
-          "deltaValue": 7466970,
+          "value": 7701730,
+          "deltaValue": 7701730,
           "deltaPct": null
         }
       }
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 24,
-      "salesAmount": 1239870,
-      "commissionAmount": 377495,
+      "salesCnt": 25,
+      "salesAmount": 1273350,
+      "commissionAmount": 387806,
       "isDeleted": false,
       "channels": [
         {
@@ -2585,13 +2585,48 @@
       "ageGroup": "FORTIES"
     },
     {
+      "creatorSpaceId": 960084028775840,
+      "name": "goldenday",
+      "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA2MDZfMjUw/MDAxNzgwNjk2MjAyNDky.Wgutn0W07YlmYs8SvxHeOfa3L308zHIPkSV0ReJskoYg.9Shu2txwPfT4neUGjj_xseYkOob4I7Xqkrf5SdfYZG8g.PNG/58235.png",
+      "performanceType": "DIRECT",
+      "salesCnt": 20,
+      "salesAmount": 808050,
+      "commissionAmount": 159992,
+      "isDeleted": false,
+      "channels": [
+        {
+          "channelType": "NCLIP",
+          "url": "https://clip.naver.com/@golden_day_",
+          "title": "청담언니",
+          "serviceId": "e_e2co_5n3opkGaJLUSx",
+          "followerCount": 232,
+          "contentCount": 120,
+          "averageVisitCount": null,
+          "averageViewCount": 60600,
+          "averageLikeCount": 82,
+          "averageCommentCount": 3,
+          "status": "ENABLED"
+        }
+      ],
+      "primaryChannelType": "NCLIP",
+      "primaryUrl": "https://clip.naver.com/@golden_day_",
+      "mainCategory": "리빙",
+      "subCategories": [
+        "푸드"
+      ],
+      "accountType": "PERSONAL",
+      "isNaverInfluencer": false,
+      "gender": "FEMALE",
+      "ageGroup": "FORTIES"
+    },
+    {
       "creatorSpaceId": 917326495877440,
       "name": "obo1221님의 블로그",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjAyMDVfMjky/MDAxNzcwMjU3Mzg5MjMz.m-1PZ-2vD4JgSZoY9xJKl5S2aDK6HJT2JMtpwqTw-NAg.HM27vjR3C58nx_JyawwcaqYwqW5CjR5n-tIj4tjNgqcg.PNG/1000035674.png",
       "performanceType": "DIRECT",
-      "salesCnt": 26,
-      "salesAmount": 776180,
-      "commissionAmount": 153660,
+      "salesCnt": 27,
+      "salesAmount": 805980,
+      "commissionAmount": 159560,
       "isDeleted": false,
       "channels": [
         {
@@ -2620,48 +2655,13 @@
       "ageGroup": "THIRTIES"
     },
     {
-      "creatorSpaceId": 960084028775840,
-      "name": "goldenday",
-      "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA2MDZfMjUw/MDAxNzgwNjk2MjAyNDky.Wgutn0W07YlmYs8SvxHeOfa3L308zHIPkSV0ReJskoYg.9Shu2txwPfT4neUGjj_xseYkOob4I7Xqkrf5SdfYZG8g.PNG/58235.png",
-      "performanceType": "DIRECT",
-      "salesCnt": 19,
-      "salesAmount": 767550,
-      "commissionAmount": 151973,
-      "isDeleted": false,
-      "channels": [
-        {
-          "channelType": "NCLIP",
-          "url": "https://clip.naver.com/@golden_day_",
-          "title": "청담언니",
-          "serviceId": "e_e2co_5n3opkGaJLUSx",
-          "followerCount": 232,
-          "contentCount": 120,
-          "averageVisitCount": null,
-          "averageViewCount": 56423,
-          "averageLikeCount": 77,
-          "averageCommentCount": 3,
-          "status": "ENABLED"
-        }
-      ],
-      "primaryChannelType": "NCLIP",
-      "primaryUrl": "https://clip.naver.com/@golden_day_",
-      "mainCategory": "리빙",
-      "subCategories": [
-        "푸드"
-      ],
-      "accountType": "PERSONAL",
-      "isNaverInfluencer": false,
-      "gender": "FEMALE",
-      "ageGroup": "FORTIES"
-    },
-    {
       "creatorSpaceId": 800866585185856,
       "name": "_lilys_home",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNTA4MTlfMjgx/MDAxNzU1NTY3MTM2ODQ4.YZdPBwB7aRSFSWGoyQvaL_2b012fXxiDl2HKIfXHU-Ig.hdkE8bjHFFBZsjQhCuOQbRABFPK37PYQwabc56NWckog.PNG/%EB%A6%B4%EB%A6%AC%ED%99%88%EB%A1%9C%EA%B3%A0.png",
       "performanceType": "DIRECT",
-      "salesCnt": 10,
-      "salesAmount": 388500,
-      "commissionAmount": 110830,
+      "salesCnt": 11,
+      "salesAmount": 421980,
+      "commissionAmount": 121141,
       "isDeleted": false,
       "channels": [
         {
@@ -2756,7 +2756,7 @@
           "followerCount": 32,
           "contentCount": 1,
           "averageVisitCount": null,
-          "averageViewCount": 0,
+          "averageViewCount": 1,
           "averageLikeCount": 0,
           "averageCommentCount": 0,
           "status": "ENABLED"
@@ -2775,6 +2775,54 @@
       "ageGroup": "FIFTIES"
     },
     {
+      "creatorSpaceId": 980065228190080,
+      "name": "✔️하이미송❤️✈️",
+      "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA4MDFfNjMg/MDAxNzg1NTc0NTMzNjAy.ejOgQnJgixjWCVItrKm_Yu_DtaiQiD_iOLFnx9QD_Swg.Bw-inaiMmNJZ6N0tpJEFzb36cfdaNepAjYTmZd-cRqUg.JPEG/IMG_5496.jpeg",
+      "performanceType": "DIRECT",
+      "salesCnt": 1,
+      "salesAmount": 33480,
+      "commissionAmount": 10311,
+      "isDeleted": false,
+      "channels": [
+        {
+          "channelType": "NBLOG",
+          "url": "https://blog.naver.com/himisong",
+          "title": "✔️하이미송❤️✈️",
+          "serviceId": "himisong",
+          "followerCount": 1041,
+          "contentCount": 1094,
+          "averageVisitCount": 493,
+          "averageViewCount": null,
+          "averageLikeCount": 3,
+          "averageCommentCount": 0,
+          "status": "ENABLED"
+        },
+        {
+          "channelType": "NCLIP",
+          "url": "https://clip.naver.com/@himisong",
+          "title": "하이미송",
+          "serviceId": "k_4E-yiFagfvv4joxZXT",
+          "followerCount": 552,
+          "contentCount": 243,
+          "averageVisitCount": null,
+          "averageViewCount": 2529,
+          "averageLikeCount": 4,
+          "averageCommentCount": 1,
+          "status": "ENABLED"
+        }
+      ],
+      "primaryChannelType": "NBLOG",
+      "primaryUrl": "https://blog.naver.com/himisong",
+      "mainCategory": "여행",
+      "subCategories": [
+        "육아"
+      ],
+      "accountType": "PERSONAL",
+      "isNaverInfluencer": false,
+      "gender": "FEMALE",
+      "ageGroup": "FORTIES"
+    },
+    {
       "creatorSpaceId": 916682979090368,
       "name": "뭐든, 비타콩",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjAyMDNfMjI0/MDAxNzcwMTAwMjM4ODQw.DyFOC2b17inUQYCbPCZXyyImVM2s7PBmo0sEqVOuYDYg.HTLOCCFgmT3g315sLVXQyaaNHFIgjRs2nOCl57TOiEQg.PNG/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2026-02-02_182909.png",
@@ -2789,8 +2837,8 @@
           "url": "https://blog.naver.com/vitakong77",
           "title": "매일 비타콩",
           "serviceId": "vitakong77",
-          "followerCount": 538,
-          "contentCount": 1080,
+          "followerCount": 542,
+          "contentCount": 1097,
           "averageVisitCount": 6523,
           "averageViewCount": null,
           "averageLikeCount": 7,
@@ -2846,17 +2894,14 @@
       "ageGroup": "FORTIES"
     }
   ],
-  "indirect": {
-    "creatorSpaceId": 0,
-    "name": "기타(간접 실적)",
-    "profileImageUrl": null,
-    "performanceType": "INDIRECT",
-    "salesCnt": 47,
-    "salesAmount": 3097020,
-    "commissionAmount": 61907,
-    "isDeleted": false
-  },
+  "indirect": null,
   "daily": [
+    {
+      "date": "2026-08-29",
+      "access": 652,
+      "sales": 234760,
+      "directVisits": 42
+    },
     {
       "date": "2026-08-28",
       "access": 596,
@@ -3125,7 +3170,7 @@
       "date": "2026-07-15",
       "access": 0,
       "sales": 0,
-      "directVisits": 24
+      "directVisits": null
     },
     {
       "date": "2026-07-14",
@@ -3387,12 +3432,6 @@
     },
     {
       "date": "2026-06-01",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-05-31",
       "access": 0,
       "sales": 0,
       "directVisits": null
