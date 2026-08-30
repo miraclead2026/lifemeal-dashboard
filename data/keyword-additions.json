@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-29",
+ "updatedAt": "2026-08-30",
  "days": [
   {
    "date": "2026-08-17",
@@ -1285,6 +1285,125 @@
    "summary": {
     "added": 0,
     "rejected": 9,
+    "held": 1
+   }
+  },
+  {
+   "date": "2026-08-30",
+   "trendDate": "2026-08-30",
+   "committed": true,
+   "added": [
+    {
+     "keyword": "파이토케미컬",
+     "intentType": "shopping",
+     "monthlyPc": 860,
+     "monthlyMobile": 6530,
+     "priorityScore": 8.94,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "group": "1일1생식",
+     "reason": "shopping 의도·1일1생식 배정",
+     "applied": true,
+     "keywordRef": "nkw-a001-01-000008558840604"
+    }
+   ],
+   "rejected": [
+    {
+     "keyword": "단백질쉐이크",
+     "intentType": "shopping",
+     "monthlyPc": 17700,
+     "monthlyMobile": 95100,
+     "priorityScore": 11.9,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "견과류",
+     "intentType": "shopping",
+     "monthlyPc": 8610,
+     "monthlyMobile": 42100,
+     "priorityScore": 11.21,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "추석선물세트",
+     "intentType": "shopping",
+     "monthlyPc": 19900,
+     "monthlyMobile": 25000,
+     "priorityScore": 10.5,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "황성주생식",
+     "intentType": "shopping",
+     "monthlyPc": 1210,
+     "monthlyMobile": 17200,
+     "priorityScore": 10.33,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "브랜드 방어(defend) — 등록대상 아님"
+    },
+    {
+     "keyword": "혈당스파이크",
+     "intentType": "shopping",
+     "monthlyPc": 4030,
+     "monthlyMobile": 23900,
+     "priorityScore": 10.09,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "컴플라이언스 제외(효능/질병)"
+    },
+    {
+     "keyword": "단백질많은음식",
+     "intentType": "shopping",
+     "monthlyPc": 2490,
+     "monthlyMobile": 24500,
+     "priorityScore": 10.06,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "컴플라이언스 제외(미스매치)"
+    },
+    {
+     "keyword": "선식",
+     "intentType": "shopping",
+     "monthlyPc": 1210,
+     "monthlyMobile": 5950,
+     "priorityScore": 9.51,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "혈스",
+     "intentType": "info",
+     "monthlyPc": 220,
+     "monthlyMobile": 910,
+     "priorityScore": 8.61,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "info 의도 — 콘텐츠용, 광고 등록대상 아님"
+    }
+   ],
+   "held": [
+    {
+     "keyword": "차전자피",
+     "intentType": "shopping",
+     "monthlyPc": 6280,
+     "monthlyMobile": 29400,
+     "priorityScore": 10.9,
+     "source": "keyword-trend",
+     "date": "2026-08-30",
+     "reason": "productHints 없음/저신뢰(low) — 임의배치 금지"
+    }
+   ],
+   "summary": {
+    "added": 1,
+    "rejected": 8,
     "held": 1
    }
   }
