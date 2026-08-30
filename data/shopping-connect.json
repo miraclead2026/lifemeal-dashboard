@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-30 09:39",
+  "updatedAt": "2026-08-31 08:37",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,12 +10,12 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 29885,
-    "productOrderCnt": 107,
+    "accessCnt": 30292,
+    "productOrderCnt": 110,
     "salesConversionRate": 0.4,
-    "salesCnt": 160,
-    "salesAmount": 7701730,
-    "commissionAmount": 1245568,
+    "salesCnt": 165,
+    "salesAmount": 7831130,
+    "commissionAmount": 1272209,
     "commissionRate": 16.2
   },
   "products": [
@@ -23,9 +23,9 @@
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 45,
-      "salesAmount": 1551640,
-      "commissionAmount": 447871,
+      "salesCnt": 46,
+      "salesAmount": 1581400,
+      "commissionAmount": 467750,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -38,6 +38,15 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_226/17873029909747u4iI_PNG/121435912860945417_912484346.png"
     },
     {
+      "connectProductId": "981216820329032",
+      "storeProductId": "12764948626",
+      "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개",
+      "salesCnt": 33,
+      "salesAmount": 926780,
+      "commissionAmount": 158539,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260820_183/1787211060405gCvbO_PNG/2733617515550951_2053253457.png"
+    },
+    {
       "connectProductId": "981216820329029",
       "storeProductId": "12763906780",
       "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
@@ -45,15 +54,6 @@
       "salesAmount": 862650,
       "commissionAmount": 170803,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_12/17873030836734Lqs3_PNG/121435927777226039_1074430072.png"
-    },
-    {
-      "connectProductId": "981216820329032",
-      "storeProductId": "12764948626",
-      "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개",
-      "salesCnt": 30,
-      "salesAmount": 843340,
-      "commissionAmount": 152100,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260820_183/1787211060405gCvbO_PNG/2733617515550951_2053253457.png"
     },
     {
       "connectProductId": "981216820329034",
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-08-30",
+      "label": "8월 30일",
+      "periodStart": "2026-08-30",
+      "periodEnd": "2026-08-30",
+      "summary": {
+        "access": {
+          "value": 407,
+          "deltaValue": -245,
+          "deltaPct": -37.6
+        },
+        "sales": {
+          "value": 129400,
+          "deltaValue": -105360,
+          "deltaPct": -44.9
+        }
+      },
+      "directVisits": 33
+    },
     {
       "key": "2026-08-29",
       "label": "8월 29일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 11
+      "directVisits": null
     },
     {
       "key": "2026-07-15",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-01",
-      "label": "6월 1일",
-      "periodStart": "2026-06-01",
-      "periodEnd": "2026-06-01",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W35",
-      "label": "8/24~8/29",
+      "label": "8/24~8/30",
       "periodStart": "2026-08-24",
-      "periodEnd": "2026-08-29",
+      "periodEnd": "2026-08-30",
       "summary": {
         "access": {
-          "value": 6880,
-          "deltaValue": -11428,
-          "deltaPct": -62.4
+          "value": 7287,
+          "deltaValue": -11021,
+          "deltaPct": -60.2
         },
         "sales": {
-          "value": 2611720,
-          "deltaValue": -1365570,
-          "deltaPct": -34.3
+          "value": 2741120,
+          "deltaValue": -1236170,
+          "deltaPct": -31.1
         }
       }
     },
@@ -2298,16 +2298,16 @@
       "key": "2026-08",
       "label": "8월",
       "periodStart": "2026-08-01",
-      "periodEnd": "2026-08-29",
+      "periodEnd": "2026-08-30",
       "summary": {
         "access": {
-          "value": 29885,
-          "deltaValue": 29885,
+          "value": 30292,
+          "deltaValue": 30292,
           "deltaPct": null
         },
         "sales": {
-          "value": 7701730,
-          "deltaValue": 7701730,
+          "value": 7831130,
+          "deltaValue": 7831130,
           "deltaPct": null
         }
       }
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 25,
-      "salesAmount": 1273350,
-      "commissionAmount": 387806,
+      "salesCnt": 27,
+      "salesAmount": 1340310,
+      "commissionAmount": 408428,
       "isDeleted": false,
       "channels": [
         {
@@ -2599,11 +2599,11 @@
           "url": "https://clip.naver.com/@golden_day_",
           "title": "청담언니",
           "serviceId": "e_e2co_5n3opkGaJLUSx",
-          "followerCount": 232,
+          "followerCount": 233,
           "contentCount": 120,
           "averageVisitCount": null,
-          "averageViewCount": 60600,
-          "averageLikeCount": 82,
+          "averageViewCount": 62304,
+          "averageLikeCount": 84,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2789,8 +2789,8 @@
           "url": "https://blog.naver.com/himisong",
           "title": "✔️하이미송❤️✈️",
           "serviceId": "himisong",
-          "followerCount": 1041,
-          "contentCount": 1094,
+          "followerCount": 1042,
+          "contentCount": 1095,
           "averageVisitCount": 493,
           "averageViewCount": null,
           "averageLikeCount": 3,
@@ -2805,7 +2805,7 @@
           "followerCount": 552,
           "contentCount": 243,
           "averageVisitCount": null,
-          "averageViewCount": 2529,
+          "averageViewCount": 2541,
           "averageLikeCount": 4,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2896,6 +2896,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-08-30",
+      "access": 407,
+      "sales": 129400,
+      "directVisits": 33
+    },
     {
       "date": "2026-08-29",
       "access": 652,
@@ -3164,7 +3170,7 @@
       "date": "2026-07-16",
       "access": 0,
       "sales": 0,
-      "directVisits": 11
+      "directVisits": null
     },
     {
       "date": "2026-07-15",
@@ -3426,12 +3432,6 @@
     },
     {
       "date": "2026-06-02",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-01",
       "access": 0,
       "sales": 0,
       "directVisits": null
