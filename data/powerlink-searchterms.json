@@ -1,43 +1,43 @@
 {
- "updatedAt": "2026-08-29",
- "basedOn": "2026-08-27",
+ "updatedAt": "2026-08-30",
+ "basedOn": "2026-08-28",
  "note": "파워링크 확장검색 실제 쿼리(EXPKEYWORD) 7일. 전환리포트 없음→노출·클릭·비용만. 신규후보=미등록&클릭2+, 제외후보=미등록&고비용&관련의심(관련판정 필요).",
  "counts": {
-  "total": 226,
+  "total": 246,
   "newCandidates": 33,
-  "excludeCandidates": 14
+  "excludeCandidates": 20
  },
  "newCandidates": [
   {
    "term": "황성주라이프밀",
-   "imp": 825,
-   "clk": 49,
-   "cost": 12523,
-   "group": "1일1생식",
+   "imp": 868,
+   "clk": 51,
+   "cost": 13186,
+   "group": "데일리생식",
    "registered": false,
    "relevance": "관련"
   },
   {
    "term": "황성주생식라이프밀",
-   "imp": 880,
-   "clk": 21,
-   "cost": 7568,
+   "imp": 970,
+   "clk": 17,
+   "cost": 6397,
    "group": "1일1생식",
    "registered": false,
    "relevance": "관련"
   },
   {
    "term": "동결건조생식분말",
-   "imp": 64,
-   "clk": 11,
-   "cost": 9137,
+   "imp": 93,
+   "clk": 16,
+   "cost": 12996,
    "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "황성주박사의1일1생식라이프밀",
-   "imp": 64,
+   "imp": 70,
    "clk": 9,
    "cost": 4556,
    "group": "1일1생식",
@@ -46,7 +46,7 @@
   },
   {
    "term": "동결건조생식70가지",
-   "imp": 25,
+   "imp": 34,
    "clk": 8,
    "cost": 5778,
    "group": "데일리생식",
@@ -55,25 +55,34 @@
   },
   {
    "term": "하루건과류",
-   "imp": 251,
-   "clk": 6,
-   "cost": 1921,
+   "imp": 238,
+   "clk": 5,
+   "cost": 1641,
    "group": "하루견과",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "라이프밀",
-   "imp": 252,
-   "clk": 4,
-   "cost": 1526,
+   "imp": 259,
+   "clk": 5,
+   "cost": 1841,
    "group": "데일리생식",
    "registered": false,
    "relevance": "관련"
   },
   {
+   "term": "동결건조생식가루",
+   "imp": 33,
+   "clk": 5,
+   "cost": 3635,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "황성주라이프밀프리미엄",
-   "imp": 12,
+   "imp": 14,
    "clk": 4,
    "cost": 982,
    "group": "1일1생식",
@@ -81,29 +90,20 @@
    "relevance": "관련"
   },
   {
-   "term": "동결건조생식가루",
-   "imp": 24,
-   "clk": 4,
-   "cost": 3000,
-   "group": "1일1생식",
+   "term": "노인식사대용간편식",
+   "imp": 13,
+   "clk": 3,
+   "cost": 2681,
+   "group": "영양식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "저당그래놀라추천",
-   "imp": 38,
+   "imp": 44,
    "clk": 3,
    "cost": 1614,
    "group": "그래놀라",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "80여가지생식가격",
-   "imp": 7,
-   "clk": 3,
-   "cost": 1103,
-   "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -117,8 +117,17 @@
    "relevance": "관련"
   },
   {
+   "term": "황성주박사선식",
+   "imp": 7,
+   "clk": 3,
+   "cost": 542,
+   "group": "영양식",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
    "term": "가루샐러드",
-   "imp": 33,
+   "imp": 37,
    "clk": 3,
    "cost": 1277,
    "group": "닥터샐러드",
@@ -127,28 +136,109 @@
   },
   {
    "term": "황성주박사생식",
-   "imp": 46,
-   "clk": 2,
-   "cost": 559,
+   "imp": 49,
+   "clk": 3,
+   "cost": 943,
    "group": "영양식",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "해밀리라이프밀",
-   "imp": 11,
+   "term": "80여가지생식가격",
+   "imp": 7,
+   "clk": 3,
+   "cost": 1103,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "80가지생식가루",
+   "imp": 15,
    "clk": 2,
-   "cost": 512,
+   "cost": 1589,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주생식라이프밀데일리",
+   "imp": 5,
+   "clk": 2,
+   "cost": 422,
    "group": "데일리생식",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "황성주박사선식",
-   "imp": 5,
+   "term": "서리태단백질쉐이크",
+   "imp": 44,
    "clk": 2,
-   "cost": 465,
+   "cost": 1416,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "80가지동결건조생식",
+   "imp": 7,
+   "clk": 2,
+   "cost": 1688,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "영양소보존한생식",
+   "imp": 6,
+   "clk": 2,
+   "cost": 1712,
    "group": "영양식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주박사의발효건강식",
+   "imp": 30,
+   "clk": 2,
+   "cost": 894,
+   "group": "발효건강식",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "마시는샐러드추천",
+   "imp": 13,
+   "clk": 2,
+   "cost": 1499,
+   "group": "닥터샐러드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "샐러드젤리",
+   "imp": 189,
+   "clk": 2,
+   "cost": 1426,
+   "group": "닥터샐러드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주1일생식",
+   "imp": 13,
+   "clk": 2,
+   "cost": 866,
+   "group": "발효건강식",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "해밀리라이프밀",
+   "imp": 10,
+   "clk": 2,
+   "cost": 512,
+   "group": "데일리생식",
    "registered": false,
    "relevance": "관련"
   },
@@ -162,58 +252,13 @@
    "relevance": "관련"
   },
   {
-   "term": "황성주1일생식",
-   "imp": 11,
-   "clk": 2,
-   "cost": 866,
-   "group": "발효건강식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "마시는샐러드추천",
-   "imp": 10,
-   "clk": 2,
-   "cost": 1499,
-   "group": "닥터샐러드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "갓구운하루견과",
-   "imp": 38,
+   "imp": 35,
    "clk": 2,
    "cost": 178,
    "group": "하루견과",
    "registered": false,
    "relevance": "관련의심"
-  },
-  {
-   "term": "황성주박사의발효건강식",
-   "imp": 28,
-   "clk": 2,
-   "cost": 894,
-   "group": "발효건강식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "샐러드젤리",
-   "imp": 172,
-   "clk": 2,
-   "cost": 1426,
-   "group": "닥터샐러드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "황성주박사의생식",
-   "imp": 8,
-   "clk": 2,
-   "cost": 724,
-   "group": "영양식",
-   "registered": false,
-   "relevance": "관련"
   },
   {
    "term": "황성주박사1일1생식라이프밀",
@@ -225,15 +270,6 @@
    "relevance": "관련"
   },
   {
-   "term": "노인식사대용간편식",
-   "imp": 10,
-   "clk": 2,
-   "cost": 1647,
-   "group": "영양식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "1일1식생식",
    "imp": 6,
    "clk": 2,
@@ -241,24 +277,6 @@
    "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
-  },
-  {
-   "term": "구운아몬드1KG",
-   "imp": 423,
-   "clk": 2,
-   "cost": 1299,
-   "group": "하루견과",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "황성주생식라이프밀데일리",
-   "imp": 5,
-   "clk": 2,
-   "cost": 422,
-   "group": "데일리생식",
-   "registered": false,
-   "relevance": "관련"
   },
   {
    "term": "라이프밀닥터샐러드",
@@ -279,24 +297,6 @@
    "relevance": "관련"
   },
   {
-   "term": "황성주박사의라이프밀레드진생",
-   "imp": 7,
-   "clk": 2,
-   "cost": 154,
-   "group": "1일1생식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "그래놀라OEM",
-   "imp": 8,
-   "clk": 2,
-   "cost": 639,
-   "group": "그래놀라",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "저녁황성주영양식",
    "imp": 2,
    "clk": 2,
@@ -309,16 +309,16 @@
  "excludeCandidates": [
   {
    "term": "동결건조생식분말",
-   "imp": 64,
-   "clk": 11,
-   "cost": 9137,
+   "imp": 93,
+   "clk": 16,
+   "cost": 12996,
    "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "동결건조생식70가지",
-   "imp": 25,
+   "imp": 34,
    "clk": 8,
    "cost": 5778,
    "group": "데일리생식",
@@ -327,34 +327,52 @@
   },
   {
    "term": "동결건조생식가루",
-   "imp": 24,
-   "clk": 4,
-   "cost": 3000,
+   "imp": 33,
+   "clk": 5,
+   "cost": 3635,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "노인식사대용간편식",
+   "imp": 13,
+   "clk": 3,
+   "cost": 2681,
+   "group": "영양식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "영양소보존한생식",
+   "imp": 6,
+   "clk": 2,
+   "cost": 1712,
+   "group": "영양식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "80가지동결건조생식",
+   "imp": 7,
+   "clk": 2,
+   "cost": 1688,
    "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "하루건과류",
-   "imp": 251,
-   "clk": 6,
-   "cost": 1921,
+   "imp": 238,
+   "clk": 5,
+   "cost": 1641,
    "group": "하루견과",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "노인식사대용간편식",
-   "imp": 10,
-   "clk": 2,
-   "cost": 1647,
-   "group": "영양식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "저당그래놀라추천",
-   "imp": 38,
+   "imp": 44,
    "clk": 3,
    "cost": 1614,
    "group": "그래놀라",
@@ -371,8 +389,17 @@
    "relevance": "관련의심"
   },
   {
+   "term": "80가지생식가루",
+   "imp": 15,
+   "clk": 2,
+   "cost": 1589,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "마시는샐러드추천",
-   "imp": 10,
+   "imp": 13,
    "clk": 2,
    "cost": 1499,
    "group": "닥터샐러드",
@@ -381,7 +408,7 @@
   },
   {
    "term": "샐러드젤리",
-   "imp": 172,
+   "imp": 189,
    "clk": 2,
    "cost": 1426,
    "group": "닥터샐러드",
@@ -389,20 +416,29 @@
    "relevance": "관련의심"
   },
   {
-   "term": "구운아몬드1KG",
-   "imp": 423,
+   "term": "서리태단백질쉐이크",
+   "imp": 44,
    "clk": 2,
-   "cost": 1299,
-   "group": "하루견과",
+   "cost": 1416,
+   "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "가루샐러드",
-   "imp": 33,
+   "imp": 37,
    "clk": 3,
    "cost": 1277,
    "group": "닥터샐러드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "초3단백질쉐이크",
+   "imp": 1,
+   "clk": 1,
+   "cost": 1162,
+   "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -416,11 +452,29 @@
    "relevance": "관련의심"
   },
   {
+   "term": "사무실건강간식",
+   "imp": 72,
+   "clk": 1,
+   "cost": 1042,
+   "group": "하루견과",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "단백질스낵",
    "imp": 10,
    "clk": 1,
    "cost": 1041,
    "group": "프로틴골드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "국산단백질선식",
+   "imp": 1,
+   "clk": 1,
+   "cost": 1028,
+   "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
   },
