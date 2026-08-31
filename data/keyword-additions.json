@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-30",
+ "updatedAt": "2026-08-31",
  "days": [
   {
    "date": "2026-08-17",
@@ -1405,6 +1405,124 @@
     "added": 1,
     "rejected": 8,
     "held": 1
+   }
+  },
+  {
+   "date": "2026-08-31",
+   "trendDate": "2026-08-31",
+   "committed": true,
+   "added": [
+    {
+     "keyword": "동결건조",
+     "intentType": "shopping",
+     "monthlyPc": 1150,
+     "monthlyMobile": 7550,
+     "priorityScore": 7.15,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "group": "1일1생식",
+     "reason": "shopping 의도·1일1생식 배정",
+     "applied": true,
+     "keywordRef": "nkw-a001-01-000008560444440"
+    }
+   ],
+   "rejected": [
+    {
+     "keyword": "소식좌",
+     "intentType": "info",
+     "monthlyPc": 310,
+     "monthlyMobile": 2180,
+     "priorityScore": 7.72,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "info 의도 — 콘텐츠용, 광고 등록대상 아님"
+    },
+    {
+     "keyword": "황성주생식",
+     "intentType": "shopping",
+     "monthlyPc": 1190,
+     "monthlyMobile": 17300,
+     "priorityScore": 7.41,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "브랜드 방어(defend) — 등록대상 아님"
+    },
+    {
+     "keyword": "식이섬유영양제",
+     "intentType": "shopping",
+     "monthlyPc": 1620,
+     "monthlyMobile": 10000,
+     "priorityScore": 7.25,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "컴플라이언스 제외(정보성/타제형)"
+    },
+    {
+     "keyword": "아침간편식",
+     "intentType": "shopping",
+     "monthlyPc": 990,
+     "monthlyMobile": 6040,
+     "priorityScore": 7.08,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "추석선물세트",
+     "intentType": "shopping",
+     "monthlyPc": 20300,
+     "monthlyMobile": 27500,
+     "priorityScore": 6.74,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "선식",
+     "intentType": "shopping",
+     "monthlyPc": 1190,
+     "monthlyMobile": 6000,
+     "priorityScore": 6.59,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "하루견과100봉",
+     "intentType": "shopping",
+     "monthlyPc": 760,
+     "monthlyMobile": 5330,
+     "priorityScore": 6.53,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "견과류선물세트",
+     "intentType": "shopping",
+     "monthlyPc": 990,
+     "monthlyMobile": 2440,
+     "priorityScore": 6.33,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "이미 등록됨(중복)"
+    },
+    {
+     "keyword": "파이토케미컬",
+     "intentType": "shopping",
+     "monthlyPc": 820,
+     "monthlyMobile": 6590,
+     "priorityScore": 6.1,
+     "source": "keyword-trend",
+     "date": "2026-08-31",
+     "reason": "이미 등록됨(중복)"
+    }
+   ],
+   "held": [],
+   "summary": {
+    "added": 1,
+    "rejected": 9,
+    "held": 0
    }
   }
  ]
