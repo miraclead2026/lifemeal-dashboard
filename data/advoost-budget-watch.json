@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-30",
+ "updatedAt": "2026-08-31",
  "changeDate": "2026-08-25",
  "change": "적자 상품 제외 + 예산 100만 증액",
  "baselineAvgRoas": 289,
@@ -41,13 +41,20 @@
    "roas": 335,
    "spend": 950250,
    "conv": 37,
+   "provisional": false
+  },
+  {
+   "date": "2026-08-30",
+   "roas": 178,
+   "spend": 912389,
+   "conv": 22,
    "provisional": true
   }
  ],
- "sinceAvgRoas": 287,
- "sinceAvgSpend": 1010038,
+ "sinceAvgRoas": 269,
+ "sinceAvgSpend": 993764,
  "status": "유지",
- "verdict": "증액 후 실구매ROAS 287% — 증액 전(289%) 수준 유지. 효율 안 깨짐.",
+ "verdict": "증액 후 실구매ROAS 269% — 증액 전(289%) 수준 유지. 효율 안 깨짐.",
  "action": "예산 100만 유지 OK. 이 상태로 2주 관측 후 더 올릴지 판단.",
  "note": "이 계정은 실구매ROAS가 다음날 집계 후 며칠에 걸쳐 오르지 않음(과거 스냅샷 검증). 다음날 값이 최종."
 }
