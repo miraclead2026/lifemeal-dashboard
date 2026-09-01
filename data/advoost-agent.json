@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-31",
+ "updatedAt": "2026-09-01",
  "goal": {
   "goal": "애드부스트 쇼핑으로 라이프밀 상품을 팔되, 실구매 ROAS를 다시 목표선까지 올린다.",
   "goalNote": "표기 ROAS(장바구니 포함)는 640%대로 좋아 보이지만, 실제 돈이 되는 실구매 ROAS는 200% 안팎으로 목표 미달.",
@@ -160,18 +160,12 @@
  ],
  "performance": {
   "latest": {
-   "date": "2026-08-30",
-   "spend": 938000,
-   "purchaseSales": 1720340,
-   "purchaseRoas": 183
+   "date": "2026-08-31",
+   "spend": 993086,
+   "purchaseSales": 2359320,
+   "purchaseRoas": 238
   },
   "trend14d": [
-   {
-    "date": "2026-08-17",
-    "spend": 695559,
-    "purchaseSales": 1773660,
-    "purchaseRoas": 255
-   },
    {
     "date": "2026-08-18",
     "spend": 609725,
@@ -249,6 +243,12 @@
     "spend": 938000,
     "purchaseSales": 1720340,
     "purchaseRoas": 183
+   },
+   {
+    "date": "2026-08-31",
+    "spend": 993086,
+    "purchaseSales": 2359320,
+    "purchaseRoas": 238
    }
   ]
  },
@@ -281,22 +281,29 @@
  "productAnalysis": {
   "period": "최근 30일(리포트 API 자동추출)",
   "totalItems": 71,
-  "totalSpend": 22124455,
-  "purchaseRoas": 250,
+  "totalSpend": 23094933,
+  "purchaseRoas": 249,
   "excludeRule": "실구매ROAS<100% & 지출>0",
   "excludeList": [
    {
     "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 6개",
     "pid": "13676606672",
-    "spend": 100181,
-    "buyRoas": 93,
+    "spend": 104412,
+    "buyRoas": 89,
     "buy": 1
    },
    {
     "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 푸룬 식이섬유, 300g",
     "pid": "13678485910",
-    "spend": 36484,
-    "buyRoas": 82,
+    "spend": 39519,
+    "buyRoas": 76,
+    "buy": 1
+   },
+   {
+    "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 오리지널,",
+    "pid": "13558590918",
+    "spend": 32621,
+    "buyRoas": 94,
     "buy": 1
    },
    {
@@ -321,9 +328,9 @@
     "buy": 0
    }
   ],
-  "excludeCount": 5,
-  "excludeSpend": 168947,
-  "excludeIds": "13676606672,13678485910,13676606671,13586137693,13495043648",
+  "excludeCount": 6,
+  "excludeSpend": 208834,
+  "excludeIds": "13676606672,13678485910,13558590918,13676606671,13586137693,13495043648",
   "excludedCount": 26,
   "excludedAt": "2026-08-25",
   "excludedList": [
@@ -510,7 +517,7 @@
     "buy": 0
    }
   ],
-  "keepCount": 40,
+  "keepCount": 39,
   "zeroSpend": [
    {
     "name": "[추석 선물세트] 황성주 박사의 프리미엄 VIP 세트 [얼리버드 특가",
@@ -559,44 +566,44 @@
    {
     "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
     "pid": "13635293181",
-    "spend": 103167,
-    "buyRoas": 694,
+    "spend": 103414,
+    "buyRoas": 692,
     "buy": 7
    },
    {
     "name": "황성주 박사의 닥터샐러드 마시는 샐러드 야채가루 14포, 6개",
     "pid": "13637171566",
     "spend": 193009,
-    "buyRoas": 527,
-    "buy": 16
+    "buyRoas": 544,
+    "buy": 17
    },
    {
     "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
     "pid": "13635278957",
-    "spend": 253018,
-    "buyRoas": 495,
+    "spend": 257691,
+    "buyRoas": 486,
     "buy": 12
    },
    {
     "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, ",
     "pid": "13670188795",
-    "spend": 259534,
-    "buyRoas": 449,
-    "buy": 16
+    "spend": 273908,
+    "buyRoas": 450,
+    "buy": 17
+   },
+   {
+    "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
+    "pid": "13616691087",
+    "spend": 2345309,
+    "buyRoas": 281,
+    "buy": 80
    },
    {
     "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
     "pid": "12763789807",
-    "spend": 5413396,
-    "buyRoas": 285,
-    "buy": 135
-   },
-   {
-    "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, ",
-    "pid": "12764871210",
-    "spend": 127676,
+    "spend": 5758344,
     "buyRoas": 278,
-    "buy": 10
+    "buy": 140
    }
   ]
  },
