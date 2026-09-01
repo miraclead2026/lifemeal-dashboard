@@ -2715,7 +2715,12 @@ function grab(name){
 }
 function applyLive(F){
   // 라이브 값은 이번 달만 갱신한다. 나머지 달은 스냅샷이 정본.
-  const ym = TODAY.slice(0,7);
+  // [v7] 이번 달을 피드가 아직 안 냈으면(월초) 데이터가 있는 마지막 달을 이번 달로 본다.
+  //      빈 달을 만들어 선택하면 매달 1일에 화면이 「0원」으로 읽힌다 — 없는 것과 0은 다르다.
+  const todayYm = TODAY.slice(0,7);
+  const feedYms = (((F["naver-sales"] || {}).months) || []).map(x => x && x.key).filter(Boolean).sort();
+  const ym = (feedYms.indexOf(todayYm) >= 0 || !feedYms.length) ? todayYm : feedYms[feedYms.length - 1];
+  LIVE_YM = ym;
   SEED.months = SEED.months || [];
   let m = SEED.months.find(x => x.key === ym);
   if (!m) {
@@ -2739,7 +2744,12 @@ function applyLive(F){
                 visitors: gv("visitors"), conversion: gv("conversion"), refund: gv("refund") };
       const old = {}; (m.daily || []).forEach(p => { old[p[0]] = p[2] || 0; });
       const d = (mo.daily || []).filter(x => x && x.date).sort((a,b) => a.date < b.date ? -1 : 1);
-      if (d.length) { m.daily = d.map(x => [x.date, x.revenue || 0, old[x.date] || 0]); m.elapsed = d.length; }
+      if (d.length) {
+        // [v6] 방문자는 라이브가 정본. 예전 파일(visitors 없는 판본)만 스냅샷으로 떨어진다.
+        //      전에는 스냅샷만 봐서, 스냅샷이 모르는 날짜(08-25~)가 0 이 되고 선이 끊겼다.
+        m.daily = d.map(x => [x.date, x.revenue || 0, (x.visitors != null ? x.visitors : (old[x.date] || 0))]);
+        m.elapsed = d.length;
+      }
       const c = (mo.channels || []).slice().sort((a,b) => (b.revenue||0)-(a.revenue||0)).slice(0,8);
       if (c.length) m.channels = c.map(x => [x.name, x.revenue||0, x.visitors||0, x.sharePct||0]);
       const p2 = (mo.products || []).slice().sort((a,b) => (b.revenue||0)-(a.revenue||0)).slice(0,8);
@@ -2832,6 +2842,26 @@ function applyLive(F){
   }
   return ch;
 }
+/* 지금 화면이 어느 달을 보고 있는지 — 월초에 지난달을 보여줄 때 상단바가 말해야 한다 */
+let LIVE_YM = "";
+/* 피드가 가진 것과 화면이 들고 있는 것을 견준다.
+   날짜가 덜 온 경우와, 날짜는 다 왔는데 방문자만 덜 온 경우를 나눈다. */
+function liveGap(F){
+  try {
+    const js = F["naver-sales"]; if (!js || !js.months) return null;
+    const ym = LIVE_YM || TODAY.slice(0, 7);
+    if (ym !== TODAY.slice(0, 7)) return { what: "이번 달", upto: ym + "-末", month: ym };
+    const mo = js.months.find(x => x && x.key === ym); if (!mo || !mo.daily) return null;
+    const m = (SEED.months || []).find(x => x.key === ym); if (!m || !m.daily || !m.daily.length) return null;
+    const fEnd = mo.daily.filter(x => x && x.date).map(x => x.date).sort().pop();
+    const sEnd = m.daily.map(p => p[0]).sort().pop();
+    if (fEnd && sEnd && sEnd < fEnd) return { what: "일자", upto: sEnd };
+    const fV = mo.daily.filter(x => x && x.date && x.visitors > 0).map(x => x.date).sort().pop();
+    const sV = m.daily.filter(p => p[2] > 0).map(p => p[0]).sort().pop();
+    if (fV && (!sV || sV < fV)) return { what: "방문자", upto: sV || "" };
+    return null;
+  } catch (e) { return null; }
+}
 function loadLive(){
   const F = {};
   return Promise.all(FEEDS.map(n => grab(n).then(j => { if (j) F[n] = j; })))
@@ -2845,8 +2875,19 @@ function loadLive(){
       const f = $("#freshTx");
       if (f) {
         f.classList.remove("ok", "stale");
-        if (ok) { f.textContent = `라이브 · 피드 ${ok}종`; f.classList.add("ok"); }
-        else { f.textContent = "스냅샷 표시 중 · 실데이터를 못 불러왔습니다"; f.classList.add("stale"); }
+        if (!ok) { f.textContent = "스냅샷 표시 중 · 실데이터를 못 불러왔습니다"; f.classList.add("stale"); }
+        else {
+          const gap = liveGap(F);
+          if (gap && gap.month) {
+            f.textContent = `${(+TODAY.slice(5, 7))}월 데이터 대기 · ${(+gap.month.slice(5, 7))}월 표시 중`;
+            f.classList.add("stale");
+          } else if (gap) {
+            f.textContent = gap.upto
+              ? `${gap.what} 일부만 반영됨 · ${(+gap.upto.slice(5, 7))}/${(+gap.upto.slice(8, 10))}까지`
+              : `${gap.what}가 반영되지 않았습니다`;
+            f.classList.add("stale");
+          } else { f.textContent = `라이브 · 피드 ${ok}종`; f.classList.add("ok"); }
+        }
       }
       if (ok) toast(`실데이터 ${ok}종을 불러왔습니다`, CHECK);
     });
@@ -3168,7 +3209,7 @@ const UP_TAGS = { '신규기능': 'var(--em)', '개선': 'var(--cool)', '수정'
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_183_K5_v5';
+const BUILD_TAG = 'index_183_K5_v7';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
