@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카드마감 영수증 취합</title>
+<meta name="robots" content="noindex">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root{--bg:#f6f7f9;--card:#fff;--ink:#1b1f24;--mute:#6b7280;--line:#e5e7eb;--ok:#0f8a5f;--okbg:#e6f6ef;--warn:#b45309;--warnbg:#fff4e0;--bad:#b91c1c;--badbg:#fde8e8;--acc:#2563eb;--accbg:#e8effd}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  header h1{font-size:16px;margin:0;font-weight:700}
+  header .sub{color:var(--mute);font-size:12px}
+  .spacer{flex:1}
+  button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;color:var(--ink)}
+  button.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+  button.drive{background:#fff;border-color:#c9d3e6;color:#1a3d8f;font-weight:600}
+  button:disabled{opacity:.5;cursor:default}
+  main{max-width:1080px;margin:0 auto;padding:16px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .stat b{display:block;font-size:20px}
+  .stat span{color:var(--mute);font-size:12px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .row.done{opacity:.72}
+  .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .top .date{font-weight:700;font-variant-numeric:tabular-nums}
+  .top .vendor{font-weight:600}
+  .top .amt{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+  .top .amt.neg{color:var(--bad)}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px}
+  .b{font-size:11px;padding:2px 8px;border-radius:999px;background:#eef0f3;color:#374151}
+  .b.ok{background:var(--okbg);color:var(--ok)} .b.bad{background:var(--badbg);color:var(--bad)} .b.warn{background:var(--warnbg);color:var(--warn)} .b.acc{background:var(--accbg);color:var(--acc)}
+  .form{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin-top:6px}
+  .form label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mute)}
+  .form label.full{grid-column:1/-1}
+  input,select,textarea{font:inherit;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fff;color:var(--ink);width:100%}
+  textarea{min-height:52px;resize:vertical}
+  .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .actions .msg{font-size:12px;color:var(--mute)}
+  .actions .msg.err{color:var(--bad)} .actions .msg.ok{color:var(--ok)}
+  a.rl{font-size:12px;color:var(--acc)}
+  .hint{font-size:12px;color:var(--mute);margin:4px 0 0}
+  .gate{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;text-align:center;margin-top:30px}
+  .gate p{color:var(--mute)}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#111;color:#fff;padding:9px 14px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;pointer-events:none}
+  .toast.show{opacity:1}
+  details.fin{margin-top:6px} details.fin summary{cursor:pointer;color:var(--mute);font-size:12px}
+  @media (max-width:640px){.form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>카드마감 영수증 취합 <span id="month"></span></h1>
+    <div class="sub" id="period">구글 로그인 후 내 드라이브의 마감 데이터를 불러옵니다</div>
+  </div>
+  <div class="spacer"></div>
+  <span class="sub" id="who"></span>
+  <button id="btnLogin" class="pri">구글 로그인</button>
+  <button id="btnReload" hidden>새로고침</button>
+</header>
+
+<main>
+  <div id="gate" class="gate">
+    <h2 style="margin:0 0 6px">영수증이 필요한 카드 결제 목록</h2>
+    <p>대시보드와 같은 구글 계정(miraclead2026)으로 로그인하면<br>「내 드라이브 › 라이프밀 › 영수증 › _마감」의 데이터를 읽어 목록을 보여줍니다.</p>
+    <button class="pri" onclick="signIn(true)">구글 로그인</button>
+  </div>
+
+  <div id="app" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="filters">
+      <span class="chip on" data-f="need">처리 필요</span>
+      <span class="chip" data-f="queued">취합됨 · 반영 대기</span>
+      <span class="chip" data-f="done">완료</span>
+      <span class="chip" data-f="all">전체</span>
+      <span style="width:8px"></span>
+      <span class="chip on" data-c="all">카드 전체</span>
+      <span class="chip" data-c="1896">1896</span>
+      <span class="chip" data-c="2748">2748</span>
+    </div>
+    <div id="list"></div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ───────── Drive OAuth (통합대시보드와 동일한 클라이언트·스코프) ───────── */
+const DRIVE_CLIENT_ID = '922127709768-fblujicah9kbma4fn1pd6nup8h44siac.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
+const MONTH = new URLSearchParams(location.search).get('m') || '2026-08';
+let _tok = null, _tokClient = null, _folderCache = {};
+
+function signIn(force){
+  return new Promise((res, rej) => {
+    if (!window.google || !google.accounts) { rej(new Error('구글 스크립트 로딩 중 — 잠시 후 다시')); return; }
+    _tokClient = google.accounts.oauth2.initTokenClient({
+      client_id: DRIVE_CLIENT_ID, scope: DRIVE_SCOPE,
+      callback: (r) => { if (r && r.access_token) { _tok = r.access_token; res(_tok); } else rej(new Error('로그인 취소')); },
+      error_callback: (e) => rej(new Error(e && e.type ? e.type : 'oauth 실패')),
+    });
+    _tokClient.requestAccessToken({ prompt: force ? 'consent' : '' });
+  }).then(async t => { await boot(); return t; }).catch(e => toast(e.message, true));
+}
+async function dfetch(url, opts = {}, retry = true){
+  const h = Object.assign({}, opts.headers || {}, { Authorization: 'Bearer ' + _tok });
+  const r = await fetch(url, Object.assign({}, opts, { headers: h }));
+  if (r.status === 401 && retry) { await new Promise(res => { _tokClient.callback = x => { _tok = x.access_token; res(); }; _tokClient.requestAccessToken({ prompt: '' }); }); return dfetch(url, opts, false); }
+  return r;
+}
+async function findOrCreateFolder(name, parentId){
+  const k = parentId + '/' + name;
+  if (_folderCache[k]) return _folderCache[k];
+  const q = `mimeType='application/vnd.google-apps.folder' and trashed=false and name='${name.replace(/'/g, "\\'")}' and '${parentId}' in parents`;
+  const r = await (await dfetch('https://www.googleapis.com/drive/v3/files?fields=files(id)&q=' + encodeURIComponent(q))).json();
+  let id = r.files && r.files[0] && r.files[0].id;
+  if (!id) {
+    const c = await (await dfetch('https://www.googleapis.com/drive/v3/files?fields=id', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] }) })).json();
+    id = c.id;
+  }
+  _folderCache[k] = id; return id;
+}
+async function deepFolder(path){ let p = 'root'; for (const n of path) p = await findOrCreateFolder(n, p); return p; }
+async function findFile(name, parentId){
+  const q = `name='${name.replace(/'/g, "\\'")}' and '${parentId}' in parents and trashed=false`;
+  const r = await (await dfetch('https://www.googleapis.com/drive/v3/files?fields=files(id,modifiedTime)&q=' + encodeURIComponent(q))).json();
+  return r.files && r.files[0];
+}
+async function readJson(name, parentId){
+  const f = await findFile(name, parentId); if (!f) return null;
+  return (await dfetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`)).json();
+}
+async function writeJson(name, parentId, obj){
+  const body = JSON.stringify(obj, null, 1);
+  let f = await findFile(name, parentId);
+  if (!f) {
+    f = await (await dfetch('https://www.googleapis.com/drive/v3/files?fields=id', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, parents: [parentId], mimeType: 'application/json' }) })).json();
+  }
+  const r = await dfetch(`https://www.googleapis.com/upload/drive/v3/files/${f.id}?uploadType=media`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body });
+  if (!r.ok) throw new Error('저장 실패 ' + r.status);
+}
+async function uploadFile(file, parentId, name){
+  const meta = { name: name || file.name, parents: [parentId] };
+  const init = await dfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,webViewLink', {
+    method: 'POST', headers: { 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': file.type || 'application/octet-stream' }, body: JSON.stringify(meta) });
+  if (!init.ok) throw new Error('업로드 시작 실패 ' + init.status);
+  const url = init.headers.get('Location');
+  const put = await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+  if (!put.ok) throw new Error('업로드 실패 ' + put.status);
+  const d = await put.json();
+  return { id: d.id, link: d.webViewLink || ('https://drive.google.com/file/d/' + d.id + '/view') };
+}
+
+/* ───────── 데이터 ───────── */
+let L = null, Q = { items: {} }, DONE = { items: {} }, FOLDER = null, FILTER = 'need', CARD = 'all';
+const $ = s => document.querySelector(s);
+const won = n => (n < 0 ? '-' : '') + Math.abs(n).toLocaleString('ko-KR') + '원';
+function toast(m, err){ const t = $('#toast'); t.textContent = m; t.style.background = err ? '#b91c1c' : '#111'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2600); }
+
+async function boot(){
+  $('#btnLogin').hidden = true; $('#btnReload').hidden = false;
+  try {
+    const me = await (await dfetch('https://www.googleapis.com/drive/v3/about?fields=user')).json();
+    $('#who').textContent = me.user ? me.user.emailAddress : '';
+    FOLDER = await deepFolder(['라이프밀', '영수증', '_마감', MONTH]);
+    L = await readJson('ledger.json', FOLDER);
+    if (!L) { toast('ledger.json 이 아직 없습니다 (자동화PC 생성 대기)', true); return; }
+    Q = (await readJson('queue.json', FOLDER)) || { items: {} };
+    DONE = (await readJson('done.json', FOLDER)) || { items: {} };
+    $('#month').textContent = L.month; $('#period').textContent = `사용기간 ${L.period} · 명세 ${L.statements['1896'].count + L.statements['2748'].count}건 · 데이터 ${L.generatedAt.slice(0, 16).replace('T', ' ')}`;
+    $('#gate').hidden = true; $('#app').hidden = false;
+    render();
+  } catch (e) { toast('불러오기 실패: ' + e.message, true); console.error(e); }
+}
+
+function stateOf(r){
+  if (DONE.items[r.key]) return 'done';
+  if (Q.items[r.key]) return 'queued';
+  return (r.needFin || r.needDash) ? 'need' : 'done';
+}
+function render(){
+  const rows = L.rows.slice().sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
+  const st = { need: 0, queued: 0, done: 0 };
+  rows.forEach(r => st[stateOf(r)]++);
+  $('#stats').innerHTML = `
+    <div class="stat"><b>${rows.length}</b><span>명세 총 건수</span></div>
+    <div class="stat"><b style="color:var(--bad)">${st.need}</b><span>처리 필요</span></div>
+    <div class="stat"><b style="color:var(--warn)">${st.queued}</b><span>취합됨 · 자동화PC 반영 대기</span></div>
+    <div class="stat"><b style="color:var(--ok)">${st.done}</b><span>완료(재무폴더+대시보드)</span></div>`;
+  const list = $('#list'); list.innerHTML = '';
+  const vis = rows.filter(r => (FILTER === 'all' || stateOf(r) === FILTER) && (CARD === 'all' || r.card === CARD));
+  if (!vis.length) { list.innerHTML = '<p class="hint" style="text-align:center;padding:30px">해당하는 건이 없습니다.</p>'; return; }
+  vis.forEach(r => list.appendChild(rowEl(r)));
+}
+function vendorOptions(sel){
+  const vs = L.vendors.slice(); if (!vs.includes(sel) && sel) vs.push(sel);
+  return vs.map(v => `<option ${v === sel ? 'selected' : ''}>${v}</option>`).join('') + '<option value="__new">+ 직접 입력…</option>';
+}
+function outputOptions(sel){
+  return '<option value="">(프로젝트 미지정)</option>' + L.outputs.map(o => `<option value="${o.id}" ${String(o.id) === String(sel) ? 'selected' : ''}>${o.name} · ${o.type}</option>`).join('');
+}
+function rowEl(r){
+  const s = stateOf(r); const q = Q.items[r.key] || {}; const d = DONE.items[r.key];
+  const el = document.createElement('div'); el.className = 'row ' + (s === 'done' ? 'done' : '');
+  const mmdd = r.date.slice(5).replace('-', '/');
+  const badges = [
+    `<span class="b">${r.card}</span>`,
+    r.finFile ? `<span class="b ok">재무폴더 ✓</span>` : `<span class="b bad">재무폴더 ✗</span>`,
+    r.dash === '해당없음(상쇄)' ? `<span class="b">대시보드 해당없음</span>` : (r.dash ? `<span class="b ok">대시보드 ✓</span>` : `<span class="b bad">대시보드 ✗</span>`),
+    s === 'queued' ? `<span class="b warn">취합됨 · 반영 대기</span>` : '', s === 'done' && d ? `<span class="b ok">완료 ${d.at ? d.at.slice(0, 10) : ''}</span>` : '',
+  ].join('');
+  let body = '';
+  if (s === 'need' || s === 'queued') {
+    const noRcpt = q.noReceipt ? 'checked' : '';
+    body = `
+    <div class="form">
+      <label>업체(결제처) <select data-k="vendor">${vendorOptions(q.vendor || r.vendorHint)}</select><input data-k="vendorNew" placeholder="새 업체명" hidden></label>
+      <label>프로젝트 <select data-k="projectId">${outputOptions(q.projectId)}</select></label>
+      <label class="full">이 영수증은 어디에 사용하신 건가요? <textarea data-k="memo" placeholder="예) 용산 팝업 얼음 구매 / 루티너 4기 촬영 소품">${q.memo || ''}</textarea></label>
+      <label>금액 <input data-k="amount" type="number" value="${q.amount != null ? q.amount : r.amount}"></label>
+      <label>결제일 <input data-k="paidDate" type="date" value="${q.paidDate || r.date}"></label>
+      <label class="full" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-k="noReceipt" ${noRcpt} style="width:auto"> 영수증 없음 (종이영수증은 사진으로 올려주세요 · 상쇄건 등은 체크)</label>
+    </div>
+    <div class="actions">
+      <input type="file" data-k="file" accept="image/*,application/pdf" style="width:auto;max-width:260px">
+      <button class="drive" data-act="upload">☁ 구글드라이브 업로드</button>
+      <button class="pri" data-act="save">저장</button>
+      ${q.receiptUrl ? `<a class="rl" href="${q.receiptUrl}" target="_blank">🧾 올린 영수증 열기</a>` : (r.finFile && !r.needFin ? `<span class="hint">재무폴더에 파일 있음 → 폼만 저장하면 그 파일로 대시보드 등록</span>` : '')}
+      <span class="msg" data-k="msg"></span>
+    </div>
+    <p class="hint">업로드 위치: 내 드라이브 › 라이프밀 › 영수증 › <b data-k="vendorLabel">${q.vendor || r.vendorHint}</b> (대시보드 실결제와 동일) · 파일명은 <code>${mmdd.replace('/', '.')} 업체 [${won(r.amount)}] (메모)</code> 형식으로 자동 지정</p>`;
+  } else {
+    body = `<p class="hint">${r.finFile ? '재무폴더: ' + r.finFile : ''}${r.dash ? ' · 대시보드: ' + r.dash : ''}${d && d.receiptUrl ? ` · <a class="rl" href="${d.receiptUrl}" target="_blank">영수증</a>` : ''}</p>`;
+  }
+  el.innerHTML = `
+    <div class="top"><span class="date">${mmdd} ${r.datetime.slice(11)}</span><span class="vendor">${r.vendorRaw}</span><span class="amt ${r.amount < 0 ? 'neg' : ''}">${won(r.amount)}</span></div>
+    <div class="badges">${badges}</div>${body}`;
+  // 이벤트
+  const vsel = el.querySelector('[data-k=vendor]'), vnew = el.querySelector('[data-k=vendorNew]'), vlab = el.querySelector('[data-k=vendorLabel]');
+  if (vsel) vsel.onchange = () => { const nw = vsel.value === '__new'; vnew.hidden = !nw; if (!nw && vlab) vlab.textContent = vsel.value; };
+  if (vnew) vnew.oninput = () => { if (vlab) vlab.textContent = vnew.value || '미지정'; };
+  const up = el.querySelector('[data-act=upload]'), sv = el.querySelector('[data-act=save]');
+  if (up) up.onclick = () => doUpload(r, el);
+  if (sv) sv.onclick = () => doSave(r, el, false);
+  return el;
+}
+function readForm(r, el){
+  const g = k => el.querySelector(`[data-k=${k}]`);
+  let vendor = g('vendor').value; if (vendor === '__new') vendor = (g('vendorNew').value || '').trim();
+  const pid = g('projectId').value; const out = L.outputs.find(o => String(o.id) === pid);
+  return { vendor, projectId: pid ? Number(pid) : null, project: out ? out.name : '', memo: (g('memo').value || '').trim(),
+           amount: Number(g('amount').value), paidDate: g('paidDate').value, noReceipt: g('noReceipt').checked };
+}
+function setMsg(el, m, cls){ const x = el.querySelector('[data-k=msg]'); x.textContent = m; x.className = 'msg ' + (cls || ''); }
+async function doUpload(r, el){
+  const f = readForm(r, el); const fileIn = el.querySelector('[data-k=file]'); const file = fileIn.files && fileIn.files[0];
+  if (!file) { setMsg(el, '파일을 먼저 선택하세요', 'err'); return; }
+  if (!f.vendor) { setMsg(el, '업체를 입력하세요', 'err'); return; }
+  const btn = el.querySelector('[data-act=upload]'); btn.disabled = true; setMsg(el, '업로드 중…');
+  try {
+    const folderId = await deepFolder(['라이프밀', '영수증', f.vendor]);
+    const ext = (file.name.match(/\.[a-z0-9]+$/i) || ['.png'])[0].toLowerCase();
+    const mm = String(Number(r.date.slice(5, 7))), dd = String(Number(r.date.slice(8, 10)));
+    const memoShort = f.memo.replace(/[\\/:*?"<>|]/g, ' ').slice(0, 20).trim();
+    const name = `${mm}.${dd} ${f.vendor} [${won(f.amount)}]${memoShort ? ' (' + memoShort + ')' : ''}${ext}`;
+    const u = await uploadFile(file, folderId, name);
+    Q.items[r.key] = Object.assign({}, Q.items[r.key] || {}, f, { key: r.key, card: r.card, cardId: r.cardId, vendorRaw: r.vendorRaw, stmtAmount: r.amount,
+      receiptUrl: u.link, receiptFileId: u.id, receiptName: name, uploadedAt: new Date().toISOString(), by: $('#who').textContent, status: 'uploaded' });
+    await writeJson('queue.json', FOLDER, Q);
+    setMsg(el, '업로드 + 저장 완료', 'ok'); toast('드라이브에 올렸습니다: ' + name); render();
+  } catch (e) { setMsg(el, e.message, 'err'); console.error(e); }
+  btn.disabled = false;
+}
+async function doSave(r, el){
+  const f = readForm(r, el);
+  if (!f.vendor) { setMsg(el, '업체를 입력하세요', 'err'); return; }
+  const prev = Q.items[r.key] || {};
+  if (!prev.receiptUrl && !f.noReceipt && r.needFin) { setMsg(el, '영수증을 업로드하거나 「영수증 없음」을 체크하세요', 'err'); return; }
+  setMsg(el, '저장 중…');
+  try {
+    Q.items[r.key] = Object.assign({}, prev, f, { key: r.key, card: r.card, cardId: r.cardId, vendorRaw: r.vendorRaw, stmtAmount: r.amount,
+      savedAt: new Date().toISOString(), by: $('#who').textContent, status: prev.receiptUrl ? 'uploaded' : (f.noReceipt ? 'noReceipt' : 'formOnly') });
+    await writeJson('queue.json', FOLDER, Q);
+    setMsg(el, '저장 완료 — 자동화PC가 대시보드·재무폴더에 반영합니다', 'ok'); render();
+  } catch (e) { setMsg(el, e.message, 'err'); }
+}
+document.querySelectorAll('.chip[data-f]').forEach(c => c.onclick = () => { document.querySelectorAll('.chip[data-f]').forEach(x => x.classList.remove('on')); c.classList.add('on'); FILTER = c.dataset.f; render(); });
+document.querySelectorAll('.chip[data-c]').forEach(c => c.onclick = () => { document.querySelectorAll('.chip[data-c]').forEach(x => x.classList.remove('on')); c.classList.add('on'); CARD = c.dataset.c; render(); });
+$('#btnLogin').onclick = () => signIn(false);
+$('#btnReload').onclick = () => boot();
+</script>
+</body>
+</html>
