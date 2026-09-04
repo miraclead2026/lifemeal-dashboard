@@ -1,6 +1,6 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-09-04 08:37",
+  "updatedAt": "2026-09-04 09:39",
   "months": [
     {
       "key": "2026-09",
@@ -620,7 +620,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-04 08:34",
+        "activeSubscribersAsOf": "2026-09-04 09:35",
         "canceled": 5,
         "byStatus": {
           "전체": 55,
@@ -4626,7 +4626,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-04 08:34",
+        "activeSubscribersAsOf": "2026-09-04 09:35",
         "canceled": 5,
         "byStatus": {
           "전체": 55,
@@ -10404,6 +10404,16 @@
           "groupProductNo": "52080500"
         }
       ],
+      "subscribers": {
+        "notify": {
+          "total": 4721,
+          "added": 58
+        },
+        "interest": {
+          "total": 4721,
+          "added": 58
+        }
+      },
       "subscription": {
         "revenue": 256660,
         "orders": 3,
@@ -10420,23 +10430,13 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-04 08:34",
+        "activeSubscribersAsOf": "2026-09-04 09:35",
         "canceled": 5,
         "byStatus": {
           "전체": 55,
           "진행중": 50,
           "종료": 0,
           "해지": 5
-        }
-      },
-      "subscribers": {
-        "notify": {
-          "total": 4721,
-          "added": 58
-        },
-        "interest": {
-          "total": 4721,
-          "added": 58
         }
       }
     },
