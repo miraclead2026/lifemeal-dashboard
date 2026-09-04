@@ -148,6 +148,17 @@ async function writeJson(name, parentId, obj){
   const r = await dfetch(`https://www.googleapis.com/upload/drive/v3/files/${f.id}?uploadType=media`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body });
   if (!r.ok) throw new Error('저장 실패 ' + r.status);
 }
+/* 건별 파일: q_<key>.json — 여러 명이 동시에 저장해도 서로 덮어쓰지 않는다 */
+async function writeRow(key, obj){ return writeJson('q_' + key + '.json', FOLDER, obj); }
+async function readAllRows(){
+  const q = `'${FOLDER}' in parents and trashed=false and name contains 'q_'`;
+  const r = await (await dfetch('https://www.googleapis.com/drive/v3/files?pageSize=200&fields=files(id,name)&q=' + encodeURIComponent(q))).json();
+  const items = {};
+  await Promise.all((r.files || []).filter(f => /^q_.+\.json$/.test(f.name)).map(async f => {
+    try { const o = await (await dfetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`)).json(); if (o && o.key) items[o.key] = o; } catch (e) {}
+  }));
+  return items;
+}
 async function uploadFile(file, parentId, name){
   const meta = { name: name || file.name, parents: [parentId] };
   const init = await dfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,webViewLink', {
@@ -182,11 +193,19 @@ async function loadState(){
     const me = await (await dfetch('https://www.googleapis.com/drive/v3/about?fields=user')).json();
     $('#who').textContent = me.user ? me.user.emailAddress : '';
     FOLDER = await deepFolder(['라이프밀', '영수증', '_마감', MONTH]);
-    Q = (await readJson('queue.json', FOLDER)) || { items: {} };
-    DONE = (await readJson('done.json', FOLDER)) || { items: {} };
-    $('#period').textContent = $('#period').textContent.replace(' · 취합 상태는 구글 로그인 후 표시', ' · 드라이브 연결됨');
-    render();
+    await refreshState();
+    $('#period').textContent = $('#period').textContent.replace(' · 취합 상태는 구글 로그인 후 표시', ' · 드라이브 연결됨 · 30초마다 자동 새로고침');
+    if (!_poll) _poll = setInterval(() => refreshState().catch(() => {}), 30000);
   } catch (e) { toast('드라이브 상태 읽기 실패: ' + e.message, true); console.error(e); }
+}
+let _poll = null, _busy = false;
+async function refreshState(){
+  if (_busy) return; _busy = true;
+  try {
+    const [items, done] = await Promise.all([readAllRows(), readJson('done.json', FOLDER)]);
+    Q = { items }; DONE = done || { items: {} };
+    if (!document.activeElement || !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) render();  // 입력 중이면 화면 유지
+  } finally { _busy = false; }
 }
 
 function stateOf(r){
@@ -218,7 +237,7 @@ function outputOptions(sel){
 function rowEl(r){
   const s = stateOf(r); const q = Q.items[r.key] || {}; const d = DONE.items[r.key];
   const el = document.createElement('div'); el.className = 'row ' + (s === 'done' ? 'done' : '');
-  const mmdd = r.date.slice(5).replace('-', '/');
+  const mmdd = Number(r.date.slice(5, 7)) + '/' + Number(r.date.slice(8, 10));
   const badges = [
     `<span class="b">${r.card}</span>`,
     r.finFile ? `<span class="b ok">재무폴더 ✓</span>` : `<span class="b bad">재무폴더 ✗</span>`,
@@ -283,7 +302,7 @@ async function doUpload(r, el){
     const u = await uploadFile(file, folderId, name);
     Q.items[r.key] = Object.assign({}, Q.items[r.key] || {}, f, { key: r.key, card: r.card, cardId: r.cardId, vendorRaw: r.vendorRaw, stmtAmount: r.amount,
       receiptUrl: u.link, receiptFileId: u.id, receiptName: name, uploadedAt: new Date().toISOString(), by: $('#who').textContent, status: 'uploaded' });
-    await writeJson('queue.json', FOLDER, Q);
+    await writeRow(r.key, Q.items[r.key]);
     setMsg(el, '업로드 + 저장 완료', 'ok'); toast('드라이브에 올렸습니다: ' + name); render();
   } catch (e) { setMsg(el, e.message, 'err'); console.error(e); }
   btn.disabled = false;
@@ -298,7 +317,7 @@ async function doSave(r, el){
     await ensureToken(); if (!FOLDER) throw new Error('드라이브 연결 실패');
     Q.items[r.key] = Object.assign({}, prev, f, { key: r.key, card: r.card, cardId: r.cardId, vendorRaw: r.vendorRaw, stmtAmount: r.amount,
       savedAt: new Date().toISOString(), by: $('#who').textContent, status: prev.receiptUrl ? 'uploaded' : (f.noReceipt ? 'noReceipt' : 'formOnly') });
-    await writeJson('queue.json', FOLDER, Q);
+    await writeRow(r.key, Q.items[r.key]);
     setMsg(el, '저장 완료 — 자동화PC가 대시보드·재무폴더에 반영합니다', 'ok'); render();
   } catch (e) { setMsg(el, e.message, 'err'); }
 }
