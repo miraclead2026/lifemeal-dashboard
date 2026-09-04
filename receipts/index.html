@@ -161,6 +161,20 @@ async function readAllRows(){
   }));
   return items;
 }
+async function trashFile(id){ return dfetch(`https://www.googleapis.com/drive/v3/files/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trashed: true }) }); }
+async function deleteRow(key){ const f = await findFile('q_' + key + '.json', FOLDER); if (f) await trashFile(f.id); }
+async function doUndo(r, el){
+  const q = Q.items[r.key]; if (!q) return;
+  if (DONE.items[r.key]) { setMsg(el, '이미 자동화PC가 반영한 건입니다 — 현수/유니에게 알려주세요', 'err'); return; }
+  if (!confirm(`「${r.vendorRaw} ${won(r.amount)}」 취합을 취소할까요?\n올린 영수증 파일은 드라이브 휴지통으로 이동합니다(30일 복구 가능).`)) return;
+  setMsg(el, '취소 중…');
+  try {
+    await ensureToken();
+    if (q.receiptFileId) { try { await trashFile(q.receiptFileId); } catch (e) {} }
+    await deleteRow(r.key); delete Q.items[r.key];
+    toast('취합을 취소했습니다'); render();
+  } catch (e) { setMsg(el, e.message, 'err'); }
+}
 async function uploadFile(file, parentId, name){
   const meta = { name: name || file.name, parents: [parentId] };
   const init = await dfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,webViewLink', {
@@ -293,8 +307,8 @@ function rowEl(r){
     <div class="actions">
       <input type="file" data-k="file" accept="image/*,application/pdf" style="width:auto;max-width:260px">
       <button class="drive" data-act="upload">☁ 구글드라이브 업로드</button>
-      <button class="pri" data-act="save">저장</button>
-      ${q.receiptUrl ? `<a class="rl" href="${q.receiptUrl}" target="_blank">🧾 올린 영수증 열기</a>` : (r.finFile && !r.needFin ? `<span class="hint">재무폴더에 파일 있음 → 폼만 저장하면 그 파일로 대시보드 등록</span>` : '')}
+      <button class="pri" data-act="save">${q.receiptUrl ? '메모·업체 수정 저장' : '저장'}</button>
+      ${q.receiptUrl ? `<a class="rl" href="${q.receiptUrl}" target="_blank">🧾 올린 영수증 열기</a> <button data-act="undo" title="올린 파일을 휴지통으로 보내고 처리 필요 상태로 되돌립니다">↩ 취합 취소</button>` : (s === 'queued' ? `<button data-act="undo">↩ 취합 취소</button>` : '') + (r.finFile && !r.needFin ? `<span class="hint">재무폴더에 파일 있음 → 폼만 저장하면 그 파일로 대시보드 등록</span>` : '')}
       <span class="msg" data-k="msg"></span>
     </div>
     <p class="hint">업로드 위치: 내 드라이브 › 라이프밀 › 영수증 › <b data-k="vendorLabel">${q.vendor || r.vendorHint}</b> (대시보드 실결제와 동일) · 파일명은 <code>${mmdd.replace('/', '.')} 업체 [${won(r.amount)}] (메모)</code> 형식으로 자동 지정</p>`;
@@ -311,6 +325,8 @@ function rowEl(r){
   const up = el.querySelector('[data-act=upload]'), sv = el.querySelector('[data-act=save]');
   if (up) up.onclick = () => doUpload(r, el);
   if (sv) sv.onclick = () => doSave(r, el, false);
+  const un = el.querySelector('[data-act=undo]');
+  if (un) un.onclick = () => doUndo(r, el);
   return el;
 }
 function readForm(r, el){
@@ -333,7 +349,9 @@ async function doUpload(r, el){
     const mm = String(Number(r.date.slice(5, 7))), dd = String(Number(r.date.slice(8, 10)));
     const memoShort = f.memo.replace(/[\\/:*?"<>|]/g, ' ').slice(0, 20).trim();
     const name = `${mm}.${dd} ${f.vendor} [${won(f.amount)}]${memoShort ? ' (' + memoShort + ')' : ''}${ext}`;
+    const prevFile = (Q.items[r.key] || {}).receiptFileId;
     const u = await uploadFile(file, folderId, name);
+    if (prevFile && prevFile !== u.id) { try { await trashFile(prevFile); } catch (e) {} }   // 다시 올리면 이전 파일은 휴지통
     Q.items[r.key] = Object.assign({}, Q.items[r.key] || {}, f, { key: r.key, card: r.card, cardId: r.cardId, vendorRaw: r.vendorRaw, stmtAmount: r.amount,
       receiptUrl: u.link, receiptFileId: u.id, receiptName: name, uploadedAt: new Date().toISOString(), by: $('#who').textContent, status: 'uploaded' });
     await writeRow(r.key, Q.items[r.key]);
