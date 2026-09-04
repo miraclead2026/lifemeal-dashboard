@@ -2341,10 +2341,20 @@ function drawChart(host){
   if (!host) return;
   const _m = (SEED.months || [])[MSEL] || (SEED.months || [])[0];
   if (!_m) return;
+  // [v8] 일별이 비면 act 가 빈 배열이 되고 act[act.length-1] 이 undefined 가 된다.
+  //      drawFlow 에는 원래 있던 가드가 여기엔 없어서 홈 전체가 죽었다(9/1 실측).
+  if (!(_m.daily || []).length) {
+    host.innerHTML = `<div style="padding:26px;color:var(--tx3);font-size:12.5px">이 달 일별 데이터가 없습니다.</div>`;
+    return;
+  }
   const W = 1200, H = 180, L = 34, R = 34, T = 20, B = 26;
   const iw = W-L-R, ih = H-T-B;
-  const x = d => L + (d-1)/((_m.days||1)-1)*iw, y = v => T + ih - (G ? v/G*ih : 0);
+  const x = d => L + (d-1)/((_m.days||1)-1)*iw;
   let a = 0; const cum = (_m.daily||[]).map(p => (a += (p[1]||0)));
+  // [v9] 목표가 없는 달은 목표선을 기준으로 그릴 수 없다 — 그 달 실적에 눈금을 맞춘다
+  const HG = G > 0;
+  const YMAX = HG ? G : Math.max(1, landing || 0, cum[cum.length - 1] || 0);
+  const y = v => T + ih - v / YMAX * ih;
   const P = p => p.map((q,i) => (i?"L":"M") + q[0].toFixed(1) + " " + q[1].toFixed(1)).join("");
   const act = cum.map((v,i) => [x(i+1), y(v)]);
   const goal = Array.from({length:_m.days}, (_,i) => [x(i+1), y(G/(_m.days||1)*(i+1))]);
@@ -2353,18 +2363,18 @@ function drawChart(host){
   host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img"
     aria-label="${_m.label} 누적 매출과 목표선 비교">
     <path d="${P(act)}L${e[0].toFixed(1)} ${(T+ih).toFixed(1)}L${L} ${(T+ih).toFixed(1)}Z" fill="url(#gArea)" id="cArea" opacity="0"/>
-    <path class="hcG" d="${P(goal)}"/><path class="hcP" d="${P(proj)}"/>
+    ${HG ? `<path class="hcG" d="${P(goal)}"/>` : ""}<path class="hcP" d="${P(proj)}"/>
     <path class="hcL" id="cLine" d="${P(act)}"/>
-    <line x1="${e[0].toFixed(1)}" y1="${e[1].toFixed(1)}" x2="${e[0].toFixed(1)}" y2="${g24[1].toFixed(1)}"
-          stroke="#F0BA5E" stroke-width="1.5" stroke-dasharray="3 4" opacity=".9"/>
+    ${(!HG || _m.elapsed >= _m.days) ? "" : `<line x1="${e[0].toFixed(1)}" y1="${e[1].toFixed(1)}" x2="${e[0].toFixed(1)}" y2="${g24[1].toFixed(1)}"
+          stroke="#F0BA5E" stroke-width="1.5" stroke-dasharray="3 4" opacity=".9"/>`}
     <circle cx="${e[0].toFixed(1)}" cy="${e[1].toFixed(1)}" r="13" fill="#4FD99A" opacity=".14"/>
     <circle cx="${e[0].toFixed(1)}" cy="${e[1].toFixed(1)}" r="5" fill="#16211C" stroke="#A6F5D0" stroke-width="2.6"/>
     <circle cx="${ep[0].toFixed(1)}" cy="${ep[1].toFixed(1)}" r="3.6" fill="#F0BA5E"/>
-    <text class="hcT b" x="${(e[0]+12).toFixed(1)}" y="${((e[1]+g24[1])/2+4).toFixed(1)}" fill="#FFD48A">−${won(G*paceRate-S.revenue)}</text>
-    <text class="hcT" x="${(goal[_m.days-1][0]-6).toFixed(1)}" y="${(goal[_m.days-1][1]-9).toFixed(1)}" text-anchor="end">목표선</text>
+    ${(!HG || _m.elapsed >= _m.days) ? "" : `<text class="hcT b" x="${(e[0]+12).toFixed(1)}" y="${((e[1]+g24[1])/2+4).toFixed(1)}" fill="#FFD48A">−${won(G*paceRate-S.revenue)}</text>`}
+    ${HG ? `<text class="hcT" x="${(goal[_m.days-1][0]-6).toFixed(1)}" y="${(goal[_m.days-1][1]-9).toFixed(1)}" text-anchor="end">목표선</text>` : ""}
     <text class="hcT b" x="${(ep[0]-6).toFixed(1)}" y="${(ep[1]+18).toFixed(1)}" text-anchor="end" fill="#FFD48A">예상 ${won(landing)}</text>
     <text class="hcT" x="${L}" y="${H-6}">${_m.key.slice(5)}/1</text>
-    <text class="hcT b" x="${e[0].toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#A6F5D0">${_m.elapsed>=_m.days?"마감":"오늘"}</text>
+    ${_m.elapsed >= _m.days ? "" : `<text class="hcT b" x="${e[0].toFixed(1)}" y="${H-6}" text-anchor="middle" fill="#A6F5D0">오늘</text>`}
     <text class="hcT" x="${W-R}" y="${H-6}" text-anchor="end">${_m.key.slice(5)}/${_m.days}</text></svg>`;
   if (RM) { $("#cArea", host).setAttribute("opacity", "1"); return; }
   const ln = $("#cLine", host), len = ln.getTotalLength();
@@ -2714,7 +2724,8 @@ function grab(name){
     .catch(() => null);
 }
 function applyLive(F){
-  // 라이브 값은 이번 달만 갱신한다. 나머지 달은 스냅샷이 정본.
+  // [v9] 피드가 가진 달은 전부 피드가 정본이다. 피드에 없는 달만 스냅샷이 정본.
+  //      (v8 까지는 「이번 달만」 갱신해서, 달이 바뀌면 직전 달이 미완성으로 얼어붙었다)
   // [v7] 이번 달을 피드가 아직 안 냈으면(월초) 데이터가 있는 마지막 달을 이번 달로 본다.
   //      빈 달을 만들어 선택하면 매달 1일에 화면이 「0원」으로 읽힌다 — 없는 것과 0은 다르다.
   const todayYm = TODAY.slice(0,7);
@@ -2722,23 +2733,34 @@ function applyLive(F){
   const ym = (feedYms.indexOf(todayYm) >= 0 || !feedYms.length) ? todayYm : feedYms[feedYms.length - 1];
   LIVE_YM = ym;
   SEED.months = SEED.months || [];
-  let m = SEED.months.find(x => x.key === ym);
-  if (!m) {
-    // 달이 바뀌었다 — 빈 달을 만들어 앞에 꽂는다(라이브가 채운다)
-    const y = +ym.slice(0,4), mo2 = +ym.slice(5,7);
-    m = { key: ym, label: mo2 + "월", days: new Date(y, mo2, 0).getDate(), elapsed: 0,
-          sum: { revenue:0, orders:0, aov:0, visitors:0, conversion:0, refund:0 },
-          delta: {}, daily: [], channels: [], products: [],
-          ads: { spend:0, rev:0, conv:0, clicks:0, imp:0, roas:0,
-                 display:{spend:0,rev:0,roas:0}, search:{spend:0,rev:0,roas:0} } };
-    SEED.months.unshift(m);
-    MSEL = 0;
-  }
+  // [v9] 없으면 만들고 있으면 그대로 준다. 목록은 항상 최신 달이 앞.
+  const ensureMonth = k2 => {
+    let mm = SEED.months.find(x => x.key === k2);
+    if (mm) return mm;
+    const y = +k2.slice(0,4), mo2 = +k2.slice(5,7);
+    mm = { key: k2, label: mo2 + "월", days: new Date(y, mo2, 0).getDate(), elapsed: 0,
+           sum: { revenue:0, orders:0, aov:0, visitors:0, conversion:0, refund:0 },
+           delta: {}, daily: [], channels: [], products: [],
+           ads: { spend:0, rev:0, conv:0, clicks:0, imp:0, roas:0,
+                  display:{spend:0,rev:0,roas:0}, search:{spend:0,rev:0,roas:0} } };
+    SEED.months.push(mm);
+    SEED.months.sort((a, b) => a.key < b.key ? 1 : -1);
+    return mm;
+  };
+  ensureMonth(ym);
   let ch = false;
   const js = F["naver-sales"];
   if (js && js.months) {
-    const mo = js.months.find(x => x && x.key === ym);
-    if (mo) {
+    // [v9] 이번 달만 갱신하면 달이 바뀌는 순간 직전 달이 미완성으로 얼어붙는다.
+    //      화면 8월 24일치 8,713만 vs 피드 8월 31일치 1억 2,493만 — 30% 낮게 보였다.
+    //      피드가 가진 달은 전부 피드가 정본이다.
+    (js.months || []).forEach(mo => {
+      if (!mo || !mo.key) return;
+      // 피드에 달 껍데기만 있으면 건너뛴다 — 멀쩡한 스냅샷을 0 으로 지우지 않는다
+      const has = ((mo.daily || []).filter(x => x && x.date).length) ||
+                  ((((mo.summary || {}).revenue) || {}).value || 0);
+      if (!has) return;
+      const m = ensureMonth(mo.key);
       const gv = k => ((((mo.summary || {})[k]) || {}).value) || 0;
       m.sum = { revenue: gv("revenue"), orders: gv("orders"), aov: gv("aov"),
                 visitors: gv("visitors"), conversion: gv("conversion"), refund: gv("refund") };
@@ -2755,8 +2777,10 @@ function applyLive(F){
       const p2 = (mo.products || []).slice().sort((a,b) => (b.revenue||0)-(a.revenue||0)).slice(0,8);
       if (p2.length) m.products = p2.map(x => [x.name, x.revenue||0, x.qty||0]);
       ch = true;
-    }
+    });
   }
+  // [v9] 위에서 달이 늘며 순서가 바뀌었을 수 있다 — 화면이 볼 달을 다시 고른다
+  MSEL = Math.max(0, SEED.months.findIndex(x => x.key === ym));
   /* 알림받기 구독자 — naver-sales 의 최상위 days[].subscribers.notify (기간 끝 누적) */
   if (js && Array.isArray(js.days)) {
     const rs = js.days.filter(d => d && d.key && d.key <= TODAY && d.subscribers && d.subscribers.notify)
@@ -2780,18 +2804,24 @@ function applyLive(F){
   }
   const ja = F["naver-ads"];
   if (ja && ja.days) {
-    const t = {spend:0,rev:0,conv:0,clicks:0,imp:0}, by = {display:{spend:0,rev:0}, search:{spend:0,rev:0}};
-    ja.days.filter(x => String(x.date||"").slice(0,7) === ym).forEach(x => {
+    // [v9] 매출만 달마다 고치면 지난달 광고가 스냅샷으로 남아 한 화면에서 어긋난다
+    const byMonth = {};
+    ja.days.forEach(x => {
+      const k2 = String(x.date||"").slice(0,7); if (!k2) return;
+      const b = byMonth[k2] || (byMonth[k2] = { t:{spend:0,rev:0,conv:0,clicks:0,imp:0},
+                                                by:{display:{spend:0,rev:0}, search:{spend:0,rev:0}} });
       (x.groups || []).forEach(g => {
         const c2 = g.channel === "search" ? "search" : "display";
-        t.spend += g.spend||0; t.rev += g.convRevenue||0; t.conv += g.purchaseConv||0;
-        t.clicks += g.clicks||0; t.imp += g.impressions||0;
-        by[c2].spend += g.spend||0; by[c2].rev += g.convRevenue||0; }); });
-    if (t.spend > 0) {
-      const r = o => o.spend ? Math.round(o.rev/o.spend*1000)/10 : 0;
-      m.ads = {...t, roas:r(t), display:{...by.display, roas:r(by.display)}, search:{...by.search, roas:r(by.search)}};
+        b.t.spend += g.spend||0; b.t.rev += g.convRevenue||0; b.t.conv += g.purchaseConv||0;
+        b.t.clicks += g.clicks||0; b.t.imp += g.impressions||0;
+        b.by[c2].spend += g.spend||0; b.by[c2].rev += g.convRevenue||0; }); });
+    const r = o => o.spend ? Math.round(o.rev/o.spend*1000)/10 : 0;
+    Object.keys(byMonth).forEach(k2 => {
+      const b = byMonth[k2]; if (!(b.t.spend > 0)) return;
+      const tm = (SEED.months || []).find(x => x.key === k2); if (!tm) return;
+      tm.ads = {...b.t, roas:r(b.t), display:{...b.by.display, roas:r(b.by.display)}, search:{...b.by.search, roas:r(b.by.search)}};
       ch = true;
-    }
+    });
   }
   const jc = F["shopping-connect"];
   if (jc && jc.summary) {
@@ -2848,7 +2878,8 @@ let LIVE_YM = "";
    날짜가 덜 온 경우와, 날짜는 다 왔는데 방문자만 덜 온 경우를 나눈다. */
 function liveGap(F){
   try {
-    const js = F["naver-sales"]; if (!js || !js.months) return null;
+    const js = F["naver-sales"];
+    if (!js || !js.months) return { what: "매출 피드", upto: "" };
     const ym = LIVE_YM || TODAY.slice(0, 7);
     if (ym !== TODAY.slice(0, 7)) return { what: "이번 달", upto: ym + "-末", month: ym };
     const mo = js.months.find(x => x && x.key === ym); if (!mo || !mo.daily) return null;
@@ -2867,15 +2898,21 @@ function loadLive(){
   return Promise.all(FEEDS.map(n => grab(n).then(j => { if (j) F[n] = j; })))
     .then(() => {
       const ok = Object.keys(F).length;
-      if (ok && applyLive(F)) {
-        recompute();
-        const h = document.getElementById("t-home");
-        if (h) { h.dataset.built = ""; window.LM.mountHome(h); }
-      }
+      // [v8] 그리다 죽으면 아래 상단바 코드까지 통째로 건너뛰어 「불러오는 중」에 얼어붙었다.
+      //      삼키지 않고 콘솔에 남기되, 화면에는 멈췄다고 말한다.
+      let drawErr = null;
+      try {
+        if (ok && applyLive(F)) {
+          recompute();
+          const h = document.getElementById("t-home");
+          if (h) { h.dataset.built = ""; window.LM.mountHome(h); }
+        }
+      } catch (e) { drawErr = e; console.error("[LM] 홈을 그리다 멈췄습니다", e); }
       const f = $("#freshTx");
       if (f) {
         f.classList.remove("ok", "stale");
-        if (!ok) { f.textContent = "스냅샷 표시 중 · 실데이터를 못 불러왔습니다"; f.classList.add("stale"); }
+        if (drawErr) { f.textContent = "화면을 그리다 멈췄습니다 · 새로고침해 주세요"; f.classList.add("stale"); }
+        else if (!ok) { f.textContent = "스냅샷 표시 중 · 실데이터를 못 불러왔습니다"; f.classList.add("stale"); }
         else {
           const gap = liveGap(F);
           if (gap && gap.month) {
@@ -3209,7 +3246,7 @@ const UP_TAGS = { '신규기능': 'var(--em)', '개선': 'var(--cool)', '수정'
 //   코드 곳곳의 (index_NNN) 주석은 '그 코드가 처음 들어온 빌드'를 가리킨다.
 //   지금 빌드가 몇 번인지는 여기만 보면 된다. 흩어진 주석으로 추적하지 않는다.
 // ═══════════════════════════════════════════════════════════════════════════
-const BUILD_TAG = 'index_183_K5_v7';
+const BUILD_TAG = 'index_183_K5_v9';
 // [index_155] 탭 6묶음 구조 되돌리기용 한 줄 스위치.
 //   false 로 바꾸면 예전 17개 탭이 그대로 돌아온다 — 데이터는 하나도 안 잃는다(화면 구조만).
 const TAB_GROUPS_ON = true;
