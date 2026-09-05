@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-05T23:20:43+09:00",
+  "updatedAt": "2026-09-05T23:21:56+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시.",
   "creators": [
     {
@@ -115,8 +115,7 @@
           "authorName": "보읽남(보고서 읽어주는 남자)",
           "connect": "strong",
           "evidence": [
-            "strong",
-            "수수료"
+            "strong"
           ],
           "source": "blog-search"
         }
@@ -283,9 +282,8 @@
       "date": "2026-09-04",
       "author": "nari7802",
       "authorName": "예담티",
-      "connect": "strong",
+      "connect": "link",
       "evidence": [
-        "strong",
         "naver.me"
       ],
       "source": "blog-search"
@@ -395,8 +393,7 @@
       "authorName": "리치맘의 먹고 쓰고 체험하고",
       "connect": "strong",
       "evidence": [
-        "strong",
-        "수수료"
+        "strong"
       ],
       "source": "blog-search"
     },
@@ -488,8 +485,7 @@
       "authorName": "살아본 사람의 취향",
       "connect": "strong",
       "evidence": [
-        "strong",
-        "수수료"
+        "strong"
       ],
       "source": "blog-search"
     },
@@ -525,8 +521,7 @@
       "authorName": "안경언니의 소란한 보통날",
       "connect": "strong",
       "evidence": [
-        "strong",
-        "수수료"
+        "strong"
       ],
       "source": "blog-search"
     },
@@ -578,9 +573,8 @@
       "date": "2026-08-25",
       "author": "ggggg0624",
       "authorName": "안경생각",
-      "connect": "strong",
+      "connect": "link",
       "evidence": [
-        "strong",
         "naver.me"
       ],
       "source": "blog-search"
@@ -599,8 +593,7 @@
       "authorName": "꾹 꾹 눌러담은 약대생 일기",
       "connect": "strong",
       "evidence": [
-        "strong",
-        "수수료"
+        "strong"
       ],
       "source": "blog-search"
     },
@@ -614,8 +607,7 @@
       "authorName": "소비연구소",
       "connect": "strong",
       "evidence": [
-        "strong",
-        "수수료"
+        "strong"
       ],
       "source": "blog-search"
     },
@@ -685,8 +677,7 @@
       "authorName": "Smart Pick",
       "connect": "strong",
       "evidence": [
-        "strong",
-        "수수료"
+        "strong"
       ],
       "source": "blog-search"
     },
@@ -710,8 +701,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-05T23:20:43+09:00",
-    "mode": "ig",
+    "lastRun": "2026-09-05T23:21:56+09:00",
+    "mode": "revalidate",
     "recencyDays": 120,
     "rule": "우리상품 언급 AND (커넥트마커 strong|link OR 작성자=판매크리에이터). 마커 없는 미상 후기는 제외.",
     "markers": {
