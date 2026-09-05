@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-06T00:06:44+09:00",
-  "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시.",
+  "updatedAt": "2026-09-06T00:29:03+09:00",
+  "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
       "creatorSpaceId": 957524799658496,
@@ -252,7 +252,17 @@
       "name": "스페셜리의 건강이야기",
       "primaryChannelType": "NBLOG",
       "primaryUrl": "https://blog.naver.com/specially_h",
-      "posts": [],
+      "posts": [
+        {
+          "platform": "blog",
+          "url": "https://blog.naver.com/specially_h/224377863341",
+          "title": "염증에 좋은 음식 10가지, 만성염증 줄이는 식단과 피해야 할 음식",
+          "thumbnail": null,
+          "date": "Thu, 13 Aug 2026",
+          "source": "naver-rss",
+          "discoveredAt": "2026-09-06"
+        }
+      ],
       "coverage": {
         "blog": "ok(50건중 1)",
         "youtube": "ok(5중 0)"
