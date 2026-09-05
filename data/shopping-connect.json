@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-05 09:39",
+  "updatedAt": "2026-09-06 08:39",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,12 +10,12 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 31686,
+    "accessCnt": 31756,
     "productOrderCnt": 115,
     "salesConversionRate": 0.4,
-    "salesCnt": 177,
-    "salesAmount": 8254490,
-    "commissionAmount": 1324781,
+    "salesCnt": 178,
+    "salesAmount": 8291690,
+    "commissionAmount": 1325524,
     "commissionRate": 16.0
   },
   "products": [
@@ -23,9 +23,9 @@
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 50,
-      "salesAmount": 1719040,
-      "commissionAmount": 500497,
+      "salesCnt": 51,
+      "salesAmount": 1756240,
+      "commissionAmount": 501240,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-05",
+      "label": "9월 5일",
+      "periodStart": "2026-09-05",
+      "periodEnd": "2026-09-05",
+      "summary": {
+        "access": {
+          "value": 70,
+          "deltaValue": 0,
+          "deltaPct": 0.0
+        },
+        "sales": {
+          "value": 37200,
+          "deltaValue": 6100,
+          "deltaPct": 19.6
+        }
+      },
+      "directVisits": 20
+    },
     {
       "key": "2026-09-04",
       "label": "9월 4일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 36
+      "directVisits": null
     },
     {
       "key": "2026-07-21",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-07",
-      "label": "6월 7일",
-      "periodStart": "2026-06-07",
-      "periodEnd": "2026-06-07",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W36",
-      "label": "8/31~9/4",
+      "label": "8/31~9/5",
       "periodStart": "2026-08-31",
-      "periodEnd": "2026-09-04",
+      "periodEnd": "2026-09-05",
       "summary": {
         "access": {
-          "value": 1394,
-          "deltaValue": -5893,
-          "deltaPct": -80.9
+          "value": 1464,
+          "deltaValue": -5823,
+          "deltaPct": -79.9
         },
         "sales": {
-          "value": 423360,
-          "deltaValue": -2317760,
-          "deltaPct": -84.6
+          "value": 460560,
+          "deltaValue": -2280560,
+          "deltaPct": -83.2
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-04",
+      "periodEnd": "2026-09-05",
       "summary": {
         "access": {
-          "value": 945,
-          "deltaValue": -29796,
-          "deltaPct": -96.9
+          "value": 1015,
+          "deltaValue": -29726,
+          "deltaPct": -96.7
         },
         "sales": {
-          "value": 259570,
-          "deltaValue": -7735350,
-          "deltaPct": -96.8
+          "value": 296770,
+          "deltaValue": -7698150,
+          "deltaPct": -96.3
         }
       }
     },
@@ -2637,8 +2637,8 @@
           "followerCount": 238,
           "contentCount": 130,
           "averageVisitCount": null,
-          "averageViewCount": 60364,
-          "averageLikeCount": 82,
+          "averageViewCount": 59591,
+          "averageLikeCount": 81,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2742,7 +2742,7 @@
           "serviceId": "himisong",
           "followerCount": 1042,
           "contentCount": 1097,
-          "averageVisitCount": 493,
+          "averageVisitCount": 624,
           "averageViewCount": null,
           "averageLikeCount": 3,
           "averageCommentCount": 0,
@@ -2756,8 +2756,8 @@
           "followerCount": 555,
           "contentCount": 243,
           "averageVisitCount": null,
-          "averageViewCount": 2411,
-          "averageLikeCount": 4,
+          "averageViewCount": 2110,
+          "averageLikeCount": 3,
           "averageCommentCount": 1,
           "status": "ENABLED"
         }
@@ -2786,13 +2786,13 @@
         {
           "channelType": "NBLOG",
           "url": "https://blog.naver.com/dmsogood",
-          "title": "Vanguard Edge",
+          "title": "보읽남(보고서 읽어주는 남자)",
           "serviceId": "dmsogood",
-          "followerCount": 4450,
-          "contentCount": 2190,
-          "averageVisitCount": 13,
+          "followerCount": 4456,
+          "contentCount": 2201,
+          "averageVisitCount": 43,
           "averageViewCount": null,
-          "averageLikeCount": 15,
+          "averageLikeCount": 16,
           "averageCommentCount": 1,
           "status": "ENABLED"
         },
@@ -2896,6 +2896,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-05",
+      "access": 70,
+      "sales": 37200,
+      "directVisits": 20
+    },
     {
       "date": "2026-09-04",
       "access": 70,
@@ -3164,7 +3170,7 @@
       "date": "2026-07-22",
       "access": 0,
       "sales": 0,
-      "directVisits": 36
+      "directVisits": null
     },
     {
       "date": "2026-07-21",
@@ -3426,12 +3432,6 @@
     },
     {
       "date": "2026-06-08",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-07",
       "access": 0,
       "sales": 0,
       "directVisits": null
