@@ -1,6 +1,6 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-09-05 08:35",
+  "updatedAt": "2026-09-05 10:11",
   "months": [
     {
       "key": "2026-09",
@@ -647,7 +647,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-05 08:32",
+        "activeSubscribersAsOf": "2026-09-05 10:08",
         "canceled": 6,
         "byStatus": {
           "전체": 56,
@@ -4680,7 +4680,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-05 08:32",
+        "activeSubscribersAsOf": "2026-09-05 10:08",
         "canceled": 6,
         "byStatus": {
           "전체": 56,
@@ -10436,6 +10436,21 @@
           "groupProductNo": "50792781"
         }
       ],
+      "subscribers": {
+        "notify": {
+          "total": 4773,
+          "added": 52
+        },
+        "interest": {
+          "total": 4773,
+          "added": 52
+        }
+      },
+      "customers": {
+        "total": 56,
+        "new": 42,
+        "returning": 14
+      },
       "subscription": {
         "revenue": 112500,
         "orders": 1,
@@ -10452,7 +10467,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-05 08:32",
+        "activeSubscribersAsOf": "2026-09-05 10:08",
         "canceled": 6,
         "byStatus": {
           "전체": 56,
@@ -10460,21 +10475,6 @@
           "종료": 0,
           "해지": 6
         }
-      },
-      "subscribers": {
-        "notify": {
-          "total": 4773,
-          "added": 52
-        },
-        "interest": {
-          "total": 4773,
-          "added": 52
-        }
-      },
-      "customers": {
-        "total": 56,
-        "new": 42,
-        "returning": 14
       }
     },
     {
