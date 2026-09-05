@@ -64,7 +64,7 @@
   </div>
   <div class="spacer"></div>
   <span class="sub" id="who"></span>
-  <button id="btnLogin" class="pri">구글 로그인</button>
+  <button id="btnLogin" class="pri">드라이브 연결</button>
   <button id="btnReload" hidden>새로고침</button>
 </header>
 
@@ -104,17 +104,27 @@ function signIn(force){
     if (!window.google || !google.accounts) { rej(new Error('구글 스크립트 로딩 중 — 잠시 후 다시')); return; }
     _tokClient = google.accounts.oauth2.initTokenClient({
       client_id: DRIVE_CLIENT_ID, scope: DRIVE_SCOPE,
-      callback: (r) => { if (r && r.access_token) { _tok = r.access_token; res(_tok); } else rej(new Error('로그인 취소')); },
+      callback: (r) => { if (r && r.access_token) { _tok = r.access_token; saveTok(r); res(_tok); } else rej(new Error('로그인 취소')); },
       error_callback: (e) => rej(new Error(e && e.type ? e.type : 'oauth 실패')),
     });
     _tokClient.requestAccessToken({ prompt: force ? 'consent' : '' });
   }).then(async t => { await loadState(); return t; }).catch(e => { toast(e.message, true); throw e; });
 }
 async function ensureToken(){ if (_tok) return _tok; return signIn(false); }
+/* 토큰을 브라우저에 기억 → 새로고침해도 취합 상태가 바로 보인다 (구글 토큰 수명 ~1시간) */
+const TOK_KEY = 'receipts_drive_tok';
+function saveTok(r){ try { localStorage.setItem(TOK_KEY, JSON.stringify({ t: r.access_token, exp: Date.now() + (Number(r.expires_in || 3500) - 60) * 1000 })); } catch (e) {} }
+function loadTok(){ try { const o = JSON.parse(localStorage.getItem(TOK_KEY) || 'null'); if (o && o.exp > Date.now()) return o.t; } catch (e) {} return null; }
+function dropTok(){ try { localStorage.removeItem(TOK_KEY); } catch (e) {} }
 async function dfetch(url, opts = {}, retry = true){
   const h = Object.assign({}, opts.headers || {}, { Authorization: 'Bearer ' + _tok });
   const r = await fetch(url, Object.assign({}, opts, { headers: h }));
-  if (r.status === 401 && retry) { await new Promise(res => { _tokClient.callback = x => { _tok = x.access_token; res(); }; _tokClient.requestAccessToken({ prompt: '' }); }); return dfetch(url, opts, false); }
+  if (r.status === 401 && retry) {
+    dropTok(); _tok = null;
+    if (!_tokClient) throw new Error('드라이브 연결이 만료됐습니다 — 오른쪽 위 「드라이브 연결」을 눌러주세요');
+    await new Promise(res => { _tokClient.callback = x => { _tok = x.access_token; saveTok(x); res(); }; _tokClient.requestAccessToken({ prompt: '' }); });
+    return dfetch(url, opts, false);
+  }
   return r;
 }
 async function findOrCreateFolder(name, parentId){
@@ -202,6 +212,8 @@ function boot(){
   $('#period').textContent = `${L.period} · 8월분 ${L.rows.length}건 · 데이터 ${L.generatedAt.slice(0, 16).replace('T', ' ')} · 취합 상태는 구글 로그인 후 표시`;
   $('#gate').hidden = true; $('#app').hidden = false;
   render();
+  const saved = loadTok();
+  if (saved) { _tok = saved; loadState().catch(() => {}); }   // 기억된 연결로 취합 상태 자동 표시
 }
 async function loadState(){
   $('#btnLogin').hidden = true; $('#btnReload').hidden = false;
