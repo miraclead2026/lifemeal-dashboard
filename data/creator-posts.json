@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-06T00:29:03+09:00",
+  "updatedAt": "2026-09-06T07:13:53+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -40,11 +40,23 @@
       "name": "goldenday",
       "primaryChannelType": "NCLIP",
       "primaryUrl": "https://clip.naver.com/@golden_day_",
-      "posts": [],
+      "posts": [
+        {
+          "platform": "clip",
+          "url": "https://clip.naver.com/contents?serviceType=CLIP&seedMediaId=B8D64A9B453E4BD65DDA783AD432CE2F2245&seedMediaType=SHORT_FORM&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%22e_e2co_5n3opkGaJLUSx%22%2C%22open%22%3Atrue%7D",
+          "title": "🔽네이버 역대급 할인정보는 아래 링크 클릭🔽\n#건강정보 #노화방지 #중년건강관리 #건강팁 #암예방음식\n#만성염증 #건강식단추천 #건강관리팁#네이",
+          "thumbnail": "https://clip-service-phinf.pstatic.net/MjAyNjA5MDZfMjky/MDAxNzg4NjMxNjkxNDA4.lGpJWJdzq5exbG_A-7qf2n0cy0kvnNRgpj7VJu8e5dsg.geOuqWJLYofJJJeBIxReUvq73h7_v2Nuou3BCuRfcSYg.JPEG/PublishThumb_20260906_030800_714.jpg",
+          "date": "2026-09-06",
+          "match": "product",
+          "relatedProduct": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+          "source": "clip-playwright",
+          "discoveredAt": "2026-09-06"
+        }
+      ],
       "coverage": {
         "youtube": "ok(5중 0)",
         "instagram": "ok(1중 0)",
-        "clip": "ok(17중 우리상품 0)"
+        "clip": "ok(17중 우리상품 1)"
       }
     },
     {
