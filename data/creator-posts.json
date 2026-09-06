@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-06T07:27:59+09:00",
+  "updatedAt": "2026-09-06T10:15:38+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -1831,6 +1831,26 @@
       "discoveredAt": "2026-09-05"
     },
     {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=7N3rarSV--k",
+      "title": "완벽한 식사대용! 생식의 모든 것, 1일1생식 라이프밀과 뉴트잇80 비교 리뷰#직장인공감 #신혼부부 #건강식#생식",
+      "thumbnail": "https://i.ytimg.com/vi/7N3rarSV--k/maxresdefault.jpg",
+      "date": "2026-05-05",
+      "author": "daollifemarkettv",
+      "authorName": "다올인생만물상TV",
+      "connect": "none",
+      "evidence": [
+        "수수료"
+      ],
+      "source": "yt-search",
+      "metrics": {
+        "views": 31,
+        "likes": 2,
+        "comments": 1
+      },
+      "discoveredAt": "2026-09-06"
+    },
+    {
       "platform": "instagram",
       "url": "https://www.instagram.com/p/DXiW5Lpjzh-/",
       "title": "매일 아침 식사는 라이프밀~~\n황성주박사의 1일1생식\n라이프밀과 닥터샐러드\n재료가 동결건조현미분말과 콩,치커리추출분말이다.\n오늘 점심은 이미나의",
@@ -1847,6 +1867,24 @@
         "comments": 12
       },
       "discoveredAt": "2026-09-05"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=lG4kaerYkTE",
+      "title": "이롬생식 추천, 갓성비 최신제품 가성비 TOP5",
+      "thumbnail": "https://i.ytimg.com/vi/lG4kaerYkTE/maxresdefault.jpg",
+      "date": "2026-04-23",
+      "author": "%eb%8b%ac%eb%aa%a8%ec%96%b4-b6t",
+      "authorName": "달모어",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 31,
+        "likes": 0,
+        "comments": 1
+      },
+      "discoveredAt": "2026-09-06"
     },
     {
       "platform": "clip",
@@ -2313,11 +2351,29 @@
         "comments": 1
       },
       "discoveredAt": "2026-09-05"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=WzTAZr9ATMk",
+      "title": "암환자 항암치료 전후 꼭 챙겨야 할 회복식┃황성주생식 주목",
+      "thumbnail": "https://i.ytimg.com/vi/WzTAZr9ATMk/maxresdefault.jpg",
+      "date": "2025-09-20",
+      "author": "%ed%95%b4%eb%b0%80%eb%a6%ac%ed%97%ac%ec%8a%a4%ec%a7%9d%ea%bf%8d%eb%a6%ac%eb%8d%94",
+      "authorName": "해밀리헬스 짝꿍리더",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 187,
+        "likes": 8,
+        "comments": 0
+      },
+      "discoveredAt": "2026-09-06"
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-06T07:27:59+09:00",
-    "mode": "revalidate",
+    "lastRun": "2026-09-06T10:15:38+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
