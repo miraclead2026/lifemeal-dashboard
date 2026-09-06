@@ -7386,6 +7386,39 @@ function TabKpi({ data, setData }) {
   );
 }
 
+function TabBooth3D() {
+  const BASE = 'https://miraclead2026.github.io/lifemeal-popup';
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+        <div style={{ fontSize: 21, fontWeight: 700, color: 'var(--tx3)' }}>🧊 FREEZE LAB 팝업 부스 3D</div>
+        <Badge label="R02" color={GO} />
+      </div>
+      <div style={{ fontSize: 16, color: 'var(--tx3)', marginBottom: 14 }}>
+        용산 아이파크몰 4F LIVING PARK · 9.10–9.23 · 끌어서 회전, 휠로 확대, 존별로 따로 보기
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+        <Btn onClick={() => window.open(BASE + '/booth3d.html', '_blank')}>새 창에서 크게 보기</Btn>
+        <Btn v="secondary" onClick={() => window.open(BASE, '_blank')}>팝업 프로젝트 사이트</Btn>
+        <Btn v="ghost" onClick={() => window.open(BASE + '/booth.glb', '_blank')}>GLB 모델 내려받기</Btn>
+      </div>
+      <Card style={{ padding: 0, overflow: 'hidden' }}>
+        <iframe
+          src={BASE + '/booth3d.html'}
+          title="FREEZE LAB 부스 3D 시뮬레이션"
+          loading="lazy"
+          allow="fullscreen"
+          style={{ display: 'block', width: '100%', height: '72vh', minHeight: 460, border: 0, background: '#000' }}
+        />
+      </Card>
+      <div style={{ fontSize: 15, color: 'var(--tx3)', marginTop: 12, lineHeight: 1.7 }}>
+        R02 기준입니다. 시식대 크기, 가벽 500 단차 기준점, 벽체 두께, 입구 쇼케이스 공용부 점유는 아직 현장 확정 전이라 제작 치수로 쓰면 안 됩니다.
+        3D가 안 보이면 크롬 설정 → 시스템에서 ‘가능한 경우 그래픽 가속 사용’을 켜고 크롬을 다시 시작하세요. 그동안은 페이지 오른쪽 위 <b>이미지</b> 버튼으로 고화질 렌더를 볼 수 있습니다.
+      </div>
+    </div>
+  );
+}
+
 function TabHold({ data, setData, onEdit }) {
   const [filter, setFilter] = useState('전체');
   const heldPlans = data.plans.filter(p => p.hold && matchOwner(p, filter));
@@ -13898,6 +13931,7 @@ function App() {
     { icon: '🧰', label: '업무관리', C: TabWork },
     { icon: '📅', label: '데일리/주간', C: TabWeekly },
     { icon: '📈', label: '프로젝트 진행 상황', C: TabProgress },
+    { icon: '🧊', label: '팝업 3D', C: TabBooth3D },
     { icon: '🗂️', label: '단계별 보기', C: TabKanban },
     { icon: '🏆', label: '업무 성과', C: TabPerformance },
     { icon: '📋', label: '주간 보고', C: TabWorkReport },
@@ -13924,7 +13958,7 @@ function App() {
   const GROUPS = TAB_GROUPS_ON ? [
     { icon: '🌿', label: '오늘', tabs: ['오늘'] },
     { icon: '🗓', label: '일정', tabs: ['일정'] },
-    { icon: '📁', label: '페이지', tabs: ['페이지'] },
+    { icon: '📁', label: '페이지', tabs: ['페이지', '팝업 3D'] },
     { icon: '🤖', label: 'AI 에이전트', tabs: ['판단 대기', 'N.파워링크', 'N.쇼핑검색', '애드부스트', '상품 최적화'] },
     { icon: '📊', label: '성과', tabs: ['주간 보고', 'KPI', '매출', '광고', '인스타 광고', '쇼핑커넥트', '카카오'] },
     { icon: '🔍', label: '인사이트', tabs: ['네이버 채널 추적', '키워드 트렌드', '키워드 총합본'] },
