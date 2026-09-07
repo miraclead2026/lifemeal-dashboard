@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-08T07:23:19+09:00",
+  "updatedAt": "2026-09-08T07:26:13+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -287,6 +287,86 @@
     }
   ],
   "unattributed": [
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/flash_lifelog/224404358853",
+      "title": "[용산 아이파크몰 팝업] 추석선물 팝업, 라이프밀 FREEZE LAB에서 직접 골라보세요",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MDhfMjkw/MDAxNzg4ODE4MjEzMjU4.H-7yzkYcHdPaTMBbz7vW9RYxJR0IkYDGKXjDemT3q0kg.MRZ-QH0aOo7e0_zaMMXIkdZGdumnoIQQ_sYcIoYxGSIg.PNG/search.pstatic.png?type=s2",
+        "vrthumbnail": false,
+        "videoThumbnail": false
+      },
+      "date": "2026-09-08",
+      "author": "flash_lifelog",
+      "authorName": "라이프 로그",
+      "connect": "strong",
+      "evidence": [
+        "naver.me",
+        "strong",
+        "수수료"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "993351720401056",
+      "channelProductNo": "13447249282",
+      "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+      "discoveredAt": "2026-09-08"
+    },
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/saneunjaemi_ife/224402432721",
+      "title": "푸룬 식이섬유 젤리, 50대가 먹기 편한 이유는? 라이프밀 15포 성분표 직접 확인",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MDZfMTk4/MDAxNzg4NjU1NzYyNzUz.R26jZjufOUXoxedCwTv8yARA1hST4_ZKFtCQ0ArDwyYg.IQoyuv8jG7YZq1llj4Gn2diuatrH2E2w1Jyj325zIJwg.PNG/900_file_00000000548c8206bf457adfe740d5c6.png?type=s2",
+        "vrthumbnail": false,
+        "videoThumbnail": false
+      },
+      "date": "2026-09-06",
+      "author": "saneunjaemi_ife",
+      "authorName": "건강한 인생 50+",
+      "connect": "strong",
+      "evidence": [
+        "strong",
+        "widget",
+        "수수료"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "992685692369024",
+      "channelProductNo": "13495035486",
+      "relatedProduct": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 푸룬 식이섬유, 300g, 1개",
+      "linkCreatorSpaceId": "984746476165984",
+      "discoveredAt": "2026-09-08"
+    },
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/viropino7o/224402648658",
+      "title": "황성주생식 30포 바쁜 아침 식사대용으로 살펴본 구성과 섭취법",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MDZfMTY5/MDAxNzg4Njc1NDMzNjMx.T0aUv4fUqACSYBBSRkLpLnSnK7euMcSmJ78Ki64lF_Ag.kq-AcjCMkd-MFh8UWH9gXQ-imm306zeva5etmjgb5pAg.JPEG/%C8%B2%BC%BA%C1%D6%BB%FD%BD%C4-30%C6%F7-%B9%D9%BB%DB-%BE%C6%C4%A7-%BD%C4%BB%E7%B4%EB%BF%EB%C0%B8%B7%CE-%BB%EC%C6%EC%BA%BB-%B1%B8%BC%BA%B0%FA-%BC%B7%C3%EB%B9%FD-shopping-1788675405208-88607bf0f045.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-06",
+      "author": "viropino7o",
+      "authorName": "초코비님의 블로그",
+      "connect": "strong",
+      "evidence": [
+        "naver.me"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "991997376911072",
+      "channelProductNo": "12763859709",
+      "relatedProduct": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+      "discoveredAt": "2026-09-08"
+    },
     {
       "platform": "blog",
       "url": "https://blog.naver.com/ha1nrah3ar31oharo/224401454110",
@@ -2624,8 +2704,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-06T10:19:34+09:00",
-    "mode": "ig",
+    "lastRun": "2026-09-08T07:26:13+09:00",
+    "mode": "blog",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
