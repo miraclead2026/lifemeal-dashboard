@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-07 09:41",
+  "updatedAt": "2026-09-08 08:39",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,22 +10,22 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 31858,
-    "productOrderCnt": 117,
+    "accessCnt": 31955,
+    "productOrderCnt": 118,
     "salesConversionRate": 0.4,
-    "salesCnt": 180,
-    "salesAmount": 8362370,
-    "commissionAmount": 1347292,
-    "commissionRate": 16.1
+    "salesCnt": 184,
+    "salesAmount": 8495840,
+    "commissionAmount": 1360631,
+    "commissionRate": 16.0
   },
   "products": [
     {
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 53,
-      "salesAmount": 1826920,
-      "commissionAmount": 523008,
+      "salesCnt": 55,
+      "salesAmount": 1893880,
+      "commissionAmount": 524344,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -41,9 +41,9 @@
       "connectProductId": "981216820329032",
       "storeProductId": "12764948626",
       "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개",
-      "salesCnt": 35,
-      "salesAmount": 983400,
-      "commissionAmount": 164974,
+      "salesCnt": 36,
+      "salesAmount": 1010220,
+      "commissionAmount": 176184,
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_183/1787211060405gCvbO_PNG/2733617515550951_2053253457.png"
     },
     {
@@ -95,9 +95,9 @@
       "connectProductId": "981216820329026",
       "storeProductId": "12763859709",
       "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 4,
-      "salesAmount": 158760,
-      "commissionAmount": 17302,
+      "salesCnt": 5,
+      "salesAmount": 198450,
+      "commissionAmount": 18095,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-07",
+      "label": "9월 7일",
+      "periodStart": "2026-09-07",
+      "periodEnd": "2026-09-07",
+      "summary": {
+        "access": {
+          "value": 97,
+          "deltaValue": -5,
+          "deltaPct": -4.9
+        },
+        "sales": {
+          "value": 133470,
+          "deltaValue": 62790,
+          "deltaPct": 88.8
+        }
+      },
+      "directVisits": 35
+    },
     {
       "key": "2026-09-06",
       "label": "9월 6일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 19
+      "directVisits": null
     },
     {
       "key": "2026-07-23",
@@ -1802,28 +1821,27 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-09",
-      "label": "6월 9일",
-      "periodStart": "2026-06-09",
-      "periodEnd": "2026-06-09",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
+    {
+      "key": "2026-W37",
+      "label": "9/7~9/7",
+      "periodStart": "2026-09-07",
+      "periodEnd": "2026-09-07",
+      "summary": {
+        "access": {
+          "value": 97,
+          "deltaValue": -1469,
+          "deltaPct": -93.8
+        },
+        "sales": {
+          "value": 133470,
+          "deltaValue": -397770,
+          "deltaPct": -74.9
+        }
+      }
+    },
     {
       "key": "2026-W36",
       "label": "8/31~9/6",
@@ -2273,24 +2291,6 @@
           "deltaPct": null
         }
       }
-    },
-    {
-      "key": "2026-W11",
-      "label": "3/9~3/15",
-      "periodStart": "2026-03-09",
-      "periodEnd": "2026-03-15",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      }
     }
   ],
   "months": [
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-06",
+      "periodEnd": "2026-09-07",
       "summary": {
         "access": {
-          "value": 1117,
-          "deltaValue": -29624,
-          "deltaPct": -96.4
+          "value": 1214,
+          "deltaValue": -29527,
+          "deltaPct": -96.1
         },
         "sales": {
-          "value": 367450,
-          "deltaValue": -7627470,
-          "deltaPct": -95.4
+          "value": 500920,
+          "deltaValue": -7494000,
+          "deltaPct": -93.7
         }
       }
     },
@@ -2637,9 +2637,9 @@
           "followerCount": 238,
           "contentCount": 133,
           "averageVisitCount": null,
-          "averageViewCount": 58676,
-          "averageLikeCount": 80,
-          "averageCommentCount": 3,
+          "averageViewCount": 57679,
+          "averageLikeCount": 79,
+          "averageCommentCount": 4,
           "status": "ENABLED"
         }
       ],
@@ -2704,8 +2704,8 @@
           "url": "https://blog.naver.com/gahong83",
           "title": "홍's Life",
           "serviceId": "gahong83",
-          "followerCount": 24,
-          "contentCount": 135,
+          "followerCount": 25,
+          "contentCount": 139,
           "averageVisitCount": 210,
           "averageViewCount": null,
           "averageLikeCount": 1,
@@ -2756,7 +2756,7 @@
           "followerCount": 555,
           "contentCount": 243,
           "averageVisitCount": null,
-          "averageViewCount": 1723,
+          "averageViewCount": 1559,
           "averageLikeCount": 3,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2801,8 +2801,8 @@
           "url": "https://clip.naver.com/@dwyg0425",
           "title": "땡깡쟁이부자아빠",
           "serviceId": "0UjpfU-VSBmMDY5vhGXx",
-          "followerCount": 263,
-          "contentCount": 4,
+          "followerCount": 281,
+          "contentCount": 5,
           "averageVisitCount": null,
           "averageViewCount": 1,
           "averageLikeCount": 0,
@@ -2837,7 +2837,7 @@
           "url": "https://blog.naver.com/vitakong77",
           "title": "매일 비타콩",
           "serviceId": "vitakong77",
-          "followerCount": 541,
+          "followerCount": 536,
           "contentCount": 1101,
           "averageVisitCount": 10301,
           "averageViewCount": null,
@@ -2859,43 +2859,62 @@
       "ageGroup": "FORTIES"
     },
     {
-      "creatorSpaceId": 950797321758016,
-      "name": "스페셜리의 건강이야기",
-      "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MTFfMjYg/MDAxNzc4NDI3NDcwNzA2.UjzDLs62hf_Ri0KBSDT_xqHD57bV0TgbttE6dwcGNREg.d6WQPTNlHSY29nKAWx3Or4DaIC8jxJGDMSP5bC9aGu0g.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_11%EC%9D%BC_%EC%98%A4%EC%A0%84_12_37_40.png",
+      "creatorSpaceId": 990937305687488,
+      "name": "도리쓰의 작은 공간",
+      "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA5MDFfNTQg/MDAxNzg4MjI4MTI4MTk0.kK42gRkkPNWaZ9IE_98Z3Iu-6mu0KIo2FMmk3lFiZaEg.iVni-JZV_6AyoFQT4D-5iiSfAQjOBTGZkJ9_A8zbSokg.JPEG/KakaoTalk_20260727_160234879.jpg",
       "performanceType": "DIRECT",
       "salesCnt": 1,
       "salesAmount": 26820,
-      "commissionAmount": 5309,
+      "commissionAmount": 11210,
       "isDeleted": false,
       "channels": [
         {
           "channelType": "NBLOG",
-          "url": "https://blog.naver.com/specially_h",
-          "title": "스페셜리의 건강이야기",
-          "serviceId": "specially_h",
-          "followerCount": 73,
-          "contentCount": 201,
-          "averageVisitCount": 185,
+          "url": "https://blog.naver.com/shinhr7979",
+          "title": "도리쓰의 작은 공간",
+          "serviceId": "shinhr7979",
+          "followerCount": 108,
+          "contentCount": 42,
+          "averageVisitCount": 209,
           "averageViewCount": null,
-          "averageLikeCount": 1,
-          "averageCommentCount": 1,
+          "averageLikeCount": 14,
+          "averageCommentCount": 6,
+          "status": "ENABLED"
+        },
+        {
+          "channelType": "NCLIP",
+          "url": "https://clip.naver.com/@lovedori486",
+          "title": "lovedori486",
+          "serviceId": "yELy4mbeWtXjuRagk4_l",
+          "followerCount": 10,
+          "contentCount": 121,
+          "averageVisitCount": null,
+          "averageViewCount": 40,
+          "averageLikeCount": 0,
+          "averageCommentCount": 0,
           "status": "ENABLED"
         }
       ],
       "primaryChannelType": "NBLOG",
-      "primaryUrl": "https://blog.naver.com/specially_h",
-      "mainCategory": "생활건강",
+      "primaryUrl": "https://blog.naver.com/shinhr7979",
+      "mainCategory": "리빙",
       "subCategories": [
-        "리빙"
+        "푸드"
       ],
       "accountType": "PERSONAL",
       "isNaverInfluencer": false,
-      "gender": "MALE",
-      "ageGroup": "FORTIES"
+      "gender": "FEMALE",
+      "ageGroup": "THIRTIES"
     }
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-07",
+      "access": 97,
+      "sales": 133470,
+      "directVisits": 35
+    },
     {
       "date": "2026-09-06",
       "access": 102,
@@ -3164,7 +3183,7 @@
       "date": "2026-07-24",
       "access": 0,
       "sales": 0,
-      "directVisits": 19
+      "directVisits": null
     },
     {
       "date": "2026-07-23",
@@ -3426,12 +3445,6 @@
     },
     {
       "date": "2026-06-10",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-09",
       "access": 0,
       "sales": 0,
       "directVisits": null
