@@ -1,6 +1,6 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-09-07 08:37",
+  "updatedAt": "2026-09-07 09:39",
   "months": [
     {
       "key": "2026-09",
@@ -725,7 +725,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-07 08:33",
+        "activeSubscribersAsOf": "2026-09-07 09:35",
         "canceled": 6,
         "byStatus": {
           "전체": 56,
@@ -4801,6 +4801,11 @@
           "added": 413
         }
       },
+      "customers": {
+        "total": 505,
+        "new": 413,
+        "returning": 92
+      },
       "subscription": {
         "revenue": 760840,
         "orders": 8,
@@ -4829,7 +4834,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-07 08:33",
+        "activeSubscribersAsOf": "2026-09-07 09:35",
         "canceled": 6,
         "byStatus": {
           "전체": 56,
@@ -4837,11 +4842,6 @@
           "종료": 0,
           "해지": 6
         }
-      },
-      "customers": {
-        "total": 505,
-        "new": 413,
-        "returning": 92
       }
     },
     {
@@ -10590,6 +10590,16 @@
           "groupProductNo": "51008878"
         }
       ],
+      "subscribers": {
+        "notify": {
+          "total": 4848,
+          "added": 0
+        },
+        "interest": {
+          "total": 4848,
+          "added": 0
+        }
+      },
       "subscription": {
         "revenue": 0,
         "orders": 0,
@@ -10599,23 +10609,13 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 50,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-07 08:33",
+        "activeSubscribersAsOf": "2026-09-07 09:35",
         "canceled": 6,
         "byStatus": {
           "전체": 56,
           "진행중": 50,
           "종료": 0,
           "해지": 6
-        }
-      },
-      "subscribers": {
-        "notify": {
-          "total": 4848,
-          "added": 0
-        },
-        "interest": {
-          "total": 4848,
-          "added": 0
         }
       }
     },
