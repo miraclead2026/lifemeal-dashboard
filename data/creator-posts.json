@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-09T07:25:17+09:00",
+  "updatedAt": "2026-09-09T07:26:04+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -1598,6 +1598,26 @@
       "discoveredAt": "2026-09-06"
     },
     {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=OlaqONPVRfc",
+      "title": "황성주생식 찐후기! 1일 1끼 건강 식사대용 꿀템 3종 비교",
+      "thumbnail": "https://i.ytimg.com/vi/OlaqONPVRfc/maxresdefault.jpg",
+      "date": "2026-08-17",
+      "author": "%ec%87%bc%ed%95%91%eb%9f%ac%ec%89%ac-q9w",
+      "authorName": "쇼핑러쉬",
+      "connect": "none",
+      "evidence": [
+        "수수료"
+      ],
+      "source": "yt-search",
+      "metrics": {
+        "views": 9,
+        "likes": 0,
+        "comments": 1
+      },
+      "discoveredAt": "2026-09-09"
+    },
+    {
       "platform": "clip",
       "url": "https://m.naver.com/shorts?serviceType=CLIP&mediaType=VOD&seedMediaId=50C4FBDF4B87FB72309E92B3E8799DCE9E7A&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%221H-ib60W94pKIderzs2C%22%2C%22open%22%3Atrue%7D",
       "title": "먹기도 쉽고 우유랑 같이 먹으면 더 맛있는 것은 안 비밀 ❤️ 휴대하기도 편하니께 언제 어디서나 라이프밀 닥터샐러드와 함께해보세요 #라이프밀 #",
@@ -2712,6 +2732,26 @@
       "discoveredAt": "2026-09-05"
     },
     {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=2-wXRXkOgV4",
+      "title": "이롬뉴밀 추천 밸류 쇼핑의 선택 가격, 품질, 판매량을 고려한 상품",
+      "thumbnail": "https://i.ytimg.com/vi/2-wXRXkOgV4/maxresdefault.jpg",
+      "date": "2026-02-18",
+      "author": "shophow",
+      "authorName": "쇼핑하우",
+      "connect": "none",
+      "evidence": [
+        "수수료"
+      ],
+      "source": "yt-search",
+      "metrics": {
+        "views": 0,
+        "likes": 0,
+        "comments": 1
+      },
+      "discoveredAt": "2026-09-09"
+    },
+    {
       "platform": "clip",
       "url": "https://m.naver.com/shorts?serviceType=CLIP&mediaType=VOD&seedMediaId=983450137BD84E5D0CD95CAA732847BA922E&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%22lkh9007%22%2C%22open%22%3Atrue%7D",
       "title": "#홍대팝업 #라이프밀 기간: 2/13~22 시간: 14:00~19:00 장소: 마포구 동교로38안길17 나만의 WBTI를 알아보며 체험도 하고 ",
@@ -3061,8 +3101,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-09T07:25:17+09:00",
-    "mode": "blog",
+    "lastRun": "2026-09-09T07:26:04+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
