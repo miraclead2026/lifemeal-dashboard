@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-09T07:29:50+09:00",
+  "updatedAt": "2026-09-10T07:12:03+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -56,7 +56,7 @@
       "coverage": {
         "youtube": "ok(5중 0)",
         "instagram": "ok(1중 0)",
-        "clip": "ok(0중 우리상품 0)"
+        "clip": "ok(17중 우리상품 1)"
       }
     },
     {
@@ -203,12 +203,35 @@
             "views": null
           },
           "discoveredAt": "2026-09-05"
+        },
+        {
+          "platform": "clip",
+          "url": "https://clip.naver.com/contents?serviceType=CLIP&seedMediaId=6a9d8e122a084e2314050bdb&seedMediaType=SHORT_FORM",
+          "title": "",
+          "thumbnail": null,
+          "date": "",
+          "match": "product",
+          "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+          "source": "clip-playwright",
+          "discoveredAt": "2026-09-10"
         }
       ],
       "coverage": {
         "blog": "ok(50건중 0)",
         "youtube": "ok(5중 0)",
-        "clip": "ok(0중 우리상품 0)"
+        "clip": "ok(6중 우리상품 1)"
+      }
+    },
+    {
+      "creatorSpaceId": 943404316043264,
+      "name": "...",
+      "primaryChannelType": "NCLIP",
+      "primaryUrl": "https://clip.naver.com/@updown_pick",
+      "posts": [],
+      "coverage": {
+        "youtube": "ok(1중 0)",
+        "instagram": "ok(1중 0)",
+        "clip": "ok(17중 우리상품 0)"
       }
     },
     {
@@ -257,40 +280,6 @@
       "coverage": {
         "blog": "ok(50건중 2)",
         "youtube": "ok(10중 0)"
-      }
-    },
-    {
-      "creatorSpaceId": 990937305687488,
-      "name": "도리쓰의 작은 공간",
-      "primaryChannelType": "NBLOG",
-      "primaryUrl": "https://blog.naver.com/shinhr7979",
-      "posts": [
-        {
-          "platform": "blog",
-          "url": "https://blog.naver.com/shinhr7979/224403633110",
-          "title": "하루 한 봉 간편한 갓 구운 하루견과 구매 후기",
-          "thumbnail": "https://blogthumb.pstatic.net/MjAyNjA5MDdfMTUw/MDAxNzg4NzU3Mzk5NDYx.Il2VDUvicwsCSz-fKkPKY6q_u-0MvobcHREeEb92UAQg.6XsXghDLb3k_U72lljRkZ1Wsc4xUPXvQS5CesSpGX7og.PNG/111111.png?type=w2",
-          "date": "2026-09-07",
-          "source": "naver-rss",
-          "metrics": {
-            "views": null
-          },
-          "discoveredAt": "2026-09-09",
-          "connect": "strong",
-          "evidence": [
-            "naver.me",
-            "strong",
-            "수수료"
-          ],
-          "affiliateId": "993075644691712",
-          "channelProductNo": "12764948626",
-          "relatedProduct": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개"
-        }
-      ],
-      "coverage": {
-        "blog": "ok(42건중 1)",
-        "youtube": "ok(5중 0)",
-        "clip": "ok(17중 우리상품 0)"
       }
     }
   ],
