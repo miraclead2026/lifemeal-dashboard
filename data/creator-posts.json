@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-10T07:12:33+09:00",
+  "updatedAt": "2026-09-10T07:16:54+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -3013,6 +3013,24 @@
     },
     {
       "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=2DTuj-i0flY",
+      "title": "이롬황성주생식 추천, MD추천제품들!! 가성비 TOP5",
+      "thumbnail": "https://i.ytimg.com/vi/2DTuj-i0flY/maxresdefault.jpg",
+      "date": "2025-12-06",
+      "author": "%ec%9a%b0%eb%a3%a8%ec%82%ac-b4v",
+      "authorName": "우루사",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 52,
+        "likes": 0,
+        "comments": 1
+      },
+      "discoveredAt": "2026-09-10"
+    },
+    {
+      "platform": "youtube",
       "url": "https://www.youtube.com/watch?v=mfmS6pDZoXE",
       "title": "황성주 생식 뉴밀플러스 솔직 후기! 1일1생식 효과는? (내돈내산)",
       "thumbnail": "https://i.ytimg.com/vi/mfmS6pDZoXE/maxresdefault.jpg",
@@ -3127,8 +3145,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-10T07:12:33+09:00",
-    "mode": "blog",
+    "lastRun": "2026-09-10T07:16:54+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
