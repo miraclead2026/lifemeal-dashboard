@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-10T07:22:23+09:00",
+  "updatedAt": "2026-09-10T07:29:27+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -311,31 +311,6 @@
     },
     {
       "platform": "blog",
-      "url": "https://blog.naver.com/ezpfmehg/224405438483",
-      "title": "건강한 아침 대용식으로 먹어본 황성주 박사 라이프밀 며칠간의 기록",
-      "thumbnail": {
-        "url": "https://blogthumb.pstatic.net/MjAyNjA5MDlfNDEg/MDAxNzg4ODg1Mjc2NDEx.ORX4xwmGNglzJ9I1UBBHG3tiVCe2it2vzqHuRPiW9PYg.-fEbymQ0OW7JKcY7LpKcvtKoyyCACv_Mo5OUlCrfrFcg.PNG/representative_%C8%B2%BC%BA%C1%D6_%B9%DA%BB%E7%C0%C7_1%C0%CF_1%BB%FD%BD%C4_%B6%F3%C0%CC%C7%C1%B9%D0_%B5%BF%B0%E1%B0%C7%C1%B6_%C8%C4%B1%E2%2C_%B3%BB%B5%B7%B3%BB%BB%EA_%B4%C0%B3%A6%C0%B8%B7%CE_%C0%FB%BE%EE%BA%C1%BF%E4_368a5cd3.png?type=s2",
-        "vrthumbnail": false,
-        "videoThumbnail": false
-      },
-      "date": "2026-09-09",
-      "author": "ezpfmehg",
-      "authorName": "ezpfmehg님의 블로그",
-      "connect": "strong",
-      "evidence": [
-        "naver.me"
-      ],
-      "source": "blog-search",
-      "metrics": {
-        "views": null
-      },
-      "affiliateId": "990092025322560",
-      "channelProductNo": "12808019284",
-      "relatedProduct": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
-      "discoveredAt": "2026-09-09"
-    },
-    {
-      "platform": "blog",
       "url": "https://blog.naver.com/livingstandards/224405815878",
       "title": "바쁜 아침 간편한 식사 동결건조생식 식사대용 황성주 박사의 1일 1생식 라이프밀",
       "thumbnail": {
@@ -360,7 +335,10 @@
       "channelProductNo": "12747389906",
       "relatedProduct": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
       "linkCreatorSpaceId": "985445512092480",
-      "discoveredAt": "2026-09-10"
+      "discoveredAt": "2026-09-10",
+      "linkUserName": "살림의 기준",
+      "linkUserUrl": "https://blog.naver.com/livingstandards",
+      "linkUserChannelType": "NBLOG"
     },
     {
       "platform": "instagram",
@@ -3181,29 +3159,11 @@
         "comments": 3
       },
       "discoveredAt": "2026-09-08"
-    },
-    {
-      "platform": "instagram",
-      "url": "https://www.instagram.com/p/DL3wCVgvast/",
-      "title": "#협찬 #제품무료제공 #이롬 #뉴밀플러스 #1일1생식 #뉴밀플러스체험단 #뉴밀플러스스페셜 #이롬뉴밀플러스\n#이롬황성주박사의1일1생식뉴밀플러스\n@",
-      "thumbnail": "https://scontent-bru2-1.cdninstagram.com/v/t51.82787-15/658994225_18132107464476988_1940123044688621913_n.jpg?stp=dst-jpg_e35_p1080x1080_tt6&_nc_cat=102&ig_cache_key=MzY3MjYxNTI3NDEzOTE3NDY2Ng%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=VDvnwlnxTxEQ7kNvwEQvjXT&_nc_oc=AdoBtX7zI_xnFg0a1x7Sy-D58z8YkIsA-Ni-HOQ_kpYV6iYZmTTBKDN612KB0Sz4D70&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-bru2-1.cdninstagram.com&_nc_gid=BrNCulFI-wpk8AW9sxenzQ&_nc_ss=7a3ba&oh=00_AQKyKEHQ0K9eSjB9ihGh5b0ECHP_YlkoYcE-Q4xqXV1CsA&oe=6AA7B9C7",
-      "date": "2025-07-09",
-      "author": "coehyeonjeong8118",
-      "authorName": "coehyeonjeong8118",
-      "connect": "none",
-      "evidence": [],
-      "source": "ig-hashtag",
-      "metrics": {
-        "views": null,
-        "likes": -1,
-        "comments": 0
-      },
-      "discoveredAt": "2026-09-10"
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-10T07:22:23+09:00",
-    "mode": "clip",
+    "lastRun": "2026-09-10T07:29:27+09:00",
+    "mode": "revalidate",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
