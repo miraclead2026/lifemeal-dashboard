@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-10 09:42",
+  "updatedAt": "2026-09-11 08:40",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,22 +10,22 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 32088,
-    "productOrderCnt": 122,
+    "accessCnt": 32199,
+    "productOrderCnt": 123,
     "salesConversionRate": 0.4,
-    "salesCnt": 193,
-    "salesAmount": 8795400,
-    "commissionAmount": 1411766,
-    "commissionRate": 16.1
+    "salesCnt": 195,
+    "salesAmount": 8868570,
+    "commissionAmount": 1422870,
+    "commissionRate": 16.0
   },
   "products": [
     {
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 61,
-      "salesAmount": 2103240,
-      "commissionAmount": 549956,
+      "salesCnt": 62,
+      "salesAmount": 2136720,
+      "commissionAmount": 560267,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -95,9 +95,9 @@
       "connectProductId": "981216820329026",
       "storeProductId": "12763859709",
       "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 5,
-      "salesAmount": 198450,
-      "commissionAmount": 18095,
+      "salesCnt": 6,
+      "salesAmount": 238140,
+      "commissionAmount": 18888,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-10",
+      "label": "9월 10일",
+      "periodStart": "2026-09-10",
+      "periodEnd": "2026-09-10",
+      "summary": {
+        "access": {
+          "value": 111,
+          "deltaValue": 57,
+          "deltaPct": 105.6
+        },
+        "sales": {
+          "value": 73170,
+          "deltaValue": -128790,
+          "deltaPct": -63.8
+        }
+      },
+      "directVisits": 27
+    },
     {
       "key": "2026-09-09",
       "label": "9월 9일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 12
+      "directVisits": null
     },
     {
       "key": "2026-07-26",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-12",
-      "label": "6월 12일",
-      "periodStart": "2026-06-12",
-      "periodEnd": "2026-06-12",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W37",
-      "label": "9/7~9/9",
+      "label": "9/7~9/10",
       "periodStart": "2026-09-07",
-      "periodEnd": "2026-09-09",
+      "periodEnd": "2026-09-10",
       "summary": {
         "access": {
-          "value": 230,
-          "deltaValue": -1336,
-          "deltaPct": -85.3
+          "value": 341,
+          "deltaValue": -1225,
+          "deltaPct": -78.2
         },
         "sales": {
-          "value": 433030,
-          "deltaValue": -98210,
-          "deltaPct": -18.5
+          "value": 506200,
+          "deltaValue": -25040,
+          "deltaPct": -4.7
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-09",
+      "periodEnd": "2026-09-10",
       "summary": {
         "access": {
-          "value": 1347,
-          "deltaValue": -29394,
-          "deltaPct": -95.6
+          "value": 1458,
+          "deltaValue": -29283,
+          "deltaPct": -95.3
         },
         "sales": {
-          "value": 800480,
-          "deltaValue": -7194440,
-          "deltaPct": -90.0
+          "value": 873650,
+          "deltaValue": -7121270,
+          "deltaPct": -89.1
         }
       }
     },
@@ -2634,12 +2634,12 @@
           "url": "https://clip.naver.com/@golden_day_",
           "title": "청담언니",
           "serviceId": "e_e2co_5n3opkGaJLUSx",
-          "followerCount": 242,
-          "contentCount": 136,
+          "followerCount": 244,
+          "contentCount": 138,
           "averageVisitCount": null,
-          "averageViewCount": 54771,
-          "averageLikeCount": 75,
-          "averageCommentCount": 4,
+          "averageViewCount": 53191,
+          "averageLikeCount": 73,
+          "averageCommentCount": 3,
           "status": "ENABLED"
         }
       ],
@@ -2756,7 +2756,7 @@
           "followerCount": 556,
           "contentCount": 247,
           "averageVisitCount": null,
-          "averageViewCount": 1480,
+          "averageViewCount": 1430,
           "averageLikeCount": 3,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2788,8 +2788,8 @@
           "url": "https://blog.naver.com/dmsogood",
           "title": "보읽남(보고서 읽어주는 남자)",
           "serviceId": "dmsogood",
-          "followerCount": 4456,
-          "contentCount": 2201,
+          "followerCount": 4468,
+          "contentCount": 2225,
           "averageVisitCount": 43,
           "averageViewCount": null,
           "averageLikeCount": 16,
@@ -2837,8 +2837,8 @@
           "url": "https://blog.naver.com/shinhr7979",
           "title": "도리쓰의 작은 공간",
           "serviceId": "shinhr7979",
-          "followerCount": 108,
-          "contentCount": 42,
+          "followerCount": 126,
+          "contentCount": 46,
           "averageVisitCount": 209,
           "averageViewCount": null,
           "averageLikeCount": 14,
@@ -2853,7 +2853,7 @@
           "followerCount": 10,
           "contentCount": 129,
           "averageVisitCount": null,
-          "averageViewCount": 38,
+          "averageViewCount": 37,
           "averageLikeCount": 0,
           "averageCommentCount": 0,
           "status": "ENABLED"
@@ -2885,11 +2885,11 @@
           "url": "https://clip.naver.com/@updown_pick",
           "title": "살림언니 뷰티수다",
           "serviceId": "5tGVhqL7mOjgYfsRNbcX",
-          "followerCount": 115,
-          "contentCount": 212,
+          "followerCount": 125,
+          "contentCount": 215,
           "averageVisitCount": null,
-          "averageViewCount": 6760,
-          "averageLikeCount": 13,
+          "averageViewCount": 7035,
+          "averageLikeCount": 14,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-10",
+      "access": 111,
+      "sales": 73170,
+      "directVisits": 27
+    },
     {
       "date": "2026-09-09",
       "access": 54,
@@ -3177,7 +3183,7 @@
       "date": "2026-07-27",
       "access": 0,
       "sales": 0,
-      "directVisits": 12
+      "directVisits": null
     },
     {
       "date": "2026-07-26",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-06-13",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-12",
       "access": 0,
       "sales": 0,
       "directVisits": null
