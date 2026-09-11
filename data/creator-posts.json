@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-12T07:10:30+09:00",
+  "updatedAt": "2026-09-12T07:14:03+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -3474,11 +3474,29 @@
         "comments": 3
       },
       "discoveredAt": "2026-09-08"
+    },
+    {
+      "platform": "instagram",
+      "url": "https://www.instagram.com/p/DL3wCVgvast/",
+      "title": "#협찬 #제품무료제공 #이롬 #뉴밀플러스 #1일1생식 #뉴밀플러스체험단 #뉴밀플러스스페셜 #이롬뉴밀플러스\n#이롬황성주박사의1일1생식뉴밀플러스\n@",
+      "thumbnail": "https://scontent-vie1-1.cdninstagram.com/v/t51.82787-15/658994225_18132107464476988_1940123044688621913_n.jpg?stp=dst-jpg_e35_p1080x1080_sh2.08_tt6&_nc_cat=102&ig_cache_key=MzY3MjYxNTI3NDEzOTE3NDY2Ng%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=ZiptNhbKI7UQ7kNvwEev8QQ&_nc_oc=AdpfgMs5Y4fNdxB5y8Knmf-Zwu_PbzW8sPtMcBRRNBMsifmJURXQ3KDLkpls2P8KKec&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-vie1-1.cdninstagram.com&_nc_gid=yTVOQXH3_G2F0HcY-VRgFw&_nc_ss=7a3ba&oh=00_AQKPnnnxpnbp4qe34p84tK5M9b54_T48Fbv_y6sCvRXbUQ&oe=6AAA5CC7",
+      "date": "2025-07-09",
+      "author": "coehyeonjeong8118",
+      "authorName": "coehyeonjeong8118",
+      "connect": "none",
+      "evidence": [],
+      "source": "ig-hashtag",
+      "metrics": {
+        "views": null,
+        "likes": -1,
+        "comments": 0
+      },
+      "discoveredAt": "2026-09-12"
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-12T07:10:30+09:00",
-    "mode": "yt",
+    "lastRun": "2026-09-12T07:14:03+09:00",
+    "mode": "ig",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
