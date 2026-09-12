@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-12 09:42",
+  "updatedAt": "2026-09-13 08:39",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,13 +10,13 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 32376,
-    "productOrderCnt": 124,
+    "accessCnt": 32786,
+    "productOrderCnt": 127,
     "salesConversionRate": 0.4,
-    "salesCnt": 197,
-    "salesAmount": 8915370,
-    "commissionAmount": 1430252,
-    "commissionRate": 16.0
+    "salesCnt": 201,
+    "salesAmount": 9005190,
+    "commissionAmount": 1455615,
+    "commissionRate": 16.2
   },
   "products": [
     {
@@ -41,9 +41,9 @@
       "connectProductId": "981216820329032",
       "storeProductId": "12764948626",
       "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개",
-      "salesCnt": 38,
-      "salesAmount": 1069820,
-      "commissionAmount": 201096,
+      "salesCnt": 39,
+      "salesAmount": 1096640,
+      "commissionAmount": 212306,
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_183/1787211060405gCvbO_PNG/2733617515550951_2053253457.png"
     },
     {
@@ -65,6 +65,15 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
+      "connectProductId": "981216820329039",
+      "storeProductId": "13447249282",
+      "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+      "salesCnt": 18,
+      "salesAmount": 555040,
+      "commissionAmount": 56128,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260820_46/1787211127304X5csH_JPEG/71666487942674219_193671377.jpg"
+    },
+    {
       "connectProductId": "981216820333124",
       "storeProductId": "13616691087",
       "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
@@ -72,15 +81,6 @@
       "salesAmount": 547670,
       "commissionAmount": 27003,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_216/1787302768754tEtCj_PNG/2825325869590978_1319965125.png"
-    },
-    {
-      "connectProductId": "981216820329039",
-      "storeProductId": "13447249282",
-      "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
-      "salesCnt": 17,
-      "salesAmount": 524440,
-      "commissionAmount": 55517,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260820_46/1787211127304X5csH_JPEG/71666487942674219_193671377.jpg"
     },
     {
       "connectProductId": "981216820333132",
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-12",
+      "label": "9월 12일",
+      "periodStart": "2026-09-12",
+      "periodEnd": "2026-09-12",
+      "summary": {
+        "access": {
+          "value": 410,
+          "deltaValue": 233,
+          "deltaPct": 131.6
+        },
+        "sales": {
+          "value": 89820,
+          "deltaValue": 43020,
+          "deltaPct": 91.9
+        }
+      },
+      "directVisits": 24
+    },
     {
       "key": "2026-09-11",
       "label": "9월 11일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 12
+      "directVisits": null
     },
     {
       "key": "2026-07-28",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-14",
-      "label": "6월 14일",
-      "periodStart": "2026-06-14",
-      "periodEnd": "2026-06-14",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W37",
-      "label": "9/7~9/11",
+      "label": "9/7~9/12",
       "periodStart": "2026-09-07",
-      "periodEnd": "2026-09-11",
+      "periodEnd": "2026-09-12",
       "summary": {
         "access": {
-          "value": 518,
-          "deltaValue": -1048,
-          "deltaPct": -66.9
+          "value": 928,
+          "deltaValue": -638,
+          "deltaPct": -40.7
         },
         "sales": {
-          "value": 553000,
-          "deltaValue": 21760,
-          "deltaPct": 4.1
+          "value": 642820,
+          "deltaValue": 111580,
+          "deltaPct": 21.0
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-11",
+      "periodEnd": "2026-09-12",
       "summary": {
         "access": {
-          "value": 1635,
-          "deltaValue": -29106,
-          "deltaPct": -94.7
+          "value": 2045,
+          "deltaValue": -28696,
+          "deltaPct": -93.3
         },
         "sales": {
-          "value": 920450,
-          "deltaValue": -7074470,
-          "deltaPct": -88.5
+          "value": 1010270,
+          "deltaValue": -6984650,
+          "deltaPct": -87.4
         }
       }
     },
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 32,
-      "salesAmount": 1497870,
-      "commissionAmount": 458735,
+      "salesCnt": 34,
+      "salesAmount": 1530270,
+      "commissionAmount": 472277,
       "isDeleted": false,
       "channels": [
         {
@@ -2634,11 +2634,11 @@
           "url": "https://clip.naver.com/@golden_day_",
           "title": "청담언니",
           "serviceId": "e_e2co_5n3opkGaJLUSx",
-          "followerCount": 244,
+          "followerCount": 245,
           "contentCount": 138,
           "averageVisitCount": null,
-          "averageViewCount": 51689,
-          "averageLikeCount": 71,
+          "averageViewCount": 49548,
+          "averageLikeCount": 67,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2756,7 +2756,7 @@
           "followerCount": 555,
           "contentCount": 250,
           "averageVisitCount": null,
-          "averageViewCount": 1356,
+          "averageViewCount": 1288,
           "averageLikeCount": 2,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2853,7 +2853,7 @@
           "followerCount": 10,
           "contentCount": 129,
           "averageVisitCount": null,
-          "averageViewCount": 37,
+          "averageViewCount": 36,
           "averageLikeCount": 0,
           "averageCommentCount": 0,
           "status": "ENABLED"
@@ -2885,11 +2885,11 @@
           "url": "https://clip.naver.com/@updown_pick",
           "title": "살림언니 뷰티수다",
           "serviceId": "5tGVhqL7mOjgYfsRNbcX",
-          "followerCount": 125,
-          "contentCount": 215,
+          "followerCount": 129,
+          "contentCount": 218,
           "averageVisitCount": null,
-          "averageViewCount": 7526,
-          "averageLikeCount": 15,
+          "averageViewCount": 7972,
+          "averageLikeCount": 16,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-12",
+      "access": 410,
+      "sales": 89820,
+      "directVisits": 24
+    },
     {
       "date": "2026-09-11",
       "access": 177,
@@ -3177,7 +3183,7 @@
       "date": "2026-07-29",
       "access": 0,
       "sales": 0,
-      "directVisits": 12
+      "directVisits": null
     },
     {
       "date": "2026-07-28",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-06-15",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-14",
       "access": 0,
       "sales": 0,
       "directVisits": null
