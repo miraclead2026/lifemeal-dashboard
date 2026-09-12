@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-13T07:12:14+09:00",
+  "updatedAt": "2026-09-13T07:12:37+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -270,6 +270,26 @@
     }
   ],
   "unattributed": [
+    {
+      "platform": "clip",
+      "url": "https://m.naver.com/shorts?serviceType=CLIP&mediaType=VOD&seedMediaId=EDC1E714D19B8006095A3E18CECAAE499F65&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%2252KcA297JCLm5hflLzIU%22%2C%22open%22%3Atrue%7D",
+      "title": "바쁜 아침, 매번 식사를 챙기기 어려웠다면 황성주 박사의 1일 1생식 라이프밀로 간편한 루틴을 시작해 보세요. 동결건조생식이라 보관과 휴대가 편",
+      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://clip-service-phinf.pstatic.net/MjAyNjA5MTNfMjg4/MDAxNzg5MjM3NzQ3NjAz.z_Un_wTHnIlyyM8lTWnqc1a2ufzC5boz4gCit1syHBIg.Y4AA9Vw8WU547EJglU2kJ5358vepKP1O7r9Fl1Q5JOog.JPEG/QDsNspm8Qk_01.jpg%22&type=w352&service=clip",
+      "date": "2026-09-13",
+      "author": "jinbalcho",
+      "authorName": "진발이",
+      "channelUrl": "https://clip.naver.com/@jinbalcho",
+      "followers": 82,
+      "connect": "none",
+      "evidence": [],
+      "source": "clip-search",
+      "metrics": {
+        "views": 8,
+        "likes": null,
+        "comments": null
+      },
+      "discoveredAt": "2026-09-13"
+    },
     {
       "platform": "blog",
       "url": "https://blog.naver.com/nhsflhuk/224409208076",
@@ -3657,8 +3677,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-13T07:12:14+09:00",
-    "mode": "ig",
+    "lastRun": "2026-09-13T07:12:37+09:00",
+    "mode": "clip",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
