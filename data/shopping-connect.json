@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-16 09:42",
+  "updatedAt": "2026-09-17 08:41",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,13 +10,13 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 34379,
-    "productOrderCnt": 141,
+    "accessCnt": 34801,
+    "productOrderCnt": 148,
     "salesConversionRate": 0.4,
-    "salesCnt": 219,
-    "salesAmount": 9305740,
-    "commissionAmount": 1558046,
-    "commissionRate": 16.7
+    "salesCnt": 228,
+    "salesAmount": 9480430,
+    "commissionAmount": 1615266,
+    "commissionRate": 17.0
   },
   "products": [
     {
@@ -83,6 +83,15 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_216/1787302768754tEtCj_PNG/2825325869590978_1319965125.png"
     },
     {
+      "connectProductId": "986303491535840",
+      "storeProductId": "13674568934",
+      "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
+      "salesCnt": 30,
+      "salesAmount": 498700,
+      "commissionAmount": 201997,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
+    },
+    {
       "connectProductId": "981216820333132",
       "storeProductId": "13638665039",
       "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 3개",
@@ -92,26 +101,36 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_111/1787302719123Hxtvm_PNG/71758079881645370_682695672.png"
     },
     {
-      "connectProductId": "986303491535840",
-      "storeProductId": "13674568934",
-      "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-      "salesCnt": 22,
-      "salesAmount": 363700,
-      "commissionAmount": 145570,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
-    },
-    {
       "connectProductId": "981216820329026",
       "storeProductId": "12763859709",
       "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 6,
-      "salesAmount": 238140,
-      "commissionAmount": 18888,
+      "salesCnt": 7,
+      "salesAmount": 277830,
+      "commissionAmount": 19681,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
     }
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-16",
+      "label": "9월 16일",
+      "periodStart": "2026-09-16",
+      "periodEnd": "2026-09-16",
+      "summary": {
+        "access": {
+          "value": 422,
+          "deltaValue": -231,
+          "deltaPct": -35.4
+        },
+        "sales": {
+          "value": 174690,
+          "deltaValue": 197110,
+          "deltaPct": -879.2
+        }
+      },
+      "directVisits": 59
+    },
     {
       "key": "2026-09-15",
       "label": "9월 15일",
@@ -870,7 +889,7 @@
           "deltaPct": -100.0
         }
       },
-      "directVisits": 22
+      "directVisits": 19
     },
     {
       "key": "2026-08-06",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 11
+      "directVisits": null
     },
     {
       "key": "2026-08-01",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-18",
-      "label": "6월 18일",
-      "periodStart": "2026-06-18",
-      "periodEnd": "2026-06-18",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W38",
-      "label": "9/14~9/15",
+      "label": "9/14~9/16",
       "periodStart": "2026-09-14",
-      "periodEnd": "2026-09-15",
+      "periodEnd": "2026-09-16",
       "summary": {
         "access": {
-          "value": 1157,
-          "deltaValue": -207,
-          "deltaPct": -15.2
+          "value": 1579,
+          "deltaValue": 215,
+          "deltaPct": 15.8
         },
         "sales": {
-          "value": 217750,
-          "deltaValue": -507870,
-          "deltaPct": -70.0
+          "value": 392440,
+          "deltaValue": -333180,
+          "deltaPct": -45.9
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-15",
+      "periodEnd": "2026-09-16",
       "summary": {
         "access": {
-          "value": 3638,
-          "deltaValue": -27103,
-          "deltaPct": -88.2
+          "value": 4060,
+          "deltaValue": -26681,
+          "deltaPct": -86.8
         },
         "sales": {
-          "value": 1310820,
-          "deltaValue": -6684100,
-          "deltaPct": -83.6
+          "value": 1485510,
+          "deltaValue": -6509410,
+          "deltaPct": -81.4
         }
       }
     },
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 52,
-      "salesAmount": 1829170,
-      "commissionAmount": 597211,
+      "salesCnt": 60,
+      "salesAmount": 1964170,
+      "commissionAmount": 653638,
       "isDeleted": false,
       "channels": [
         {
@@ -2634,11 +2634,11 @@
           "url": "https://clip.naver.com/@golden_day_",
           "title": "청담언니",
           "serviceId": "e_e2co_5n3opkGaJLUSx",
-          "followerCount": 247,
-          "contentCount": 140,
+          "followerCount": 251,
+          "contentCount": 146,
           "averageVisitCount": null,
-          "averageViewCount": 41346,
-          "averageLikeCount": 54,
+          "averageViewCount": 39643,
+          "averageLikeCount": 53,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2704,8 +2704,8 @@
           "url": "https://blog.naver.com/gahong83",
           "title": "홍's Life",
           "serviceId": "gahong83",
-          "followerCount": 25,
-          "contentCount": 139,
+          "followerCount": 26,
+          "contentCount": 142,
           "averageVisitCount": 210,
           "averageViewCount": null,
           "averageLikeCount": 1,
@@ -2756,7 +2756,7 @@
           "followerCount": 554,
           "contentCount": 253,
           "averageVisitCount": null,
-          "averageViewCount": 762,
+          "averageViewCount": 631,
           "averageLikeCount": 2,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2837,10 +2837,10 @@
           "url": "https://clip.naver.com/@updown_pick",
           "title": "살림언니 뷰티수다",
           "serviceId": "5tGVhqL7mOjgYfsRNbcX",
-          "followerCount": 133,
-          "contentCount": 221,
+          "followerCount": 136,
+          "contentCount": 223,
           "averageVisitCount": null,
-          "averageViewCount": 8452,
+          "averageViewCount": 8613,
           "averageLikeCount": 17,
           "averageCommentCount": 2,
           "status": "ENABLED"
@@ -2889,7 +2889,7 @@
           "followerCount": 22,
           "contentCount": 47,
           "averageVisitCount": null,
-          "averageViewCount": 60,
+          "averageViewCount": 59,
           "averageLikeCount": 0,
           "averageCommentCount": 0,
           "status": "ENABLED"
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-16",
+      "access": 422,
+      "sales": 174690,
+      "directVisits": 59
+    },
     {
       "date": "2026-09-15",
       "access": 653,
@@ -3147,7 +3153,7 @@
       "date": "2026-08-07",
       "access": 4,
       "sales": 0,
-      "directVisits": 22
+      "directVisits": 19
     },
     {
       "date": "2026-08-06",
@@ -3177,7 +3183,7 @@
       "date": "2026-08-02",
       "access": 0,
       "sales": 0,
-      "directVisits": 11
+      "directVisits": null
     },
     {
       "date": "2026-08-01",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-06-19",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-18",
       "access": 0,
       "sales": 0,
       "directVisits": null
