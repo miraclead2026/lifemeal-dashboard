@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-17 09:42",
+  "updatedAt": "2026-09-18 08:40",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,22 +10,22 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 34801,
-    "productOrderCnt": 148,
+    "accessCnt": 35133,
+    "productOrderCnt": 158,
     "salesConversionRate": 0.4,
-    "salesCnt": 228,
-    "salesAmount": 9480430,
-    "commissionAmount": 1615266,
-    "commissionRate": 17.0
+    "salesCnt": 240,
+    "salesAmount": 9714790,
+    "commissionAmount": 1696215,
+    "commissionRate": 17.5
   },
   "products": [
     {
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 63,
-      "salesAmount": 2170200,
-      "commissionAmount": 560935,
+      "salesCnt": 65,
+      "salesAmount": 2237160,
+      "commissionAmount": 571914,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -65,6 +65,15 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
+      "connectProductId": "986303491535840",
+      "storeProductId": "13674568934",
+      "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
+      "salesCnt": 40,
+      "salesAmount": 666100,
+      "commissionAmount": 271967,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
+    },
+    {
       "connectProductId": "981216820329039",
       "storeProductId": "13447249282",
       "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
@@ -81,15 +90,6 @@
       "salesAmount": 547670,
       "commissionAmount": 27003,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_216/1787302768754tEtCj_PNG/2825325869590978_1319965125.png"
-    },
-    {
-      "connectProductId": "986303491535840",
-      "storeProductId": "13674568934",
-      "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-      "salesCnt": 30,
-      "salesAmount": 498700,
-      "commissionAmount": 201997,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
     },
     {
       "connectProductId": "981216820333132",
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-17",
+      "label": "9월 17일",
+      "periodStart": "2026-09-17",
+      "periodEnd": "2026-09-17",
+      "summary": {
+        "access": {
+          "value": 332,
+          "deltaValue": -90,
+          "deltaPct": -21.3
+        },
+        "sales": {
+          "value": 234360,
+          "deltaValue": 59670,
+          "deltaPct": 34.2
+        }
+      },
+      "directVisits": 41
+    },
     {
       "key": "2026-09-16",
       "label": "9월 16일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 3
+      "directVisits": null
     },
     {
       "key": "2026-08-02",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-19",
-      "label": "6월 19일",
-      "periodStart": "2026-06-19",
-      "periodEnd": "2026-06-19",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W38",
-      "label": "9/14~9/16",
+      "label": "9/14~9/17",
       "periodStart": "2026-09-14",
-      "periodEnd": "2026-09-16",
+      "periodEnd": "2026-09-17",
       "summary": {
         "access": {
-          "value": 1579,
-          "deltaValue": 215,
-          "deltaPct": 15.8
+          "value": 1911,
+          "deltaValue": 547,
+          "deltaPct": 40.1
         },
         "sales": {
-          "value": 392440,
-          "deltaValue": -333180,
-          "deltaPct": -45.9
+          "value": 626800,
+          "deltaValue": -98820,
+          "deltaPct": -13.6
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-16",
+      "periodEnd": "2026-09-17",
       "summary": {
         "access": {
-          "value": 4060,
-          "deltaValue": -26681,
-          "deltaPct": -86.8
+          "value": 4392,
+          "deltaValue": -26349,
+          "deltaPct": -85.7
         },
         "sales": {
-          "value": 1485510,
-          "deltaValue": -6509410,
-          "deltaPct": -81.4
+          "value": 1719870,
+          "deltaValue": -6275050,
+          "deltaPct": -78.5
         }
       }
     },
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 60,
-      "salesAmount": 1964170,
-      "commissionAmount": 653638,
+      "salesCnt": 70,
+      "salesAmount": 2131570,
+      "commissionAmount": 723608,
       "isDeleted": false,
       "channels": [
         {
@@ -2637,8 +2637,8 @@
           "followerCount": 251,
           "contentCount": 146,
           "averageVisitCount": null,
-          "averageViewCount": 39643,
-          "averageLikeCount": 53,
+          "averageViewCount": 37900,
+          "averageLikeCount": 50,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2753,10 +2753,10 @@
           "url": "https://clip.naver.com/@himisong",
           "title": "하이미송",
           "serviceId": "k_4E-yiFagfvv4joxZXT",
-          "followerCount": 554,
-          "contentCount": 253,
+          "followerCount": 556,
+          "contentCount": 260,
           "averageVisitCount": null,
-          "averageViewCount": 631,
+          "averageViewCount": 566,
           "averageLikeCount": 2,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2801,11 +2801,11 @@
           "url": "https://clip.naver.com/@dwyg0425",
           "title": "땡깡쟁이부자아빠",
           "serviceId": "0UjpfU-VSBmMDY5vhGXx",
-          "followerCount": 313,
+          "followerCount": 321,
           "contentCount": 7,
           "averageVisitCount": null,
-          "averageViewCount": 2,
-          "averageLikeCount": 0,
+          "averageViewCount": 3,
+          "averageLikeCount": 1,
           "averageCommentCount": 0,
           "status": "ENABLED"
         }
@@ -2840,7 +2840,7 @@
           "followerCount": 136,
           "contentCount": 223,
           "averageVisitCount": null,
-          "averageViewCount": 8613,
+          "averageViewCount": 8712,
           "averageLikeCount": 17,
           "averageCommentCount": 2,
           "status": "ENABLED"
@@ -2889,7 +2889,7 @@
           "followerCount": 22,
           "contentCount": 47,
           "averageVisitCount": null,
-          "averageViewCount": 59,
+          "averageViewCount": 55,
           "averageLikeCount": 0,
           "averageCommentCount": 0,
           "status": "ENABLED"
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-17",
+      "access": 332,
+      "sales": 234360,
+      "directVisits": 41
+    },
     {
       "date": "2026-09-16",
       "access": 422,
@@ -3177,7 +3183,7 @@
       "date": "2026-08-03",
       "access": 0,
       "sales": 0,
-      "directVisits": 3
+      "directVisits": null
     },
     {
       "date": "2026-08-02",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-06-20",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-19",
       "access": 0,
       "sales": 0,
       "directVisits": null
