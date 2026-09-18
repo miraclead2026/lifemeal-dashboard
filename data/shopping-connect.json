@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-18 09:42",
+  "updatedAt": "2026-09-19 08:41",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,22 +10,22 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 35133,
-    "productOrderCnt": 158,
-    "salesConversionRate": 0.4,
-    "salesCnt": 240,
-    "salesAmount": 9714790,
-    "commissionAmount": 1696215,
-    "commissionRate": 17.5
+    "accessCnt": 35447,
+    "productOrderCnt": 160,
+    "salesConversionRate": 0.5,
+    "salesCnt": 246,
+    "salesAmount": 9860170,
+    "commissionAmount": 1712730,
+    "commissionRate": 17.4
   },
   "products": [
     {
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 65,
-      "salesAmount": 2237160,
-      "commissionAmount": 571914,
+      "salesCnt": 66,
+      "salesAmount": 2270940,
+      "commissionAmount": 572589,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -68,18 +68,18 @@
       "connectProductId": "986303491535840",
       "storeProductId": "13674568934",
       "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-      "salesCnt": 40,
-      "salesAmount": 666100,
-      "commissionAmount": 271967,
+      "salesCnt": 43,
+      "salesAmount": 716500,
+      "commissionAmount": 286585,
       "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
     },
     {
       "connectProductId": "981216820329039",
       "storeProductId": "13447249282",
       "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
-      "salesCnt": 18,
-      "salesAmount": 555040,
-      "commissionAmount": 56128,
+      "salesCnt": 20,
+      "salesAmount": 616240,
+      "commissionAmount": 57350,
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_46/1787211127304X5csH_JPEG/71666487942674219_193671377.jpg"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-18",
+      "label": "9월 18일",
+      "periodStart": "2026-09-18",
+      "periodEnd": "2026-09-18",
+      "summary": {
+        "access": {
+          "value": 314,
+          "deltaValue": -18,
+          "deltaPct": -5.4
+        },
+        "sales": {
+          "value": 145380,
+          "deltaValue": -88980,
+          "deltaPct": -38.0
+        }
+      },
+      "directVisits": 28
+    },
     {
       "key": "2026-09-17",
       "label": "9월 17일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 16
+      "directVisits": null
     },
     {
       "key": "2026-08-03",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-20",
-      "label": "6월 20일",
-      "periodStart": "2026-06-20",
-      "periodEnd": "2026-06-20",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W38",
-      "label": "9/14~9/17",
+      "label": "9/14~9/18",
       "periodStart": "2026-09-14",
-      "periodEnd": "2026-09-17",
+      "periodEnd": "2026-09-18",
       "summary": {
         "access": {
-          "value": 1911,
-          "deltaValue": 547,
-          "deltaPct": 40.1
+          "value": 2225,
+          "deltaValue": 861,
+          "deltaPct": 63.1
         },
         "sales": {
-          "value": 626800,
-          "deltaValue": -98820,
-          "deltaPct": -13.6
+          "value": 772180,
+          "deltaValue": 46560,
+          "deltaPct": 6.4
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-17",
+      "periodEnd": "2026-09-18",
       "summary": {
         "access": {
-          "value": 4392,
-          "deltaValue": -26349,
-          "deltaPct": -85.7
+          "value": 4706,
+          "deltaValue": -26035,
+          "deltaPct": -84.7
         },
         "sales": {
-          "value": 1719870,
-          "deltaValue": -6275050,
-          "deltaPct": -78.5
+          "value": 1865250,
+          "deltaValue": -6129670,
+          "deltaPct": -76.7
         }
       }
     },
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 70,
-      "salesAmount": 2131570,
-      "commissionAmount": 723608,
+      "salesCnt": 72,
+      "salesAmount": 2165770,
+      "commissionAmount": 737903,
       "isDeleted": false,
       "channels": [
         {
@@ -2634,11 +2634,11 @@
           "url": "https://clip.naver.com/@golden_day_",
           "title": "청담언니",
           "serviceId": "e_e2co_5n3opkGaJLUSx",
-          "followerCount": 251,
+          "followerCount": 253,
           "contentCount": 146,
           "averageVisitCount": null,
-          "averageViewCount": 37900,
-          "averageLikeCount": 50,
+          "averageViewCount": 36345,
+          "averageLikeCount": 48,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2756,7 +2756,7 @@
           "followerCount": 556,
           "contentCount": 260,
           "averageVisitCount": null,
-          "averageViewCount": 566,
+          "averageViewCount": 519,
           "averageLikeCount": 2,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2840,7 +2840,7 @@
           "followerCount": 136,
           "contentCount": 223,
           "averageVisitCount": null,
-          "averageViewCount": 8712,
+          "averageViewCount": 8791,
           "averageLikeCount": 17,
           "averageCommentCount": 2,
           "status": "ENABLED"
@@ -2889,7 +2889,7 @@
           "followerCount": 22,
           "contentCount": 47,
           "averageVisitCount": null,
-          "averageViewCount": 55,
+          "averageViewCount": 49,
           "averageLikeCount": 0,
           "averageCommentCount": 0,
           "status": "ENABLED"
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-18",
+      "access": 314,
+      "sales": 145380,
+      "directVisits": 28
+    },
     {
       "date": "2026-09-17",
       "access": 332,
@@ -3177,7 +3183,7 @@
       "date": "2026-08-04",
       "access": 0,
       "sales": 0,
-      "directVisits": 16
+      "directVisits": null
     },
     {
       "date": "2026-08-03",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-06-21",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-20",
       "access": 0,
       "sales": 0,
       "directVisits": null
