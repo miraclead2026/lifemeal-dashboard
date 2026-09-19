@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-09-18",
+ "updatedAt": "2026-09-19",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 320911,
-   "roas": 284,
-   "conv": 11,
+   "spend": 360653,
+   "roas": 259,
+   "conv": 13,
    "options": 4,
-   "action": "상품군 통합 ROAS 284% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "action": "상품군 통합 ROAS 259% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
    "severity": "medium",
    "executor": "watch",
    "nccAdIds": [
@@ -39,21 +39,8 @@
   },
   {
    "channel": "쇼핑검색",
-   "item": "갓 구운 하루견과 20g 30개입",
-   "spend": 187757,
-   "roas": 288,
-   "conv": 9,
-   "options": 3,
-   "action": "상품군 통합 ROAS 288% — 이미 집행중단(소재 OFF/삭제됨) (옵션 3개 합산)",
-   "severity": "medium",
-   "executor": "done",
-   "nccAdIds": [],
-   "matched": false
-  },
-  {
-   "channel": "쇼핑검색",
    "item": "프로틴 골드 HIGH5",
-   "spend": 44125,
+   "spend": 47248,
    "roas": 0,
    "conv": 0,
    "options": 1,
@@ -69,7 +56,7 @@
   {
    "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 40948,
+   "spend": 45884,
    "roas": 0,
    "conv": 0,
    "options": 3,
@@ -88,10 +75,10 @@
   {
    "channel": "애드부스트",
    "item": "애셋 그룹#2606191823",
-   "spend": 6916118,
-   "roas": 311,
-   "conv": 294,
-   "action": "ROAS 311% 미달 — 예산 축소·소재 교체",
+   "spend": 5998164,
+   "roas": 325,
+   "conv": 264,
+   "action": "ROAS 325% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -99,10 +86,10 @@
   {
    "channel": "애드부스트",
    "item": "260708 애드부스트 제품",
-   "spend": 695808,
-   "roas": 276,
-   "conv": 31,
-   "action": "ROAS 276% 미달 — 예산 축소·소재 교체",
+   "spend": 598140,
+   "roas": 290,
+   "conv": 26,
+   "action": "ROAS 290% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -110,23 +97,23 @@
   {
    "channel": "애드부스트",
    "item": "광고 그룹#2608151604",
-   "spend": 149269,
-   "roas": 180,
-   "conv": 8,
-   "action": "ROAS 180% 미달 — 예산 축소·소재 교체",
+   "spend": 127816,
+   "roas": 166,
+   "conv": 6,
+   "action": "ROAS 166% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
   }
  ],
  "powerlinkAuto": {
-  "date": "2026-09-17",
-  "changed": 171,
+  "date": "2026-09-18",
+  "changed": 137,
   "downs": 0,
-  "deleteReview": 2
+  "deleteReview": 3
  },
  "summary": {
-  "shopping": 5,
+  "shopping": 4,
   "advoost": 3,
   "approveNeeded": 2
  },
@@ -284,6 +271,12 @@
   {
    "date": null,
    "shopping": 5,
+   "advoost": 3,
+   "approveNeeded": 2
+  },
+  {
+   "date": null,
+   "shopping": 4,
    "advoost": 3,
    "approveNeeded": 2
   }
