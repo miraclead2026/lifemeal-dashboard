@@ -1,28 +1,28 @@
 {
- "updatedAt": "2026-09-18",
- "basedOn": "2026-09-16",
+ "updatedAt": "2026-09-19",
+ "basedOn": "2026-09-17",
  "note": "파워링크 확장검색 실제 쿼리(EXPKEYWORD) 7일. 전환리포트 없음→노출·클릭·비용만. 신규후보=미등록&클릭2+, 제외후보=미등록&고비용&관련의심(관련판정 필요).",
  "counts": {
-  "total": 370,
-  "newCandidates": 60,
-  "excludeCandidates": 105
+  "total": 413,
+  "newCandidates": 68,
+  "excludeCandidates": 118
  },
  "newCandidates": [
   {
    "term": "황성주라이프밀",
-   "imp": 709,
-   "clk": 63,
-   "cost": 42346,
+   "imp": 716,
+   "clk": 68,
+   "cost": 42747,
    "group": "1일1생식",
    "registered": false,
    "relevance": "관련"
   },
   {
    "term": "황성주생식라이프밀",
-   "imp": 683,
-   "clk": 63,
-   "cost": 36196,
-   "group": "데일리생식",
+   "imp": 710,
+   "clk": 67,
+   "cost": 39150,
+   "group": "영양식",
    "registered": false,
    "relevance": "관련"
   },
@@ -40,9 +40,27 @@
    "imp": 42,
    "clk": 8,
    "cost": 2998,
-   "group": "1일1생식",
+   "group": "데일리생식",
    "registered": false,
    "relevance": "관련"
+  },
+  {
+   "term": "해밀리라이프밀",
+   "imp": 13,
+   "clk": 6,
+   "cost": 3501,
+   "group": "데일리생식",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "프리미엄기프트세트",
+   "imp": 95,
+   "clk": 5,
+   "cost": 9621,
+   "group": "추석 프리미엄VIP세트",
+   "registered": false,
+   "relevance": "관련의심"
   },
   {
    "term": "동결건조생식추천",
@@ -54,15 +72,6 @@
    "relevance": "관련의심"
   },
   {
-   "term": "해밀리라이프밀",
-   "imp": 12,
-   "clk": 5,
-   "cost": 2397,
-   "group": "데일리생식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
    "term": "동결건조생식70가지",
    "imp": 13,
    "clk": 5,
@@ -72,26 +81,8 @@
    "relevance": "관련의심"
   },
   {
-   "term": "라이프밀",
-   "imp": 225,
-   "clk": 4,
-   "cost": 2493,
-   "group": "추석 프리미엄VIP세트",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "프리미엄기프트세트",
-   "imp": 78,
-   "clk": 4,
-   "cost": 6983,
-   "group": "추석 프리미엄VIP세트",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "아침식사대용간편식",
-   "imp": 70,
+   "imp": 81,
    "clk": 4,
    "cost": 3165,
    "group": "데일리생식",
@@ -99,8 +90,17 @@
    "relevance": "관련의심"
   },
   {
+   "term": "라이프밀",
+   "imp": 252,
+   "clk": 4,
+   "cost": 2493,
+   "group": "추석 프리미엄VIP세트",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
    "term": "씨리얼",
-   "imp": 1391,
+   "imp": 1574,
    "clk": 4,
    "cost": 2939,
    "group": "그래놀라",
@@ -108,11 +108,11 @@
    "relevance": "관련의심"
   },
   {
-   "term": "생식의효능",
-   "imp": 13,
+   "term": "식물성단백질종류",
+   "imp": 99,
    "clk": 4,
-   "cost": 4529,
-   "group": "1일1생식",
+   "cost": 7296,
+   "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -126,17 +126,26 @@
    "relevance": "관련의심"
   },
   {
-   "term": "그레놀라",
-   "imp": 543,
+   "term": "쉐이크",
+   "imp": 144,
    "clk": 3,
-   "cost": 2666,
-   "group": "그래놀라",
+   "cost": 5994,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "단백질음식",
+   "imp": 787,
+   "clk": 3,
+   "cost": 5386,
+   "group": "프로틴골드",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "젤리",
-   "imp": 621,
+   "imp": 609,
    "clk": 3,
    "cost": 5136,
    "group": "알로에젤리",
@@ -144,8 +153,35 @@
    "relevance": "관련의심"
   },
   {
+   "term": "일일견과류",
+   "imp": 58,
+   "clk": 3,
+   "cost": 2448,
+   "group": "하루견과",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주샐러드",
+   "imp": 17,
+   "clk": 3,
+   "cost": 2169,
+   "group": "닥터샐러드",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "젤리스틱",
+   "imp": 157,
+   "clk": 3,
+   "cost": 4070,
+   "group": "알로에젤리",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "고마워요하루견과",
-   "imp": 337,
+   "imp": 364,
    "clk": 3,
    "cost": 2374,
    "group": "하루견과",
@@ -153,11 +189,20 @@
    "relevance": "관련의심"
   },
   {
-   "term": "황성주샐러드",
-   "imp": 13,
+   "term": "그레놀라",
+   "imp": 629,
    "clk": 3,
-   "cost": 2169,
-   "group": "닥터샐러드",
+   "cost": 2666,
+   "group": "그래놀라",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주박사라이프밀",
+   "imp": 14,
+   "clk": 3,
+   "cost": 1475,
+   "group": "1일1생식",
    "registered": false,
    "relevance": "관련"
   },
@@ -171,47 +216,20 @@
    "relevance": "관련의심"
   },
   {
-   "term": "식물성단백질종류",
-   "imp": 82,
-   "clk": 3,
-   "cost": 5523,
-   "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "일일견과류",
-   "imp": 60,
-   "clk": 3,
-   "cost": 2448,
-   "group": "하루견과",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "황성주박사1일1생식",
+   "term": "생식의효능",
    "imp": 11,
    "clk": 3,
-   "cost": 1863,
+   "cost": 3481,
    "group": "1일1생식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "젤리스틱",
-   "imp": 139,
-   "clk": 3,
-   "cost": 4070,
-   "group": "콜라겐젤리",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "황성주박사라이프밀",
-   "imp": 13,
+   "term": "황성주생식라이프밀프리미엄",
+   "imp": 3,
    "clk": 3,
-   "cost": 1475,
-   "group": "데일리생식",
+   "cost": 1311,
+   "group": "1일1생식",
    "registered": false,
    "relevance": "관련"
   },
@@ -243,17 +261,8 @@
    "relevance": "관련"
   },
   {
-   "term": "샐러드야채젤리",
-   "imp": 4,
-   "clk": 2,
-   "cost": 939,
-   "group": "닥터샐러드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "노인식사대용간편식",
-   "imp": 30,
+   "imp": 31,
    "clk": 2,
    "cost": 2062,
    "group": "영양식",
@@ -261,71 +270,17 @@
    "relevance": "관련의심"
   },
   {
-   "term": "황성주박사1일1생식라이프밀",
-   "imp": 3,
+   "term": "갓구운하루견과",
+   "imp": 35,
    "clk": 2,
-   "cost": 614,
-   "group": "1일1생식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "아침건강식",
-   "imp": 49,
-   "clk": 2,
-   "cost": 1688,
-   "group": "발효건강식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "황성주생식홈페이지",
-   "imp": 4,
-   "clk": 2,
-   "cost": 810,
-   "group": "발효건강식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "1일생식",
-   "imp": 7,
-   "clk": 2,
-   "cost": 1016,
-   "group": "1일1생식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "마시는프로틴",
-   "imp": 60,
-   "clk": 2,
-   "cost": 2429,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "추석명절선물세트",
-   "imp": 127,
-   "clk": 2,
-   "cost": 3322,
-   "group": "추석 데일리루틴세트",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "고급추석선물세트",
-   "imp": 67,
-   "clk": 2,
-   "cost": 3685,
-   "group": "추석 프리미엄VIP세트",
+   "cost": 285,
+   "group": "하루견과",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "오그래놀라저당",
-   "imp": 401,
+   "imp": 436,
    "clk": 2,
    "cost": 1497,
    "group": "그래놀라",
@@ -333,38 +288,83 @@
    "relevance": "관련의심"
   },
   {
-   "term": "인기추석선물세트",
+   "term": "생식효능",
+   "imp": 51,
+   "clk": 2,
+   "cost": 1621,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주생식뉴밀",
    "imp": 8,
    "clk": 2,
-   "cost": 2942,
+   "cost": 1557,
+   "group": "데일리생식",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "단백질쉐이크는머야",
+   "imp": 1,
+   "clk": 2,
+   "cost": 2712,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "마시는프로틴",
+   "imp": 65,
+   "clk": 2,
+   "cost": 2429,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "우유로그릭요거트",
+   "imp": 84,
+   "clk": 2,
+   "cost": 1948,
+   "group": "그래놀라",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "야채샐러드젤리",
+   "imp": 45,
+   "clk": 2,
+   "cost": 1676,
+   "group": "닥터샐러드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "프리미엄추석선물세트",
+   "imp": 40,
+   "clk": 2,
+   "cost": 2622,
    "group": "추석 프리미엄VIP세트",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "단백질음식",
-   "imp": 674,
+   "term": "DR샐러드",
+   "imp": 10,
    "clk": 2,
-   "cost": 3613,
-   "group": "프로틴골드",
+   "cost": 1518,
+   "group": "닥터샐러드",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "황성주라이프밀생식",
-   "imp": 16,
+   "term": "서리태단백질쉐이크",
+   "imp": 47,
    "clk": 2,
-   "cost": 1267,
-   "group": "영양식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "저녁대용",
-   "imp": 33,
-   "clk": 2,
-   "cost": 2752,
-   "group": "영양식",
+   "cost": 2313,
+   "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
   }
@@ -381,25 +381,43 @@
   },
   {
    "term": "프리미엄기프트세트",
-   "imp": 78,
-   "clk": 4,
-   "cost": 6983,
+   "imp": 95,
+   "clk": 5,
+   "cost": 9621,
    "group": "추석 프리미엄VIP세트",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "식물성단백질종류",
-   "imp": 82,
+   "imp": 99,
+   "clk": 4,
+   "cost": 7296,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "쉐이크",
+   "imp": 144,
    "clk": 3,
-   "cost": 5523,
+   "cost": 5994,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "단백질음식",
+   "imp": 787,
+   "clk": 3,
+   "cost": 5386,
    "group": "프로틴골드",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "젤리",
-   "imp": 621,
+   "imp": 609,
    "clk": 3,
    "cost": 5136,
    "group": "알로에젤리",
@@ -416,24 +434,6 @@
    "relevance": "관련의심"
   },
   {
-   "term": "생식의효능",
-   "imp": 13,
-   "clk": 4,
-   "cost": 4529,
-   "group": "1일1생식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "쉐이크",
-   "imp": 110,
-   "clk": 2,
-   "cost": 4191,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "추석선물세트추천10만원대",
    "imp": 165,
    "clk": 3,
@@ -444,10 +444,10 @@
   },
   {
    "term": "젤리스틱",
-   "imp": 139,
+   "imp": 157,
    "clk": 3,
    "cost": 4070,
-   "group": "콜라겐젤리",
+   "group": "알로에젤리",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -461,26 +461,17 @@
    "relevance": "관련의심"
   },
   {
-   "term": "고급추석선물세트",
-   "imp": 67,
-   "clk": 2,
-   "cost": 3685,
-   "group": "추석 프리미엄VIP세트",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "단백질음식",
-   "imp": 674,
-   "clk": 2,
-   "cost": 3613,
-   "group": "프로틴골드",
+   "term": "생식의효능",
+   "imp": 11,
+   "clk": 3,
+   "cost": 3481,
+   "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "추석명절선물세트",
-   "imp": 127,
+   "imp": 126,
    "clk": 2,
    "cost": 3322,
    "group": "추석 데일리루틴세트",
@@ -489,7 +480,7 @@
   },
   {
    "term": "아침식사대용간편식",
-   "imp": 70,
+   "imp": 81,
    "clk": 4,
    "cost": 3165,
    "group": "데일리생식",
@@ -516,7 +507,7 @@
   },
   {
    "term": "단백질쉐이크선물세트",
-   "imp": 23,
+   "imp": 26,
    "clk": 2,
    "cost": 2941,
    "group": "데이업",
@@ -525,7 +516,7 @@
   },
   {
    "term": "씨리얼",
-   "imp": 1391,
+   "imp": 1574,
    "clk": 4,
    "cost": 2939,
    "group": "그래놀라",
@@ -533,8 +524,17 @@
    "relevance": "관련의심"
   },
   {
+   "term": "추석선물세트1만원대추천",
+   "imp": 11,
+   "clk": 2,
+   "cost": 2781,
+   "group": "추석 프리미엄VIP세트",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "저녁대용",
-   "imp": 33,
+   "imp": 40,
    "clk": 2,
    "cost": 2752,
    "group": "영양식",
@@ -543,7 +543,7 @@
   },
   {
    "term": "부모추석선물",
-   "imp": 2,
+   "imp": 1,
    "clk": 1,
    "cost": 2714,
    "group": "추석 데일리루틴세트",
@@ -551,8 +551,17 @@
    "relevance": "관련의심"
   },
   {
+   "term": "단백질쉐이크는머야",
+   "imp": 1,
+   "clk": 2,
+   "cost": 2712,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "그레놀라",
-   "imp": 543,
+   "imp": 629,
    "clk": 3,
    "cost": 2666,
    "group": "그래놀라",
@@ -561,7 +570,7 @@
   },
   {
    "term": "프리미엄추석선물세트",
-   "imp": 35,
+   "imp": 40,
    "clk": 2,
    "cost": 2622,
    "group": "추석 프리미엄VIP세트",
@@ -570,7 +579,7 @@
   },
   {
    "term": "일일견과류",
-   "imp": 60,
+   "imp": 58,
    "clk": 3,
    "cost": 2448,
    "group": "하루견과",
@@ -579,7 +588,7 @@
   },
   {
    "term": "마시는프로틴",
-   "imp": 60,
+   "imp": 65,
    "clk": 2,
    "cost": 2429,
    "group": "데이업",
@@ -588,7 +597,7 @@
   },
   {
    "term": "고마워요하루견과",
-   "imp": 337,
+   "imp": 364,
    "clk": 3,
    "cost": 2374,
    "group": "하루견과",
@@ -597,7 +606,7 @@
   },
   {
    "term": "서리태단백질쉐이크",
-   "imp": 44,
+   "imp": 47,
    "clk": 2,
    "cost": 2313,
    "group": "데이업",
@@ -615,7 +624,7 @@
   },
   {
    "term": "PREMIUMGIFTSET",
-   "imp": 42,
+   "imp": 44,
    "clk": 1,
    "cost": 2235,
    "group": "추석 프리미엄VIP세트",
@@ -624,7 +633,7 @@
   },
   {
    "term": "추석선물세트부모님",
-   "imp": 4,
+   "imp": 9,
    "clk": 1,
    "cost": 2153,
    "group": "추석 데일리루틴세트",
@@ -633,7 +642,7 @@
   },
   {
    "term": "노인식사대용간편식",
-   "imp": 30,
+   "imp": 31,
    "clk": 2,
    "cost": 2062,
    "group": "영양식",
@@ -641,8 +650,17 @@
    "relevance": "관련의심"
   },
   {
+   "term": "고급추석선물세트",
+   "imp": 50,
+   "clk": 1,
+   "cost": 1969,
+   "group": "추석 프리미엄VIP세트",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "우유로그릭요거트",
-   "imp": 76,
+   "imp": 84,
    "clk": 2,
    "cost": 1948,
    "group": "그래놀라",
@@ -651,7 +669,7 @@
   },
   {
    "term": "단백질파우치쉐이크",
-   "imp": 8,
+   "imp": 11,
    "clk": 1,
    "cost": 1938,
    "group": "데이업",
@@ -660,7 +678,7 @@
   },
   {
    "term": "추석부모님선물",
-   "imp": 39,
+   "imp": 64,
    "clk": 1,
    "cost": 1880,
    "group": "추석 데일리루틴세트",
@@ -669,7 +687,7 @@
   },
   {
    "term": "담백질음료",
-   "imp": 57,
+   "imp": 67,
    "clk": 1,
    "cost": 1873,
    "group": "데이업",
@@ -705,27 +723,9 @@
   },
   {
    "term": "마시는단백질음료",
-   "imp": 43,
+   "imp": 42,
    "clk": 1,
    "cost": 1799,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "국산단백질쉐이크",
-   "imp": 8,
-   "clk": 1,
-   "cost": 1783,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "단백질곡물",
-   "imp": 4,
-   "clk": 1,
-   "cost": 1777,
    "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
