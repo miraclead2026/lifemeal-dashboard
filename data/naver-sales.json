@@ -1,6 +1,6 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-09-20 12:16",
+  "updatedAt": "2026-09-20 12:43",
   "months": [
     {
       "key": "2026-09",
@@ -1091,15 +1091,15 @@
           }
         ],
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
-        "activeSubscribers": 59,
+        "activeSubscribers": 58,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-20 12:02",
-        "canceled": 9,
+        "activeSubscribersAsOf": "2026-09-20 12:35",
+        "canceled": 10,
         "byStatus": {
           "전체": 68,
-          "진행중": 59,
+          "진행중": 58,
           "종료": 0,
-          "해지": 9
+          "해지": 10
         }
       }
     },
@@ -5254,15 +5254,15 @@
           }
         ],
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
-        "activeSubscribers": 59,
+        "activeSubscribers": 58,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-20 12:02",
-        "canceled": 9,
+        "activeSubscribersAsOf": "2026-09-20 12:35",
+        "canceled": 10,
         "byStatus": {
           "전체": 68,
-          "진행중": 59,
+          "진행중": 58,
           "종료": 0,
-          "해지": 9
+          "해지": 10
         }
       }
     },
@@ -11820,31 +11820,6 @@
           "groupProductNo": "51008878"
         }
       ],
-      "subscription": {
-        "revenue": 85580,
-        "orders": 1,
-        "newOrders": 1,
-        "renewOrders": 0,
-        "products": [
-          {
-            "productId": "13616691087",
-            "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
-            "orders": 1,
-            "revenue": 85580
-          }
-        ],
-        "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
-        "activeSubscribers": 59,
-        "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-20 12:02",
-        "canceled": 9,
-        "byStatus": {
-          "전체": 68,
-          "진행중": 59,
-          "종료": 0,
-          "해지": 9
-        }
-      },
       "subscribers": {
         "notify": {
           "total": 5894,
@@ -11859,6 +11834,31 @@
         "total": 50,
         "new": 40,
         "returning": 10
+      },
+      "subscription": {
+        "revenue": 85580,
+        "orders": 1,
+        "newOrders": 1,
+        "renewOrders": 0,
+        "products": [
+          {
+            "productId": "13616691087",
+            "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
+            "orders": 1,
+            "revenue": 85580
+          }
+        ],
+        "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
+        "activeSubscribers": 58,
+        "activeSubscribersSource": "subscription-console",
+        "activeSubscribersAsOf": "2026-09-20 12:35",
+        "canceled": 10,
+        "byStatus": {
+          "전체": 68,
+          "진행중": 58,
+          "종료": 0,
+          "해지": 10
+        }
       }
     },
     {
