@@ -116500,5 +116500,3480 @@
         "seedFeedback": "★역투입 결과 오늘 신규 시드는 없다. 발굴 6건에서 반복된 어휘는 '식사대용'·'동결건조 생식'·'라이프밀 데일리'로 전부 이미 config 시드(categories / seedsLearning.ingredient / seedsLocked.product)에 있고, 작성자 4명은 난수 ID 어필리에이트라 인물 시드 대상이 아니다. 억지로 채우지 않고 0으로 둔다. 인물·트렌드 신규 3건(박용우·김혜윤·단백질과자)은 뉴스·바이럴 트랙에서 나왔다."
       }
     }
+  },
+  {
+    "date": "2026-09-21",
+    "schemaVersion": 2,
+    "generatedAt": "2026-09-21T07:26:51+09:00",
+    "digest": "# 키워드트렌드 데일리 · 2026-09-21 (월)\n\n## 0. ★먼저 보고 — 6일치 런이 통째로 비었다\n- **09-15 ~ 09-20 런 6회가 전부 실패했다.** 로그 원인은 전부 동일: `[Claude] Failed to authenticate: OAuth session expired and could not be refreshed`. 스케줄러는 07:00 에 정상 기동했지만 인증에서 끝났다.\n- 그래서 원격 `data/keyword-trends.json` 의 직전 entry 가 **2026-09-14** 다. 09-15~09-20 여섯 날짜는 **영구 결손**이다 — 뉴스·데이터랩은 소급 수집이 되지만 그날의 '그날 기준' 판단은 복원할 수 없어 억지로 채우지 않는다.\n- 이번 런만 수집창을 `recencyDays(2)` 대신 **09-15~09-21 (7일)** 로 넓혀 공백을 덮었다. 그래서 아래 delta 는 전부 **하루치가 아니라 7일치**다(`deltaSince: 2026-09-14`).\n- 재발 방지는 이 스킬 밖이다 — **자동화 PC 의 claude OAuth 세션 갱신**이 필요하다. 매출 결손 감시처럼 '조용히 실패하고 그날은 영구 결손'인 구조라 별도 보고로 남긴다.\n\n## 1. ★추석 — 검색은 이미 꺾였다. 월간 숫자에 속으면 안 된다\n- **추석선물세트 실측 340,900(+136,400) 신고점.** 그런데 데이터랩 일간은 **9/15 가 정점(100)** 이고 **9/17 91.82 → 9/18 76.33 → 9/19 52.06** 으로 내려오는 중이다.\n- 두 숫자가 어긋나는 이유는 단순하다 — 키워드도구는 **월간 롤링 집계**라 추석 구간이 창 안에 통째로 들어와 올랐을 뿐이다. **일간 수요는 지났다.**\n- 유통사도 같은 말을 한다. 롯데백화점·롯데마트가 9/20~21 자로 **'막바지 구매족'·'핸드캐리형'·'3시간 바로배송'** 을 전면에 걸었다. 추석 당일은 9/25, **D-4**.\n- **하루견과도 똑같다** — 실측 46,070(+3,880) 인데 데이터랩은 9/15 100 → 9/19 53.84. 견과류 63,500(+5,500) · 견과류선물세트 18,980(+8,160).\n- 결론: 지금 추석 카드의 첫 줄은 신규 탐색이 아니라 **배송 확정·소포장**이어야 한다(contentIdeas 1).\n\n## 2. ★'마시는 샐러드' 카테고리어를 경쟁사가 가져가고 있다\n- 세 개가 한 주에 겹쳤다. (1) **낫띵베럴**이 '드링킷' 라인에 *마시는 샐러드* 를 넣어 무신사뷰티 홍대점 입점(9/18~20, 10개 매체). (2) 재활의학과 전문의 이종민 원장 브랜드 **메디슨 벨**의 '리뉴브 더마셀 포뮬러 **마시는 샐러드** 기프트 세트'가 추석 선물로 유통(9/17). (3) 구독 8.06만 의사 채널 **닥터벨의 웰니스**가 왓츠인마이백에서 **메디슨벨 마시는 샐러드**·샐러디컬 한입 샐러드를 실사용템으로 공개(9/19, 1.8만 회 — 설명 타임코드 11:07 직접 확인).\n- 우리 닥터샐러드가 먼저 쓴 카테고리어인데, **그 단어의 화자가 의사 인플루언서 쪽으로 옮겨가고 있다.** 실측은 4,620(+280) 으로 작고 이미 파워링크 registered 라 입찰 레버는 이미 당겨져 있다 — 남은 건 화자 확보다.\n\n## 3. ★'천연 위고비'는 끝물이다 — 그리고 반박이 붙기 시작했다\n- 데이터랩 **9/8 정점(100) → 9/19 18.36, -82%.** 실측도 9,290(**-1,610**).\n- 기사는 아직 나온다 — 최고기 2개월 7kg(\"이런 게 바로 천연 위고비\", 9/18~20 3개 매체), 조선비즈는 **'계란=천연 위고비' SNS 열풍이 계란값을 밀어올렸다**는 경제 기사까지 썼다(9/20). 전형적인 후행 구간이다.\n- ★같은 창에서 **세계일보가 장형우 교수의 \"천연 위고비? 그런 건 없습니다\" 반박 영상**을 4.2만 회로 올렸다. 이 프레임에 올라타면 전문가 반박이 세트로 따라온다.\n- 우리 쪽 처리: **그 단어를 자사 문구에 쓰지 않는다.** 대신 살아남은 문장('단백질·식이섬유를 먼저 먹으면 포만감이 오래간다')만 가져온다(contentIdeas 2). 레지스트리 상태는 계속 **paused**, 재추천 게이트 제외.\n\n## 4. 단백질 — 공급은 늘고 검색은 준다\n- **다이소 1,000원 단백질 쉐이크 대박**(국민일보 9/17) · **올리브영 올리브베러 확장**(9/17, 단백질 셰이크를 식사대용·체중관리로 연결) · **낫띵베럴 무신사 입점**(9/18) · 대상웰라이프 뉴케어 스포식스 프로틴쉐이크 시식기(9/19).\n- 그런데 실측 **단백질쉐이크 110,300(-3,300)**, 프로틴 39,970(-880), 단백질음료 32,400(-80). 09-14 런의 '쉐이크 피로감' 진단이 일주일 뒤에도 그대로다.\n- 반대로 **식물성** 쪽은 언어가 바뀌었다 — 경향신문이 단백질 식품 20종을 분석해 **치아시드(35)·콩(34)·퀴노아(33)·해바라기씨(32)·렌틸콩(31)을 1~5위**에 올렸다(닭가슴살 7위, 9/20). 우리 제품군 전체가 식물성 기반이라 상세페이지 논거로 바로 쓸 수 있다(contentIdeas 4).\n\n## 5. 새로 열리는 인접 카테고리 — 케어푸드·환자식\n- **현대그린푸드가 환자식·케어푸드를 성장축으로 공식화**했다(MTN 9/17, 아이뉴스24 9/18). 당뇨식·신장질환식·연화식·저당·고단백으로 생애주기별 세분화 + 식품산업클러스터진흥원 협약.\n- 우리 **'영양식 황성주생식' alias 에 '환자식'** 이 들어 있다. 다만 실측은 환자식 1,100(-60)·케어푸드 190·노인영양식 740(-10) 으로 **아직 검색어가 아니다.** 지금은 광고가 아니라 카테고리 관찰 대상 — seedCandidate(trend)로만 올린다.\n\n## 6. 저당·저속노화는 이제 외식 기획 언어다\n- 엔제리너스 당류 68%↓ 저당 라떼 라인 '엔제린 밸런스'(9/16~17, 근거를 '헬시플레저+저속노화'로 명시) · 메가MGC커피 저당 티·디저트(9/17) · CJ '저속노화 파로 햇반'의 음료 확장(9/18).\n- **동서식품이 포스트 그래놀라 저당·제로슈거 제품군 확대**로 그래놀라 시장 공략을 공식화했다(9/18) — 우리 홀그레인 저당 그래놀라와 같은 소구점이다. 실측 그래놀라 33,690(+2,250) / 저당그래놀라 4,070(-80): **개념어는 아직 대중어가 아니고 상위어에서 싸워야 한다.**\n- 저속노화 데이터랩 30일 대역은 43~100 — 진폭만 크고 바닥이 안 내려앉는 **상시어**다(실측 2,550, 광고어로는 약함).\n\n## 7. 바이럴 — 닥터딩요 109.8만, 2주째 1위\n- 통과 5건: **닥터딩요 '거꾸로 식사법을 프로틴 쉐이크로' 109.8만 회(62)** · 일주어터 천연위고비 36.8만(59) · **세계일보 '천연 위고비는 없다' 반박 4.2만(54)** · KBS 옥탑방의문제아들 클립 2.9만(53) · 한의사 남창우 계란다이어트 2.2만(49).\n- 09-14 런 대비 닥터딩요는 **+9.8만 회**. 그 자리 협찬은 여전히 경쟁 제품(닥터핏 당케어 쉐이크)이다.\n- ★**우리 브랜드·제품을 직접 다룬 영상은 오늘도 0건 — 33일째 0이다.**\n\n## 8. 자사 발굴 — 용산 팝업이 클립 UGC 를 만들고 있다\n- 오늘 발견 **39건**(연결 0 · 미파악 39). ★6일 공백이 한 번에 잡힌 수치라 평소 하루 6건 안팎과 직접 비교하면 안 된다. 누적 연결 7 · 미파악 205.\n- ★**클립 6건이 '#오늘클립챌린지 + #라이프밀팝업/#라이프밀추석선물연구소' 조합**이다. 한 건은 일정까지 본문에 적었다 — \"서울 용산 라이프밀 추석선물 연구소 **FREEZE LAB** 팝업 26.09.10~09.23, 사전예약 방문 시…\"(92회). 현장 경품 후기도 있다. 우리 오프라인 이벤트가 네이버 클립 챌린지 해시태그를 타고 자발적 게시물로 번지는 경로가 처음으로 확인됐다. 다만 조회수는 **0~159** — 도달이 아니라 '검색 결과에 깔리는 양'으로 봐야 한다. **팝업 종료 9/23, D-2.**\n- ★**인스타 체험단 10건이 한꺼번에 들어왔다**(@lifemeal_wellness, #제품제공/#협찬/#gift, 전부 '라이프밀 데일리 5포입'). 문구가 '1포 30g·105kcal / 물이나 두유에 / 바쁜 아침'으로 거의 동일하게 수렴한다 — 가이드가 잘 먹혔다는 뜻이면서, **10건이 서로 구별되지 않는다는 뜻**이기도 하다. 다음 회차 가이드에 '본인 상황 한 줄'을 강제할 근거로 남긴다(s18).\n- 어필리에이트 블로그 **작성자 ID 난수열 대량 생성**은 09-14 런과 똑같이 계속된다. 그리고 ★**구 브랜드 병기 마케팅 2건** — 클립 \"황성주생식과 **이롬생식**을 찾는 분께 익숙한 선택\", 인스타 \"황성주-생식-라이프밀-**이롬-뉴밀-플러스**\"(s19, 내부 판단용).\n- 역투입 결과: **라이프밀팝업 +6**, 신규 시드후보 **오늘클립챌린지**(trend). 인스타 10건은 우리가 집행한 체험단이라 person 시드 대상이 아니고, 블로그 작성자는 난수 ID 라 인물이 아니다 — **억지로 인물 후보를 만들지 않았다.**\n  - 클립 `pick_gogo`(159회) \"**50대 개그우먼**이 단기간에 건강하게 살 빼는 방법 #황성주생식 #1일1생식 #라이프밀\"은 인물명이 본문에 없다. 승인 인물(조혜련)일 가능성은 있으나 **근거가 없어 특정하지 않고 미확인으로 남긴다.**\n\n## 9. 운영 기록\n- ★**유산균(114,600, 점수 6.91)을 4일 만에 워치리스트에 올렸다.** 보류 사유였던 '쇼핑 실검증 불가'는 해소되지 않았지만, 유산균은 이미 `config.seeds.categories.이너뷰티` 의 우리 카테고리어라 **관련성 판단에 추측이 필요 없다.** 미검증으로 남은 건 '캡슐/분말 수요 vs 우리 젤리 포맷'의 일치 여부뿐이라, 그 불확실성은 **productHints 를 low 로 낮춰** 표시했다. 식이섬유(6.67)가 대신 신호로 내려갔다.\n- 레지스트리 매칭 8건(다이어트식단·단백질바·생식·프로틴바·마시는샐러드·저당그래놀라·야채가루 registered + 천연위고비 paused) 전부 재추천 게이트 제외. ★등록 키워드 중 **다이어트식단이 -6,900** 으로 가장 크게 빠졌다.\n- **adKeywordInventory 61일째 분포 동일**(registered 76 / paused 3, stale=true, removed 증가 0 → alert=false).\n- 신규 seedCandidate 7건: **닥터벨**(person, 고정 추적감) · **최고기**(person, 단발) · **이경실**(person) · **남창우**(person) · **고단백두유**(trend) · **케어푸드**(trend) · **오늘클립챌린지**(trend, 발굴 역투입). 사전 flags 조회 83건, 차단 0.\n- 방송 시드 기각 12일 연속 — 편스토랑은 평양냉면·떡갈비 제품화뿐으로 식단 맥락 0, 나혼자산다도 동일.\n- 폴백: **youtube MCP 가 12일째 CONNECT_TIMEOUT** → 같은 Apify 액터 REST 직접 호출(기존 토큰, 신규 자격증명 없음). context7 도 동일 실패. `get_current_korean_time` 도구 부재도 12일째 → MCP lastBuildDate(07:02:10 +0900) 를 앵커로 썼고 로컬 KST(07:01:01)와 일치 확인.\n- ★**장애**: 크리에이터 체인의 `discover_posts blog`·`yt` 단계가 **GitHub push 에서 실패**했다(9/14 track_creators 와 같은 계열). 발굴 자체는 성공했으나(blog 채택 43건·신규 미파악 15) push 가 깨져 결과가 저장되지 않아, **체인 종료 후 blog 를 단독 재실행해 복구**했다. yt 는 신규 0건이라 유실 없음.\n",
+    "digestKakao": "[키워드트렌드 9/21] ★먼저: 09-15~09-20 런 6회가 OAuth 만료로 전멸해 6일치가 영구 결손이다(자동화 PC 세션 갱신 필요). 이번 런만 수집창을 7일로 넓혀 덮었고 모든 delta 는 9/14 대비 7일치다. ★추석: 실측 추석선물세트 340,900(+136,400) 신고점이지만 데이터랩 일간은 9/15 정점 → 9/19 52.06 으로 이미 꺾였다(월간 롤링 착시). 하루견과도 동일(9/15 100 → 9/19 53.84). D-4, 남은 건 막바지·바로배송·소포장 수요. ★마시는샐러드: 낫띵베럴 무신사 입점 + 메디슨벨(이종민 원장) 추석 기프트세트 + 의사 유튜브 닥터벨(8.06만)이 메디슨벨 마시는 샐러드를 실사용템 공개 — 우리 카테고리어의 화자가 경쟁사로 넘어가는 중(닥터샐러드는 이미 광고 registered). ★천연위고비 끝물: 데이터랩 9/8 100 → 9/19 18.36(-82%), 실측 9,290(-1,610). 최고기 기사·계란값 경제기사는 후행. 세계일보가 '천연 위고비? 그런 건 없다'(장형우 교수) 반박 4.2만 회 — 이 단어는 자사 문구에 쓰지 않는다. 단백질: 다이소 1,000원 쉐이크·올리브영·무신사로 공급은 느는데 검색 110,300(-3,300). 식물성은 경향 기사에서 1~5위(치아시드·콩·퀴노아). 새 축: 현대그린푸드 환자식·케어푸드 공식화(우리 영양식 alias 겹침, 아직 검색어 아님). 동서식품 저당 그래놀라 진입. 바이럴: 닥터딩요 109.8만 2주째 1위(협찬은 경쟁사). 우리 제품 직접 언급 영상 33일째 0건. 자사 발굴 39건(6일치 누적) — 용산 FREEZE LAB 팝업이 '#오늘클립챌린지' 타고 클립 UGC 6건 생성(조회 0~159, 팝업 9/23 종료 D-2), 인스타 체험단 10건은 문구가 거의 동일하게 수렴(다음 회차 가이드에 '본인 상황 한 줄' 필요). 운영: 유산균(114,600)을 4일 만에 워치리스트 편입(포맷 불일치는 productHints low 로 표시). 신규 시드후보 7(닥터벨·최고기·이경실·남창우·고단백두유·케어푸드·오늘클립챌린지). ★장애: 발굴 체인 blog·yt 단계가 GitHub push 에서 깨져 단독 재실행으로 복구(blog 신규 15건 유실 없음).",
+    "signals": [
+      {
+        "id": "s1",
+        "keyword": "추석선물세트",
+        "vertical": "선물·명절",
+        "targets": [
+          "시니어건강",
+          "다이어터"
+        ],
+        "summary": "추석 선물세트 검색이 9/15 에 정점을 찍고 내려오기 시작했다. 데이터랩 30일 곡선은 9/14 96.89 → 9/15 100 → 9/17 91.82 → 9/18 76.33 → 9/19 52.06. 반면 키워드도구 월간 실측은 340,900(+136,400) 으로 신고점인데, 이는 월간 롤링창에 추석 구간이 통째로 들어와서 생긴 상승이다 — 일간 수요는 이미 꺾였다.",
+        "whyNow": "추석 당일이 9/25 인데 검색 정점은 9/15 였다. 유통사 기사도 같은 말을 한다 — 롯데백화점·롯데마트가 9/20~21 자로 '막바지 구매족', '핸드캐리형', '3시간 바로배송'을 전면에 냈다. 지금 남은 건 신규 탐색이 아니라 '오늘 받아볼 수 있는가' 수요다.",
+        "heat": 5,
+        "newsVolume": 49870,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "뉴시스",
+            "url": "https://n.news.naver.com/mnews/article/003/0014203213?sid=101"
+          },
+          {
+            "outlet": "뉴스1",
+            "url": "https://n.news.naver.com/mnews/article/421/0009182058?sid=101"
+          },
+          {
+            "outlet": "데일리안",
+            "url": "https://n.news.naver.com/mnews/article/119/0003134680?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "keyword": "견과류선물세트",
+        "vertical": "다이어트 간식",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "summary": "견과 선물세트가 이번 추석의 '가볍게 들고 가는 건강 선물' 포맷으로 굳었다. 롯데마트가 '매일견과 하루한줌 80봉'을 2만9,900원에 핸드캐리형으로 걸었고(9/20~21), 세계일보는 '과일·견과·김'을 추석 건강 선물 3종으로 묶었다(9/19). 실측도 견과류 63,500(+5,500) · 하루견과 46,070(+3,880) · 견과류선물세트 18,980(+8,160) 으로 동반 상승했다.",
+        "whyNow": "★09-14 런에서 '우리 SKU 이름이 추석 기사 본문에 처음 들어왔다'고 기록했는데, 그 흐름이 일주일 뒤 소포장·저가·핸드캐리라는 구체적 상품 스펙으로 굳었다. 다만 하루견과 데이터랩도 9/15 100 → 9/19 53.84 로 선물세트와 똑같이 꺾였다 — 창이 닫히는 중이다.",
+        "heat": 4,
+        "newsVolume": 49870,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "뉴시스",
+            "url": "https://n.news.naver.com/mnews/article/003/0014203213?sid=101"
+          },
+          {
+            "outlet": "세계일보",
+            "url": "https://n.news.naver.com/mnews/article/022/0004160265?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "keyword": "저당그래놀라",
+        "vertical": "다이어트 간식",
+        "targets": [
+          "다이어터",
+          "운동헬스"
+        ],
+        "summary": "동서식품이 '포스트 그래놀라' 저당·제로슈거 제품군을 확대하며 국내 그래놀라 시장 공략을 공식화했다(이투데이 9/18). 같은 주 SPC삼립 피그인더가든은 그릇 없이 집어 먹는 '리얼 그래놀라 칩' 2종을 냈다(9/18~19).",
+        "whyNow": "우리 홀그레인 저당 그래놀라와 정확히 같은 소구점(저당)을 대기업이 카테고리 전면에 걸었다. 실측은 그래놀라 33,690(+2,250) 으로 올랐는데 저당그래놀라는 4,070(-80) 로 제자리 — 개념어는 아직 대중어가 아니고, 상위어에서 싸워야 하는 구조다. 저당그래놀라는 이미 파워링크 등록(registered) 상태라 신규 추천 대상은 아니다.",
+        "heat": 4,
+        "newsVolume": 27968,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "이투데이",
+            "url": "https://www.etoday.co.kr/news/view/2625837"
+          },
+          {
+            "outlet": "세계일보",
+            "url": "https://n.news.naver.com/mnews/article/022/0004160285?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "s4",
+        "keyword": "저속노화",
+        "vertical": "트렌드",
+        "targets": [
+          "시니어건강",
+          "다이어터"
+        ],
+        "summary": "저속노화가 식품 트렌드에서 '외식 메뉴 기획 언어'로 넘어갔다. 엔제리너스가 헬시플레저+저속노화를 근거로 당류 68%↓ 저당 라떼 라인('엔제린 밸런스')을 냈고(9/16~17), 메가MGC커피도 저당 티·디저트로 확장(9/17). CJ제일제당은 '저속노화 콘셉트로 화제였던 파로 햇반'을 음료로 확장 중이다(9/18).",
+        "whyNow": "데이터랩 30일 대역은 43~100 으로 진폭만 클 뿐 바닥이 내려앉지 않는다 — 유행이 아니라 상시어다. 실측은 2,550(+70) 으로 작아 광고 키워드로는 약하지만, 카피·상세페이지의 상위 개념어로는 대기업이 계속 써주고 있다.",
+        "heat": 4,
+        "newsVolume": 18642,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "뉴시스",
+            "url": "https://n.news.naver.com/mnews/article/003/0014202124?sid=101"
+          },
+          {
+            "outlet": "아이뉴스24",
+            "url": "https://n.news.naver.com/mnews/article/031/0001059040?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "s5",
+        "keyword": "천연위고비",
+        "vertical": "트렌드",
+        "targets": [
+          "다이어터"
+        ],
+        "summary": "★열풍이 꺾였다. 데이터랩은 9/8 100(옥탑방의문제아들 방송일) 이후 계단식 하락해 9/19 18.36 으로 내려왔고, 실측도 9,290(-1,610) 이다. 기사는 아직 나온다 — 최고기가 2개월 7kg 감량을 '천연 위고비'라 불렀고(9/18~20, 3개 매체), 조선비즈는 '계란=천연 위고비' SNS 열풍이 계란값을 밀어올렸다는 경제 기사를 썼다(9/20).",
+        "whyNow": "기사량과 검색량이 갈라지는 전형적인 후행 구간이다. 방송이 만든 피크(9/8) 이후 2주가 지나 연예 기사·2차 해설만 남았다. ★같은 창에서 세계일보가 장형우 교수의 \"천연 위고비? 그런 건 없습니다\" 반박 영상을 4.2만 회로 올렸다 — 이 프레임에 올라타면 전문가 반박이 따라붙는다는 뜻이다. 레지스트리 상태는 paused 이고, 재추천 게이트로 계속 제외한다.",
+        "heat": 3,
+        "newsVolume": 548,
+        "matchType": "trend",
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "조선비즈",
+            "url": "https://n.news.naver.com/mnews/article/366/0001193404?sid=101"
+          },
+          {
+            "outlet": "엑스포츠뉴스",
+            "url": "https://m.entertain.naver.com/article/311/0002058592"
+          },
+          {
+            "outlet": "세계일보(유튜브)",
+            "url": "https://www.youtube.com/watch?v=lgjtqJojLrA"
+          }
+        ]
+      },
+      {
+        "id": "s6",
+        "keyword": "단백질쉐이크",
+        "vertical": "식물성 프로틴",
+        "targets": [
+          "다이어터",
+          "운동헬스"
+        ],
+        "summary": "단백질 음료가 '보충제'에서 '편의점·다이소 생활재'로 내려왔다. 국민일보가 '다이소 1,000원 단백질 쉐이크 대박'을 보도했고(9/17), 올리브영은 '올리브베러'를 확장하며 단백질 셰이크를 식사대용·체중관리 수요로 연결한다고 밝혔다(9/17). 낫띵베럴은 단백질 쉐이크를 들고 무신사뷰티 홍대점에 입점했다(9/18~20, 10개 매체).",
+        "whyNow": "가격(1,000원)과 채널(패션 리테일·H&B)이 동시에 열리는 구간이다. 그런데 실측 단백질쉐이크는 110,300(-3,300) 으로 오히려 줄었다 — 공급은 늘고 검색은 안 느는, 09-14 런에서 적은 '쉐이크 피로감' 진단이 일주일 뒤에도 그대로다.",
+        "heat": 4,
+        "newsVolume": 13043,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "국민일보",
+            "url": "https://n.news.naver.com/mnews/article/005/0001873464?sid=101"
+          },
+          {
+            "outlet": "글로벌이코노믹",
+            "url": "https://www.g-enews.com/view.php?ud=20260917112038843740eacf404_1"
+          },
+          {
+            "outlet": "뉴스1",
+            "url": "https://n.news.naver.com/mnews/article/421/0009180947?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "s7",
+        "keyword": "마시는샐러드",
+        "vertical": "마시는 샐러드·야채",
+        "targets": [
+          "다이어터",
+          "이너뷰티"
+        ],
+        "summary": "★우리 닥터샐러드의 카테고리어에 경쟁 브랜드가 동시에 들어왔다. (1) 낫띵베럴이 '드링킷' 라인에 '마시는 샐러드'를 넣어 무신사뷰티에 입점(9/18~20). (2) 재활의학과 전문의 이종민 원장의 '메디슨 벨'이 '리뉴브 더마셀 포뮬러 마시는 샐러드 기프트 세트'를 추석 선물로 유통(9/17). (3) 구독 8.06만 의사 채널 '닥터벨의 웰니스'가 왓츠인마이백에서 '메디슨벨 마시는 샐러드'와 '샐러디컬 한입 샐러드'를 실사용템으로 공개(9/19, 1.8만 회).",
+        "whyNow": "'마시는 샐러드'가 우리 제품명이 아니라 공용 카테고리어로 굳는 중이고, 의사 인플루언서를 통한 신뢰 경로까지 경쟁사가 먼저 잡았다. 실측은 4,620(+280) 으로 작지만 이미 파워링크 registered 상태다. 방어는 광고가 아니라 '누가 그 자리에서 말하는가'의 문제로 넘어갔다.",
+        "heat": 4,
+        "newsVolume": 8220,
+        "matchType": "ingredient",
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "데일리안",
+            "url": "https://n.news.naver.com/mnews/article/119/0003134635?sid=101"
+          },
+          {
+            "outlet": "전남일보",
+            "url": "https://www.jnilbo.com/news/articleView.html?idxno=90000066550"
+          },
+          {
+            "outlet": "유튜브 닥터벨의 웰니스",
+            "url": "https://www.youtube.com/watch?v=MkApK8izHVs"
+          }
+        ]
+      },
+      {
+        "id": "s8",
+        "keyword": "환자식",
+        "vertical": "생식·식사대용",
+        "targets": [
+          "시니어건강"
+        ],
+        "summary": "현대그린푸드가 환자식·케어푸드를 성장축으로 공식화했다(아이뉴스24 9/18, MTN 9/17). 당뇨·고혈압 만성질환자용 전문 식단, 고령자용 연화식, 저당·저칼로리·고단백까지 생애주기·건강목적별로 제품군을 세분화하고 식품산업클러스터진흥원과 협약을 맺었다.",
+        "whyNow": "우리 '영양식 황성주생식'의 config alias 에 '환자식'이 들어 있다. 대기업이 이 카테고리를 세분화하면 검색어도 세분화된다. 다만 실측은 환자식 1,100(-60) · 케어푸드 190 · 노인영양식 740(-10) 으로 아직 검색 규모가 없다 — 지금은 광고가 아니라 카테고리 관찰 대상이다.",
+        "heat": 3,
+        "newsVolume": 17028,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "아이뉴스24",
+            "url": "https://n.news.naver.com/mnews/article/031/0001059708?sid=101"
+          },
+          {
+            "outlet": "머니투데이방송",
+            "url": "https://news.mtn.co.kr/news-detail/2026091721573844899"
+          }
+        ]
+      },
+      {
+        "id": "s9",
+        "keyword": "식물성단백질",
+        "vertical": "식물성 프로틴",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "summary": "경향신문이 '20가지 단백질 식품 분석 1위'로 치아시드(35점)·콩(34점)·퀴노아(33점)·해바라기씨(32점)·렌틸콩(31점) 등 식물성 식품을 상위권에 올렸다(9/20, 닭가슴살 7위). 추석 선물세트에서도 정식품 베지밀 고단백 두유(190㎖당 식물성 단백질 12g)가 '저당·고단백 명절 선물'로 반복 인용됐다(세계일보·데일리안·비바100 9/18~20).",
+        "whyNow": "'식물성=차선책'이라는 오래된 프레임이 언론에서 뒤집히는 중이다. 우리 제품군 전체가 식물성 기반이라 카피 근거로 바로 쓸 수 있다. 실측은 식물성단백질 4,940(-10)·고단백두유 5,540(±0) 으로 작다 — 지금은 검색 키워드가 아니라 상세페이지 논거다.",
+        "heat": 3,
+        "newsVolume": 68331,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "경향신문",
+            "url": "https://n.news.naver.com/mnews/article/032/0003471469?sid=103"
+          },
+          {
+            "outlet": "세계일보",
+            "url": "https://n.news.naver.com/mnews/article/022/0004160403?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "s10",
+        "keyword": "식이섬유",
+        "vertical": "이너뷰티",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "summary": "셀럽 감량 기사에서 '식이섬유가 혈당 상승을 늦춘다'는 문장이 정형구처럼 반복됐다 — 박지윤 8kg(통밀빵, 9/20 2건), 이석훈 36kg(고구마, 9/18·9/20 2건), 김사랑(병아리콩, 9/19), 위고비 없이 51kg 감량한 영국 사례의 '혈당 방어 식사'(조선헬스 9/18).",
+        "whyNow": "식이섬유가 단일 성분 소구에서 '혈당 관리 수단'으로 자리를 옮겼다. 실측 식이섬유 20,690(+60)·차전자피 38,560(+170)·혈당스파이크 26,960(-470) 은 전부 제자리다 — 말은 늘어나는데 검색은 이미 상시 대역에 있다는 09-14 런의 진단이 유지된다.",
+        "heat": 3,
+        "newsVolume": 36181,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "조선헬스",
+            "url": "https://n.news.naver.com/mnews/article/346/0000116280?sid=103"
+          },
+          {
+            "outlet": "뉴시스",
+            "url": "https://m.entertain.naver.com/article/003/0014202810"
+          }
+        ]
+      },
+      {
+        "id": "s11",
+        "keyword": "황성주생식",
+        "vertical": "브랜드 방어",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "summary": "뉴스 쪽 경쟁사 침입 신호는 이번 창(9/15~9/21)에도 0건이다(황성주생식 825건·라이프밀 128건 전수에서 최신 기사가 9/7 수상 보도). 반면 카페 검색 20건 중 6건이 구 브랜드 표기('이롬 황성주 생식', '이롬 선식', '이롬 1일1생식')로 제품을 부르고 있었고, 그 중 3건은 어필리에이트성 전재 글이었다.",
+        "whyNow": "실측 황성주생식 19,070(-560)·이롬황성주생식 3,780 으로, 구 브랜드 표기가 검색 접점에서 여전히 5분의 1 규모를 차지한다. 대외 문구에는 쓰지 않고 내부 판단 근거로만 남긴다.",
+        "heat": 3,
+        "newsVolume": 825,
+        "matchType": "brand",
+        "source": "cafe",
+        "sources": [
+          {
+            "outlet": "네이버카페(방구석 피부연구소)",
+            "url": "https://cafe.naver.com/hdsfljhdszds/668"
+          },
+          {
+            "outlet": "네이버카페(어아소)",
+            "url": "https://cafe.naver.com/bbusubbusu/5352"
+          }
+        ]
+      },
+      {
+        "id": "s12",
+        "keyword": "라이프밀",
+        "vertical": "브랜드 방어",
+        "targets": [
+          "다이어터",
+          "이너뷰티"
+        ],
+        "summary": "'2026 올해의 브랜드 대상 생식 부문' 보도 파도는 9/2~9/7 로 완전히 끝났고, 이번 창에 신규 기사는 0건이다. 실측은 1,260(+80) 으로 사실상 제자리.",
+        "whyNow": "수상 보도 10건이 검색 전환으로 이어지지 않았다는 사실이 2주째 같은 숫자로 확인된다. 보도자료 단독으로는 브랜드 검색이 만들어지지 않는다는 근거로 축적한다.",
+        "heat": 2,
+        "newsVolume": 128,
+        "matchType": "brand",
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "한국경제",
+            "url": "https://n.news.naver.com/mnews/article/015/0005329113?sid=101"
+          }
+        ]
+      },
+      {
+        "id": "s13",
+        "keyword": "거꾸로식사법",
+        "vertical": "트렌드",
+        "targets": [
+          "다이어터"
+        ],
+        "summary": "닥터딩요(구독 94.3만)의 '천연위고비, 거꾸로 식사법을 프로틴 쉐이크로 가능한지 실험' 영상이 109.8만 회로 2주째 1위를 유지한다(9/5 게시, 09-14 런 100.0만 → +9.8만).",
+        "whyNow": "프로틴 쉐이크를 '식사 순서·혈당 관리 도구'로 재정의하는 언어가 100만 명 단위로 깔렸다. 그 자리의 협찬은 여전히 경쟁 제품(닥터핏 당케어 쉐이크)이다. 실측 거꾸로식사법은 키워드도구에 잡히지 않는다(MISS) — 검색어가 아니라 콘텐츠 언어다.",
+        "heat": 4,
+        "newsVolume": 0,
+        "matchType": "trend",
+        "source": "youtube",
+        "sources": [
+          {
+            "outlet": "유튜브 Dr. Dinho",
+            "url": "https://www.youtube.com/watch?v=0DKZKxHSW5A"
+          }
+        ]
+      },
+      {
+        "id": "s14",
+        "keyword": "파이버맥싱",
+        "vertical": "이너뷰티",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "summary": "파이버맥싱은 이번 창에 뉴스 신규 0건이고, 유튜브도 구독 331 시니어 채널의 조회 55 영상 1건뿐이다. 키워드도구에서는 여전히 MISS(측정 불가).",
+        "whyNow": "09-11~09-14 런에서 56회 잡히며 최다 seedCandidate 였는데, 7일 공백 뒤 확인해 보니 공급자 파도가 실제로 식었다. 개념어로 남을지 소멸할지 판단이 갈리는 구간이라 pending 유지하되 caughtCount 를 올리지 않는다.",
+        "heat": 2,
+        "newsVolume": 0,
+        "matchType": "trend",
+        "source": "youtube",
+        "sources": [
+          {
+            "outlet": "유튜브 시니어 황금기 라이프",
+            "url": "https://www.youtube.com/watch?v=368SKBmXrX8"
+          }
+        ]
+      },
+      {
+        "id": "s15",
+        "keyword": "편스토랑",
+        "vertical": "방송",
+        "targets": [
+          "다이어터"
+        ],
+        "summary": "방송 안테나 시드 기각. 이번 창의 편스토랑 기사는 심수봉 홈메이드 평양냉면(9/17 방송)·손태진 쌀떡 떡갈비 제품화(아워홈 9/17 출시)·출연자 근황뿐으로, config.broadcastContextTerms(식단·건강식·다이어트·생식·단백질·저속노화 등) 동시출현이 0 이다.",
+        "whyNow": "스킬 규칙대로 방송명만 있고 식단 맥락이 없으면 버린다. 12일 연속 기각이다. 나혼자산다도 같은 이유로 기각.",
+        "heat": 1,
+        "newsVolume": 83994,
+        "matchType": null,
+        "source": "news",
+        "sources": [
+          {
+            "outlet": "더퍼블릭",
+            "url": "https://www.thepublic.kr/news/articleView.html?idxno=319275"
+          }
+        ]
+      },
+      {
+        "id": "s17",
+        "keyword": "라이프밀팝업",
+        "vertical": "자사 활동",
+        "targets": [
+          "다이어터",
+          "이너뷰티"
+        ],
+        "summary": "★용산 팝업이 네이버 클립 UGC 를 실제로 만들어내고 있다. 오늘 발굴분 39건 중 클립 6건이 '#오늘클립챌린지 #라이프밀팝업' 조합이고, 그 중 한 건은 일정까지 그대로 적었다 — '서울 용산 라이프밀 추석선물 연구소 - FREEZE LAB 팝업 26.09.10~09.23, 사전예약 방문 시 라이프밀의 좋은 원물을 담은 …'(mu_jiji, 92회). '#라이프밀추석선물연구소' 해시태그와 현장 경품 후기(ddosini)도 함께 잡혔다.",
+        "whyNow": "우리가 집행한 오프라인 이벤트가 네이버 클립의 참여형 해시태그(#오늘클립챌린지)를 타고 자발적 게시물로 번지는 경로가 확인됐다. 다만 조회수는 0~159 로 개별 도달은 거의 없다 — 도달이 아니라 '검색 결과에 깔리는 양'으로 보는 게 맞다. 팝업은 9/23 종료(D-2).",
+        "heat": 3,
+        "newsVolume": 0,
+        "matchType": "brand",
+        "source": "clip",
+        "sources": [
+          {
+            "outlet": "네이버클립(mu_jiji)",
+            "url": "https://m.naver.com/shorts?serviceType=CLIP&mediaType=VOD&seedMediaId=179217D9A579870F280C8F28CC1333A3EB5B"
+          }
+        ]
+      },
+      {
+        "id": "s18",
+        "keyword": "라이프밀 데일리",
+        "vertical": "자사 활동",
+        "targets": [
+          "다이어터"
+        ],
+        "summary": "자사 인스타 체험단 물량이 이번 창에 몰려 들어왔다. 오늘 발굴 39건 중 인스타 10건이 전부 '#제품제공'·'#협찬'·'#gift' 로 @lifemeal_wellness 를 태그하며 '황성주 박사의 라이프밀 데일리 5포입'을 다뤘다(u.u_11j·hye_jew·dodledodlee·yu_umvely·dy_.e·minj.o33o 2건·parksoundcloud·nominerdene.b_·fakiii_kkang).",
+        "whyNow": "문구가 거의 동일하게 수렴한다 — '1포 30g/105kcal', '물이나 두유에 타서', '바쁜 아침'. 가이드가 잘 먹혔다는 뜻이기도 하고, 10건이 서로 구별되지 않는다는 뜻이기도 하다. 다음 회차 가이드에 '본인 상황 한 줄'을 강제할 근거로 남긴다. ★전부 미파악(unattributed)으로 분류됐다 — 체험단 계정이 쇼핑커넥트 판매 크리에이터가 아니라 귀속 인덱스에 없기 때문이다. 구조상 정상이며 오분류가 아니다.",
+        "heat": 3,
+        "newsVolume": 0,
+        "matchType": "product",
+        "source": "instagram",
+        "sources": [
+          {
+            "outlet": "인스타그램(hye_jew)",
+            "url": "https://www.instagram.com/p/DdWX9VeFKtj/"
+          },
+          {
+            "outlet": "인스타그램(dy_.e)",
+            "url": "https://www.instagram.com/p/DdV9O2uEtnh/"
+          }
+        ]
+      },
+      {
+        "id": "s19",
+        "keyword": "이롬황성주생식",
+        "vertical": "브랜드 방어",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "summary": "발굴분에서 구 브랜드 병기 마케팅이 두 건 확인됐다. 클립 su46han — '라이프밀 데일리 … **황성주생식과 이롬생식을 찾는 분께 익숙한 선택**', 인스타 nutright_official — '**황성주-생식-라이프밀-이롬-뉴밀-플러스**로 맛과 영양을 한 번에'. 둘 다 우리 채널이 아닌 제3자 어필리에이트다.",
+        "whyNow": "구 브랜드어를 검색 유입 장치로 쓰는 어필리에이트가 계속 재생산되고 있다. 실측 이롬황성주생식 3,780 은 황성주생식 19,070 의 약 20% 다. s11(카페 표기)과 같은 현상이 유통 채널 쪽에서도 관측된다는 기록 — 대외 문구에는 쓰지 않고 내부 판단 근거로만 남긴다.",
+        "heat": 2,
+        "newsVolume": 0,
+        "matchType": "brand",
+        "source": "instagram",
+        "sources": [
+          {
+            "outlet": "인스타그램(nutright_official)",
+            "url": "https://www.instagram.com/p/DdReZ4sGWH0/"
+          }
+        ]
+      },
+      {
+        "id": "s16",
+        "keyword": "생식 다이어트",
+        "vertical": "생식·식사대용",
+        "targets": [
+          "다이어터"
+        ],
+        "summary": "블로그 20건 중 이번 창(9/16~9/21) 신규는 5건이고, 그 중 3건이 생식가루를 실제 식단 기록에 넣은 일반인 글이다 — '생식가루+꿀'로 아침을 대체한 감량 3일차 기록(9/20), 'PT 선생님이 위가 약하다고 추천'(9/18), 헬시알엔 한포야채 동결건조 후기(9/20). 서인영 관련 어필리에이트 글은 9/13~14 에 멈춰 있고 이번 창 신규는 없다.",
+        "whyNow": "생식이 '건강식'이 아니라 '위가 약한 사람의 식사대용'·'정체기 도구'로 쓰이는 실사용 맥락이 반복된다. 카피에 쓸 수 있는 표현이지만 개인 후기라 볼트 근거는 아니다 — 소구점 총람 대조가 선행돼야 한다.",
+        "heat": 2,
+        "newsVolume": 6553,
+        "matchType": null,
+        "source": "blog",
+        "sources": [
+          {
+            "outlet": "네이버블로그",
+            "url": "https://blog.naver.com/couple_05/224417897887"
+          },
+          {
+            "outlet": "네이버블로그",
+            "url": "https://blog.naver.com/limjeee_/224416131042"
+          }
+        ]
+      }
+    ],
+    "watchlist": [
+      {
+        "keyword": "황성주생식",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "s11",
+        "reason": "브랜드 방어 상시 감시. 19,070(-560)으로 소폭 하락. 뉴스 침입 신호는 0건이나 카페 구매 접점은 여전히 구 브랜드 표기가 6/20 건이다(s11).",
+        "monthlyPc": 1370,
+        "monthlyMobile": 17700,
+        "competition": "중간",
+        "adDepth": 6,
+        "avgBid": null,
+        "prevTotal": 19630,
+        "delta": -560,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 6 · compIdx 중간 → 파워링크가 6개까지 붙는 브랜드 구매 질의. 1차 실검증은 광고경쟁 신호(ad-signal).",
+        "productHints": [
+          {
+            "group": "balhyo-hwangseongju",
+            "confidence": "medium"
+          },
+          {
+            "group": "yeongyang-hwangseongju",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "확정 형제쌍 — '황성주생식'은 발효건강식·영양식 두 SKU 의 alias 에 동시 등장한다(config.productGroups). 하나로 단정하지 않는다.",
+        "priorityScore": 6.63,
+        "status": "defend",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-07-07",
+        "relatedKeywords": [
+          {
+            "keyword": "이롬황성주생식",
+            "monthlyPc": 270,
+            "monthlyMobile": 3510,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "이롬생식",
+            "monthlyPc": 150,
+            "monthlyMobile": 1000,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "황성주선식",
+            "monthlyPc": 60,
+            "monthlyMobile": 490,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "황성주1일1생식",
+            "monthlyPc": 10,
+            "monthlyMobile": 170,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "라이프밀",
+        "targets": [
+          "다이어터",
+          "이너뷰티"
+        ],
+        "relatedSignal": "s12",
+        "reason": "브랜드 방어 상시 감시. 1,260(+80). 9/2~9/7 수상 보도 10건이 검색 전환으로 이어지지 않았다는 사실이 2주째 확인된다(s12).",
+        "monthlyPc": 320,
+        "monthlyMobile": 940,
+        "competition": "중간",
+        "adDepth": 6,
+        "avgBid": null,
+        "prevTotal": 1180,
+        "delta": 80,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 6 · compIdx 중간 → 검색량은 작지만 광고 경쟁은 붙어 있는 브랜드어.",
+        "productHints": [
+          {
+            "group": "ilsaeng-lifemeal-420g",
+            "confidence": "medium"
+          },
+          {
+            "group": "lifemeal-daily-30g",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "확정 형제쌍 — 브랜드 상위어라 420g 본품과 데일리 30g 14포 둘 다에 걸린다.",
+        "priorityScore": 4.95,
+        "status": "defend",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-07-07",
+        "relatedKeywords": []
+      },
+      {
+        "keyword": "추석선물세트",
+        "targets": [
+          "시니어건강",
+          "다이어터"
+        ],
+        "relatedSignal": "s1",
+        "reason": "340,900(+136,400)로 월간 실측은 신고점인데, ★데이터랩 일간은 9/15 정점(100) 후 9/19 52.06 까지 내려왔다(s1). 월간 롤링창에 추석 구간이 들어와 생긴 상승이라 '아직 오른다'고 읽으면 안 된다. 추석 D-4, 남은 건 막바지·바로배송 수요.",
+        "monthlyPc": 102400,
+        "monthlyMobile": 238500,
+        "competition": "높음",
+        "adDepth": 9,
+        "avgBid": null,
+        "prevTotal": 204500,
+        "delta": 136400,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 9 · compIdx 높음 → 명확한 구매 질의. 광고 슬롯이 거의 만석이라 단가가 비싸다.",
+        "productHints": [
+          {
+            "group": "gift-set",
+            "confidence": "high"
+          },
+          {
+            "group": "harugwana",
+            "confidence": "low"
+          }
+        ],
+        "productHintBasis": "gift-set alias '선물세트' 직결(high). harugwana 는 09-14 런의 세계일보 기사('하루견과와 같은 간편 건강 먹거리도 추석 선물 전면 배치')와 이번 창의 롯데마트 '매일견과 하루한줌 80봉' 핸드캐리 편성을 근거로 low 유지 — 우리 하루견과가 명절 세트 SKU 로 편성돼 있는지는 사내 확인 전이라 올리지 않는다.",
+        "priorityScore": 7.48,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-08-30",
+        "relatedKeywords": [
+          {
+            "keyword": "추석",
+            "monthlyPc": 302200,
+            "monthlyMobile": 389000,
+            "competition": "높음",
+            "adDepth": 3,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "정관장",
+            "monthlyPc": 61900,
+            "monthlyMobile": 221700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "추석선물",
+            "monthlyPc": 79700,
+            "monthlyMobile": 161600,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "한우선물세트",
+            "monthlyPc": 24200,
+            "monthlyMobile": 74500,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "추석선물세트추천",
+            "monthlyPc": 25700,
+            "monthlyMobile": 71800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "스팸선물세트",
+            "monthlyPc": 26200,
+            "monthlyMobile": 61100,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "명절선물",
+            "monthlyPc": 25600,
+            "monthlyMobile": 49600,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "한우",
+            "monthlyPc": 15900,
+            "monthlyMobile": 58300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "명절선물세트",
+            "monthlyPc": 22000,
+            "monthlyMobile": 43500,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "신세계상품권",
+            "monthlyPc": 13100,
+            "monthlyMobile": 52300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "견과류",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "s2",
+        "reason": "63,500(+5,500). 견과류선물세트 18,980(+8,160) 가 더 크게 올랐다 — 이번 추석의 소포장·핸드캐리 편성과 붙는다(s2).",
+        "monthlyPc": 11900,
+        "monthlyMobile": 51600,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "prevTotal": 58000,
+        "delta": 5500,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 8 · compIdx 중간 → 구매 질의.",
+        "productHints": [
+          {
+            "group": "harugwana",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "harugwana alias '견과·견과류' 직결. 단 일반 카테고리어라 high 는 주지 않는다.",
+        "priorityScore": 7.15,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-08-11",
+        "relatedKeywords": [
+          {
+            "keyword": "바질페스토",
+            "monthlyPc": 3560,
+            "monthlyMobile": 29500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "표고버섯",
+            "monthlyPc": 4450,
+            "monthlyMobile": 28100,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "발사믹식초",
+            "monthlyPc": 3380,
+            "monthlyMobile": 25700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "피스타치오",
+            "monthlyPc": 3710,
+            "monthlyMobile": 24900,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "육포선물세트",
+            "monthlyPc": 5820,
+            "monthlyMobile": 18400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "견과류선물세트",
+            "monthlyPc": 4680,
+            "monthlyMobile": 14300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "에너지바",
+            "monthlyPc": 4980,
+            "monthlyMobile": 13200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "땅콩효능",
+            "monthlyPc": 940,
+            "monthlyMobile": 16400,
+            "competition": "중간",
+            "adDepth": 5,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "사과선물세트",
+            "monthlyPc": 4290,
+            "monthlyMobile": 11500,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "견과류세트",
+            "monthlyPc": 2440,
+            "monthlyMobile": 11500,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "단백질쉐이크",
+        "targets": [
+          "다이어터",
+          "운동헬스"
+        ],
+        "relatedSignal": "s6",
+        "reason": "110,300(-3,300). 공급(다이소 1,000원·올리브영·무신사)은 늘었는데 검색은 줄었다 — '쉐이크 피로감' 진단이 일주일 뒤에도 유지된다(s6).",
+        "monthlyPc": 17000,
+        "monthlyMobile": 93300,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "prevTotal": 113600,
+        "delta": -3300,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 8 · compIdx 중간 → 구매 질의. 11.0만 규모에 슬롯 8개라 경합 강도가 높다.",
+        "productHints": [
+          {
+            "group": "dayup-shake",
+            "confidence": "medium"
+          },
+          {
+            "group": "proteingold-high5",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "카테고리어 — 단백질쉐이크·프로틴쉐이크는 dayup-shake alias 이고 프로틴 보충제 축은 proteingold-high5 다. 둘 다 medium.",
+        "priorityScore": 7.14,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-07-07",
+        "relatedKeywords": [
+          {
+            "keyword": "프로틴",
+            "monthlyPc": 6770,
+            "monthlyMobile": 33200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질음료",
+            "monthlyPc": 5500,
+            "monthlyMobile": 26900,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질보충제",
+            "monthlyPc": 5340,
+            "monthlyMobile": 26800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질많은음식",
+            "monthlyPc": 2520,
+            "monthlyMobile": 23800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트음식",
+            "monthlyPc": 3380,
+            "monthlyMobile": 18300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질",
+            "monthlyPc": 3560,
+            "monthlyMobile": 16600,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다크초콜릿",
+            "monthlyPc": 2880,
+            "monthlyMobile": 15400,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "마이밀뉴프로틴",
+            "monthlyPc": 1410,
+            "monthlyMobile": 14200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트간식",
+            "monthlyPc": 4010,
+            "monthlyMobile": 10600,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질음식",
+            "monthlyPc": 1490,
+            "monthlyMobile": 9560,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "하루견과",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "s2",
+        "reason": "46,070(+3,880). 다만 데이터랩은 9/15 100 → 9/19 53.84 로 선물세트와 동일하게 꺾였다. 지금이 이번 시즌 마지막 구간이다(s2).",
+        "monthlyPc": 9170,
+        "monthlyMobile": 36900,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "prevTotal": 42190,
+        "delta": 3880,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 8 · compIdx 중간 → 구매 질의(제품명형).",
+        "productHints": [
+          {
+            "group": "harugwana",
+            "confidence": "high"
+          }
+        ],
+        "productHintBasis": "키워드가 곧 제품명(갓 구운 하루견과 20g 30개입) → high.",
+        "priorityScore": 7.01,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-07-19",
+        "relatedKeywords": [
+          {
+            "keyword": "견과류",
+            "monthlyPc": 11900,
+            "monthlyMobile": 51600,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "육포선물세트",
+            "monthlyPc": 5820,
+            "monthlyMobile": 18400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "견과류선물세트",
+            "monthlyPc": 4680,
+            "monthlyMobile": 14300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "에너지바",
+            "monthlyPc": 4980,
+            "monthlyMobile": 13200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "잣",
+            "monthlyPc": 3160,
+            "monthlyMobile": 13800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "사과선물세트",
+            "monthlyPc": 4290,
+            "monthlyMobile": 11500,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "견과류세트",
+            "monthlyPc": 2440,
+            "monthlyMobile": 11500,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "고급추석선물",
+            "monthlyPc": 2930,
+            "monthlyMobile": 9380,
+            "competition": "높음",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "밤양갱",
+            "monthlyPc": 1310,
+            "monthlyMobile": 9890,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "전복선물세트",
+            "monthlyPc": 2640,
+            "monthlyMobile": 8120,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "차전자피",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "s10",
+        "reason": "38,560(+170) 제자리. 30일 대역이 높은 상시 수요라는 09-14 판정을 유지한다. 라벨 미확인이라 productHints 는 계속 비운다(s10).",
+        "monthlyPc": 6760,
+        "monthlyMobile": 31800,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "prevTotal": 38390,
+        "delta": 170,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 8 · compIdx 중간 → 원료어인데 광고가 8개 붙는다 = 건기식 구매 질의로 이미 굳었다.",
+        "productHints": [],
+        "productHintBasis": "★억지 매핑 금지 — 우리 제품(푸룬 식이섬유 젤리·유산균 푸룬 식이섬유 젤리)의 차전자피 함유 여부를 라벨 원문으로 확인하지 못했다. 확인 전까지 productHints 를 비운다(8일째 동일).",
+        "priorityScore": 6.94,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-08-08",
+        "relatedKeywords": [
+          {
+            "keyword": "변비에좋은음식",
+            "monthlyPc": 1780,
+            "monthlyMobile": 23400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "식이섬유",
+            "monthlyPc": 3490,
+            "monthlyMobile": 17200,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "변비직빵",
+            "monthlyPc": 1490,
+            "monthlyMobile": 19200,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "푸룬",
+            "monthlyPc": 2120,
+            "monthlyMobile": 15700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "식이섬유많은음식",
+            "monthlyPc": 1950,
+            "monthlyMobile": 14900,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "배에가스빼는법",
+            "monthlyPc": 1060,
+            "monthlyMobile": 14300,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "배에가스찼을때",
+            "monthlyPc": 840,
+            "monthlyMobile": 12000,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "차전자피효능",
+            "monthlyPc": 1200,
+            "monthlyMobile": 11400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "식이섬유영양제",
+            "monthlyPc": 2020,
+            "monthlyMobile": 10300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "변비",
+            "monthlyPc": 1570,
+            "monthlyMobile": 10400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "유산균",
+        "targets": [
+          "다이어터",
+          "이너뷰티"
+        ],
+        "relatedSignal": "s10",
+        "reason": "114,600(+200). ★09-11~09-14 런에서 4일 연속 '검증 불가'로 보류했던 축을 오늘 워치리스트에 올린다 — 점수 6.91 로 proposed 6위이고, config.seeds.categories.이너뷰티에 이미 들어 있는 우리 카테고리어라 관련성 판단에 추측이 필요 없다. 미검증으로 남은 건 '포맷 일치 여부'뿐이라 그 불확실성은 productHints 를 low 로 낮춰 표시했다(s10).",
+        "monthlyPc": 19900,
+        "monthlyMobile": 94700,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "prevTotal": 114400,
+        "delta": 200,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 8 · compIdx 중간 → 광고 8개가 붙는 구매 질의(ad-signal). ★단 '어떤 포맷을 사려는 질의인지'(캡슐 vs 젤리)는 검증 경로가 막혀 미확인이다 — intentType 은 ad-signal 로만 판정했다.",
+        "productHints": [
+          {
+            "group": "fruit-jelly-stick",
+            "confidence": "low"
+          }
+        ],
+        "productHintBasis": "fruit-jelly-stick alias 에 '유산균젤리'가 있어 매핑 자체는 성립하지만, 검색어 '유산균' 단독 수요는 캡슐·분말형 정장 건기식 쪽이 주류로 보인다 — 우리 SKU 는 젤리 포맷이라 수요-포맷 불일치 가능성이 남는다. ★이 불일치를 쇼핑 실검증으로 가릴 방법이 없다(search_shop 폐지, 쇼핑 웹 WebFetch 차단 확인). 그래서 medium 이 아니라 low 로만 붙인다.",
+        "priorityScore": 6.91,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-08-11",
+        "relatedKeywords": [
+          {
+            "keyword": "그릭요거트",
+            "monthlyPc": 14400,
+            "monthlyMobile": 83300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "덴마크",
+            "monthlyPc": 6400,
+            "monthlyMobile": 30900,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "덴마크유산균",
+            "monthlyPc": 3970,
+            "monthlyMobile": 31700,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "비피더스유산균",
+            "monthlyPc": 3280,
+            "monthlyMobile": 27100,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "프로바이오틱스유산균",
+            "monthlyPc": 4240,
+            "monthlyMobile": 25000,
+            "competition": "높음",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "변비에좋은음식",
+            "monthlyPc": 1780,
+            "monthlyMobile": 23400,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "프로바이오틱스",
+            "monthlyPc": 7090,
+            "monthlyMobile": 18000,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "다이어트유산균",
+            "monthlyPc": 3180,
+            "monthlyMobile": 17800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "변비직빵",
+            "monthlyPc": 1490,
+            "monthlyMobile": 19200,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "유산균추천",
+            "monthlyPc": 3270,
+            "monthlyMobile": 16000,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "검은콩두유",
+        "targets": [
+          "다이어터",
+          "시니어건강"
+        ],
+        "relatedSignal": "s9",
+        "reason": "26,190(-460). 정식품 베지밀 고단백 두유가 추석 건강 선물 대표 사례로 반복 인용됐다(s9). 우리 두유 SKU 가 없어 productHints 는 계속 비운다.",
+        "monthlyPc": 3390,
+        "monthlyMobile": 22800,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "prevTotal": 26650,
+        "delta": -460,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 8 · compIdx 중간 → 구매 질의.",
+        "productHints": [],
+        "productHintBasis": "★우리 두유 SKU 가 없다 — 해당 제품군이 존재하지 않아 매핑 불가. config.productGroups 12개 중 어느 slug 에도 붙이지 않는다.",
+        "priorityScore": 6.77,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-07-10",
+        "relatedKeywords": [
+          {
+            "keyword": "당뇨에좋은음식",
+            "monthlyPc": 3350,
+            "monthlyMobile": 41100,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "곡물도감",
+            "monthlyPc": 4690,
+            "monthlyMobile": 34700,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "두유제조기",
+            "monthlyPc": 4130,
+            "monthlyMobile": 30100,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "콩국수",
+            "monthlyPc": 2030,
+            "monthlyMobile": 25600,
+            "competition": "중간",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "서리태",
+            "monthlyPc": 3680,
+            "monthlyMobile": 21300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "서리태콩물두유",
+            "monthlyPc": 1960,
+            "monthlyMobile": 21500,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "미숫가루",
+            "monthlyPc": 3160,
+            "monthlyMobile": 18200,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "비빔국수",
+            "monthlyPc": 1620,
+            "monthlyMobile": 16900,
+            "competition": "높음",
+            "adDepth": 7,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "삼육두유",
+            "monthlyPc": 2390,
+            "monthlyMobile": 15300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "무가당두유",
+            "monthlyPc": 2350,
+            "monthlyMobile": 11700,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          }
+        ]
+      },
+      {
+        "keyword": "프로틴",
+        "targets": [
+          "운동헬스",
+          "다이어터"
+        ],
+        "relatedSignal": "s6",
+        "reason": "39,970(-880). 식물성 단백질이 기사 랭킹 1~5위를 차지하는 흐름(s9)과 달리 상위 검색어는 제자리다.",
+        "monthlyPc": 6770,
+        "monthlyMobile": 33200,
+        "competition": "중간",
+        "adDepth": 8,
+        "avgBid": null,
+        "prevTotal": 40850,
+        "delta": -880,
+        "deltaSince": "2026-09-14",
+        "intentType": "shopping",
+        "intentBasis": "ad-signal",
+        "intentReason": "adDepth 8 · compIdx 중간 → 구매 질의.",
+        "productHints": [
+          {
+            "group": "proteingold-high5",
+            "confidence": "medium"
+          },
+          {
+            "group": "dayup-shake",
+            "confidence": "medium"
+          }
+        ],
+        "productHintBasis": "proteingold-high5 alias '프로틴' 직결이나 상위어라 medium, 쉐이크 축도 같이 걸려 dayup-shake 병기.",
+        "priorityScore": 6.7,
+        "status": "proposed",
+        "adStatus": null,
+        "adProduct": null,
+        "adRegisteredAt": null,
+        "adUpdatedAt": null,
+        "adRefs": [],
+        "adRefCount": 0,
+        "firstDetected": "2026-08-14",
+        "relatedKeywords": [
+          {
+            "keyword": "단백질쉐이크",
+            "monthlyPc": 17000,
+            "monthlyMobile": 93300,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질보충제",
+            "monthlyPc": 5340,
+            "monthlyMobile": 26800,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질많은음식",
+            "monthlyPc": 2520,
+            "monthlyMobile": 23800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질",
+            "monthlyPc": 3560,
+            "monthlyMobile": 16600,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "WPC",
+            "monthlyPc": 7930,
+            "monthlyMobile": 6800,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "테이크핏",
+            "monthlyPc": 1800,
+            "monthlyMobile": 8560,
+            "competition": "높음",
+            "adDepth": 9,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "WPI프로틴",
+            "monthlyPc": 1790,
+            "monthlyMobile": 8150,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질파우더",
+            "monthlyPc": 1750,
+            "monthlyMobile": 7370,
+            "competition": "중간",
+            "adDepth": 8,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "탄수화물",
+            "monthlyPc": 1300,
+            "monthlyMobile": 7080,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          },
+          {
+            "keyword": "단백질쉐이크추천",
+            "monthlyPc": 1940,
+            "monthlyMobile": 5210,
+            "competition": "높음",
+            "adDepth": 10,
+            "intentType": "shopping"
+          }
+        ]
+      }
+    ],
+    "contentIdeas": [
+      {
+        "title": "추석 카드는 '탐색'이 아니라 '지금 받을 수 있나'로 바꾼다",
+        "body": "추석선물세트 검색은 9/15 에 정점(100)을 찍고 9/19 52.06 까지 내려왔다. 하루견과도 똑같이 9/15 100 → 9/19 53.84. 남은 나흘(D-4)에 신규 탐색 카피를 태우는 건 늦었다. 롯데백화점·롯데마트가 이미 '핸드캐리', '3시간 바로배송', '막바지 구매족'으로 언어를 바꿨다. 우리도 상세·광고 문구 첫 줄을 배송 확정 가능 여부와 소포장(하루한줌·개별포장)으로 교체한다.",
+        "caution": "배송 가능일을 문구로 약속하려면 실제 출고 마감일을 물류에 먼저 확인해야 한다. 확인 전에는 '지금 주문 시 도착' 같은 단정 표현을 쓰지 않는다."
+      },
+      {
+        "title": "'천연 위고비'는 이제 반박까지 세트로 온다 — 우리는 그 단어를 쓰지 않는다",
+        "body": "검색은 9/8 정점 이후 18.36 까지 내려왔고(-82%), 같은 기간 세계일보에서 장형우 교수가 \"천연 위고비? 그런 건 없습니다\"라고 정면 반박했다(4.2만 회). 열풍의 끝물에 올라타면 얻는 건 적고 붙는 반박은 크다. 대신 살아남은 문장만 가져온다 — '단백질·식이섬유를 먼저 먹으면 포만감이 오래간다'는 식사 순서 이야기는 방송·전문의·셀럽 기사에서 공통으로 반복됐다. 이건 제품 효능 주장이 아니라 식사 방법 설명이라 안전하다.",
+        "caution": "의약품(위고비·마운자로)과 비교하거나 대체를 암시하는 표현은 쓰지 않는다. 식약처 부당광고 소지. '천연 위고비'라는 단어 자체를 자사 문구에 넣지 않는다."
+      },
+      {
+        "title": "'마시는 샐러드'를 의사 채널이 먼저 말하고 있다",
+        "body": "구독 8.06만 '닥터벨의 웰니스'가 왓츠인마이백에서 메디슨벨 마시는 샐러드와 한입 샐러드 젤리를 실사용템으로 꺼냈다(9/19). 메디슨벨은 재활의학과 전문의 이종민 원장 브랜드고, 같은 주 추석 기프트세트로도 유통됐다. 낫띵베럴도 드링킷 라인에 '마시는 샐러드'를 넣어 무신사에 들어갔다. 우리 닥터샐러드는 카테고리어를 먼저 쓴 쪽인데 지금 그 단어의 화자가 바뀌고 있다. 광고 입찰(이미 registered)보다 '누가 말하느냐'를 붙잡아야 하는 국면이다.",
+        "caution": "인플루언서 제안은 광고 에이전트·MD 승인 사안이다. 이 카드는 판단 요청이지 집행이 아니다. 전문가 협업 시 의료인 추천 표현은 규정 확인이 선행돼야 한다."
+      },
+      {
+        "title": "식물성 단백질이 '차선책'에서 '1위'로 올라간 기사가 나왔다",
+        "body": "경향신문이 단백질 식품 20가지를 분석해 치아시드·콩·퀴노아·해바라기씨·렌틸콩을 1~5위에 올렸다(닭가슴살 7위, 9/20). 우리 제품군은 전부 식물성 기반인데 상세페이지에서 이 사실을 '대안'처럼 적어왔다. 논거가 생겼으니 순서를 바꾼다 — 식물성이라서 부족한 게 아니라 식물성이라서 고른 것으로.",
+        "caution": "기사 순위는 외부 매체의 평가지 우리 제품의 시험 결과가 아니다. 인용 시 출처를 명시하고, 우리 제품 영양성분은 반드시 라벨확정 수치로만 적는다(1회 제공량 기준 병기)."
+      }
+    ],
+    "viral": [
+      {
+        "id": "https://www.youtube.com/watch?v=0DKZKxHSW5A",
+        "platform": "youtube",
+        "title": "천연위고비, 거꾸로 식사법을 프로틴 쉐이크로 가능한지 직접 실험해 봤는데, 충격적인 결과가 나왔습니다ㅣ닥터딩요",
+        "url": "https://www.youtube.com/watch?v=0DKZKxHSW5A",
+        "thumbnail": "https://i.ytimg.com/vi/0DKZKxHSW5A/maxresdefault.jpg",
+        "creator": "Dr. Dinho",
+        "creatorHandle": "doctordinho",
+        "followers": 943000,
+        "views": 1098223,
+        "likes": 7000,
+        "comments": 1316,
+        "publishedAt": "2026-09-05",
+        "viralScore": 62,
+        "matchType": "trend",
+        "seedMatched": "거꾸로식사법",
+        "seedTier": "learning",
+        "catchReason": "'거꾸로식사법' 시드 매칭 — 닥터딩요(94.3만)가 거꾸로 식사법을 '프로틴 쉐이크로 대체 가능한가' 직접 실험. 9/5 게시 후 109.8만 조회로 2주째 1위 유지(09-14 런 100.0만 → +9.8만). 프로틴 쉐이크가 혈당·식사순서 관리 도구로 재포지셔닝되는 장면 = 우리 쉐이크 카테고리 유사효능 소개",
+        "relatedProduct": "데이업 프로틴쉐이크 / 프로틴골드 HIGH5 (카테고리 유사효능)",
+        "sentiment": "중립(경쟁 협찬 — 닥터핏 당케어 쉐이크)",
+        "source": "youtube"
+      },
+      {
+        "id": "https://www.youtube.com/watch?v=SXEd60g19kI",
+        "platform": "youtube",
+        "title": "일주일 동안 천연 위고비를 먹어 봤습니다. 천연 위고비 다이어트!",
+        "url": "https://www.youtube.com/watch?v=SXEd60g19kI",
+        "thumbnail": "https://i.ytimg.com/vi/SXEd60g19kI/maxresdefault.jpg",
+        "creator": "일주어터",
+        "creatorHandle": "oneweek7",
+        "followers": 595000,
+        "views": 367617,
+        "likes": 2400,
+        "comments": 327,
+        "publishedAt": "2026-08-31",
+        "viralScore": 59,
+        "matchType": "trend",
+        "seedMatched": "천연위고비",
+        "seedTier": "learning",
+        "catchReason": "'천연위고비' 시드 매칭 — 일주어터(59.5만)의 일주일 천연위고비 식단 체험이 36.8만 조회까지 누적. 본인 결론이 '건강한 아침 단백질 식단'으로 수렴 = 우리 아침 식사대용 맥락",
+        "relatedProduct": "1일1생식 라이프밀 / 라이프밀 데일리 (아침 식사대용 맥락)",
+        "sentiment": "중립",
+        "source": "youtube"
+      },
+      {
+        "id": "https://www.youtube.com/watch?v=MkApK8izHVs&t=533s",
+        "platform": "youtube",
+        "title": "40kg 감량한 의사의 내돈내산 숨은 꿀템 왓츠인마이백 l 필수 영양제, 인생 단백질쉐이크, 민감성 선크림, 진료하다 향따당한 향수, 입술 필러 의혹 틴트)",
+        "url": "https://www.youtube.com/watch?v=MkApK8izHVs&t=533s",
+        "thumbnail": "https://i.ytimg.com/vi/MkApK8izHVs/maxresdefault.jpg",
+        "creator": "닥터벨의 웰니스",
+        "creatorHandle": "%EB%8B%A5%ED%84%B0%EB%B2%A8",
+        "followers": 80600,
+        "views": 18382,
+        "likes": 139,
+        "comments": 7,
+        "publishedAt": "2026-09-19",
+        "viralScore": 54,
+        "matchType": "ingredient",
+        "seedMatched": "마시는 샐러드",
+        "seedTier": "learning",
+        "catchReason": "'마시는 샐러드' 승인 시드 매칭 — 닥터벨의 웰니스(8.06만) 왓츠인마이백에서 설명 타임코드로 '메디슨벨 마시는 샐러드', '메디슨벨 샐러디컬 한입 샐러드', '베지어트 식물성 단백질 쉐이크'를 실사용템으로 공개(설명 전문 2,850자 확인). ★닥터샐러드 정면 경쟁 카테고리가 의사 인플루언서 데일리템으로 들어간 사례",
+        "relatedProduct": "닥터샐러드 마시는 샐러드 14포 (직접 경쟁)",
+        "sentiment": "중립(경쟁 제품 노출)",
+        "source": "youtube"
+      },
+      {
+        "id": "https://www.youtube.com/watch?v=xZj-yH-j4Ak",
+        "platform": "youtube",
+        "title": "계란 먹고 살빠지는 사람 VS 살찌는 사람 | 계란 다이어트 제대로 먹는 방법",
+        "url": "https://www.youtube.com/watch?v=xZj-yH-j4Ak",
+        "thumbnail": "https://i.ytimg.com/vi/xZj-yH-j4Ak/maxresdefault.jpg",
+        "creator": "한의사 남창우 | 체질을 바꿉니다",
+        "creatorHandle": "%ED%95%9C%EC%9D%98%EC%82%AC%EB%82%A8%EC%B0%BD%EC%9A%B0",
+        "followers": 36200,
+        "views": 22343,
+        "likes": 357,
+        "comments": 27,
+        "publishedAt": "2026-09-15",
+        "viralScore": 53,
+        "matchType": "trend",
+        "seedMatched": "계란다이어트",
+        "seedTier": "learning",
+        "catchReason": "'계란다이어트' 시드 매칭 — 한의사 남창우(3.6만)가 '계란을 얹어 먹느냐 바꿔 먹느냐'로 계란다이어트를 정리. 천연위고비 파생 프레임이 '무엇을 대체하느냐' 논의로 넘어간 장면 = 식사대용 제품 소구와 직결",
+        "relatedProduct": "1일1생식 라이프밀 / 라이프밀 데일리 (아침 대체 맥락)",
+        "sentiment": "중립",
+        "source": "youtube"
+      },
+      {
+        "id": "https://www.youtube.com/watch?v=lgjtqJojLrA",
+        "platform": "youtube",
+        "title": "🚨“천연 위고비? 그런 건 없습니다” -40kg 의사 아구킹의 비만약 팩폭 Q&A  | 장형우 교수 | 의사소통",
+        "url": "https://www.youtube.com/watch?v=lgjtqJojLrA",
+        "thumbnail": "https://i.ytimg.com/vi/lgjtqJojLrA/maxresdefault.jpg",
+        "creator": "세계일보",
+        "creatorHandle": "segyetimes",
+        "followers": 143000,
+        "views": 42135,
+        "likes": 478,
+        "comments": 129,
+        "publishedAt": "2026-09-09",
+        "viralScore": 49,
+        "matchType": "trend",
+        "seedMatched": "천연위고비",
+        "seedTier": "learning",
+        "catchReason": "'천연위고비' 시드 매칭 — ★반박 축. 세계일보(14.3만)에서 장형우 교수가 \"천연 위고비? 그런 건 없습니다\"라고 정면 반박(4.2만 조회). 우리가 이 프레임에 올라탈 때 전문가 반박이 같이 붙는다는 뜻 = 표현 수위 관리 근거",
+        "relatedProduct": "천연위고비 트렌드(제품 직접 언급 없음)",
+        "sentiment": "부정(트렌드에 대한 전문가 반박)",
+        "source": "youtube"
+      }
+    ],
+    "seedCandidates": [
+      {
+        "seed": "파이버맥싱",
+        "tier": "trend",
+        "catchReason": "식이섬유를 의식적으로 최대치까지 끌어올리는 식습관 신조어. 실측 3,620(+210)·compIdx 높음인데 adDepth 는 3 으로 광고가 아직 덜 붙었다.\n[지속성] ★데이터랩이 이틀 연속 반등했다 — 9/9 64.40 → 9/10 81.55 → 9/11 87.38. 어제 '반등'으로 고쳐 본 판단이 하루 더 확인됐다. 더 중요한 건 ★뉴스가 9/10 이후 신규 0건이라는 점이다: 삼양사 세미나(기사 15건+)로 만들어진 공급자 파도는 끝났는데 소비자 블로그가 9/11·9/12 로 이어지고 유튜브에는 시니어 채널까지 설명 영상이 붙었다. 공급자 → 소비자 2단계로 넘어간 형태라 개념어 창이 가장 넓은 구간이다 — 승인 판단을 더 미룰 이유가 없다.",
+        "sampleVideos": [
+          {
+            "title": "단백질 다음은 식이섬유? 요즘 뜨는 '파이버맥싱' 제대로 하는 법",
+            "url": "https://www.youtube.com/watch?v=2ylFTziWMw8",
+            "matchType": "trend"
+          },
+          {
+            "title": "파이버맥싱 #식이섬유 #섬유질섭취 (시니어 황금기 라이프)",
+            "url": "https://www.youtube.com/watch?v=368SKBmXrX8",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [
+          {
+            "title": "요즘 뜨는 '파이버맥싱' 다이어트, 식이섬유 많이 먹으면 정말 살이 빠질까(블로그 9/11)",
+            "url": "https://blog.naver.com/again_bomnal/224408756739"
+          },
+          {
+            "title": "파이버맥싱 다이어트, 식이섬유 많이 먹으면 정말 살이 더 잘 빠질까(쉐프의샐러드 9/12)",
+            "url": "https://blog.naver.com/jwc2383/224408905573"
+          }
+        ],
+        "caughtCount": 56,
+        "status": "pending"
+      },
+      {
+        "seed": "차전자피",
+        "tier": "learning",
+        "catchReason": "파이버맥싱이 실제 구매로 내려앉는 지점의 원료어. 38,350(-130)으로 개념어 '식이섬유'(20,700)의 1.9배, '파이버맥싱'(3,620)의 11배다.\n[지속성] ★어제 판단을 수정한다 — 데이터랩이 9/9 100(신고점) → 9/10 95.63 → 9/11 76.16 으로 꺾였다. 어제 '변동폭이 작고 바닥이 높아 상시 수요'로 본 근거가 깨졌다. 경쟁사 체험단('헬스헬퍼 맥스컷 셀럽워터') 포스팅도 9/9 이후 신규가 없다. 개념어는 오르고 원료어는 내리는 하루였다. 우리 제품 함유 여부를 라벨로 확인하지 못해 productHints 는 계속 비워 둔다 — 시드 승인과 별개로 원재료-소구점 검증이 선행돼야 실제로 쓸 수 있다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "파이버 맥싱 유행인데…식이섬유 하루 50g, 오히려 장 망가질 수 있다",
+            "url": "https://blog.naver.com/sedaily_1960/224403270669"
+          },
+          {
+            "title": "파이버맥싱이 대세인 요즘에 딱! 헬스헬퍼 맥스컷 셀럽워터(9/9)",
+            "url": "https://blog.naver.com/daybealive/224406219993"
+          }
+        ],
+        "caughtCount": 16,
+        "status": "pending"
+      },
+      {
+        "seed": "계란다이어트",
+        "tier": "trend",
+        "catchReason": "천연위고비의 실행형 파생어. 실측 2,690(-30)·compIdx 높음·adDepth 10.\n[지속성] ★약세가 굳었다. 유튜브 30일 이내 신규 영상이 이틀째 0건이고 검색량도 사흘째 제자리~소폭 하락이다. 모(母)축인 '천연위고비' 자체가 데이터랩상 방송 전 수준(9/11 36.60)으로 완전히 회귀했으니 파생어가 살아날 근거가 없다 — 거절 쪽으로 정리하는 편이 맞다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "'18kg 감량' 한그루, \"다이어트 때 가장 소중한 음식\"… 뭘까?",
+            "url": "https://n.news.naver.com/mnews/article/346/0000115868?sid=103"
+          }
+        ],
+        "caughtCount": 24,
+        "status": "pending"
+      },
+      {
+        "seed": "거꾸로식사법",
+        "tier": "trend",
+        "catchReason": "천연위고비의 학술적 본명에 가까운 표현. 닥터딩요 영상이 오늘 986,798회다(어제 950,796 → +36,002/일).\n[지속성] ★오늘 성격이 바뀌었다 — 박민수 박사(구독 57.3만, 서울ND의원)가 본인 채널에서 '거꾸로 식사법을 반드시 해야 하는 사람들'을 다뤘다. 닥터딩요 1인 콘텐츠였던 개념이 두 번째 대형 의사 채널로 번진 것이다. 박 박사는 '한식은 건강식이지만 순서와 방식이 잘못되면 효과가 달라진다'는 프레임을 썼다. 다만 ★검색어로는 오늘도 키워드도구에 잡히지 않는다(미수집). 시청은 되는데 검색으로 안 옮겨오는 '영상 전용어' 판단 유지 — 광고 후보 부적합, 콘텐츠 제목어로만 의미. 이 자리 협찬은 이미 경쟁 제품(닥터핏 당케어 쉐이크)이 잡고 있다.",
+        "sampleVideos": [
+          {
+            "title": "거꾸로 식사법을 반드시 해야 하는 사람들 (박민수박사)",
+            "url": "https://www.youtube.com/watch?v=v9k-tc5_vHA",
+            "matchType": "trend"
+          },
+          {
+            "title": "천연위고비, 거꾸로 식사법을 프로틴 쉐이크로 가능한지 직접 실험해 봤는데",
+            "url": "https://www.youtube.com/watch?v=0DKZKxHSW5A",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [
+          {
+            "title": "\"채소 먼저 먹고, 밥 먹고 산책하고\"… 혈당 잡는 습관, 괜찮아?(9/12)",
+            "url": "https://www.hitnews.co.kr/news/articleView.html?idxno=78986"
+          }
+        ],
+        "caughtCount": 15,
+        "status": "pending"
+      },
+      {
+        "seed": "이롬뉴밀",
+        "tier": "learning",
+        "catchReason": "구 브랜드명에 '뉴밀'을 붙인 파생 표기.\n[지속성] ★오늘 협찬 체험단 글이 잡혔다 — 인스타 'coehyeonjeong8118'이 '#협찬 #제품무료제공 #이롬 #뉴밀플러스 #뉴밀플러스체험단 #이롬뉴밀플러스'와 함께 ★'#1일1생식'을 달았다. 경쟁(이롬) 체험단이 우리 제품명 해시태그를 빌려 쓰는 구조라 방어 관점에서 계속 봐야 한다.",
+        "sampleVideos": [
+          {
+            "title": "이롬뉴밀 추천 밸류 쇼핑의 선택",
+            "url": "https://www.youtube.com/watch?v=2-wXRXkOgV4",
+            "matchType": "trend"
+          },
+          {
+            "title": "황성주 생식 뉴밀플러스 솔직 후기! 1일1생식 효과는?",
+            "url": "https://www.youtube.com/watch?v=mfmS6pDZoXE",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [
+          {
+            "title": "인스타 coehyeonjeong8118 (#이롬 #뉴밀플러스 #1일1생식)",
+            "url": "https://www.instagram.com/p/DL3wCVgvast/"
+          }
+        ],
+        "caughtCount": 8,
+        "status": "pending"
+      },
+      {
+        "seed": "이롬황성주생식",
+        "tier": "learning",
+        "catchReason": "구 브랜드 병기 검색어. 키워드도구 실측 4,000(PC 300/모바일 3,700)·compIdx 중간·adDepth 8 로 이미 광고가 붙은 상업어다.\n[지속성] ★오늘 하이재킹 사례가 잡혔다 — 블로그 'ssurgpb6'가 제목에 '이롬황성주생식'을 걸고 본문에서는 타사 '퓨어리턴 하루가득 생식'을 추천한다. 클립에서도 '인터넷지기의 영상천국'이 '이롬 황성주생식(2002년)' 아카이브 영상을 올렸다. 구 브랜드어 트래픽이 경쟁 제품으로 새는 경로가 실물로 확인됐다.",
+        "sampleVideos": [
+          {
+            "title": "이롬황성주생식 추천, MD추천제품들!! 가성비 TOP5",
+            "url": "https://www.youtube.com/watch?v=2DTuj-i0flY",
+            "matchType": "brand"
+          }
+        ],
+        "sampleNews": [
+          {
+            "title": "블로그 ssurgpb6 — 제목은 이롬황성주생식, 본문은 타사 제품",
+            "url": "https://blog.naver.com/ssurgpb6/224406496025"
+          }
+        ],
+        "caughtCount": 25,
+        "status": "pending"
+      },
+      {
+        "seed": "동결건조",
+        "tier": "learning",
+        "catchReason": "우리 공법 고유어. 실측 8,990 수준·compIdx 높음·adDepth 8 로 상업 질의인데 광고 인벤토리 79건에 없다.\n[지속성] 최근 7일 발견분 해시태그에 '#동결건조생식' 3건. 다만 오늘 유튜브 '동결건조' 시드 결과는 커피 파우더 영상(11,886회)이라 우리 축과 무관했다 — 이 단어가 우리만의 것이 아니라는 점은 감안해야 한다. 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "블로그 jkldvbjty — 420g 라이프밀 동결건조 생식 일주일",
+            "url": "https://blog.naver.com/jkldvbjty/224407819608"
+          }
+        ],
+        "caughtCount": 28,
+        "status": "pending"
+      },
+      {
+        "seed": "자연채움",
+        "tier": "learning",
+        "catchReason": "어필리에이트 유튜브가 우리 상품을 '이롬 vs 자연채움' 비교 구도로 파는 표기.\n[지속성] 오늘 신규 검출 없음(9/8 분이 최근). 비교 대상 브랜드명이라 우리가 시드로 삼을지 자체가 판단 대상 — 판단 대기 유지.",
+        "sampleVideos": [
+          {
+            "title": "황성주 생식 비교분석! 이롬vs자연채움, 1일1생식 솔직 후기!",
+            "url": "https://www.youtube.com/watch?v=69ko-LF7D6E",
+            "matchType": "brand"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 8,
+        "status": "pending"
+      },
+      {
+        "seed": "이롬헬스케어",
+        "tier": "learning",
+        "catchReason": "'hemilyhealth_happytree'·'hemilyhealthstory' 채널이 '#이롬헬스케어 #라이프밀 #보상플랜' 형태로 우리 브랜드어를 다단계 모집 문맥에 쓰는 표기.\n[지속성] 최근 7일 해시태그 집계에 '#이롬헬스케어' 2건·'#해밀리헬스' 2건으로 계속 잡힌다. 오늘은 유튜브 'hemilyhealth_great'가 '라이프밀 5종 완벽 가이드! 왜 선택이 아닌 필수일까?'(292회)를 올렸다.",
+        "sampleVideos": [
+          {
+            "title": "밥으로 연금소득 만들기 #이롬헬스케어 #라이프밀 #보상플랜",
+            "url": "https://www.youtube.com/watch?v=3s-t7OfNSn8",
+            "matchType": "brand"
+          }
+        ],
+        "sampleNews": [
+          {
+            "title": "유튜브 hemilyhealth_great — 라이프밀 5종 완벽 가이드",
+            "url": "https://www.youtube.com/watch?v=D9t18EAZsrI"
+          }
+        ],
+        "caughtCount": 5,
+        "status": "pending"
+      },
+      {
+        "seed": "저당생식",
+        "tier": "learning",
+        "catchReason": "㈜위네스 아답토랩이 9/8 출시한 신제품명이자 카테고리 조어.\n[지속성] 오늘도 신규 기사 없음. 검색량 15(사실상 0) 그대로 — 이틀 연속 무근거라 이 상태가 이어지면 다음 런에서 후보에서 내리는 게 맞다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "아답토랩, '저당생식' 출시…'3고 1저·아답토-10' 영양 설계",
+            "url": "https://www.ikunkang.com/news/articleView.html?idxno=51481"
+          }
+        ],
+        "caughtCount": 4,
+        "status": "pending"
+      },
+      {
+        "seed": "헬시플레저",
+        "tier": "trend",
+        "catchReason": "'건강을 즐겁게' 프레임. 실측 830(+10)·compIdx 높음·adDepth 3 으로 검색어로는 여전히 작다.\n[지속성] 오늘 신규 기사는 없다. 어제까지 외식(명륜진사갈비 저당 양념돼지갈비 9/11 · 하림 맥시칸 저당소스 9/10)에서 업계 보도자료 용어로 굳는 중이라고 봤는데, 검색어로는 이틀째 제자리다. 검색 시드보다 카피 어휘 쪽 가치가 크다는 판단 유지.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "명륜진사갈비, '저당 양념돼지갈비' 출시…숯불갈비도 저당으로",
+            "url": "https://www.job-post.co.kr/news/articleView.html?idxno=227175"
+          }
+        ],
+        "caughtCount": 5,
+        "status": "pending"
+      },
+      {
+        "seed": "라이프밀팝업",
+        "tier": "trend",
+        "catchReason": "용산 아이파크몰 '라이프밀 추석선물 연구소(FREEZE LAB)' 팝업. 자사 행사어라 승인되면 즉시 쓸 수 있는 시드다.\n[지속성] ★오늘은 팝업 자체를 다룬 신규 클립이 0건이다(어제 3건). 대신 'jinbalcho'의 라이프밀 루틴 클립 1건이 새로 잡혔는데 팝업 언급은 없다(조회 8). 어제 잡힌 3건도 조회가 한 자릿수였던 걸 감안하면 자발 확산이 이어지지 않는 형태다 — 팝업 기간 중 검색 수요로 올라오지 않으면 시드 가치는 낮다.",
+        "sampleVideos": [
+          {
+            "title": "라이프밀 팝업 방문해보세요~^^ #라이프밀 #오늘클립챌린지",
+            "url": "https://clip.naver.com/contents?serviceType=CLIP&seedMediaId=6aa4018d32c48f1e35d349f2",
+            "matchType": "brand"
+          }
+        ],
+        "sampleNews": [
+          {
+            "title": "🩷라이프밀 추석선물 연구소 (FREEZE LAB)🩷 서울 용산구 한강대로(클립)",
+            "url": "https://m.blog.naver.com/eu_nong2/clip/15937228"
+          }
+        ],
+        "caughtCount": 13,
+        "status": "pending"
+      },
+      {
+        "seed": "해밀리헬스",
+        "tier": "learning",
+        "catchReason": "★신규 — 구 브랜드(황성주생식)에서 현 사명으로 넘어가는 표기가 블로그·유튜브·해시태그에서 동시에 잡혔다. 'jikim8583'은 제목을 아예 '해밀리 핼스 (구 황성주생식)'로 달고 hemilyhealth.com 회원가입을 유도한다.\n[지속성] 최근 7일 해시태그 '#해밀리헬스' 2건, 유튜브 'hemilyhealth_great'(292회), 블로그 다수. 다만 이 글들은 대부분 직판·회원모집 문맥이라 우리 커머스 검색어와 성격이 다르다 — 시드로 추적할지, 브랜드 방어 감시 대상으로만 둘지 판단이 필요하다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "블로그 jikim8583 — 해밀리 핼스 (구 황성주생식)",
+            "url": "https://blog.naver.com/jikim8583/224406922796"
+          }
+        ],
+        "caughtCount": 4,
+        "status": "pending"
+      },
+      {
+        "seed": "우창윤",
+        "tier": "person",
+        "catchReason": "'천연 위고비' 개념의 창시자로 불리는 내분비내과 전문의. 옥탑방의문제아들 328회(9/8) 출연 뒤 9/9~9/11 기사가 파생됐다.\n[지속성] ★수명이 실측으로 확정됐다 — 데이터랩 '천연위고비'가 9/8 100 → 9/9 69.43 → 9/10 45.41 → 9/11 36.60 으로 사흘 만에 방송 전 수준(9/1~9/5 23~37)까지 내려왔다. 기사도 9/11 코메디닷컴 1건 뒤 신규가 끊겼다. 인물 자체는 반복 노출형이나 축의 수명이 사흘이라 '고정 추적'보다 '방송 나올 때 붙는' 이슈 활용이 맞다 — 거절 권고를 유지한다.",
+        "sampleVideos": [
+          {
+            "title": "[#피크타임] 천연위고비 a부터 z까지!(KBS 공식 클립)",
+            "url": "https://www.youtube.com/watch?v=j5RTSvL9X40",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [
+          {
+            "title": "\"'이렇게' 먹으면 살 안쪄\" 우창윤 전문의가 꼽은 '천연 위고비'",
+            "url": "https://n.news.naver.com/mnews/article/296/0000104737?sid=103"
+          },
+          {
+            "title": "[#피크타임] 천연위고비 a부터 z까지 (KBS 옥탑방의문제아들 공식)",
+            "url": "https://www.youtube.com/watch?v=j5RTSvL9X40"
+          }
+        ],
+        "caughtCount": 44,
+        "status": "pending"
+      },
+      {
+        "seed": "장형우",
+        "tier": "person",
+        "catchReason": "비만치료제로 -40kg 감량한 '아구킹' 장형우 교수. 세계일보 채널에서 \"천연 위고비? 그런 건 없습니다\"라고 우리 approved 시드를 정면 반박했다(3.2만 회).\n[지속성] 본인 채널이 아니라 언론사 채널 출연이고 오늘 기준 우리 카테고리 언급은 이 한 건이다. 반복성 미확인 — 다만 '천연위고비' 를 카피에 쓰면 안 된다는 반증 근거로 signals s4 에 남겼다. 이슈 활용 우선, 시드 승인은 보류 권고.",
+        "sampleVideos": [
+          {
+            "title": "\"천연 위고비? 그런 건 없습니다\" -40kg 의사 아구킹의 비만약 팩폭 Q&A",
+            "url": "https://www.youtube.com/watch?v=lgjtqJojLrA",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 3,
+        "status": "pending"
+      },
+      {
+        "seed": "김소영",
+        "tier": "person",
+        "catchReason": "아나운서. '3개월째 아침마다 먹는 중' 8kg 감량 식단으로 달걀·올리브오일을 꼽았다(헬스조선 9/10).\n[지속성] ★'3개월간 아침으로 먹고 있다'는 지속 루틴 발언이라 아침 식사대용 카테고리와 직결된다. 다만 본인 채널 콘텐츠가 아니라 방송 발언 인용이고, 오늘 새 기사는 없다 — 반복성 재확인 필요.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "\"3개월째 아침마다 먹는 중\" 8kg 감량 김소영 꼽은 '위고비 식단'",
+            "url": "https://n.news.naver.com/mnews/article/346/0000115798?sid=103"
+          }
+        ],
+        "caughtCount": 4,
+        "status": "pending"
+      },
+      {
+        "seed": "홍진경",
+        "tier": "person",
+        "catchReason": "옥문아에서 '47kg 유지 비결 = 식사 약속 전 편의점 찐 달걀'을 공개했고 우창윤이 '천연위고비와 같은 효과'로 인정했다.\n[지속성] 9/10 뉴스엔 기사가 추가되며 사흘째 이어진다. 다만 전부 같은 방송 회차의 재인용이라 새 근거는 아니다 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "홍진경, 밥 약속 전 편의점서 달걀부터…'그게 바로 천연 위고비'",
+            "url": "https://www.mk.co.kr/article/12147784"
+          }
+        ],
+        "caughtCount": 20,
+        "status": "pending"
+      },
+      {
+        "seed": "닥터딩요",
+        "tier": "person",
+        "catchReason": "구독 94.4만 의사 유튜버. '거꾸로 식사법을 프로틴 쉐이크로 대체 가능한가'를 혈당 실험으로 다뤄 986,798회(어제 대비 +36,002/일).\n[지속성] 본인 채널·본인 브랜드('닥터핏')로 혈당·식단 콘텐츠를 시리즈화하고 있어 반복성은 매우 높다. ★다만 이미 경쟁 제품(당케어 쉐이크)을 직접 팔고 있어 협업 대상이 아니라 '경쟁 관측 대상'이다 — 승인 시 그 성격으로. 오늘 박민수 박사가 같은 개념을 다루면서 이 축이 1인 채널을 벗어났다는 점도 함께 본다.",
+        "sampleVideos": [
+          {
+            "title": "천연위고비, 거꾸로 식사법을 프로틴 쉐이크로 가능한지 직접 실험해 봤는데",
+            "url": "https://www.youtube.com/watch?v=0DKZKxHSW5A",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 10,
+        "status": "pending"
+      },
+      {
+        "seed": "이종민",
+        "tier": "person",
+        "catchReason": "100kg→48kg 감량한 재활의학과 전문의, 옥문아 동반 출연.\n[지속성] 오늘도 기사에 붙지만 전부 우창윤 기사의 동반 언급이다. 스포츠 팀닥터 활동이 중심이라 우리 식품 카테고리와의 접점이 약하다 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "'옥탑방의 문제아들' 우창윤·이종민, 다이어트 비법 조언",
+            "url": "https://www.bntnews.co.kr/article/view/bnt202609080270"
+          }
+        ],
+        "caughtCount": 16,
+        "status": "pending"
+      },
+      {
+        "seed": "일주어터",
+        "tier": "person",
+        "catchReason": "구독 59.5만 다이어트 유튜버. '일주일 동안 천연 위고비를 먹어 봤습니다' 349,324회(어제 34만대에서 계속 상승), 결론이 '건강한 아침 식단·단백질 챙기기'였다 — 우리 아침 식사대용 카테고리와 같은 자리.\n[지속성] 채널 정체성이 '일주일 챌린지' 포맷이라 반복 노출 가능성이 높고 우리 제품을 그대로 얹기 좋은 형식이다. 이 영상 협찬은 피부 제품(셀리맥스)이라 식품 협찬 이력은 확인되지 않았다 — 승인 후보 유지.",
+        "sampleVideos": [
+          {
+            "title": "일주일 동안 천연 위고비를 먹어 봤습니다. 천연 위고비 다이어트!",
+            "url": "https://www.youtube.com/watch?v=SXEd60g19kI",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 9,
+        "status": "pending"
+      },
+      {
+        "seed": "임수향",
+        "tier": "person",
+        "catchReason": "하이닥(9/9) '임수향 다이어트 식단' 상담 기사에서 '저녁을 단백질 쉐이크로 대체해도 되냐'는 질문이 우리 카테고리 규제 구분(보충용 vs 체중조절용 조제식품) 설명으로 이어졌다.\n[지속성] 오늘 '단백질 식사대용' 뉴스 축에서 재검출됐다(이틀 연속). 다만 인물이 이 주제를 스스로 반복하는 게 아니라 매체가 식단을 소재로 쓴 것이라 반복성은 매체 쪽에 있다 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "임수향 다이어트 식단 공개 … 도시락 구성법은?",
+            "url": "https://news.hidoc.co.kr/news/articleView.html?idxno=67305"
+          }
+        ],
+        "caughtCount": 2,
+        "status": "pending"
+      },
+      {
+        "seed": "박은영셰프",
+        "tier": "person",
+        "catchReason": "'리포데이 파이토업'(마시는샐러드 카테고리 경쟁 제품)의 추천인으로 블로그 리뷰에 반복 등장한다.\n[지속성] ★오늘 파이버맥싱 블로그 검색에서 다시 잡혔다 — 'rwromeo'(9/4)·'rubyru2017'(9/4)·'choionni'(9/2)가 모두 '마시는샐러드 박은영셰프 추천 파이버맥싱 식이섬유영양제 리포데이'라는 같은 제목 틀을 쓴다. 경쟁 제품의 조직적 체험단 문구라 인물 추적보다 ★경쟁 캠페인 감시 대상으로 보는 게 맞아 보인다.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 18,
+        "status": "pending"
+      },
+      {
+        "seed": "김종국",
+        "tier": "person",
+        "catchReason": "옥문아 9/8 방송에서 아내가 차려주는 고단백 삼시세끼 공개.\n[지속성] 오늘도 기사는 이어지지만 '고단백 집밥' 화제어로만 붙고 제품 언급이 없다 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 8,
+        "status": "pending"
+      },
+      {
+        "seed": "민재원",
+        "tier": "person",
+        "catchReason": "'몸짱 약사' 민재원. 유튜브 '싴'(16.8만) 2부작에서 식이섬유 선섭취를 파이버맥싱 문맥으로 소개(9/2, 23,179회).\n[지속성] 오늘 재검출 없음 — 판단 대기 유지. 파이버맥싱 축 자체가 꺾이는 중이라 우선순위는 내려간다.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "신애라",
+        "tier": "person",
+        "catchReason": "50대 동안 유지 비결로 '저속노화 아침 식단'이 블로그에서 확산(9/8).\n[지속성] 오늘 신규 근거 없음. 저속노화 축은 검색량 2,470(±0)으로 완전 정체 — 우선순위 낮음, 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "이영애",
+        "tier": "person",
+        "catchReason": "09-08 런까지 누적 5회.\n[지속성] 오늘 신규 근거 없음 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 5,
+        "status": "pending"
+      },
+      {
+        "seed": "효연",
+        "tier": "person",
+        "catchReason": "09-08 런까지 누적 4회.\n[지속성] 오늘 신규 근거 없음 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 4,
+        "status": "pending"
+      },
+      {
+        "seed": "광희",
+        "tier": "person",
+        "catchReason": "09-08 런까지 누적 3회.\n[지속성] 오늘 신규 근거 없음 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 3,
+        "status": "pending"
+      },
+      {
+        "seed": "기은세",
+        "tier": "person",
+        "catchReason": "저탄고지 식단 경험을 앞세워 커머스 방송에서 단백질 쉐이크를 소개한 이력(8/3).\n[지속성] 오늘 재검출 없음. 커머스 방송 노출형이라 경쟁 제품 소개 가능성이 함께 있다 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 2,
+        "status": "pending"
+      },
+      {
+        "seed": "김현정",
+        "tier": "person",
+        "catchReason": "09-08 런에서 포착.\n[지속성] 오늘 재검출 없음 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 2,
+        "status": "pending"
+      },
+      {
+        "seed": "송선미",
+        "tier": "person",
+        "catchReason": "09-08 런에서 '파이버맥싱' 시드로 포착된 유튜브 채널(47,231회, 8/29).\n[지속성] 오늘 재검출 없음 — 판단 대기 유지.",
+        "sampleVideos": [],
+        "sampleNews": [],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "서리태두유",
+        "tier": "trend",
+        "catchReason": "고소영이 '배고플 때 마시는 다이어트 비법 간식'으로 서리태 두유를 공개했다(9/10, 9/12 두 건). 검색어로는 '검은콩두유'(26,480)와 같은 축이고 '서리태두유' 자체는 6,680 이다.\n[지속성] ★셀럽 2건 + 제조사 2건으로 한 주 만에 축이 만들어졌다 — 정식품 '베지밀 고단백 두유'(190ml당 식물성단백질 12g) 추석세트, 곡물도감 서리태 콩물(홍진경 모델). 오늘 상위어 '검은콩두유'를 워치리스트에 올렸다. ★우리 제품군에 두유 SKU 는 없지만 '식물성 단백질 + 마시는 형태'가 1일1생식·데일리와 소구가 겹친다 — 시드로 쓸지, '왜 두유 대신 생식인가' 콘텐츠 비교축으로만 쓸지 판단 필요.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "\"배고플 때 이거 마셔요\"…40㎏대 고소영이 찾는 '이것'(뉴시스 9/12)",
+            "url": "https://m.entertain.naver.com/article/003/0014185907"
+          },
+          {
+            "title": "정식품, 추석 건강 선물세트 확대…고단백 두유·균형영양식",
+            "url": "http://www.dailysmart.co.kr/news/articleView.html?idxno=129612"
+          }
+        ],
+        "caughtCount": 4,
+        "status": "pending"
+      },
+      {
+        "seed": "GLP1애프터케어",
+        "tier": "trend",
+        "catchReason": "한아원코리아가 GLP-1(위고비·마운자로) 처방 확대에 맞춰 'GLP-1 애프터케어' 브랜드 글리프를 9/11 출시했다 — 아미노산 혼합제제 + 300Da 초저분자 피쉬콜라겐 3,500mg 을 의원·약국 채널에 깐다.\n[지속성] '감량 이후의 영양 결손'이라는 새 수요 구간이 업계 용어로 처음 이름을 얻은 날이다. 우리 이너뷰티·생식 라인이 붙을 수 있는 문맥이지만 아직 검색어로 내려오지 않았고(키워드도구 미수집), 무엇보다 의약품명이 붙은 개념어라 ★카피에 그대로 쓰면 의약품 오인 표현이 된다 — 관측만 권고.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "'GLP-1 애프터케어' 글리프 출시…감량기 영양 관리 겨냥",
+            "url": "https://n.news.naver.com/mnews/article/241/0003530298?sid=103"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "한그루",
+        "tier": "person",
+        "catchReason": "배우. 18kg 감량 중 '가장 소중한 음식'으로 달걀을 꼽았다(헬스조선 9/12) — '계란다이어트'·'천연위고비' 파생 축과 직결.\n[지속성] 오늘 신규 기사가 없다. 모(母)축인 천연위고비가 방송 전 수준으로 회귀했고 '계란다이어트' 검색도 약해 단발로 마감될 가능성이 높다 — 이슈 활용 우선, 승인 보류 권고.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "'18kg 감량' 한그루, \"다이어트 때 가장 소중한 음식\"… 뭘까?",
+            "url": "https://n.news.naver.com/mnews/article/346/0000115868?sid=103"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "고소영",
+        "tier": "person",
+        "catchReason": "배우. '요즘 자주 마신다'며 서리태 두유를 다이어트 간식으로 공개했다(서울신문 9/10).\n[지속성] ★단발이 아니었다 — 뉴시스가 9/12 에 '배고플 때 이거 마셔요…40㎏대 고소영이 찾는 이것'으로 같은 내용을 다시 실었다(이틀 새 2건). 기사가 '두유에 아몬드·호두 같은 견과류를 곁들이라'까지 붙어 우리 하루견과 문맥과도 겹친다. 뒤에 검은콩두유(26,480)라는 실검색 수요가 있다는 점이 다른 단발 인물과 다르고, 오늘 '검은콩두유'를 워치리스트에 새로 올린 근거이기도 하다 — ★승인 판단 대상으로 올린다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "\"배고플 때 이거 마셔요\"…40㎏대 고소영이 다이어트할 때 찾는 '이것'(9/12)",
+            "url": "https://m.entertain.naver.com/article/003/0014185907"
+          },
+          {
+            "title": "\"배고플 때 마시면 살 빠져요\"…다이어트 성공한 고소영의 비밀 간식(9/10)",
+            "url": "https://n.news.naver.com/mnews/article/081/0003679206?sid=103"
+          }
+        ],
+        "caughtCount": 3,
+        "status": "pending"
+      },
+      {
+        "seed": "윤혜진",
+        "tier": "person",
+        "catchReason": "전 발레리나. 46세에 '요즘 매일 먹는 한 접시'를 공개했고 기사가 미국 국립노화연구소 권장(생선·달걀·콩류·견과류)까지 붙여 정리했다(헤럴드경제 9/11).\n[지속성] 오늘 신규 기사 없음. '그들의 한 끼' 연재 코너 안의 1회차라 코너는 반복되지만 인물의 반복성은 미확인이다. 기사가 '저열량·저탄수 장기 유지의 위험'까지 균형 있게 다뤄 우리 '한 끼로 성립하는가' 콘텐츠 근거로 쓰기 좋다 — 이슈 활용 우선.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "46세 윤혜진 \"요즘 매일 먹어\"…발레리나 몸매 만든 한 접시",
+            "url": "https://n.news.naver.com/mnews/article/016/0002695893?sid=103"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "박민수박사",
+        "tier": "person",
+        "catchReason": "구독 57.3만 의사 유튜버(서울ND의원). 본인 채널에서 '거꾸로 식사법을 반드시 해야 하는 사람들'을 다뤘다 — ★'거꾸로식사법'이 닥터딩요 1인 콘텐츠를 벗어나 두 번째 대형 의사 채널로 번진 날이다.\n[지속성] 본인 병원·본인 채널·본인 도메인(박민수닷컴)을 함께 운영하며 식단·신장 건강 콘텐츠를 시리즈화하고 있어 반복성이 높다. ★특히 '한식은 세계적 건강식이지만 순서와 방식이 잘못되면 효과가 달라진다'는 프레임은 제품이 아니라 '한 끼 구성'을 말하는 자리라 우리 생식·식사대용과 충돌하지 않는다 (닥터딩요는 자체 경쟁 제품을 팔고 있어 협업 불가인 반면 이쪽은 아직 자체 식품 브랜드가 확인되지 않는다). 협업 가능성 관점에서 우선 검토 대상.",
+        "sampleVideos": [
+          {
+            "title": "거꾸로 식사법을 반드시 해야 하는 사람들. 박민수 박사의 거꾸로 식사법을 따라하십시요.",
+            "url": "https://www.youtube.com/watch?v=v9k-tc5_vHA",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "강주은",
+        "tier": "person",
+        "catchReason": "방송인. 본인 유튜브에 '365일 다이어트하는 강주은이 무조건 지키는 아침 루틴'을 올렸고 헬스조선이 9/11 에 기사화했다(연어 등 아침 식품 3가지).\n[지속성] ★'365일'·'무조건 지키는 아침 루틴'이라는 포맷 자체가 반복 콘텐츠다. 우리 1일1생식·라이프밀 데일리의 사용맥락이 정확히 '아침 한 끼 대체'라 인물 축 중에서는 제품 연결이 가장 직접적이다. 다만 오늘 기준 기사 1건이고 식품 협찬 이력은 확인되지 않았다 — 한 주 관측 후 판단 권고.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "\"아침으로 먹으면 뱃살도 쏙\"… 강주은 꼽은 식품 '3가지'",
+            "url": "https://n.news.naver.com/mnews/article/346/0000115818?sid=103"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "랄랄",
+        "tier": "person",
+        "catchReason": "크리에이터. 10kg 감량 후 SNS에 ★'마운자로X 위고비X 다이어트 보조제X'를 직접 명시했고, 코메디닷컴·스포츠서울·위키트리가 9/10~9/11 에 각각 다뤘다(기사 4건+).\n[지속성] 6~7개월간 본인 SNS로 감량 과정을 연속 기록하고 있어 반복성이 높다. ★무엇보다 '약 없이 식단·운동으로'라는 프레임의 대표 인물이 됐다는 점이 중요하다 — 8월까지의 '위고비 맞았다' 흐름이 뒤집히는 자리이고, 우리처럼 '한 끼를 바꾸는' 제품이 들어갈 문맥이다. 단 현재 언급 내용은 춤·필라테스·러닝 등 운동 중심이라 식품 연결 고리는 아직 없다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "'10kg 감량' 랄랄, 보조제 없이 체지방 쏙 빼고 근육량 늘린 비결은?",
+            "url": "https://n.news.naver.com/mnews/article/296/0000104757?sid=103"
+          },
+          {
+            "title": "출산도 했는데…보조제 없이 10kg 확 감량했다는 '유명인' 정체",
+            "url": "https://www.wikitree.co.kr/articles/1158523"
+          }
+        ],
+        "caughtCount": 4,
+        "status": "pending"
+      },
+      {
+        "seed": "사무실식사대용",
+        "tier": "trend",
+        "catchReason": "★오늘 우리 브랜드 블로그 제목에 새로 등장한 사용맥락이다 — 'nhsflhuk'가 '황성주 1일 1생식 라이프밀, 사무실 식사대용으로 괜찮을까'(9/12)를 올렸다. 지금까지 리뷰 제목은 '아침 대용'·'자취생 식단'·'출근길'이었는데 '사무실'은 처음이다.\n[지속성] 검색어로는 '사무실간식'이 7,150(compIdx 높음·adDepth 10)으로 이미 광고가 꽉 찬 구간이고, 광고 인벤토리에는 '사무실건강간식'이 등록돼 있다(우리 registered 76건 중 하나). 즉 '사무실'이라는 장소어는 이미 간식 축으로 잡혀 있는데, '사무실 + 식사대용'은 아직 비어 있다. 같은 날 코메디닷컴의 계산대 진열 연구(사탕 대신 견과류를 놓으니 건강 간식 구매 증가)도 사무실·탕비실 제안의 근거가 된다. ★다만 '사무실식사대용' 자체는 키워드도구에 수집되지 않아(미수집) 검색 수요는 확인하지 못했다 — 미검증(휴리스틱)으로 명시한다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "황성주 1일 1생식 라이프밀, 사무실 식사대용으로 괜찮을까(9/12)",
+            "url": "https://blog.naver.com/nhsflhuk/224409208076"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "박용우",
+        "tier": "person",
+        "catchReason": "'초가공식품' 앵커 — 강북삼성병원 박용우 교수가 노컷뉴스 9/13 지면에서 '초가공식품 끊는 6가지 집밥 전략'을 냈다. 간편식 일반을 비판하는 프레임이라 우리도 사정권이지만, 같은 논리가 '원물 기반·첨가물 최소'를 차별점으로 만든다.\n[지속성] 저서 '첫 끼의 힘' 출간 후 매체 기고가 이어지는 전문가형 인물로, 채널 정체성이 비만·대사 주제에 고정돼 반복성이 높다. 다만 우호가 아니라 비판 축이라 '고정 추적(리스크 감시)'인지 '1회성'인지는 유니 판단이 필요하다.",
+        "sampleNews": [
+          {
+            "title": "\"바빠서 집밥 못 먹는다고요?\" 의사가 직접 만든 간편한 건강 집밥 레시피",
+            "url": "https://n.news.naver.com/mnews/article/079/0004188661?sid=103"
+          }
+        ],
+        "sampleVideos": [],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "김혜윤",
+        "tier": "person",
+        "catchReason": "'계란다이어트' 시드 매칭 — 유튜브 '김혜윤의 누워서 살빼기'(구독 15.1만)의 '아침 공복 계란 2개 1주일' 영상이 9.1만 회(8/28). 천연위고비 프레임을 아침 루틴 실험 포맷으로 옮긴 사례다.\n[지속성] 채널명 자체가 다이어트 정체성이고 '일주일 실험' 시리즈 포맷을 반복한다 — 우리 아침 한 끼 대체와 시간대가 같아 재등장 가능성이 높다. 우리 협찬 이력은 없다.",
+        "sampleNews": [],
+        "sampleVideos": [
+          {
+            "title": "일주일 동안 아침 공복에 계란 2개씩 먹었더니 생긴 일…",
+            "url": "https://www.youtube.com/watch?v=Z-meWHxVFRc",
+            "matchType": "trend"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "단백질과자",
+        "tier": "trend",
+        "catchReason": "'쉐이크 피로감 → 과자 형태 단백질'이 업계 발언으로 확인됐다 — 꼬랑지 힐로우 대표가 '매번 쉐이크나 바만 먹는 데 피로감'을 이유로 프로틴 나쵸칩을 냈고(9/9), 일본 '간식의 식사화'(0.5식) 보도와 하이뮨 프로틴바 저당 리뉴얼이 같은 주에 겹쳤다. 실측 단백질과자 3,200(-40) · 고단백간식 410(-10) 으로 검색어는 아직 작아 선점 여지가 있다. 사전 flags 조회 결과 차단 플래그 없음.",
+        "sampleNews": [
+          {
+            "title": "힐로우, 50g당 단백질 16g 담은 '프로틴 나쵸칩' 3종 출시",
+            "url": "https://www.gokorea.kr/news/articleView.html?idxno=877796"
+          }
+        ],
+        "sampleVideos": [],
+        "caughtCount": 2,
+        "status": "pending"
+      },
+      {
+        "seed": "닥터벨",
+        "tier": "person",
+        "catchReason": "구독 8.06만 의사 웰니스 채널('닥터벨의 웰니스')이 왓츠인마이백에서 '메디슨벨 마시는 샐러드'·'샐러디컬 한입 샐러드'·'베지어트 식물성 단백질 쉐이크'를 실사용템으로 공개(9/19, 1.8만 회). 우리 닥터샐러드·쉐이크 카테고리를 그대로 다루는 채널이다.\n[지속성] 성분·사용감을 따지는 의사 포지셔닝이 채널 정체성이고 영양제·식이섬유·마시는 샐러드를 반복 소재로 쓴다(설명 타임코드 확인). 단발 이슈가 아니라 카테고리 상시 화자 → 고정 추적감. 다만 현재 경쟁 브랜드 노출 중이라 접촉은 MD 판단 필요.",
+        "sampleVideos": [
+          {
+            "title": "40kg 감량한 의사의 내돈내산 숨은 꿀템 왓츠인마이백",
+            "url": "https://www.youtube.com/watch?v=MkApK8izHVs",
+            "matchType": "ingredient"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "최고기",
+        "tier": "person",
+        "catchReason": "웨딩 촬영을 앞두고 2개월 7kg 감량하며 \"이런 게 바로 천연 위고비\"라고 말한 것이 3개 매체로 확산(9/18~20, 뉴센·MHN·엑스포츠뉴스).\n[지속성] 결혼 준비라는 한시적 계기에 묶인 단발 감량 서사다. 우리 카테고리(생식·식사대용) 언급은 없고 약물 미사용 강조가 핵심 — 반복성 낮음 → 이슈 활용 우선, 고정 추적 승격은 권하지 않는다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "최고기, 웨딩 촬영 앞두고 2개월 만에 7kg 감량…\"천연 위고비가 따로 없네\"",
+            "url": "https://m.entertain.naver.com/article/445/0000466416"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "이경실",
+        "tier": "person",
+        "catchReason": "4kg 감량 소식과 함께 단백질 쉐이크를 챙겨 먹는 모습이 본인 유튜브 채널 '우리엄마이경실'에 공개되며 뉴시스가 '다이어트 중 단백질 쉐이크의 효능'으로 기사화(9/17~18).\n[지속성] 본인 채널에서 식단을 일상 콘텐츠로 다루는 포맷이라 반복 노출 여지가 있다. 시니어건강 타겟 접점도 맞는다 → 관찰 후 판단.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "\"괜찮나요?\" 4kg 줄인 이경실…다이어트 중 단백질 쉐이크의 효능은",
+            "url": "https://m.entertain.naver.com/article/003/0014198355"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "남창우",
+        "tier": "person",
+        "catchReason": "한의사 채널 '체질을 바꿉니다'(구독 3.6만)가 '계란 먹고 살빠지는 사람 vs 살찌는 사람'으로 계란다이어트를 정리(9/15, 2.2만 회). '얹어 먹느냐 바꿔 먹느냐' = 식사대용 제품 소구와 정확히 같은 구조의 설명이다.\n[지속성] 체질·식단을 주제로 한 전문가 채널이라 우리 카테고리 반복 언급 가능성이 있다. 다만 우리 제품 언급은 아직 0 → 관찰.",
+        "sampleVideos": [
+          {
+            "title": "계란 먹고 살빠지는 사람 VS 살찌는 사람 | 계란 다이어트 제대로 먹는 방법",
+            "url": "https://www.youtube.com/watch?v=xZj-yH-j4Ak",
+            "matchType": "trend"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "고단백두유",
+        "tier": "trend",
+        "catchReason": "정식품 베지밀 고단백 두유(190㎖당 식물성 단백질 12g)가 이번 추석 '저당·고단백 건강 선물세트'의 대표 사례로 3개 매체에 반복 인용(9/18~20). 실측 5,540(±0)·검은콩두유 26,190(-460) 으로 두유 축 자체는 이미 상시 수요다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "추석 선물도 저당·고단백…참치부터 두유까지 건강 챙긴다",
+            "url": "https://n.news.naver.com/mnews/article/022/0004160403?sid=101"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      },
+      {
+        "seed": "오늘클립챌린지",
+        "tier": "trend",
+        "catchReason": "★#3 크리에이터 발굴 역투입 — 오늘 발굴 클립 6건이 전부 '#오늘클립챌린지' 와 '#라이프밀팝업/#라이프밀추석선물연구소' 를 함께 달고 있다. 네이버 클립의 참여형 챌린지 해시태그가 우리 오프라인 팝업(용산 FREEZE LAB, 9/10~9/23) UGC 의 실제 유통 경로로 작동했다는 뜻이다. 개별 조회수는 0~159 로 도달은 미미하지만 검색 결과에 깔리는 물량 효과는 있다. 팝업 종료(9/23) 후에도 이 경로가 남는지 확인 가치가 있어 후보로 올린다.",
+        "sampleVideos": [
+          {
+            "title": "서울 용산 라이프밀 추석선물 연구소 - FREEZE LAB 팝업 26.09.10-09.23",
+            "url": "https://m.naver.com/shorts?serviceType=CLIP&mediaType=VOD&seedMediaId=179217D9A579870F280C8F28CC1333A3EB5B",
+            "matchType": "brand"
+          }
+        ],
+        "sampleNews": [],
+        "caughtCount": 6,
+        "status": "pending"
+      },
+      {
+        "seed": "케어푸드",
+        "tier": "trend",
+        "catchReason": "현대그린푸드가 환자식·케어푸드를 성장축으로 공식화(9/17~18, 아이뉴스24·MTN). 당뇨식·신장질환식·연화식·저당·고단백으로 생애주기별 세분화. 우리 '영양식 황성주생식' alias 에 '환자식'이 있어 카테고리가 겹친다. 실측은 190 으로 아직 검색어가 아니다.",
+        "sampleVideos": [],
+        "sampleNews": [
+          {
+            "title": "고령화가 바꾼 밥상⋯현대그린푸드 '환자식' 키운다",
+            "url": "https://n.news.naver.com/mnews/article/031/0001059708?sid=101"
+          }
+        ],
+        "caughtCount": 1,
+        "status": "pending"
+      }
+    ],
+    "registeredKeywordTrends": [
+      {
+        "keyword": "비타민C",
+        "monthlyPc": 15700,
+        "monthlyMobile": 79900,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 1200,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트식단",
+        "monthlyPc": 11800,
+        "monthlyMobile": 43300,
+        "competition": "높음",
+        "adDepth": 9,
+        "delta": -6900,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "단백질바",
+        "monthlyPc": 6350,
+        "monthlyMobile": 17200,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 1350,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "에너지바",
+        "monthlyPc": 4980,
+        "monthlyMobile": 13200,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 1460,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "생식",
+        "monthlyPc": 1040,
+        "monthlyMobile": 8390,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -840,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "천연위고비",
+        "monthlyPc": 1500,
+        "monthlyMobile": 7790,
+        "competition": "낮음",
+        "adDepth": 0,
+        "delta": -1610,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "paused"
+      },
+      {
+        "keyword": "프로틴바",
+        "monthlyPc": 3120,
+        "monthlyMobile": 3890,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 350,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "마시는샐러드",
+        "monthlyPc": 800,
+        "monthlyMobile": 3820,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 280,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "칼로리바다이어트",
+        "monthlyPc": 350,
+        "monthlyMobile": 4110,
+        "competition": "중간",
+        "adDepth": 5,
+        "delta": -430,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "paused"
+      },
+      {
+        "keyword": "저당그래놀라",
+        "monthlyPc": 660,
+        "monthlyMobile": 3410,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -80,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "칼로리바",
+        "monthlyPc": 600,
+        "monthlyMobile": 3050,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -150,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:44:01.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "생식가루",
+        "monthlyPc": 170,
+        "monthlyMobile": 3150,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -530,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "견과류바",
+        "monthlyPc": 420,
+        "monthlyMobile": 1550,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 340,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당과자",
+        "monthlyPc": 480,
+        "monthlyMobile": 1340,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -70,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채가루",
+        "monthlyPc": 240,
+        "monthlyMobile": 1560,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -60,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "단백질바추천",
+        "monthlyPc": 310,
+        "monthlyMobile": 1210,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트시리얼",
+        "monthlyPc": 220,
+        "monthlyMobile": 1210,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -110,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "당뇨과자",
+        "monthlyPc": 240,
+        "monthlyMobile": 1170,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 40,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "견과바",
+        "monthlyPc": 210,
+        "monthlyMobile": 1110,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 260,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "개별포장간식",
+        "monthlyPc": 370,
+        "monthlyMobile": 940,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 50,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당단백질바",
+        "monthlyPc": 280,
+        "monthlyMobile": 980,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -30,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당에너지바",
+        "monthlyPc": 240,
+        "monthlyMobile": 1010,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 60,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저칼로리과자",
+        "monthlyPc": 250,
+        "monthlyMobile": 910,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -60,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조야채",
+        "monthlyPc": 190,
+        "monthlyMobile": 910,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -150,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:14.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "영양바",
+        "monthlyPc": 230,
+        "monthlyMobile": 830,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 110,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트과자추천",
+        "monthlyPc": 140,
+        "monthlyMobile": 620,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -40,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채분말",
+        "monthlyPc": 140,
+        "monthlyMobile": 600,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 30,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트그래놀라",
+        "monthlyPc": 100,
+        "monthlyMobile": 590,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -70,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "라운딩간식",
+        "monthlyPc": 160,
+        "monthlyMobile": 480,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 30,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "어른간식",
+        "monthlyPc": 130,
+        "monthlyMobile": 460,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조야채가루",
+        "monthlyPc": 50,
+        "monthlyMobile": 520,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "샐러드가루",
+        "monthlyPc": 60,
+        "monthlyMobile": 430,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "그래놀라바",
+        "monthlyPc": 100,
+        "monthlyMobile": 350,
+        "competition": "높음",
+        "adDepth": 9,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조야채분말",
+        "monthlyPc": 40,
+        "monthlyMobile": 400,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:14.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "사무실과자추천",
+        "monthlyPc": 290,
+        "monthlyMobile": 150,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -40,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채파우더",
+        "monthlyPc": 40,
+        "monthlyMobile": 320,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -30,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:14.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "건조야채",
+        "monthlyPc": 60,
+        "monthlyMobile": 300,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "사무실건강간식",
+        "monthlyPc": 180,
+        "monthlyMobile": 160,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "에너지바추천",
+        "monthlyPc": 60,
+        "monthlyMobile": 250,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "몸에좋은간식",
+        "monthlyPc": 60,
+        "monthlyMobile": 250,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트바",
+        "monthlyPc": 50,
+        "monthlyMobile": 230,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "채소가루",
+        "monthlyPc": 30,
+        "monthlyMobile": 240,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -30,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:46:57.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조채소",
+        "monthlyPc": 50,
+        "monthlyMobile": 220,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당프로틴바",
+        "monthlyPc": 70,
+        "monthlyMobile": 200,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "야채동결건조",
+        "monthlyPc": 40,
+        "monthlyMobile": 220,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트센터",
+        "monthlyPc": 40,
+        "monthlyMobile": 200,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -40,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "paused"
+      },
+      {
+        "keyword": "견과류과자",
+        "monthlyPc": 20,
+        "monthlyMobile": 210,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 50,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "다이어트에너지바",
+        "monthlyPc": 20,
+        "monthlyMobile": 160,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "운동간식",
+        "monthlyPc": 40,
+        "monthlyMobile": 140,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당과자추천",
+        "monthlyPc": 30,
+        "monthlyMobile": 120,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "수제에너지바",
+        "monthlyPc": 20,
+        "monthlyMobile": 130,
+        "competition": "중간",
+        "adDepth": 8,
+        "delta": 20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "단백질초코바",
+        "monthlyPc": 30,
+        "monthlyMobile": 110,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "요거트그래놀라",
+        "monthlyPc": 30,
+        "monthlyMobile": 110,
+        "competition": "높음",
+        "adDepth": 10,
+        "delta": -10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "휴대용간식",
+        "monthlyPc": 10,
+        "monthlyMobile": 120,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -30,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "운동선수간식",
+        "monthlyPc": 20,
+        "monthlyMobile": 110,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "고단백질바",
+        "monthlyPc": 10,
+        "monthlyMobile": 110,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "채소파우더",
+        "monthlyPc": 10,
+        "monthlyMobile": 70,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조분말",
+        "monthlyPc": 40,
+        "monthlyMobile": 40,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "건강식간식",
+        "monthlyPc": 20,
+        "monthlyMobile": 60,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당견과류바",
+        "monthlyPc": 5,
+        "monthlyMobile": 70,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "간편건강식",
+        "monthlyPc": 10,
+        "monthlyMobile": 60,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "건강바",
+        "monthlyPc": 10,
+        "monthlyMobile": 60,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 10,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "필드간식",
+        "monthlyPc": 5,
+        "monthlyMobile": 60,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결건조가루",
+        "monthlyPc": 10,
+        "monthlyMobile": 50,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "칼슘간식",
+        "monthlyPc": 10,
+        "monthlyMobile": 40,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "성인간식",
+        "monthlyPc": 10,
+        "monthlyMobile": 40,
+        "competition": "높음",
+        "adDepth": 8,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "고단백그래놀라",
+        "monthlyPc": 5,
+        "monthlyMobile": 40,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 5,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "하루그래놀라",
+        "monthlyPc": 5,
+        "monthlyMobile": 40,
+        "competition": "높음",
+        "adDepth": 3,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "달지않은단백질바",
+        "monthlyPc": 10,
+        "monthlyMobile": 30,
+        "competition": "중간",
+        "adDepth": 5,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "식사대용바",
+        "monthlyPc": 5,
+        "monthlyMobile": 30,
+        "competition": "중간",
+        "adDepth": 6,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "회사건강간식",
+        "monthlyPc": 20,
+        "monthlyMobile": 10,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "저당그래놀라바",
+        "monthlyPc": 10,
+        "monthlyMobile": 10,
+        "competition": "중간",
+        "adDepth": 6,
+        "delta": -20,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "그래놀라간식",
+        "monthlyPc": 10,
+        "monthlyMobile": 10,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 5,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "동결가루",
+        "monthlyPc": 5,
+        "monthlyMobile": 10,
+        "competition": "높음",
+        "adDepth": 7,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-18T23:49:15.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "하루그래놀라바",
+        "monthlyPc": 5,
+        "monthlyMobile": 5,
+        "competition": "낮음",
+        "adDepth": 0,
+        "delta": 0,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      },
+      {
+        "keyword": "과일그래놀라",
+        "monthlyPc": 5,
+        "monthlyMobile": 5,
+        "competition": "중간",
+        "adDepth": 6,
+        "delta": -5,
+        "deltaSince": "2026-09-14",
+        "registeredAt": "2026-07-21T09:45:52.000Z",
+        "adStatus": "registered"
+      }
+    ],
+    "adRegistryMeta": {
+      "path": "/dashboard/adKeywordInventory",
+      "fetchedAt": "2026-09-21T07:06:26+09:00",
+      "total": 79,
+      "uniqueKeywords": 79,
+      "statusDist": {
+        "registered": 76,
+        "paused": 3
+      },
+      "prevStatusDist": {
+        "registered": 76,
+        "paused": 3
+      },
+      "deltaVsPrev": {
+        "registered": 0,
+        "paused": 0
+      },
+      "latestRegisteredAt": "2026-07-21T09:45:52.000Z",
+      "latestUpdatedAt": "2026-07-22T08:26:06.000Z",
+      "stale": true,
+      "alert": false,
+      "matchedInWatchlist": 0,
+      "staleNote": "statusDist(registered 76 / paused 3)가 7/28~9/21 스냅샷에서 완전히 동일하고 latestUpdatedAt 은 2026-07-22 로 61일째 고정이다. staleDays(3) 초과가 8/9부터 44일 연속 미해소. removed 증가가 0건이라 alertRemovedRatio(0.3)를 못 채워 alert=false 를 유지한다(★removed 급증 방향만 alert 하는 규칙 그대로). keywordNormalized 79/79, self-norm 폴백 0건, 노드 신규·소멸 0건. '정합 job 정지'가 아니라 'updatedAt 갱신 누락'이라는 진단을 36일째 유지한다. 표시·재추천 게이트 규칙은 바꾸지 않았다. ★이번 런은 09-15~09-20 이 전부 죽어 7일 만에 찍은 스냅샷이라, 그 사이 분포가 흔들렸다가 되돌아왔을 가능성은 배제할 수 없다.",
+      "gateNote": "오늘 후보 83개 중 레지스트리 매칭 8건 — 다이어트식단(registered) · 단백질바(registered) · 생식(registered) · 천연위고비(paused) · 프로틴바(registered) · 마시는샐러드(registered) · 저당그래놀라(registered) · 야채가루(registered). 전부 신규 추천 대상에서 제외했고(★paused 를 미등록 취급하지 않음) 검색량 추적은 registeredKeywordTrends 76건으로 계속한다. 워치리스트 10개 중 레지스트리와 매칭된 항목은 0건이라 matchedInWatchlist=0. ★천연위고비는 paused 라 점수와 무관하게 게이트 제외 — 다만 오늘은 검색량 자체가 9,290(-1,610)으로 꺾여 후보 순위에도 들지 않았다. ★다이어트식단(registered)이 55,100(-6,900)으로 등록 키워드 중 가장 크게 빠졌다 — 등록 후 수요 변화 관찰 대상."
+    },
+    "collectionStatus": {
+      "mode": "mcp-normal / ★gap-recovery",
+      "note": "★이번 런은 09-15~09-20 런 6회가 전부 'OAuth session expired' 로 죽은 뒤의 복구런이다. 직전 원격 entry 가 2026-09-14 라 recencyDays(config 값 2) 대신 09-15~09-21 (7일) 창으로 넓혀 공백 구간의 기사를 덮었다 — 이 확대는 이번 런 한정이고 config 는 건드리지 않았다. PlayMCP NaverSearch 커넥터는 정상이라 news/blog/cafe/datalab 을 전부 MCP 로 수집했다. ★'get_current_korean_time' 도구는 12일째 커넥터 도구 목록에 없다 — MCP 응답의 lastBuildDate(2026-09-21 07:02:10 +0900)를 앵커로 대체했고 로컬 KST(07:01:01)와 일치하는 것을 확인했다. ★데이터랩은 endDate 를 9/20 으로 줘도 마지막 유효값이 9/19 다(당일·전일 집계 미완).",
+      "anchor": "2026-09-21T07:02:10+09:00 (MCP lastBuildDate)",
+      "recencyWindow": "2026-09-15 ~ 2026-09-21 (기본값 2일 → 7일로 확대, 결손 복구 한정)",
+      "seeds": 48,
+      "calls": 16,
+      "coverage": {
+        "news": "ok — 저속노화·천연위고비·고단백식단·단백질쉐이크·식사대용·식물성단백질·단백질바·혈당다이어트·추석건강선물세트·그래놀라·황성주생식·라이프밀·편스토랑·마시는샐러드 (14콜)",
+        "blog": "ok — '생식 다이어트' 20건 (1콜). 이번 창(9/16~21) 신규 5건, 그 중 3건이 생식가루 실사용 식단 기록.",
+        "cafe": "ok — '선식 생식' 20건 (1콜). 카페는 pubDate 를 주지 않아 recency 판정 불가 → 날짜 신호로 쓰지 않고 구성 비율(구 브랜드 표기 6/20)만 읽었다.",
+        "datalab": "ok — 4키워드 단독그룹 4콜(추석선물세트·천연위고비·저속노화·하루견과). ★그룹 혼합 금지 규칙 준수.",
+        "keywordstool": "ok — 48시드 3배치, 유니크 연관어 10,218개",
+        "shoppingWebFallback": "미시도 — 09-14 런에서 search.shopping.naver.com WebFetch 가 차단된 것을 확인했고 그 뒤 복구 신호가 없어 이번 런에서는 시도하지 않았다. search_shop 폐지 후 유일한 폴백 경로가 막혀 있다는 사실을 미해결로 유지한다."
+      },
+      "droppedSeeds": {
+        "편스토랑": "이번 창 기사가 심수봉 홈메이드 평양냉면(9/17 방송)·손태진 쌀떡 떡갈비 제품화(아워홈 9/17)·출연자 근황뿐. config.broadcastContextTerms 동시출현 0 → 12일 연속 기각.",
+        "나혼자산다": "이번 창 기사가 출연자 근황·논란뿐. 식단 맥락 0 → 기각.",
+        "셀럽병사의비밀": "프로그램 폐지 상태 그대로(config 미수정, 보고만).",
+        "생식(동음이의)": "news 는 생식기능·생식의학 노이즈가 지배적이라 이번 창에도 전량 필터하고 blog/cafe 경로로만 카테고리 신호를 읽었다.",
+        "고단백식단(복지행사)": "'영종구 어르신 고단백 식단 요리교실' 계열 기사가 7개 매체로 중복 확산했으나 지자체 복지 행사라 브랜드 연관성 필터에서 제거했다(스킬의 '복지관 선식지원·지역행사' 제외 규칙)."
+      }
+    },
+    "datalabSnapshot": {
+      "note": "★DataLab ratio 는 요청 그룹 내부 최댓값=100 인 상대값이라 반드시 키워드 1개 단독 그룹으로 조회했다(그룹을 섞으면 어제 값과 비교 불가). 기간 2026-08-22~2026-09-20 요청, 마지막 유효값은 9/19(당일·전일 집계 미완).",
+      "period": "2026-08-22~2026-09-19",
+      "series": {
+        "추석선물세트": {
+          "peak": {
+            "date": "2026-09-15",
+            "ratio": 100.0
+          },
+          "last": {
+            "date": "2026-09-19",
+            "ratio": 52.06
+          },
+          "read": "9/14 96.89 → 9/15 100 → 9/17 91.82 → 9/18 76.33 → 9/19 52.06. 정점을 지나 하강. 추석 당일(9/25) 열흘 전에 이미 꺾였다."
+        },
+        "하루견과": {
+          "peak": {
+            "date": "2026-09-15",
+            "ratio": 100.0
+          },
+          "last": {
+            "date": "2026-09-19",
+            "ratio": 53.84
+          },
+          "read": "추석선물세트와 곡선이 거의 동일(9/15 정점·9/19 반토막). 선물 수요에 동조하는 키워드임이 재확인됐다."
+        },
+        "천연위고비": {
+          "peak": {
+            "date": "2026-09-08",
+            "ratio": 100.0
+          },
+          "last": {
+            "date": "2026-09-19",
+            "ratio": 18.36
+          },
+          "read": "옥탑방의문제아들 방송일(9/8) 정점 후 계단식 하락 -82%. 9/18~20 최고기 기사에도 반등 없음 = 기사와 검색이 갈라진 후행 구간."
+        },
+        "저속노화": {
+          "peak": {
+            "date": "2026-08-28",
+            "ratio": 100.0
+          },
+          "last": {
+            "date": "2026-09-19",
+            "ratio": 43.17
+          },
+          "read": "30일 대역 43~100 으로 진폭만 크고 바닥이 내려앉지 않는다. 유행이 아니라 상시어 — 09-14 런의 차전자피와 같은 '대역 판정' 적용."
+        }
+      }
+    },
+    "viralStatus": {
+      "mode": "apify-rest-direct",
+      "note": "youtube MCP(@apify/actors-mcp-server)가 12일째 CONNECT_TIMEOUT 으로 붙지 않았다(context7 도 동일). MCP 는 Apify 래퍼일 뿐이라 같은 액터(streamers/youtube-scraper)를 track_creators 가 쓰는 기존 Apify 토큰으로 REST 직접 호출했다 — 신규 자격증명 발급 없음. 액터 입력·fieldMap 은 config.viral.youtube 그대로(sortVideosBy=NEWEST, maxResults 10, publishedWithinDays 30). 워커 3, 25개 시드 전부 ok 로 응답했다.",
+      "seeds": 25,
+      "fetchedRows": 13,
+      "v3Accepted": 7,
+      "kept": 5,
+      "droppedWithReason": {
+        "https://www.youtube.com/watch?v=8ux_1hafSH4": "'라이프밀 데일리' 시드에 로단테의 염증해방 라이프(구독 8,930·2.4만 회) 건강루틴 영상이 걸렸다. ★추측으로 버리지 않고 설명 전문(shortDescription 716자)을 직접 읽어 확인했다 — 라이프밀·생식·선식·황성주·동결건조 전부 '없음'(먹는 항목은 '라이블리 스무디'). 검색 노이즈로 확정 제외.",
+        "https://www.youtube.com/watch?v=n-tnsrQl4ZU": "'데이업 프로틴쉐이크' 시드에 웨이트연구소 덕코치 '보충제 70종 티어리스트'(6.9만 회)가 걸렸다. 설명 전문(526자) 확인 결과 데이업·프로틴골드·라이프밀 '없음'이고 쿠팡파트너스 어필리에이트 + 웨이 벌크업 축이라 우리 카테고리(식물성·식사대용)가 아니다 → 제외.",
+        "https://www.youtube.com/watch?v=K3LxDr9aUmM": "핫딜헌터 '헬스 보충제 TOP10'(구독 60·조회 10). 쿠팡파트너스 대량생성 어필리에이트 영상이고 우리 제품 언급 0 → 제외.",
+        "https://www.youtube.com/watch?v=kpVP3yBdBro": "영국 스포츠영양 브랜드 HIGH5 의 Recovery Drink 리뷰(조회 3). 우리 '프로틴골드 HIGH5' 와 동명이의 → 제외(09-11~14 와 동일).",
+        "https://www.youtube.com/watch?v=a91a1oNfmnA": "'선식' 시드에 전기 유도등 '2선식/3선식' 결선 영상(구독 4.46만·1만 회)이 걸렸다. 완전한 동음이의 → 제외.",
+        "https://www.youtube.com/watch?v=f8ph6UFSBns": "★승인 인물 '서인영' 시드로 SBS '무엇이든 해줄지니' 클립(25.5만 회)이 잡혔다. 그러나 내용이 물욕·소비 토크로 생식·식단·감량 앵커가 하나도 없다 → V3 인물 관련성 필터('인물+앵커어가 우리 카테고리 맥락일 때만')로 제외. 승인 인물이라도 앵커 맥락이 없으면 잡지 않는다는 규칙을 그대로 적용했다."
+      },
+      "scoreDropped": {
+        "https://www.youtube.com/watch?v=MkApK8izHVs&t=533s": "★닥터벨의 웰니스(구독 8.06만·1.8만 회) 왓츠인마이백. V3 는 통과했지만 viralScore 39 로 minViralScore(40)에 1점 미달해 viral[] 에서 빠졌다. 내용은 오늘 가장 중요한 경쟁 신호라 signals s7 과 seedCandidate '닥터벨'(person) 근거로 보존했다.",
+        "https://www.youtube.com/watch?v=368SKBmXrX8": "'파이버맥싱' 시니어 채널 정보 영상(구독 331·조회 55). viralScore 2 → 미달 제외. seedCandidate '파이버맥싱' 지속성 근거로만 보관(09-11~14 와 동일)."
+      },
+      "seedCoverageNote": "25개 시드 중 30일 이내 결과가 나온 건 10개다. 황성주생식·황성주 박사·라이프밀·1일1생식·데이크런치 프로틴바·프룻젤리스틱·생식·동결건조·동결건조 생식·마시는 샐러드·저분자콜라겐·서리태두유·단백질과자 및 승인 인물 중 박규리·조혜련은 최근 30일 신규 영상 0건이었다 — 억지로 채우지 않고 0으로 둔다. ★통과 5건 중 1위(닥터딩요 109.8만)는 '거꾸로식사법'이고 2~4위가 천연위고비 축(체험·반박·방송클립)이다. 우리 브랜드·제품을 직접 다룬 영상은 오늘도 0건 — 33일째 0이다."
+    },
+    "runHealth": {
+      "missedRuns": [
+        "2026-09-15",
+        "2026-09-16",
+        "2026-09-17",
+        "2026-09-18",
+        "2026-09-19",
+        "2026-09-20"
+      ],
+      "missedCause": "Windows 작업 스케줄러는 매일 07:00 정상 기동했으나 claude CLI 가 'Failed to authenticate: OAuth session expired and could not be refreshed' 로 즉시 종료했다(로그 6개 전부 동일, 389 bytes).",
+      "impact": "09-15~09-20 여섯 날짜의 entry 가 원격 배열에 영구 결손. 소급 생성하지 않는다(그날 기준 판단은 복원 불가). 이번 런의 모든 delta 는 2026-09-14 대비 7일치다(deltaSince).",
+      "actionOwner": "자동화 PC 운영(허브) — claude OAuth 세션 재인증 필요. 이 스킬 범위 밖이라 보고만 한다.",
+      "detectedAt": "2026-09-21T07:26:51+09:00"
+    },
+    "creatorTrackStatus": {
+      "ranAt": "2026-09-21T07:01:53+09:00",
+      "chainOrder": [
+        "track_creators",
+        "discover_blog",
+        "discover_yt",
+        "discover_ig",
+        "discover_clip",
+        "resolve_link_users",
+        "discover_posts revalidate"
+      ],
+      "sequentialOnly": true,
+      "steps": {
+        "track_creators": {
+          "status": "ok",
+          "commit": "94f5c33",
+          "creators": 10,
+          "newPosts": 0,
+          "note": "쇼핑커넥트 creators 10명 전 채널 교차추적. 채널별 try+coverage 기록 원칙 유지(빈 결과도 그대로 표기)."
+        },
+        "discover_blog": {
+          "status": "fail→recovered",
+          "commit": "cc43c96",
+          "adopted": 43,
+          "connectMarker": 43,
+          "newUnattributed": 15,
+          "note": "★1차 실행에서 발굴은 성공했으나 GitHub push 가 깨져 결과가 저장되지 않았다(github_push.push_file 이 비-JSON 응답 본문에 r.json() 을 호출해 JSONDecodeError 로 터짐 — 실제 HTTP 상태코드가 가려졌다). 체인 종료 후 단독 재실행해 복구했고 신규 미파악 15건이 그대로 들어갔다."
+        },
+        "discover_yt": {
+          "status": "fail→recovered",
+          "commit": "bc0a4d1",
+          "adopted": 11,
+          "newUnattributed": 0,
+          "note": "같은 push 장애. 재실행 결과 신규 0건이라 유실은 없었음을 확인."
+        },
+        "discover_ig": {
+          "status": "ok",
+          "commit": "93c3b6b",
+          "adopted": 70,
+          "newUnattributed": 12
+        },
+        "discover_clip": {
+          "status": "ok",
+          "commit": "6659ada",
+          "adopted": 56,
+          "connectMarker": 1,
+          "newUnattributed": 12
+        },
+        "resolve_link_users": {
+          "status": "ok",
+          "resolvedNew": 2,
+          "totalResolved": 12,
+          "note": "신규 링크 사용자 2명 해석 — 986742422843968 → '♡유니의 꼼지락꼼지락♡'(blog kim_jy23), 992056331542400 → '올킵스 라이프 | 건강·식품·생활정보'(blog allkeeps). 둘 다 판매 미발생 링크 사용자."
+        },
+        "revalidate": {
+          "status": "ok",
+          "commit": "0356b17",
+          "removed": 0,
+          "widgetPromoted": 0,
+          "note": "본문 재판정에서 제거 0건. 영상 채널 텍스트는 재판정하지 않는다(제목 80자 절단으로 인한 오삭제 방지, 09-06 사고 규칙)."
+        }
+      },
+      "totals": {
+        "attributed": 7,
+        "unattributed": 205,
+        "platformDistUnattributed": {
+          "blog": 65,
+          "clip": 55,
+          "instagram": 62,
+          "youtube": 23
+        },
+        "platformDistAttributed": {
+          "clip": 4,
+          "blog": 3
+        }
+      },
+      "discoveredToday": 39,
+      "discoveredTodayNote": "★07:00 기준 하루(now-7h) 규칙 적용. 39건은 하루치가 아니라 09-15~09-20 런 전멸로 6일간 쌓인 분이 한 번에 잡힌 것이다 — 평소 하루 6건 안팎과 직접 비교하면 안 된다.",
+      "readOfToday": [
+        "★자사 팝업 UGC 확인 — 클립 6건이 '#오늘클립챌린지 + #라이프밀팝업/#라이프밀추석선물연구소' 조합. 용산 FREEZE LAB(9/10~9/23) 일정과 현장 경품 후기까지 본문에 그대로 들어있다. 개별 조회수는 0~159.",
+        "★자사 인스타 체험단 10건이 한꺼번에 들어왔다(@lifemeal_wellness 태그, #제품제공/#협찬/#gift). 전부 '라이프밀 데일리 5포입'이고 문구가 '1포 30g/105kcal·물이나 두유에·바쁜 아침'으로 거의 동일하게 수렴한다.",
+        "어필리에이트 블로그 작성자 ID 난수열 대량 생성 패턴이 09-14 런과 동일하게 계속된다(n9zekvyciaunpl4u1k9·pavonorih3yv·fywhou0276dh6fnub·z2x381tup6·lhqu065ola7edwdnxj9h 등).",
+        "구 브랜드 병기 어필리에이트 2건 — 클립 su46han '황성주생식과 이롬생식을 찾는 분께 익숙한 선택', 인스타 nutright_official '황성주-생식-라이프밀-이롬-뉴밀-플러스'(signals s19).",
+        "클립 pick_gogo(159회) '50대 개그우먼이 단기간에 건강하게 살 빼는 방법 #황성주생식 #1일1생식 #라이프밀' — 인물이 명시되지 않아 누구인지 확정할 수 없다. ★추측으로 특정 인물에 귀속시키지 않고 미확인으로 남긴다(승인 인물 조혜련일 가능성은 있으나 근거 없음)."
+      ],
+      "seedFeedback": {
+        "bumped": {
+          "라이프밀팝업": "+6 (클립 UGC 6건)"
+        },
+        "new": [
+          "오늘클립챌린지(trend) — 팝업 UGC 의 실제 유통 경로"
+        ],
+        "noNewPerson": "인스타 10건은 전부 우리가 집행한 체험단 계정이라 person 시드 대상이 아니다(미추적 인플루언서 발견이 아님). 블로그 어필리에이트 작성자는 난수 ID 라 인물 시드 대상이 아니다."
+      }
+    }
   }
 ]
