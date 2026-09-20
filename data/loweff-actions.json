@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-09-19",
+ "updatedAt": "2026-09-20",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 360653,
-   "roas": 259,
+   "spend": 439679,
+   "roas": 213,
    "conv": 13,
    "options": 4,
-   "action": "상품군 통합 ROAS 259% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "action": "상품군 통합 ROAS 213% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
    "severity": "medium",
    "executor": "watch",
    "nccAdIds": [
@@ -27,7 +27,7 @@
   {
    "channel": "쇼핑검색",
    "item": "선물/기획세트",
-   "spend": 271492,
+   "spend": 241878,
    "roas": 0,
    "conv": 0,
    "options": 2,
@@ -39,24 +39,8 @@
   },
   {
    "channel": "쇼핑검색",
-   "item": "프로틴 골드 HIGH5",
-   "spend": 47248,
-   "roas": 0,
-   "conv": 0,
-   "options": 1,
-   "action": "상품군 전체 전환 0인데 광고비 소진 — 상품군 광고 OFF/개선 검토",
-   "severity": "high",
-   "executor": "approve",
-   "nccAdIds": [
-    "nad-a001-02-000000494209013",
-    "nad-a001-02-000000553654562"
-   ],
-   "matched": true
-  },
-  {
-   "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 45884,
+   "spend": 49026,
    "roas": 0,
    "conv": 0,
    "options": 3,
@@ -73,11 +57,27 @@
    "matched": true
   },
   {
+   "channel": "쇼핑검색",
+   "item": "프로틴 골드 HIGH5",
+   "spend": 40894,
+   "roas": 0,
+   "conv": 0,
+   "options": 1,
+   "action": "상품군 전체 전환 0인데 광고비 소진 — 상품군 광고 OFF/개선 검토",
+   "severity": "high",
+   "executor": "approve",
+   "nccAdIds": [
+    "nad-a001-02-000000494209013",
+    "nad-a001-02-000000553654562"
+   ],
+   "matched": true
+  },
+  {
    "channel": "애드부스트",
-   "item": "애셋 그룹#2606191823",
-   "spend": 5998164,
+   "item": "260708 애드부스트 제품",
+   "spend": 500001,
    "roas": 325,
-   "conv": 264,
+   "conv": 23,
    "action": "ROAS 325% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
@@ -85,36 +85,25 @@
   },
   {
    "channel": "애드부스트",
-   "item": "260708 애드부스트 제품",
-   "spend": 598140,
-   "roas": 290,
-   "conv": 26,
-   "action": "ROAS 290% 미달 — 예산 축소·소재 교체",
-   "severity": "medium",
-   "executor": "human",
-   "nccAdIds": []
-  },
-  {
-   "channel": "애드부스트",
    "item": "광고 그룹#2608151604",
-   "spend": 127816,
-   "roas": 166,
-   "conv": 6,
-   "action": "ROAS 166% 미달 — 예산 축소·소재 교체",
+   "spend": 103374,
+   "roas": 147,
+   "conv": 5,
+   "action": "ROAS 147% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
   }
  ],
  "powerlinkAuto": {
-  "date": "2026-09-18",
-  "changed": 137,
-  "downs": 0,
-  "deleteReview": 3
+  "date": "2026-09-19",
+  "changed": 37,
+  "downs": 1,
+  "deleteReview": 2
  },
  "summary": {
   "shopping": 4,
-  "advoost": 3,
+  "advoost": 2,
   "approveNeeded": 2
  },
  "days": [
@@ -278,6 +267,12 @@
    "date": null,
    "shopping": 4,
    "advoost": 3,
+   "approveNeeded": 2
+  },
+  {
+   "date": null,
+   "shopping": 4,
+   "advoost": 2,
    "approveNeeded": 2
   }
  ]
