@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-22T07:13:20+09:00",
+  "updatedAt": "2026-09-22T07:13:36+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -575,6 +575,26 @@
       "channelProductNo": "12763789807",
       "relatedProduct": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
       "discoveredAt": "2026-09-21"
+    },
+    {
+      "platform": "clip",
+      "url": "https://m.naver.com/shorts?serviceType=MOMENT&mediaType=VOD&seedMediaId=BF90397AA92DFCF57AF197243D9F33A8CE06&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%22maaI8i9tN59yfpqMDvPp%22%2C%22open%22%3Atrue%7D",
+      "title": "황성주 박사의 1일1생식 라이프밀 아침식사대용, 건강한 식습관의 시작!! 1일 1생식 하세요~",
+      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://phinf.pstatic.net/tvcast/20260917_51/U347G_1789642236477NrWM2_JPEG/PublishThumb_20260917_194854_006.jpg%22&type=w352&service=clip",
+      "date": "2026-09-17",
+      "author": "",
+      "authorName": "리치유니",
+      "channelUrl": "https://clip.naver.com/@richyuni365",
+      "followers": 0,
+      "connect": "none",
+      "evidence": [],
+      "source": "clip-search",
+      "metrics": {
+        "views": 39,
+        "likes": null,
+        "comments": null
+      },
+      "discoveredAt": "2026-09-22"
     },
     {
       "platform": "instagram",
@@ -4646,8 +4666,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-22T07:13:20+09:00",
-    "mode": "ig",
+    "lastRun": "2026-09-22T07:13:36+09:00",
+    "mode": "clip",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
