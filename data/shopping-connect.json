@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-21 09:42",
+  "updatedAt": "2026-09-22 08:41",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,13 +10,13 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 36816,
-    "productOrderCnt": 171,
-    "salesConversionRate": 0.5,
-    "salesCnt": 260,
-    "salesAmount": 10162450,
-    "commissionAmount": 1823844,
-    "commissionRate": 17.9
+    "accessCnt": 39719,
+    "productOrderCnt": 173,
+    "salesConversionRate": 0.4,
+    "salesCnt": 263,
+    "salesAmount": 10200250,
+    "commissionAmount": 1839644,
+    "commissionRate": 18.0
   },
   "products": [
     {
@@ -50,9 +50,9 @@
       "connectProductId": "986303491535840",
       "storeProductId": "13674568934",
       "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-      "salesCnt": 53,
-      "salesAmount": 880300,
-      "commissionAmount": 355050,
+      "salesCnt": 54,
+      "salesAmount": 898300,
+      "commissionAmount": 362574,
       "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
     },
     {
@@ -92,15 +92,6 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_216/1787302768754tEtCj_PNG/2825325869590978_1319965125.png"
     },
     {
-      "connectProductId": "981216820333132",
-      "storeProductId": "13638665039",
-      "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 3개",
-      "salesCnt": 5,
-      "salesAmount": 364500,
-      "commissionAmount": 20262,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260821_111/1787302719123Hxtvm_PNG/71758079881645370_682695672.png"
-    },
-    {
       "connectProductId": "981216820329026",
       "storeProductId": "12763859709",
       "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
@@ -108,10 +99,38 @@
       "salesAmount": 277830,
       "commissionAmount": 19681,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
+    },
+    {
+      "connectProductId": "981216820329033",
+      "storeProductId": "12764970820",
+      "name": "홀그레인 저당 그래놀라 그릭요거트토핑 귀리 씨리얼 140g, 1개",
+      "salesCnt": 7,
+      "salesAmount": 70400,
+      "commissionAmount": 9287,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260821_264/1787302563751rXNfF_PNG/100827632527360433_1997339272.png"
     }
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-21",
+      "label": "9월 21일",
+      "periodStart": "2026-09-21",
+      "periodEnd": "2026-09-21",
+      "summary": {
+        "access": {
+          "value": 2903,
+          "deltaValue": 1909,
+          "deltaPct": 192.1
+        },
+        "sales": {
+          "value": 37800,
+          "deltaValue": -95880,
+          "deltaPct": -71.7
+        }
+      },
+      "directVisits": 25
+    },
     {
       "key": "2026-09-20",
       "label": "9월 20일",
@@ -965,7 +984,7 @@
           "deltaPct": -100.0
         }
       },
-      "directVisits": 19
+      "directVisits": null
     },
     {
       "key": "2026-08-06",
@@ -1802,28 +1821,27 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-23",
-      "label": "6월 23일",
-      "periodStart": "2026-06-23",
-      "periodEnd": "2026-06-23",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
+    {
+      "key": "2026-W39",
+      "label": "9/21~9/21",
+      "periodStart": "2026-09-21",
+      "periodEnd": "2026-09-21",
+      "summary": {
+        "access": {
+          "value": 2903,
+          "deltaValue": -691,
+          "deltaPct": -19.2
+        },
+        "sales": {
+          "value": 37800,
+          "deltaValue": -1036660,
+          "deltaPct": -96.5
+        }
+      }
+    },
     {
       "key": "2026-W38",
       "label": "9/14~9/20",
@@ -2273,24 +2291,6 @@
           "deltaPct": null
         }
       }
-    },
-    {
-      "key": "2026-W13",
-      "label": "3/23~3/29",
-      "periodStart": "2026-03-23",
-      "periodEnd": "2026-03-29",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      }
     }
   ],
   "months": [
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-20",
+      "periodEnd": "2026-09-21",
       "summary": {
         "access": {
-          "value": 6075,
-          "deltaValue": -24666,
-          "deltaPct": -80.2
+          "value": 8978,
+          "deltaValue": -21763,
+          "deltaPct": -70.8
         },
         "sales": {
-          "value": 2167530,
-          "deltaValue": -5827390,
-          "deltaPct": -72.9
+          "value": 2205330,
+          "deltaValue": -5789590,
+          "deltaPct": -72.4
         }
       }
     },
@@ -2517,18 +2517,18 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 82,
-      "salesAmount": 2329570,
-      "commissionAmount": 806368,
+      "salesCnt": 85,
+      "salesAmount": 2367370,
+      "commissionAmount": 822168,
       "isDeleted": false,
       "channels": [
         {
           "channelType": "NBLOG",
           "url": "https://blog.naver.com/cozyhome-edit",
-          "title": "cozyhome-edit",
+          "title": "한끗차이",
           "serviceId": "cozyhome-edit",
-          "followerCount": 0,
-          "contentCount": 0,
+          "followerCount": 1,
+          "contentCount": 1,
           "averageVisitCount": 0,
           "averageViewCount": null,
           "averageLikeCount": 0,
@@ -2561,10 +2561,10 @@
         {
           "channelType": "NBLOG",
           "url": "https://blog.naver.com/temtalktalk",
-          "title": "템톡톡",
+          "title": "꿀타래",
           "serviceId": "temtalktalk",
           "followerCount": 0,
-          "contentCount": 0,
+          "contentCount": 2,
           "averageVisitCount": 1,
           "averageViewCount": null,
           "averageLikeCount": 0,
@@ -2637,8 +2637,8 @@
           "followerCount": 254,
           "contentCount": 148,
           "averageVisitCount": null,
-          "averageViewCount": 32021,
-          "averageLikeCount": 43,
+          "averageViewCount": 28355,
+          "averageLikeCount": 38,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2704,8 +2704,8 @@
           "url": "https://blog.naver.com/gahong83",
           "title": "홍's Life",
           "serviceId": "gahong83",
-          "followerCount": 26,
-          "contentCount": 142,
+          "followerCount": 25,
+          "contentCount": 146,
           "averageVisitCount": 210,
           "averageViewCount": null,
           "averageLikeCount": 1,
@@ -2744,7 +2744,7 @@
           "contentCount": 2940,
           "averageVisitCount": 12558,
           "averageViewCount": null,
-          "averageLikeCount": 7,
+          "averageLikeCount": 8,
           "averageCommentCount": 0,
           "status": "ENABLED"
         },
@@ -2753,11 +2753,11 @@
           "url": "https://clip.naver.com/@gmdwlsl8352",
           "title": "레드뷰잉",
           "serviceId": "fSNyegT_tz5be7PiefkK",
-          "followerCount": 3905,
-          "contentCount": 1379,
+          "followerCount": 3914,
+          "contentCount": 1383,
           "averageVisitCount": null,
-          "averageViewCount": 32698,
-          "averageLikeCount": 32,
+          "averageViewCount": 32261,
+          "averageLikeCount": 31,
           "averageCommentCount": 10,
           "status": "ENABLED"
         }
@@ -2801,10 +2801,10 @@
           "url": "https://clip.naver.com/@himisong",
           "title": "하이미송",
           "serviceId": "k_4E-yiFagfvv4joxZXT",
-          "followerCount": 559,
-          "contentCount": 261,
+          "followerCount": 563,
+          "contentCount": 264,
           "averageVisitCount": null,
-          "averageViewCount": 406,
+          "averageViewCount": 387,
           "averageLikeCount": 2,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2886,9 +2886,9 @@
           "title": "살림언니 뷰티수다",
           "serviceId": "5tGVhqL7mOjgYfsRNbcX",
           "followerCount": 139,
-          "contentCount": 226,
+          "contentCount": 228,
           "averageVisitCount": null,
-          "averageViewCount": 8893,
+          "averageViewCount": 8937,
           "averageLikeCount": 18,
           "averageCommentCount": 2,
           "status": "ENABLED"
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-21",
+      "access": 2903,
+      "sales": 37800,
+      "directVisits": 25
+    },
     {
       "date": "2026-09-20",
       "access": 994,
@@ -3177,7 +3183,7 @@
       "date": "2026-08-07",
       "access": 4,
       "sales": 0,
-      "directVisits": 19
+      "directVisits": null
     },
     {
       "date": "2026-08-06",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-06-24",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-23",
       "access": 0,
       "sales": 0,
       "directVisits": null
