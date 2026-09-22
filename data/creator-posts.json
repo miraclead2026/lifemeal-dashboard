@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-23T07:17:23+09:00",
+  "updatedAt": "2026-09-23T07:17:57+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -419,6 +419,26 @@
         "views": 33407,
         "likes": 196,
         "comments": 3
+      },
+      "discoveredAt": "2026-09-23"
+    },
+    {
+      "platform": "clip",
+      "url": "https://clip.naver.com/contents?serviceType=CLIP&seedMediaId=6ab2722400492c0f87685c67&recType=CLIP_PC&recId=%7B%22targetProfileId%22:%22iaWIkeUdmUdPKogxYyKn%22,%22open%22:true%7D",
+      "title": "황성주생식 & 엄마가오란다 = 훌륭한 간식 . . #엄마가오란다 #오늘의간식 #오늘클립챌린지",
+      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://pup-post-phinf.pstatic.net/MjAyNjA5MjJfMjQy/MDAxNzkwMDc5NTI0NTUz.15jSE7zPWxgK8j5149sSosgoEl3sQTZu7OslzkquH94g.ZqvK2wSadpII13JDdwSMyko668oXgg4ExTUxQvD0Qdkg.JPEG/PostEncodingTask.FD6BDD2C-82F0-4BC7-8083-A93411E46539.jpg%22&type=w352&service=clip",
+      "date": "2026-09-22",
+      "author": "onna11",
+      "authorName": "gaeko",
+      "channelUrl": "https://clip.naver.com/@onna11",
+      "followers": 44,
+      "connect": "none",
+      "evidence": [],
+      "source": "clip-search",
+      "metrics": {
+        "views": 0,
+        "likes": null,
+        "comments": null
       },
       "discoveredAt": "2026-09-23"
     },
@@ -4992,8 +5012,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-23T07:17:23+09:00",
-    "mode": "ig",
+    "lastRun": "2026-09-23T07:17:57+09:00",
+    "mode": "clip",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
