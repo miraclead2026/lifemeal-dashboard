@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-23T07:11:25+09:00",
+  "updatedAt": "2026-09-23T07:11:28+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -296,6 +296,60 @@
     }
   ],
   "unattributed": [
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/mamapicknote/224419761361",
+      "title": "황성주 생식 라이프밀 3개월 후기, 밥 대신 먹으면 배부를까?",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjJfMjM2/MDAxNzkwMDUwMDg4NTUy.Sa_OQHZxXr2L0oiHdGxtweVWZM6174cnNYZmYv2NfeYg.VYrdL1DJdsRR6AIXMEo0L6tF1ZzYdclVDt9tRbZlrR8g.PNG/900_file_00000000653881f89317a842ad17dcaf.png?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-22",
+      "author": "mamapicknote",
+      "authorName": "맘픽노트",
+      "connect": "strong",
+      "evidence": [
+        "strong",
+        "widget"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "998403201931744",
+      "channelProductNo": "12747389906",
+      "relatedProduct": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
+      "linkCreatorSpaceId": "983140594812864",
+      "discoveredAt": "2026-09-23"
+    },
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/ccibook/224419553704",
+      "title": "라이프밀 황성주 박사의 데이 크런치 프로틴바 초코 칼로리 간식 정보 총정리",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjJfMTIw/MDAxNzkwMDQwMjEyNDIw.u16Vc34b07_0vnQ_dMSwSoohhWln3EfUCocNx8elMr4g.Nl2vBWNOIzlBMvAibp86nqPsV90mo_5-HWB4ekxTB7Ag.JPEG/blog_img_1.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-22",
+      "author": "ccibook",
+      "authorName": "소소한 일상",
+      "connect": "strong",
+      "evidence": [
+        "naver.me",
+        "strong",
+        "수수료"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "998355341728224",
+      "channelProductNo": "13064112029",
+      "relatedProduct": "황성주 박사의 데이 크런치 프로틴바 에너지바 칼로리 간식 초코, 10개입, 1개",
+      "discoveredAt": "2026-09-23"
+    },
     {
       "platform": "blog",
       "url": "https://blog.naver.com/mosu_m/224418220618",
@@ -4668,8 +4722,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-22T07:13:51+09:00",
-    "mode": "revalidate",
+    "lastRun": "2026-09-23T07:11:28+09:00",
+    "mode": "blog",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
