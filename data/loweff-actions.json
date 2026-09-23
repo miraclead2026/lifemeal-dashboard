@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-09-22",
+ "updatedAt": "2026-09-23",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 534048,
-   "roas": 258,
+   "spend": 564559,
+   "roas": 238,
    "conv": 16,
    "options": 4,
-   "action": "상품군 통합 ROAS 258% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "action": "상품군 통합 ROAS 238% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
    "severity": "medium",
    "executor": "watch",
    "nccAdIds": [
@@ -26,25 +26,12 @@
   },
   {
    "channel": "쇼핑검색",
-   "item": "선물/기획세트",
-   "spend": 105989,
-   "roas": 0,
-   "conv": 0,
-   "options": 2,
-   "action": "상품군 통합 ROAS 0% — 이미 집행중단(소재 OFF/삭제됨) (옵션 2개 합산)",
-   "severity": "medium",
-   "executor": "done",
-   "nccAdIds": [],
-   "matched": false
-  },
-  {
-   "channel": "쇼핑검색",
    "item": "프로틴 골드 HIGH5",
-   "spend": 80884,
-   "roas": 60,
+   "spend": 103030,
+   "roas": 47,
    "conv": 1,
    "options": 1,
-   "action": "상품군 통합 ROAS 60% (매우 낮음) — OFF/개선 검토",
+   "action": "상품군 통합 ROAS 47% (매우 낮음) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
@@ -55,8 +42,21 @@
   },
   {
    "channel": "쇼핑검색",
+   "item": "선물/기획세트",
+   "spend": 74272,
+   "roas": 0,
+   "conv": 0,
+   "options": 1,
+   "action": "상품군 통합 ROAS 0% — 이미 집행중단(소재 OFF/삭제됨)",
+   "severity": "medium",
+   "executor": "done",
+   "nccAdIds": [],
+   "matched": false
+  },
+  {
+   "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 52201,
+   "spend": 47777,
    "roas": 0,
    "conv": 0,
    "options": 3,
@@ -75,10 +75,10 @@
   {
    "channel": "애드부스트",
    "item": "애셋 그룹#2606191823",
-   "spend": 5805854,
-   "roas": 315,
-   "conv": 228,
-   "action": "ROAS 315% 미달 — 예산 축소·소재 교체",
+   "spend": 5708583,
+   "roas": 299,
+   "conv": 212,
+   "action": "ROAS 299% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -86,10 +86,10 @@
   {
    "channel": "애드부스트",
    "item": "260708 애드부스트 제품",
-   "spend": 586396,
-   "roas": 220,
-   "conv": 22,
-   "action": "ROAS 220% 미달 — 예산 축소·소재 교체",
+   "spend": 585538,
+   "roas": 196,
+   "conv": 21,
+   "action": "ROAS 196% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -97,18 +97,18 @@
   {
    "channel": "애드부스트",
    "item": "광고 그룹#2608151604",
-   "spend": 119427,
-   "roas": 285,
+   "spend": 125214,
+   "roas": 272,
    "conv": 7,
-   "action": "ROAS 285% 미달 — 예산 축소·소재 교체",
+   "action": "ROAS 272% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
   }
  ],
  "powerlinkAuto": {
-  "date": "2026-09-21",
-  "changed": 167,
+  "date": "2026-09-22",
+  "changed": 138,
   "downs": 0,
   "deleteReview": 1
  },
@@ -118,12 +118,6 @@
   "approveNeeded": 2
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 17,
-   "advoost": 2,
-   "approveNeeded": 13
-  },
   {
    "date": null,
    "shopping": 8,
@@ -284,6 +278,12 @@
    "date": null,
    "shopping": 4,
    "advoost": 2,
+   "approveNeeded": 2
+  },
+  {
+   "date": null,
+   "shopping": 4,
+   "advoost": 3,
    "approveNeeded": 2
   },
   {
