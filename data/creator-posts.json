@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-24T07:10:52+09:00",
+  "updatedAt": "2026-09-24T07:11:40+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -336,6 +336,42 @@
       "discoveredAt": "2026-09-24"
     },
     {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=JVcV2aFrfdE",
+      "title": "정황은 다 만들어졌다…이제 양봉만 나오면 된다! | 박병창 MP파트너스 대표 [마켓 인사이드]",
+      "thumbnail": "https://i.ytimg.com/vi/JVcV2aFrfdE/maxresdefault.jpg",
+      "date": "2026-09-23",
+      "author": "3protv",
+      "authorName": "삼프로TV 3PROTV",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 114567,
+        "likes": 1000,
+        "comments": 28
+      },
+      "discoveredAt": "2026-09-24"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=fAqYtAPxGkE",
+      "title": "\"클래리티 법안 기다릴 수 없다\" SEC•CFTC 규제 및 면제 조치에 집중하는 백악관 | 김동환, 서동주, 박상혁 디지털애셋 편집장 [크립토 ",
+      "thumbnail": "https://i.ytimg.com/vi/fAqYtAPxGkE/maxresdefault.jpg",
+      "date": "2026-09-23",
+      "author": "3protv",
+      "authorName": "삼프로TV 3PROTV",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 94063,
+        "likes": 920,
+        "comments": 49
+      },
+      "discoveredAt": "2026-09-24"
+    },
+    {
       "platform": "blog",
       "url": "https://blog.naver.com/mamapicknote/224419761361",
       "title": "황성주 생식 라이프밀 3개월 후기, 밥 대신 먹으면 배부를까?",
@@ -483,6 +519,42 @@
         "comments": null
       },
       "discoveredAt": "2026-09-23"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=lkURoYXmKfY",
+      "title": "트럼프 \"미국산 경유 수출금지 입장\"…중국과 6개월 휴전 연장 논의 | \"배터리도 냉각도 LG\"…엔비디아 'AI 팩토리' 뚫은 K기술 | 권순우",
+      "thumbnail": "https://i.ytimg.com/vi/lkURoYXmKfY/maxresdefault.jpg",
+      "date": "2026-09-22",
+      "author": "3protv",
+      "authorName": "삼프로TV 3PROTV",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 72130,
+        "likes": 531,
+        "comments": 20
+      },
+      "discoveredAt": "2026-09-24"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=xI-3wZiY3os",
+      "title": "\"랠리 후반부 준비해야...지금부터는 종목 압축할 때\" | 신영증권 김효진 박사 [글로벌 인터뷰]",
+      "thumbnail": "https://i.ytimg.com/vi/xI-3wZiY3os/maxresdefault.jpg",
+      "date": "2026-09-22",
+      "author": "3protv",
+      "authorName": "삼프로TV 3PROTV",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 108728,
+        "likes": 809,
+        "comments": 24
+      },
+      "discoveredAt": "2026-09-24"
     },
     {
       "platform": "blog",
@@ -5054,8 +5126,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-24T07:10:52+09:00",
-    "mode": "blog",
+    "lastRun": "2026-09-24T07:11:40+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
