@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-23 09:43",
+  "updatedAt": "2026-09-24 08:36",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,22 +10,22 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 43326,
-    "productOrderCnt": 174,
+    "accessCnt": 46579,
+    "productOrderCnt": 177,
     "salesConversionRate": 0.4,
-    "salesCnt": 265,
-    "salesAmount": 10232650,
-    "commissionAmount": 1853187,
-    "commissionRate": 18.1
+    "salesCnt": 270,
+    "salesAmount": 10395190,
+    "commissionAmount": 1894476,
+    "commissionRate": 18.2
   },
   "products": [
     {
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 69,
-      "salesAmount": 2378820,
-      "commissionAmount": 605814,
+      "salesCnt": 71,
+      "salesAmount": 2445780,
+      "commissionAmount": 607152,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -50,9 +50,9 @@
       "connectProductId": "986303491535840",
       "storeProductId": "13674568934",
       "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-      "salesCnt": 56,
-      "salesAmount": 930700,
-      "commissionAmount": 376117,
+      "salesCnt": 57,
+      "salesAmount": 946900,
+      "commissionAmount": 382888,
       "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
     },
     {
@@ -95,9 +95,9 @@
       "connectProductId": "981216820329026",
       "storeProductId": "12763859709",
       "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 7,
-      "salesAmount": 277830,
-      "commissionAmount": 19681,
+      "salesCnt": 9,
+      "salesAmount": 357210,
+      "commissionAmount": 52861,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-09-23",
+      "label": "9월 23일",
+      "periodStart": "2026-09-23",
+      "periodEnd": "2026-09-23",
+      "summary": {
+        "access": {
+          "value": 3253,
+          "deltaValue": -354,
+          "deltaPct": -9.8
+        },
+        "sales": {
+          "value": 162540,
+          "deltaValue": 130140,
+          "deltaPct": 401.7
+        }
+      },
+      "directVisits": 0
+    },
     {
       "key": "2026-09-22",
       "label": "9월 22일",
@@ -965,7 +984,7 @@
           "deltaPct": null
         }
       },
-      "directVisits": 16
+      "directVisits": null
     },
     {
       "key": "2026-08-08",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-06-25",
-      "label": "6월 25일",
-      "periodStart": "2026-06-25",
-      "periodEnd": "2026-06-25",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W39",
-      "label": "9/21~9/22",
+      "label": "9/21~9/23",
       "periodStart": "2026-09-21",
-      "periodEnd": "2026-09-22",
+      "periodEnd": "2026-09-23",
       "summary": {
         "access": {
-          "value": 6510,
-          "deltaValue": 2916,
-          "deltaPct": 81.1
+          "value": 9763,
+          "deltaValue": 6169,
+          "deltaPct": 171.6
         },
         "sales": {
-          "value": 70200,
-          "deltaValue": -1004260,
-          "deltaPct": -93.5
+          "value": 232740,
+          "deltaValue": -841720,
+          "deltaPct": -78.3
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-22",
+      "periodEnd": "2026-09-23",
       "summary": {
         "access": {
-          "value": 12585,
-          "deltaValue": -18156,
-          "deltaPct": -59.1
+          "value": 15838,
+          "deltaValue": -14903,
+          "deltaPct": -48.5
         },
         "sales": {
-          "value": 2237730,
-          "deltaValue": -5757190,
-          "deltaPct": -72.0
+          "value": 2400270,
+          "deltaValue": -5594650,
+          "deltaPct": -70.0
         }
       }
     },
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 87,
-      "salesAmount": 2399770,
-      "commissionAmount": 835711,
+      "salesCnt": 88,
+      "salesAmount": 2415970,
+      "commissionAmount": 842482,
       "isDeleted": false,
       "channels": [
         {
@@ -2553,9 +2553,9 @@
       "name": "템톡톡",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfMTg5/MDAxNzgwMDcyOTI1NzY4.f_XQqPBgeVt_cwilGqtAbb4yWv74EnFUbmB_szim4K8g.oK6d2xI9wOFTYqjk2HrqmzVGT6DHi0O2gVWSeSW99uUg.PNG/ChatGPT_Image_2026%EB%85%84_2%EC%9B%94_14%EC%9D%BC_%EC%98%A4%ED%9B%84_02_28_33.png",
       "performanceType": "DIRECT",
-      "salesCnt": 21,
-      "salesAmount": 913180,
-      "commissionAmount": 258850,
+      "salesCnt": 22,
+      "salesAmount": 952870,
+      "commissionAmount": 275440,
       "isDeleted": false,
       "channels": [
         {
@@ -2589,9 +2589,9 @@
       "name": "obo1221님의 블로그",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjAyMDVfMjky/MDAxNzcwMjU3Mzg5MjMz.m-1PZ-2vD4JgSZoY9xJKl5S2aDK6HJT2JMtpwqTw-NAg.HM27vjR3C58nx_JyawwcaqYwqW5CjR5n-tIj4tjNgqcg.PNG/1000035674.png",
       "performanceType": "DIRECT",
-      "salesCnt": 28,
-      "salesAmount": 835780,
-      "commissionAmount": 165460,
+      "salesCnt": 29,
+      "salesAmount": 875470,
+      "commissionAmount": 182050,
       "isDeleted": false,
       "channels": [
         {
@@ -2637,8 +2637,8 @@
           "followerCount": 257,
           "contentCount": 152,
           "averageVisitCount": null,
-          "averageViewCount": 26248,
-          "averageLikeCount": 35,
+          "averageViewCount": 23904,
+          "averageLikeCount": 31,
           "averageCommentCount": 3,
           "status": "ENABLED"
         }
@@ -2740,8 +2740,8 @@
           "url": "https://blog.naver.com/sudden4082",
           "title": "❤️뷰티 인플루언서 ❤️",
           "serviceId": "sudden4082",
-          "followerCount": 5713,
-          "contentCount": 2940,
+          "followerCount": 5714,
+          "contentCount": 3037,
           "averageVisitCount": 12558,
           "averageViewCount": null,
           "averageLikeCount": 7,
@@ -2753,10 +2753,10 @@
           "url": "https://clip.naver.com/@gmdwlsl8352",
           "title": "레드뷰잉",
           "serviceId": "fSNyegT_tz5be7PiefkK",
-          "followerCount": 3914,
+          "followerCount": 3921,
           "contentCount": 1383,
           "averageVisitCount": null,
-          "averageViewCount": 32529,
+          "averageViewCount": 32453,
           "averageLikeCount": 31,
           "averageCommentCount": 10,
           "status": "ENABLED"
@@ -2804,7 +2804,7 @@
           "followerCount": 563,
           "contentCount": 264,
           "averageVisitCount": null,
-          "averageViewCount": 351,
+          "averageViewCount": 319,
           "averageLikeCount": 2,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2840,7 +2840,7 @@
           "contentCount": 2271,
           "averageVisitCount": 43,
           "averageViewCount": null,
-          "averageLikeCount": 16,
+          "averageLikeCount": 17,
           "averageCommentCount": 1,
           "status": "ENABLED"
         },
@@ -2885,10 +2885,10 @@
           "url": "https://clip.naver.com/@updown_pick",
           "title": "살림언니 뷰티수다",
           "serviceId": "5tGVhqL7mOjgYfsRNbcX",
-          "followerCount": 139,
-          "contentCount": 228,
+          "followerCount": 142,
+          "contentCount": 229,
           "averageVisitCount": null,
-          "averageViewCount": 8989,
+          "averageViewCount": 8992,
           "averageLikeCount": 18,
           "averageCommentCount": 2,
           "status": "ENABLED"
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-09-23",
+      "access": 3253,
+      "sales": 162540,
+      "directVisits": 0
+    },
     {
       "date": "2026-09-22",
       "access": 3607,
@@ -3177,7 +3183,7 @@
       "date": "2026-08-09",
       "access": 3,
       "sales": 0,
-      "directVisits": 16
+      "directVisits": null
     },
     {
       "date": "2026-08-08",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-06-26",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-06-25",
       "access": 0,
       "sales": 0,
       "directVisits": null
