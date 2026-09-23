@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-24T07:16:02+09:00",
+  "updatedAt": "2026-09-24T07:16:19+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -111,13 +111,15 @@
           "platform": "blog",
           "url": "https://blog.naver.com/sudden4082/224421081862",
           "title": "반려견 체스와 찍은 민낯 셀카.. 잡티 하나 없는 60세 전인화",
-          "thumbnail": null,
+          "thumbnail": "https://blogthumb.pstatic.net/MjAyNjA5MjNfMjQ5/MDAxNzkwMTUwMjEwNjM5.E7yIaYpAgD825Z-yd3G1miBeAv4q_0BaFpraVxneF9cg.kKP3Bc2rYumEBlsFH2mW9zI_wkG-Que2vYd3nds-a4kg.PNG/image.png?type=w2",
           "date": "2026-09-23",
           "source": "naver-rss",
           "metrics": {
             "views": null
           },
-          "discoveredAt": "2026-09-24"
+          "discoveredAt": "2026-09-24",
+          "connect": "none",
+          "evidence": []
         },
         {
           "platform": "blog",
@@ -5368,8 +5370,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-24T07:16:02+09:00",
-    "mode": "clip",
+    "lastRun": "2026-09-24T07:16:19+09:00",
+    "mode": "revalidate",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
