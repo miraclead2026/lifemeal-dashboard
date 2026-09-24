@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-25T07:07:28+09:00",
+  "updatedAt": "2026-09-25T07:08:16+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -452,6 +452,24 @@
         "comments": null
       },
       "discoveredAt": "2026-09-24"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=QiuxHr84wNM",
+      "title": "\"현금, 토큰 필요없다\" 코인베이스의 IPO 시장 진출에 주목해야 하는 이유 | 서동주, 김동환, 최윤영 한화투자증권 팀장 [크립토 PLUS]",
+      "thumbnail": "https://i.ytimg.com/vi/QiuxHr84wNM/maxresdefault.jpg",
+      "date": "2026-09-23",
+      "author": "3protv",
+      "authorName": "삼프로TV 3PROTV",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 43153,
+        "likes": 243,
+        "comments": 6
+      },
+      "discoveredAt": "2026-09-25"
     },
     {
       "platform": "blog",
@@ -5370,8 +5388,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-25T07:07:28+09:00",
-    "mode": "blog",
+    "lastRun": "2026-09-25T07:08:16+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
