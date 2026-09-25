@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-26T07:09:42+09:00",
+  "updatedAt": "2026-09-26T07:09:46+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -310,6 +310,56 @@
     }
   ],
   "unattributed": [
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/ai2mdrkaqcs/224422861588",
+      "title": "황성주 박사의 라이프밀 데일리 생식 후기 할인으로 간편하게 챙긴 아침 한 끼",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjZfMzcg/MDAxNzkwMzY4OTg2OTM4.R9T79MkdSQh4_9gJHU0zPuphiP1Q12YXhRM7DgmEOEAg.s-CGzThYiSGG93UAqTYc30vzhQPZrO1coreSb_3WC8og.JPEG/%C8%B2%BC%BA%C1%D6-%B9%DA%BB%E7%C0%C7-%B6%F3%C0%CC%C7%C1%B9%D0-%B5%A5%C0%CF%B8%AE-%BB%FD%BD%C4-%C8%C4%B1%E2-%C7%D2%C0%CE%C0%B8%B7%CE-%B0%A3%C6%ED%C7%CF%B0%D4-%C3%AC%B1%E4-%BE%C6%C4%A7-%C7%D1-%B3%A2-shopping-1790368944011-686116b33c.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-26",
+      "author": "ai2mdrkaqcs",
+      "authorName": "ai2mdrkaqcs님의 블로그",
+      "connect": "strong",
+      "evidence": [
+        "naver.me"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "991594897068448",
+      "channelProductNo": "13447249282",
+      "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+      "discoveredAt": "2026-09-26"
+    },
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/xemaqogd/224422834197",
+      "title": "황성주 박사의 데이 크런치 프로틴바 그레인 10개입 가격 정보",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjZfMjE4/MDAxNzkwMzYxNjg2NTEy.p7vkA_Od4ne0f-y5n7r2GlNLv_CMgTPHDUytV5r9i7gg.eCvXN-MnGReG12CxB0BLrEDo4oOpszgy4tLux1x7prIg.JPEG/shopping-product-1.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-26",
+      "author": "xemaqogd",
+      "authorName": "제마곰님의 블로그",
+      "connect": "strong",
+      "evidence": [
+        "naver.me"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "993963935052288",
+      "channelProductNo": "13064086505",
+      "relatedProduct": "황성주 박사의 데이 크런치 프로틴바 에너지바 칼로리 간식 그레인, 10개입, 1개",
+      "discoveredAt": "2026-09-26"
+    },
     {
       "platform": "instagram",
       "url": "https://www.instagram.com/p/DdpsmtymK7n/",
@@ -5442,8 +5492,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-25T07:12:03+09:00",
-    "mode": "revalidate",
+    "lastRun": "2026-09-26T07:09:46+09:00",
+    "mode": "blog",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
