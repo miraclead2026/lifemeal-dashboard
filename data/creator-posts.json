@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-27T07:07:31+09:00",
+  "updatedAt": "2026-09-27T07:07:35+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -359,6 +359,33 @@
       "channelProductNo": "13064086505",
       "relatedProduct": "황성주 박사의 데이 크런치 프로틴바 에너지바 칼로리 간식 그레인, 10개입, 1개",
       "discoveredAt": "2026-09-26"
+    },
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/yobg20/224422985856",
+      "title": "라이프밀 황성주박사의 발효건강식 황성주생식 식사대용 30포 체크포인트",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjZfMzIg/MDAxNzkwMzg3ODI0NDAw.lQ4H2j2-lYAfVGZnZodjMQJpNH0qAAHg2GD-04no_60g.V-bAwzKL7Jg0dHxxw041M64leyRn8e7Gj-2H9bUduLMg.JPEG/blog_img_1.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-26",
+      "author": "yobg20",
+      "authorName": "SECRETE DAIRY",
+      "connect": "strong",
+      "evidence": [
+        "naver.me",
+        "strong",
+        "수수료"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "999780092742304",
+      "channelProductNo": "12763859709",
+      "relatedProduct": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+      "discoveredAt": "2026-09-27"
     },
     {
       "platform": "instagram",
@@ -5492,8 +5519,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-26T07:15:10+09:00",
-    "mode": "revalidate",
+    "lastRun": "2026-09-27T07:07:35+09:00",
+    "mode": "blog",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
