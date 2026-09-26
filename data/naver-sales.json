@@ -1,6 +1,6 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-09-26 08:41",
+  "updatedAt": "2026-09-26 09:42",
   "months": [
     {
       "key": "2026-09",
@@ -1159,7 +1159,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 56,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-26 08:36",
+        "activeSubscribersAsOf": "2026-09-26 09:37",
         "canceled": 16,
         "byStatus": {
           "전체": 72,
@@ -5145,7 +5145,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 56,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-26 08:36",
+        "activeSubscribersAsOf": "2026-09-26 09:37",
         "canceled": 16,
         "byStatus": {
           "전체": 72,
@@ -12231,24 +12231,6 @@
           "groupProductNo": "52014175"
         }
       ],
-      "subscription": {
-        "revenue": 0,
-        "orders": 0,
-        "newOrders": 0,
-        "renewOrders": 0,
-        "products": [],
-        "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
-        "activeSubscribers": 56,
-        "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-26 08:36",
-        "canceled": 16,
-        "byStatus": {
-          "전체": 72,
-          "진행중": 56,
-          "종료": 0,
-          "해지": 16
-        }
-      },
       "subscribers": {
         "notify": {
           "total": 6213,
@@ -12263,6 +12245,24 @@
         "total": 42,
         "new": 36,
         "returning": 6
+      },
+      "subscription": {
+        "revenue": 0,
+        "orders": 0,
+        "newOrders": 0,
+        "renewOrders": 0,
+        "products": [],
+        "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
+        "activeSubscribers": 56,
+        "activeSubscribersSource": "subscription-console",
+        "activeSubscribersAsOf": "2026-09-26 09:37",
+        "canceled": 16,
+        "byStatus": {
+          "전체": 72,
+          "진행중": 56,
+          "종료": 0,
+          "해지": 16
+        }
       }
     },
     {
