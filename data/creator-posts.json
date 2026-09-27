@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-28T07:07:40+09:00",
+  "updatedAt": "2026-09-28T07:07:43+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -310,6 +310,60 @@
     }
   ],
   "unattributed": [
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/426kjj/224423877603",
+      "title": "[황성주생식/라이프밀] 서인영 개과천선 생식 다이어트",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjdfMjUw/MDAxNzkwNDkxMzUzNjE2.c1u54mvbl_LVE6KGTXzfxpf0Cs4DeaHBFhhxAAR5FNMg.NA-Kv_1z0ZoY3wEdMkq216-O-TlPkz483Wi-bXzS49Yg.JPEG/900_20260923_231037.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-27",
+      "author": "426kjj",
+      "authorName": "♬흥미정진한 콩깍진_♬*funmejungjin & kongkkakjin",
+      "connect": "strong",
+      "evidence": [
+        "naver.me",
+        "strong",
+        "수수료"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "992920182867424",
+      "channelProductNo": "12747389906",
+      "relatedProduct": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
+      "discoveredAt": "2026-09-28"
+    },
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/87hyo/224422545484",
+      "title": "라이프밀 황성주 박사 프로틴 골드 HIGH5로 아침 1분 컷, 27% 할인 득템 찬스!",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjVfMjAy/MDAxNzkwMzI1NjI5MDAy.zBQw_yBB__azhQ647m2xWuttC7j1gwpHzHIo83I0sAcg.8dyh0mUA2ajpf1pCYXFVqPFiwljOnLO8sIjObV8yXkwg.JPEG/mainImage.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-27",
+      "author": "87hyo",
+      "authorName": "ISFP 벼리블랑 | 맛집과 육아, 두 가지 일상",
+      "connect": "strong",
+      "evidence": [
+        "naver.me",
+        "strong",
+        "수수료"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "999475121494592",
+      "channelProductNo": "12764871210",
+      "relatedProduct": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
+      "discoveredAt": "2026-09-28"
+    },
     {
       "platform": "blog",
       "url": "https://blog.naver.com/ai2mdrkaqcs/224422861588",
@@ -5557,8 +5611,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-27T07:11:41+09:00",
-    "mode": "revalidate",
+    "lastRun": "2026-09-28T07:07:43+09:00",
+    "mode": "blog",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
