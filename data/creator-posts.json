@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-28T07:11:46+09:00",
+  "updatedAt": "2026-09-28T07:12:01+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -310,6 +310,26 @@
     }
   ],
   "unattributed": [
+    {
+      "platform": "clip",
+      "url": "https://m.naver.com/shorts?serviceType=CLIP&mediaType=VOD&seedMediaId=570AD7E2D9D228AB11246B9438F8028AAF5E&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%22zHxLwmxAdWwphECdeK_5%22%2C%22open%22%3Atrue%7D",
+      "title": "#오늘클립챌린지 #가을감성 #추석선물 #황성주생식 황성주두유가 유명하죠? 생식도 다양하게 종류별로 있고 맛볼수 있어서 좋았어요~",
+      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://clip-service-phinf.pstatic.net/MjAyNjA5MjhfNDUg/MDAxNzkwNTMzOTYyMzM1.uFGuPJnB0DyyAZ-VQlxdIQyqtpmt8GwazWb2-WoeHWgg.KDi5CzMmobRXqv-AY0Zheole3PAdA_rCNqZVG8e5picg.JPEG/thumbnail-1FA56F90-9F1A-4947-B967-89621464AC83.jpg%22&type=w352&service=clip",
+      "date": "2026-09-28",
+      "author": "soon_62oo",
+      "authorName": "soon62oo",
+      "channelUrl": "https://clip.naver.com/@soon_62oo",
+      "followers": 0,
+      "connect": "none",
+      "evidence": [],
+      "source": "clip-search",
+      "metrics": {
+        "views": 0,
+        "likes": null,
+        "comments": null
+      },
+      "discoveredAt": "2026-09-28"
+    },
     {
       "platform": "blog",
       "url": "https://blog.naver.com/426kjj/224423877603",
@@ -5611,8 +5631,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-28T07:11:46+09:00",
-    "mode": "ig",
+    "lastRun": "2026-09-28T07:12:01+09:00",
+    "mode": "clip",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
