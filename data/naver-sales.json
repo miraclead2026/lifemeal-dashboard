@@ -1,6 +1,6 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-09-28 08:40",
+  "updatedAt": "2026-09-28 09:42",
   "months": [
     {
       "key": "2026-09",
@@ -1185,7 +1185,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 58,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-28 08:35",
+        "activeSubscribersAsOf": "2026-09-28 09:37",
         "canceled": 16,
         "byStatus": {
           "전체": 74,
@@ -5191,6 +5191,11 @@
           "added": 403
         }
       },
+      "customers": {
+        "total": 310,
+        "new": 255,
+        "returning": 55
+      },
       "subscription": {
         "revenue": 960600,
         "orders": 10,
@@ -5219,7 +5224,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 58,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-28 08:35",
+        "activeSubscribersAsOf": "2026-09-28 09:37",
         "canceled": 16,
         "byStatus": {
           "전체": 74,
@@ -5227,11 +5232,6 @@
           "종료": 0,
           "해지": 16
         }
-      },
-      "customers": {
-        "total": 310,
-        "new": 255,
-        "returning": 55
       }
     },
     {
@@ -12259,6 +12259,21 @@
           "groupProductNo": "52014175"
         }
       ],
+      "subscribers": {
+        "notify": {
+          "total": 6350,
+          "added": 71
+        },
+        "interest": {
+          "total": 6350,
+          "added": 71
+        }
+      },
+      "customers": {
+        "total": 64,
+        "new": 56,
+        "returning": 8
+      },
       "subscription": {
         "revenue": 189090,
         "orders": 2,
@@ -12281,7 +12296,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 58,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-28 08:35",
+        "activeSubscribersAsOf": "2026-09-28 09:37",
         "canceled": 16,
         "byStatus": {
           "전체": 74,
@@ -12289,21 +12304,6 @@
           "종료": 0,
           "해지": 16
         }
-      },
-      "subscribers": {
-        "notify": {
-          "total": 6350,
-          "added": 71
-        },
-        "interest": {
-          "total": 6350,
-          "added": 71
-        }
-      },
-      "customers": {
-        "total": 64,
-        "new": 56,
-        "returning": 8
       }
     },
     {
