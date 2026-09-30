@@ -1,37 +1,37 @@
 {
   "channel": "naver",
-  "updatedAt": "2026-09-30 09:38",
+  "updatedAt": "2026-10-01 08:38",
   "months": [
     {
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
-      "periodEnd": "2026-09-29",
+      "periodEnd": "2026-09-30",
       "summary": {
         "revenue": {
-          "value": 155286730,
-          "deltaValue": 39677030,
-          "deltaPct": 34.3
+          "value": 159478110,
+          "deltaValue": 39830340,
+          "deltaPct": 33.3
         },
         "orders": {
-          "value": 2215,
-          "deltaValue": 596,
-          "deltaPct": 36.8
+          "value": 2268,
+          "deltaValue": 600,
+          "deltaPct": 36.0
         },
         "aov": {
-          "value": 70107,
-          "deltaValue": -1301,
-          "deltaPct": -1.8
+          "value": 70317,
+          "deltaValue": -1414,
+          "deltaPct": -2.0
         },
         "refund": {
-          "value": 11157720,
-          "deltaValue": 2115150,
-          "deltaPct": 23.4,
+          "value": 11555020,
+          "deltaValue": 2355400,
+          "deltaPct": 25.6,
           "breakdown": {
             "basis": "처리일(취소완료일)",
             "cancel": {
-              "amount": 11197580,
-              "count": 164
+              "amount": 11594880,
+              "count": 169
             },
             "return": {
               "amount": 832370,
@@ -42,22 +42,22 @@
               "count": 1
             },
             "total": {
-              "amount": 12059950,
-              "count": 184
+              "amount": 12457250,
+              "count": 189
             },
-            "deltaValue": 1867790,
-            "deltaPct": 18.3
+            "deltaValue": 2108040,
+            "deltaPct": 20.4
           }
         },
         "visitors": {
-          "value": 59336,
-          "deltaValue": 3175,
-          "deltaPct": 5.7
+          "value": 60713,
+          "deltaValue": 3145,
+          "deltaPct": 5.5
         },
         "conversion": {
-          "value": 3.73,
-          "deltaValue": 0.85,
-          "deltaPct": 29.5
+          "value": 3.74,
+          "deltaValue": 0.84,
+          "deltaPct": 29.0
         }
       },
       "daily": [
@@ -205,141 +205,153 @@
           "date": "2026-09-29",
           "revenue": 5832500,
           "visitors": 1562
+        },
+        {
+          "date": "2026-09-30",
+          "revenue": 4191380,
+          "visitors": 1377
         }
       ],
       "channels": [
         {
           "name": "디스플레이 광고 > ADVoost쇼핑(제품광고)",
           "path": "네이버 광고 > 디스플레이 광고 > ADVoost쇼핑(제품광고)",
-          "revenue": 37486610,
-          "visitors": 7887,
+          "revenue": 38684640,
+          "visitors": 8150,
           "sharePct": 32.4
         },
         {
           "name": "스토어 내부 > 다른 상품",
           "path": "네이버 서비스 > 스토어 내부 > 다른 상품",
-          "revenue": 14251600,
-          "visitors": 1776,
-          "sharePct": 12.3
-        },
-        {
-          "name": "네이버 페이 > 장바구니",
-          "path": "네이버 서비스 > 네이버 페이 > 장바구니",
-          "revenue": 10293930,
-          "visitors": 1236,
-          "sharePct": 8.9
+          "revenue": 14454000,
+          "visitors": 1809,
+          "sharePct": 12.1
         },
         {
           "name": "스토어 내부 > 스토어 홈",
           "path": "네이버 서비스 > 스토어 내부 > 스토어 홈",
-          "revenue": 10249630,
-          "visitors": 3833,
-          "sharePct": 8.9
+          "revenue": 10534130,
+          "visitors": 3959,
+          "sharePct": 8.8
+        },
+        {
+          "name": "네이버 페이 > 장바구니",
+          "path": "네이버 서비스 > 네이버 페이 > 장바구니",
+          "revenue": 10435130,
+          "visitors": 1277,
+          "sharePct": 8.8
         },
         {
           "name": "통합검색 > 기타",
           "path": "네이버 검색 > 통합검색 > 기타",
-          "revenue": 5517290,
-          "visitors": 1161,
-          "sharePct": 4.8
+          "revenue": 5572490,
+          "visitors": 1203,
+          "sharePct": 4.7
         },
         {
           "name": "네이버플러스스토어 > 마이쇼핑",
           "path": "네이버 서비스 > 네이버플러스스토어 > 마이쇼핑",
-          "revenue": 4054040,
-          "visitors": 1372,
-          "sharePct": 3.5
+          "revenue": 4411440,
+          "visitors": 1442,
+          "sharePct": 3.7
         },
         {
           "name": "네이버플러스스토어 > 네플스홈 > 홈탭",
           "path": "네이버 서비스 > 네이버플러스스토어 > 네플스홈 > 홈탭",
-          "revenue": 3813330,
-          "visitors": 430,
-          "sharePct": 3.3
+          "revenue": 4161140,
+          "visitors": 447,
+          "sharePct": 3.5
         },
         {
           "name": "통합검색 > 가격비교",
           "path": "네이버 검색 > 통합검색 > 가격비교",
-          "revenue": 3562790,
-          "visitors": 1839,
-          "sharePct": 3.1
-        },
-        {
-          "name": "네이버플러스스토어 > 그 외",
-          "path": "네이버 서비스 > 네이버플러스스토어 > 그 외",
-          "revenue": 3538810,
-          "visitors": 486,
+          "revenue": 3710090,
+          "visitors": 1857,
           "sharePct": 3.1
         },
         {
           "name": "직유입",
           "path": "직유입",
-          "revenue": 3508320,
-          "visitors": 866,
+          "revenue": 3612480,
+          "visitors": 884,
+          "sharePct": 3.0
+        },
+        {
+          "name": "네이버플러스스토어 > 그 외",
+          "path": "네이버 서비스 > 네이버플러스스토어 > 그 외",
+          "revenue": 3605610,
+          "visitors": 505,
           "sharePct": 3.0
         },
         {
           "name": "네이버 서비스 > 기타",
           "path": "네이버 서비스 > 기타",
-          "revenue": 3002630,
-          "visitors": 898,
+          "revenue": 3101630,
+          "visitors": 921,
           "sharePct": 2.6
         },
         {
           "name": "검색 광고 > 파워링크",
           "path": "네이버 광고 > 검색 광고 > 파워링크",
-          "revenue": 2819380,
-          "visitors": 4221,
+          "revenue": 2856580,
+          "visitors": 4389,
           "sharePct": 2.4
         },
         {
           "name": "검색 광고 > 쇼핑검색광고",
           "path": "네이버 광고 > 검색 광고 > 쇼핑검색광고",
           "revenue": 2517670,
-          "visitors": 1000,
-          "sharePct": 2.2
+          "visitors": 1028,
+          "sharePct": 2.1
         },
         {
           "name": "디스플레이 광고 > 성과형광고",
           "path": "네이버 광고 > 디스플레이 광고 > 성과형광고",
-          "revenue": 2396480,
-          "visitors": 2437,
+          "revenue": 2506480,
+          "visitors": 2518,
           "sharePct": 2.1
         },
         {
           "name": "네이버 광고 외 마케팅채널 > 브랜드커넥트",
           "path": "네이버 광고 외 마케팅채널 > 브랜드커넥트",
-          "revenue": 2129000,
-          "visitors": 24997,
+          "revenue": 2157130,
+          "visitors": 25378,
           "sharePct": 1.8
         },
         {
           "name": "가격비교 검색 > 검색",
           "path": "네이버 검색 > 가격비교 검색 > 검색",
-          "revenue": 1943180,
-          "visitors": 508,
+          "revenue": 2050180,
+          "visitors": 518,
           "sharePct": 1.7
         },
         {
           "name": "네이버 페이 > 결제내역",
           "path": "네이버 서비스 > 네이버 페이 > 결제내역",
-          "revenue": 1469540,
-          "visitors": 358,
-          "sharePct": 1.3
+          "revenue": 1690740,
+          "visitors": 369,
+          "sharePct": 1.4
         },
         {
           "name": "네이버 외부 > api.omoplay.com",
           "path": "네이버 외부 > api.omoplay.com",
           "revenue": 1462300,
           "visitors": 154,
-          "sharePct": 1.3
+          "sharePct": 1.2
         },
         {
           "name": "네이버 검색 > 네이버플러스스토어 검색",
           "path": "네이버 검색 > 네이버플러스스토어 검색",
           "revenue": 654410,
-          "visitors": 208,
-          "sharePct": 0.6
+          "visitors": 211,
+          "sharePct": 0.5
+        },
+        {
+          "name": "검색 광고 > 브랜드검색광고",
+          "path": "네이버 광고 > 검색 광고 > 브랜드검색광고",
+          "revenue": 407000,
+          "visitors": 384,
+          "sharePct": 0.3
         },
         {
           "name": "네이버 광고 외 마케팅채널 > 톡톡",
@@ -349,17 +361,10 @@
           "sharePct": 0.3
         },
         {
-          "name": "검색 광고 > 브랜드검색광고",
-          "path": "네이버 광고 > 검색 광고 > 브랜드검색광고",
-          "revenue": 308000,
-          "visitors": 371,
-          "sharePct": 0.3
-        },
-        {
           "name": "통합검색 > 네이버플러스스토어",
           "path": "네이버 검색 > 통합검색 > 네이버플러스스토어",
           "revenue": 147300,
-          "visitors": 100,
+          "visitors": 102,
           "sharePct": 0.1
         },
         {
@@ -401,21 +406,21 @@
           "name": "네이버 쇼핑 이외 서비스 > 네이버 블로그",
           "path": "네이버 서비스 > 네이버 쇼핑 이외 서비스 > 네이버 블로그",
           "revenue": 0,
-          "visitors": 46,
+          "visitors": 49,
           "sharePct": 0.0
         },
         {
           "name": "네이버 외부 > push",
           "path": "네이버 외부 > push",
           "revenue": 0,
-          "visitors": 36,
+          "visitors": 37,
           "sharePct": 0.0
         },
         {
           "name": "네이버 외부 > hemily.co.kr",
           "path": "네이버 외부 > hemily.co.kr",
           "revenue": 0,
-          "visitors": 35,
+          "visitors": 36,
           "sharePct": 0.0
         },
         {
@@ -426,17 +431,17 @@
           "sharePct": 0.0
         },
         {
-          "name": "네이버 외부 > facebook.com",
-          "path": "네이버 외부 > facebook.com",
+          "name": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
+          "path": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
           "revenue": 0,
           "visitors": 21,
           "sharePct": 0.0
         },
         {
-          "name": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
-          "path": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
+          "name": "네이버 외부 > facebook.com",
+          "path": "네이버 외부 > facebook.com",
           "revenue": 0,
-          "visitors": 18,
+          "visitors": 21,
           "sharePct": 0.0
         },
         {
@@ -559,6 +564,13 @@
           "sharePct": 0.0
         },
         {
+          "name": "네이버 외부 > admin.omoplay.com",
+          "path": "네이버 외부 > admin.omoplay.com",
+          "revenue": 0,
+          "visitors": 4,
+          "sharePct": 0.0
+        },
+        {
           "name": "네이버 외부 > teams.public.onecdn.static.microsoft",
           "path": "네이버 외부 > teams.public.onecdn.static.microsoft",
           "revenue": 0,
@@ -591,13 +603,6 @@
           "path": "네이버 외부 > www.google.com",
           "revenue": 0,
           "visitors": 3,
-          "sharePct": 0.0
-        },
-        {
-          "name": "네이버 외부 > admin.omoplay.com",
-          "path": "네이버 외부 > admin.omoplay.com",
-          "revenue": 0,
-          "visitors": 2,
           "sharePct": 0.0
         },
         {
@@ -690,72 +695,72 @@
           "rank": 1,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
           "productId": "12763789807",
-          "revenue": 34943010,
-          "qty": 259,
+          "revenue": 35659510,
+          "qty": 264,
           "groupProductNo": "50993779"
         },
         {
           "rank": 2,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
           "productId": "12747389906",
-          "revenue": 17191470,
-          "qty": 507,
+          "revenue": 17621310,
+          "qty": 519,
           "groupProductNo": "50993779"
         },
         {
           "rank": 3,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
           "productId": "13616691087",
-          "revenue": 17115370,
-          "qty": 190,
+          "revenue": 17588760,
+          "qty": 195,
           "groupProductNo": "51079437"
         },
         {
           "rank": 4,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 4개",
           "productId": "13616691089",
-          "revenue": 16571110,
-          "qty": 136,
+          "revenue": 16953260,
+          "qty": 139,
           "groupProductNo": "51079437"
         },
         {
           "rank": 5,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
           "productId": "12894742052",
-          "revenue": 9701970,
-          "qty": 96,
+          "revenue": 9923170,
+          "qty": 98,
           "groupProductNo": "50993779"
         },
         {
           "rank": 6,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
           "productId": "12808019284",
-          "revenue": 9145690,
-          "qty": 136,
+          "revenue": 9500410,
+          "qty": 141,
           "groupProductNo": "50993779"
         },
         {
           "rank": 7,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
           "productId": "13447249282",
-          "revenue": 8360870,
-          "qty": 268,
+          "revenue": 8493470,
+          "qty": 272,
           "groupProductNo": "51079437"
         },
         {
           "rank": 8,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 2개",
           "productId": "13616691086",
-          "revenue": 4784930,
-          "qty": 78,
+          "revenue": 4912230,
+          "qty": 80,
           "groupProductNo": "51079437"
         },
         {
           "rank": 9,
           "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
           "productId": "13635293181",
-          "revenue": 4448480,
-          "qty": 40,
+          "revenue": 4560980,
+          "qty": 41,
           "groupProductNo": "50792765"
         },
         {
@@ -768,6 +773,14 @@
         },
         {
           "rank": 11,
+          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635278957",
+          "revenue": 3320650,
+          "qty": 33,
+          "groupProductNo": "50792781"
+        },
+        {
+          "rank": 12,
           "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 6개",
           "productId": "13676606672",
           "revenue": 3071320,
@@ -775,20 +788,12 @@
           "groupProductNo": "52080500"
         },
         {
-          "rank": 12,
+          "rank": 13,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 28포, 1개",
           "productId": "13734910996",
           "revenue": 2533000,
           "qty": 47,
           "groupProductNo": "51079437"
-        },
-        {
-          "rank": 13,
-          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
-          "productId": "13635278957",
-          "revenue": 2476650,
-          "qty": 25,
-          "groupProductNo": "50792781"
         },
         {
           "rank": 14,
@@ -810,25 +815,25 @@
           "rank": 16,
           "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
           "productId": "12763859709",
-          "revenue": 2144560,
-          "qty": 53,
+          "revenue": 2188660,
+          "qty": 54,
           "groupProductNo": "50792765"
         },
         {
           "rank": 17,
-          "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-          "productId": "13674568934",
-          "revenue": 1743300,
-          "qty": 103,
-          "groupProductNo": "52080500"
+          "name": "[선물세트] 황성주 박사의 프리미엄 VIP 세트 + 쿨백",
+          "productId": "13735894967",
+          "revenue": 1822250,
+          "qty": 12,
+          "groupProductNo": ""
         },
         {
           "rank": 18,
-          "name": "[추석 선물세트] 황성주 박사의 프리미엄 VIP 세트 + 쿨백",
-          "productId": "13735894967",
-          "revenue": 1673250,
-          "qty": 11,
-          "groupProductNo": ""
+          "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
+          "productId": "13674568934",
+          "revenue": 1761300,
+          "qty": 104,
+          "groupProductNo": "52080500"
         },
         {
           "rank": 19,
@@ -842,8 +847,8 @@
           "rank": 20,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
           "productId": "12763906780",
-          "revenue": 960570,
-          "qty": 26,
+          "revenue": 1118520,
+          "qty": 30,
           "groupProductNo": "50792781"
         },
         {
@@ -856,7 +861,7 @@
         },
         {
           "rank": 22,
-          "name": "[추석 선물세트] 황성주 박사의 데일리 루틴 선물세트 [얼리버드 특가]",
+          "name": "[선물세트] 황성주 박사의 데일리 루틴 선물세트",
           "productId": "13734874122",
           "revenue": 826000,
           "qty": 13,
@@ -874,8 +879,8 @@
           "rank": 24,
           "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
           "productId": "12764871210",
-          "revenue": 589890,
-          "qty": 22,
+          "revenue": 618020,
+          "qty": 23,
           "groupProductNo": "50792809"
         },
         {
@@ -1161,37 +1166,37 @@
       ],
       "subscribers": {
         "notify": {
-          "total": 6529,
-          "added": 2019
+          "total": 6545,
+          "added": 2035
         },
         "interest": {
-          "total": 6529,
-          "added": 2019
+          "total": 6545,
+          "added": 2035
         }
       },
       "subscription": {
-        "revenue": 3519780,
-        "orders": 38,
-        "newOrders": 25,
-        "renewOrders": 13,
+        "revenue": 3718280,
+        "orders": 40,
+        "newOrders": 26,
+        "renewOrders": 14,
         "products": [
           {
             "productId": "13616691087",
             "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
-            "orders": 25,
-            "revenue": 2172720
+            "orders": 26,
+            "revenue": 2258720
+          },
+          {
+            "productId": "13635293181",
+            "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+            "orders": 6,
+            "revenue": 653960
           },
           {
             "productId": "12894742052",
             "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
             "orders": 6,
             "revenue": 607600
-          },
-          {
-            "productId": "13635293181",
-            "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
-            "orders": 5,
-            "revenue": 541460
           },
           {
             "productId": "13635278957",
@@ -1203,7 +1208,7 @@
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 60,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-30 09:33",
+        "activeSubscribersAsOf": "2026-10-01 08:32",
         "canceled": 16,
         "byStatus": {
           "전체": 76,
@@ -4574,34 +4579,34 @@
   "weeks": [
     {
       "key": "2026-W40",
-      "label": "9/28~9/29",
+      "label": "9/28~9/30",
       "periodStart": "2026-09-28",
-      "periodEnd": "2026-09-29",
+      "periodEnd": "2026-09-30",
       "summary": {
         "revenue": {
-          "value": 14446110,
-          "deltaValue": 5814430,
-          "deltaPct": 67.4
+          "value": 18637490,
+          "deltaValue": 6566960,
+          "deltaPct": 54.4
         },
         "orders": {
-          "value": 202,
-          "deltaValue": 96,
-          "deltaPct": 90.6
+          "value": 255,
+          "deltaValue": 110,
+          "deltaPct": 75.9
         },
         "aov": {
-          "value": 71515,
-          "deltaValue": -9916,
+          "value": 73088,
+          "deltaValue": -10157,
           "deltaPct": -12.2
         },
         "refund": {
-          "value": 1443270,
-          "deltaValue": 786820,
-          "deltaPct": 119.9,
+          "value": 1840570,
+          "deltaValue": 719080,
+          "deltaPct": 64.1,
           "breakdown": {
             "basis": "처리일(취소완료일)",
             "cancel": {
-              "amount": 1459470,
-              "count": 15
+              "amount": 1856770,
+              "count": 20
             },
             "return": {
               "amount": 0,
@@ -4612,22 +4617,22 @@
               "count": 0
             },
             "total": {
-              "amount": 1459470,
-              "count": 15
+              "amount": 1856770,
+              "count": 20
             },
-            "deltaValue": 803020,
-            "deltaPct": 122.3
+            "deltaValue": 735280,
+            "deltaPct": 65.6
           }
         },
         "visitors": {
-          "value": 3877,
-          "deltaValue": -4555,
-          "deltaPct": -54.0
+          "value": 5254,
+          "deltaValue": -7275,
+          "deltaPct": -58.1
         },
         "conversion": {
-          "value": 5.21,
-          "deltaValue": 3.95,
-          "deltaPct": 313.5
+          "value": 4.85,
+          "deltaValue": 3.69,
+          "deltaPct": 318.1
         }
       },
       "daily": [
@@ -4640,145 +4645,164 @@
           "date": "2026-09-29",
           "revenue": 5832500,
           "visitors": 1562
+        },
+        {
+          "date": "2026-09-30",
+          "revenue": 4191380,
+          "visitors": 1377
         }
       ],
       "channels": [
         {
           "name": "디스플레이 광고 > ADVoost쇼핑(제품광고)",
           "path": "네이버 광고 > 디스플레이 광고 > ADVoost쇼핑(제품광고)",
-          "revenue": 2419430,
-          "visitors": 652,
-          "sharePct": 23.0
+          "revenue": 3617460,
+          "visitors": 915,
+          "sharePct": 25.6
         },
         {
           "name": "스토어 내부 > 다른 상품",
           "path": "네이버 서비스 > 스토어 내부 > 다른 상품",
-          "revenue": 1644560,
-          "visitors": 158,
-          "sharePct": 15.6
+          "revenue": 1846960,
+          "visitors": 191,
+          "sharePct": 13.1
         },
         {
           "name": "네이버 페이 > 장바구니",
           "path": "네이버 서비스 > 네이버 페이 > 장바구니",
-          "revenue": 1435410,
-          "visitors": 84,
-          "sharePct": 13.6
+          "revenue": 1576610,
+          "visitors": 125,
+          "sharePct": 11.1
         },
         {
           "name": "스토어 내부 > 스토어 홈",
           "path": "네이버 서비스 > 스토어 내부 > 스토어 홈",
-          "revenue": 1185070,
-          "visitors": 321,
-          "sharePct": 11.2
-        },
-        {
-          "name": "통합검색 > 기타",
-          "path": "네이버 검색 > 통합검색 > 기타",
-          "revenue": 679120,
-          "visitors": 98,
-          "sharePct": 6.4
-        },
-        {
-          "name": "직유입",
-          "path": "직유입",
-          "revenue": 537720,
-          "visitors": 54,
-          "sharePct": 5.1
+          "revenue": 1469570,
+          "visitors": 447,
+          "sharePct": 10.4
         },
         {
           "name": "네이버플러스스토어 > 네플스홈 > 홈탭",
           "path": "네이버 서비스 > 네이버플러스스토어 > 네플스홈 > 홈탭",
-          "revenue": 416250,
-          "visitors": 38,
-          "sharePct": 4.0
+          "revenue": 764060,
+          "visitors": 55,
+          "sharePct": 5.4
+        },
+        {
+          "name": "통합검색 > 기타",
+          "path": "네이버 검색 > 통합검색 > 기타",
+          "revenue": 734320,
+          "visitors": 140,
+          "sharePct": 5.2
         },
         {
           "name": "네이버플러스스토어 > 마이쇼핑",
           "path": "네이버 서비스 > 네이버플러스스토어 > 마이쇼핑",
-          "revenue": 291560,
-          "visitors": 148,
-          "sharePct": 2.8
+          "revenue": 648960,
+          "visitors": 218,
+          "sharePct": 4.6
+        },
+        {
+          "name": "직유입",
+          "path": "직유입",
+          "revenue": 641880,
+          "visitors": 72,
+          "sharePct": 4.5
         },
         {
           "name": "네이버 페이 > 결제내역",
           "path": "네이버 서비스 > 네이버 페이 > 결제내역",
-          "revenue": 291100,
-          "visitors": 26,
-          "sharePct": 2.8
+          "revenue": 512300,
+          "visitors": 37,
+          "sharePct": 3.6
+        },
+        {
+          "name": "네이버 서비스 > 기타",
+          "path": "네이버 서비스 > 기타",
+          "revenue": 334540,
+          "visitors": 95,
+          "sharePct": 2.4
+        },
+        {
+          "name": "네이버플러스스토어 > 그 외",
+          "path": "네이버 서비스 > 네이버플러스스토어 > 그 외",
+          "revenue": 326180,
+          "visitors": 59,
+          "sharePct": 2.3
+        },
+        {
+          "name": "검색 광고 > 브랜드검색광고",
+          "path": "네이버 광고 > 검색 광고 > 브랜드검색광고",
+          "revenue": 308000,
+          "visitors": 52,
+          "sharePct": 2.2
+        },
+        {
+          "name": "가격비교 검색 > 검색",
+          "path": "네이버 검색 > 가격비교 검색 > 검색",
+          "revenue": 298500,
+          "visitors": 41,
+          "sharePct": 2.1
+        },
+        {
+          "name": "통합검색 > 가격비교",
+          "path": "네이버 검색 > 통합검색 > 가격비교",
+          "revenue": 296500,
+          "visitors": 157,
+          "sharePct": 2.1
         },
         {
           "name": "검색 광고 > 쇼핑검색광고",
           "path": "네이버 광고 > 검색 광고 > 쇼핑검색광고",
           "revenue": 269760,
-          "visitors": 72,
-          "sharePct": 2.6
-        },
-        {
-          "name": "네이버플러스스토어 > 그 외",
-          "path": "네이버 서비스 > 네이버플러스스토어 > 그 외",
-          "revenue": 259380,
-          "visitors": 40,
-          "sharePct": 2.5
-        },
-        {
-          "name": "네이버 서비스 > 기타",
-          "path": "네이버 서비스 > 기타",
-          "revenue": 235540,
-          "visitors": 72,
-          "sharePct": 2.2
-        },
-        {
-          "name": "검색 광고 > 브랜드검색광고",
-          "path": "네이버 광고 > 검색 광고 > 브랜드검색광고",
-          "revenue": 209000,
-          "visitors": 39,
-          "sharePct": 2.0
-        },
-        {
-          "name": "가격비교 검색 > 검색",
-          "path": "네이버 검색 > 가격비교 검색 > 검색",
-          "revenue": 191500,
-          "visitors": 31,
-          "sharePct": 1.8
+          "visitors": 100,
+          "sharePct": 1.9
         },
         {
           "name": "네이버 검색 > 네이버플러스스토어 검색",
           "path": "네이버 검색 > 네이버플러스스토어 검색",
           "revenue": 163170,
-          "visitors": 10,
-          "sharePct": 1.5
-        },
-        {
-          "name": "통합검색 > 가격비교",
-          "path": "네이버 검색 > 통합검색 > 가격비교",
-          "revenue": 149200,
-          "visitors": 139,
-          "sharePct": 1.4
-        },
-        {
-          "name": "검색 광고 > 파워링크",
-          "path": "네이버 광고 > 검색 광고 > 파워링크",
-          "revenue": 75080,
-          "visitors": 358,
-          "sharePct": 0.7
+          "visitors": 13,
+          "sharePct": 1.2
         },
         {
           "name": "디스플레이 광고 > 성과형광고",
           "path": "네이버 광고 > 디스플레이 광고 > 성과형광고",
-          "revenue": 44100,
-          "visitors": 168,
-          "sharePct": 0.4
+          "revenue": 154100,
+          "visitors": 249,
+          "sharePct": 1.1
+        },
+        {
+          "name": "검색 광고 > 파워링크",
+          "path": "네이버 광고 > 검색 광고 > 파워링크",
+          "revenue": 112280,
+          "visitors": 526,
+          "sharePct": 0.8
         },
         {
           "name": "네이버 광고 외 마케팅채널 > 브랜드커넥트",
           "path": "네이버 광고 외 마케팅채널 > 브랜드커넥트",
-          "revenue": 39690,
-          "visitors": 1350,
-          "sharePct": 0.4
+          "revenue": 67820,
+          "visitors": 1731,
+          "sharePct": 0.5
         },
         {
           "name": "네이버 외부 > hemily.co.kr",
           "path": "네이버 외부 > hemily.co.kr",
+          "revenue": 0,
+          "visitors": 6,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
+          "path": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
+          "revenue": 0,
+          "visitors": 5,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 쇼핑 이외 서비스 > 네이버 블로그",
+          "path": "네이버 서비스 > 네이버 쇼핑 이외 서비스 > 네이버 블로그",
           "revenue": 0,
           "visitors": 5,
           "sharePct": 0.0
@@ -4791,15 +4815,15 @@
           "sharePct": 0.0
         },
         {
-          "name": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
-          "path": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
+          "name": "통합검색 > 네이버플러스스토어",
+          "path": "네이버 검색 > 통합검색 > 네이버플러스스토어",
           "revenue": 0,
           "visitors": 2,
           "sharePct": 0.0
         },
         {
-          "name": "네이버 쇼핑 이외 서비스 > 네이버 블로그",
-          "path": "네이버 서비스 > 네이버 쇼핑 이외 서비스 > 네이버 블로그",
+          "name": "네이버 외부 > admin.omoplay.com",
+          "path": "네이버 외부 > admin.omoplay.com",
           "revenue": 0,
           "visitors": 2,
           "sharePct": 0.0
@@ -4807,6 +4831,13 @@
         {
           "name": "네이버 외부 > inpk.link",
           "path": "네이버 외부 > inpk.link",
+          "revenue": 0,
+          "visitors": 2,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 외부 > push",
+          "path": "네이버 외부 > push",
           "revenue": 0,
           "visitors": 2,
           "sharePct": 0.0
@@ -4826,13 +4857,6 @@
           "sharePct": 0.0
         },
         {
-          "name": "네이버 외부 > push",
-          "path": "네이버 외부 > push",
-          "revenue": 0,
-          "visitors": 1,
-          "sharePct": 0.0
-        },
-        {
           "name": "네이버 외부 > worksense.co.kr",
           "path": "네이버 외부 > worksense.co.kr",
           "revenue": 0,
@@ -4845,105 +4869,105 @@
           "rank": 1,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
           "productId": "12763789807",
-          "revenue": 3112220,
-          "qty": 23,
+          "revenue": 3828720,
+          "qty": 28,
           "groupProductNo": "50993779"
         },
         {
           "rank": 2,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 4개",
           "productId": "13616691089",
-          "revenue": 1714290,
-          "qty": 14,
+          "revenue": 2096440,
+          "qty": 17,
           "groupProductNo": "51079437"
         },
         {
           "rank": 3,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
           "productId": "13616691087",
-          "revenue": 1524700,
-          "qty": 17,
+          "revenue": 1998090,
+          "qty": 22,
           "groupProductNo": "51079437"
         },
         {
           "rank": 4,
           "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
           "productId": "12747389906",
-          "revenue": 1275060,
-          "qty": 37,
+          "revenue": 1704900,
+          "qty": 49,
           "groupProductNo": "50993779"
         },
         {
           "rank": 5,
-          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
-          "productId": "12808019284",
-          "revenue": 931900,
-          "qty": 14,
-          "groupProductNo": "50993779"
+          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635278957",
+          "revenue": 1637550,
+          "qty": 16,
+          "groupProductNo": "50792781"
         },
         {
           "rank": 6,
-          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
-          "productId": "12894742052",
-          "revenue": 796320,
-          "qty": 8,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
+          "productId": "12808019284",
+          "revenue": 1286620,
+          "qty": 19,
           "groupProductNo": "50993779"
         },
         {
           "rank": 7,
-          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
-          "productId": "13635278957",
-          "revenue": 793550,
-          "qty": 8,
-          "groupProductNo": "50792781"
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
+          "productId": "12894742052",
+          "revenue": 1017520,
+          "qty": 10,
+          "groupProductNo": "50993779"
         },
         {
           "rank": 8,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
           "productId": "13447249282",
-          "revenue": 697000,
-          "qty": 22,
+          "revenue": 829600,
+          "qty": 26,
           "groupProductNo": "51079437"
         },
         {
           "rank": 9,
           "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 2개",
           "productId": "13616691086",
-          "revenue": 672200,
-          "qty": 11,
+          "revenue": 799500,
+          "qty": 13,
           "groupProductNo": "51079437"
         },
         {
           "rank": 10,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
           "productId": "12763906780",
-          "revenue": 372600,
-          "qty": 10,
+          "revenue": 530550,
+          "qty": 14,
           "groupProductNo": "50792781"
         },
         {
           "rank": 11,
-          "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 3개",
-          "productId": "13670188795",
-          "revenue": 361900,
-          "qty": 5,
-          "groupProductNo": "50792809"
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635293181",
+          "revenue": 439710,
+          "qty": 4,
+          "groupProductNo": "50792765"
         },
         {
           "rank": 12,
           "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
           "productId": "12763859709",
-          "revenue": 335160,
-          "qty": 8,
+          "revenue": 379260,
+          "qty": 9,
           "groupProductNo": "50792765"
         },
         {
           "rank": 13,
-          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
-          "productId": "13635293181",
-          "revenue": 327210,
-          "qty": 3,
-          "groupProductNo": "50792765"
+          "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 3개",
+          "productId": "13670188795",
+          "revenue": 361900,
+          "qty": 5,
+          "groupProductNo": "50792809"
         },
         {
           "rank": 14,
@@ -4971,14 +4995,22 @@
         },
         {
           "rank": 17,
-          "name": "[추석 선물세트] 황성주 박사의 데일리 루틴 선물세트 [얼리버드 특가]",
+          "name": "[선물세트] 황성주 박사의 프리미엄 VIP 세트 + 쿨백",
+          "productId": "13735894967",
+          "revenue": 149000,
+          "qty": 1,
+          "groupProductNo": ""
+        },
+        {
+          "rank": 18,
+          "name": "[선물세트] 황성주 박사의 데일리 루틴 선물세트",
           "productId": "13734874122",
           "revenue": 147500,
           "qty": 2,
           "groupProductNo": ""
         },
         {
-          "rank": 18,
+          "rank": 19,
           "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 2개",
           "productId": "13635278956",
           "revenue": 145800,
@@ -4986,7 +5018,15 @@
           "groupProductNo": "50792781"
         },
         {
-          "rank": 19,
+          "rank": 20,
+          "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
+          "productId": "13674568934",
+          "revenue": 122400,
+          "qty": 7,
+          "groupProductNo": "52080500"
+        },
+        {
+          "rank": 21,
           "name": "[임직원 전용 파격 비밀링크] 황성주 박사의 프리미엄 VIP 세트",
           "productId": "13750355365",
           "revenue": 118000,
@@ -4994,23 +5034,15 @@
           "groupProductNo": ""
         },
         {
-          "rank": 20,
-          "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-          "productId": "13674568934",
-          "revenue": 104400,
-          "qty": 6,
-          "groupProductNo": "52080500"
-        },
-        {
-          "rank": 21,
+          "rank": 22,
           "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
           "productId": "12764871210",
-          "revenue": 81200,
-          "qty": 3,
+          "revenue": 109330,
+          "qty": 4,
           "groupProductNo": "50792809"
         },
         {
-          "rank": 22,
+          "rank": 23,
           "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 2개",
           "productId": "13635293180",
           "revenue": 79380,
@@ -5018,7 +5050,7 @@
           "groupProductNo": "50792765"
         },
         {
-          "rank": 23,
+          "rank": 24,
           "name": "황성주 박사의 데이 업 프로틴 쉐이크 식물성 단백질 파우치 (7개) 오리지널, 45g, 21개",
           "productId": "13586602898",
           "revenue": 64120,
@@ -5026,7 +5058,7 @@
           "groupProductNo": "51008878"
         },
         {
-          "rank": 24,
+          "rank": 25,
           "name": "홀그레인 저당 그래놀라 그릭요거트토핑 귀리 씨리얼 140g, 3개",
           "productId": "13675382726",
           "revenue": 54900,
@@ -5034,7 +5066,7 @@
           "groupProductNo": "52062043"
         },
         {
-          "rank": 25,
+          "rank": 26,
           "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 3개",
           "productId": "13676606671",
           "revenue": 45900,
@@ -5042,7 +5074,7 @@
           "groupProductNo": "52080500"
         },
         {
-          "rank": 26,
+          "rank": 27,
           "name": "홀그레인 저당 그래놀라 그릭요거트토핑 귀리 씨리얼 140g, 2개",
           "productId": "13675382725",
           "revenue": 20500,
@@ -5050,7 +5082,7 @@
           "groupProductNo": "52062043"
         },
         {
-          "rank": 27,
+          "rank": 28,
           "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 푸룬 식이섬유, 300g, 1개",
           "productId": "13495035486",
           "revenue": 15000,
@@ -5058,7 +5090,7 @@
           "groupProductNo": "52113400"
         },
         {
-          "rank": 28,
+          "rank": 29,
           "name": "홀그레인 저당 그래놀라 그릭요거트토핑 귀리 씨리얼 140g, 1개",
           "productId": "12764970820",
           "revenue": 11000,
@@ -5068,24 +5100,37 @@
       ],
       "subscribers": {
         "notify": {
-          "total": 6529,
-          "added": 179
+          "total": 6545,
+          "added": 195
         },
         "interest": {
-          "total": 6529,
-          "added": 179
+          "total": 6545,
+          "added": 195
         }
       },
       "subscription": {
-        "revenue": 0,
-        "orders": 0,
-        "newOrders": 0,
-        "renewOrders": 0,
-        "products": [],
+        "revenue": 198500,
+        "orders": 2,
+        "newOrders": 1,
+        "renewOrders": 1,
+        "products": [
+          {
+            "productId": "13635293181",
+            "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+            "orders": 1,
+            "revenue": 112500
+          },
+          {
+            "productId": "13616691087",
+            "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
+            "orders": 1,
+            "revenue": 86000
+          }
+        ],
         "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
         "activeSubscribers": 60,
         "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-09-30 09:33",
+        "activeSubscribersAsOf": "2026-10-01 08:32",
         "canceled": 16,
         "byStatus": {
           "전체": 76,
@@ -12047,6 +12092,417 @@
     }
   ],
   "days": [
+    {
+      "key": "2026-09-30",
+      "label": "9월 30일",
+      "periodStart": "2026-09-30",
+      "periodEnd": "2026-09-30",
+      "summary": {
+        "revenue": {
+          "value": 4191380,
+          "deltaValue": -1641120,
+          "deltaPct": -28.1
+        },
+        "orders": {
+          "value": 53,
+          "deltaValue": -30,
+          "deltaPct": -36.1
+        },
+        "aov": {
+          "value": 79083,
+          "deltaValue": 8812,
+          "deltaPct": 12.5
+        },
+        "refund": {
+          "value": 397300,
+          "deltaValue": 53190,
+          "deltaPct": 15.5,
+          "breakdown": {
+            "basis": "처리일(취소완료일)",
+            "cancel": {
+              "amount": 397300,
+              "count": 5
+            },
+            "return": {
+              "amount": 0,
+              "count": 0
+            },
+            "exchange": {
+              "amount": 0,
+              "count": 0
+            },
+            "total": {
+              "amount": 397300,
+              "count": 5
+            },
+            "deltaValue": 36990,
+            "deltaPct": 10.3
+          }
+        },
+        "visitors": {
+          "value": 1377,
+          "deltaValue": -2720,
+          "deltaPct": -66.4
+        },
+        "conversion": {
+          "value": 3.85,
+          "deltaValue": 2.9,
+          "deltaPct": 305.3
+        }
+      },
+      "daily": [
+        {
+          "date": "2026-09-30",
+          "revenue": 4191380,
+          "visitors": 1377
+        }
+      ],
+      "channels": [
+        {
+          "name": "디스플레이 광고 > ADVoost쇼핑(제품광고)",
+          "path": "네이버 광고 > 디스플레이 광고 > ADVoost쇼핑(제품광고)",
+          "revenue": 1198030,
+          "visitors": 263,
+          "sharePct": 33.2
+        },
+        {
+          "name": "네이버플러스스토어 > 마이쇼핑",
+          "path": "네이버 서비스 > 네이버플러스스토어 > 마이쇼핑",
+          "revenue": 357400,
+          "visitors": 70,
+          "sharePct": 9.9
+        },
+        {
+          "name": "네이버플러스스토어 > 네플스홈 > 홈탭",
+          "path": "네이버 서비스 > 네이버플러스스토어 > 네플스홈 > 홈탭",
+          "revenue": 347810,
+          "visitors": 17,
+          "sharePct": 9.6
+        },
+        {
+          "name": "스토어 내부 > 스토어 홈",
+          "path": "네이버 서비스 > 스토어 내부 > 스토어 홈",
+          "revenue": 284500,
+          "visitors": 126,
+          "sharePct": 7.9
+        },
+        {
+          "name": "네이버 페이 > 결제내역",
+          "path": "네이버 서비스 > 네이버 페이 > 결제내역",
+          "revenue": 221200,
+          "visitors": 11,
+          "sharePct": 6.1
+        },
+        {
+          "name": "스토어 내부 > 다른 상품",
+          "path": "네이버 서비스 > 스토어 내부 > 다른 상품",
+          "revenue": 202400,
+          "visitors": 33,
+          "sharePct": 5.6
+        },
+        {
+          "name": "통합검색 > 가격비교",
+          "path": "네이버 검색 > 통합검색 > 가격비교",
+          "revenue": 147300,
+          "visitors": 18,
+          "sharePct": 4.1
+        },
+        {
+          "name": "네이버 페이 > 장바구니",
+          "path": "네이버 서비스 > 네이버 페이 > 장바구니",
+          "revenue": 141200,
+          "visitors": 41,
+          "sharePct": 3.9
+        },
+        {
+          "name": "디스플레이 광고 > 성과형광고",
+          "path": "네이버 광고 > 디스플레이 광고 > 성과형광고",
+          "revenue": 110000,
+          "visitors": 81,
+          "sharePct": 3.1
+        },
+        {
+          "name": "가격비교 검색 > 검색",
+          "path": "네이버 검색 > 가격비교 검색 > 검색",
+          "revenue": 107000,
+          "visitors": 10,
+          "sharePct": 3.0
+        },
+        {
+          "name": "직유입",
+          "path": "직유입",
+          "revenue": 104160,
+          "visitors": 18,
+          "sharePct": 2.9
+        },
+        {
+          "name": "네이버 서비스 > 기타",
+          "path": "네이버 서비스 > 기타",
+          "revenue": 99000,
+          "visitors": 23,
+          "sharePct": 2.7
+        },
+        {
+          "name": "검색 광고 > 브랜드검색광고",
+          "path": "네이버 광고 > 검색 광고 > 브랜드검색광고",
+          "revenue": 99000,
+          "visitors": 13,
+          "sharePct": 2.7
+        },
+        {
+          "name": "네이버플러스스토어 > 그 외",
+          "path": "네이버 서비스 > 네이버플러스스토어 > 그 외",
+          "revenue": 66800,
+          "visitors": 19,
+          "sharePct": 1.9
+        },
+        {
+          "name": "통합검색 > 기타",
+          "path": "네이버 검색 > 통합검색 > 기타",
+          "revenue": 55200,
+          "visitors": 42,
+          "sharePct": 1.5
+        },
+        {
+          "name": "검색 광고 > 파워링크",
+          "path": "네이버 광고 > 검색 광고 > 파워링크",
+          "revenue": 37200,
+          "visitors": 168,
+          "sharePct": 1.0
+        },
+        {
+          "name": "네이버 광고 외 마케팅채널 > 브랜드커넥트",
+          "path": "네이버 광고 외 마케팅채널 > 브랜드커넥트",
+          "revenue": 28130,
+          "visitors": 381,
+          "sharePct": 0.8
+        },
+        {
+          "name": "검색 광고 > 쇼핑검색광고",
+          "path": "네이버 광고 > 검색 광고 > 쇼핑검색광고",
+          "revenue": 0,
+          "visitors": 28,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 검색 > 네이버플러스스토어 검색",
+          "path": "네이버 검색 > 네이버플러스스토어 검색",
+          "revenue": 0,
+          "visitors": 3,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
+          "path": "네이버 광고 외 마케팅채널 > 쇼핑라이브",
+          "revenue": 0,
+          "visitors": 3,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 쇼핑 이외 서비스 > 네이버 블로그",
+          "path": "네이버 서비스 > 네이버 쇼핑 이외 서비스 > 네이버 블로그",
+          "revenue": 0,
+          "visitors": 3,
+          "sharePct": 0.0
+        },
+        {
+          "name": "통합검색 > 네이버플러스스토어",
+          "path": "네이버 검색 > 통합검색 > 네이버플러스스토어",
+          "revenue": 0,
+          "visitors": 2,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 외부 > admin.omoplay.com",
+          "path": "네이버 외부 > admin.omoplay.com",
+          "revenue": 0,
+          "visitors": 2,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 외부 > hemily.co.kr",
+          "path": "네이버 외부 > hemily.co.kr",
+          "revenue": 0,
+          "visitors": 1,
+          "sharePct": 0.0
+        },
+        {
+          "name": "네이버 외부 > push",
+          "path": "네이버 외부 > push",
+          "revenue": 0,
+          "visitors": 1,
+          "sharePct": 0.0
+        }
+      ],
+      "products": [
+        {
+          "rank": 1,
+          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635278957",
+          "revenue": 844000,
+          "qty": 8,
+          "groupProductNo": "50792781"
+        },
+        {
+          "rank": 2,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
+          "productId": "12763789807",
+          "revenue": 716500,
+          "qty": 5,
+          "groupProductNo": "50993779"
+        },
+        {
+          "rank": 3,
+          "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
+          "productId": "13616691087",
+          "revenue": 473390,
+          "qty": 5,
+          "groupProductNo": "51079437"
+        },
+        {
+          "rank": 4,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
+          "productId": "12747389906",
+          "revenue": 429840,
+          "qty": 12,
+          "groupProductNo": "50993779"
+        },
+        {
+          "rank": 5,
+          "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 4개",
+          "productId": "13616691089",
+          "revenue": 382150,
+          "qty": 3,
+          "groupProductNo": "51079437"
+        },
+        {
+          "rank": 6,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
+          "productId": "12808019284",
+          "revenue": 354720,
+          "qty": 5,
+          "groupProductNo": "50993779"
+        },
+        {
+          "rank": 7,
+          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
+          "productId": "12894742052",
+          "revenue": 221200,
+          "qty": 2,
+          "groupProductNo": "50993779"
+        },
+        {
+          "rank": 8,
+          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
+          "productId": "12763906780",
+          "revenue": 157950,
+          "qty": 4,
+          "groupProductNo": "50792781"
+        },
+        {
+          "rank": 9,
+          "name": "[선물세트] 황성주 박사의 프리미엄 VIP 세트 + 쿨백",
+          "productId": "13735894967",
+          "revenue": 149000,
+          "qty": 1,
+          "groupProductNo": ""
+        },
+        {
+          "rank": 10,
+          "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+          "productId": "13447249282",
+          "revenue": 132600,
+          "qty": 4,
+          "groupProductNo": "51079437"
+        },
+        {
+          "rank": 11,
+          "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 2개",
+          "productId": "13616691086",
+          "revenue": 127300,
+          "qty": 2,
+          "groupProductNo": "51079437"
+        },
+        {
+          "rank": 12,
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+          "productId": "13635293181",
+          "revenue": 112500,
+          "qty": 1,
+          "groupProductNo": "50792765"
+        },
+        {
+          "rank": 13,
+          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+          "productId": "12763859709",
+          "revenue": 44100,
+          "qty": 1,
+          "groupProductNo": "50792765"
+        },
+        {
+          "rank": 14,
+          "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
+          "productId": "12764871210",
+          "revenue": 28130,
+          "qty": 1,
+          "groupProductNo": "50792809"
+        },
+        {
+          "rank": 15,
+          "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
+          "productId": "13674568934",
+          "revenue": 18000,
+          "qty": 1,
+          "groupProductNo": "52080500"
+        }
+      ],
+      "subscription": {
+        "revenue": 198500,
+        "orders": 2,
+        "newOrders": 1,
+        "renewOrders": 1,
+        "products": [
+          {
+            "productId": "13635293181",
+            "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 3개",
+            "orders": 1,
+            "revenue": 112500
+          },
+          {
+            "productId": "13616691087",
+            "name": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 3개",
+            "orders": 1,
+            "revenue": 86000
+          }
+        ],
+        "basis": "조인 확정분 기준 — orders=newOrders+renewOrders, products 합=revenue. 신규=구독 1회차(scheduleIndex=1), 재구매=2회차 이상. activeSubscribers 계열은 구독관리 콘솔 별도 수집분이라 이 기준과 무관.",
+        "activeSubscribers": 60,
+        "activeSubscribersSource": "subscription-console",
+        "activeSubscribersAsOf": "2026-10-01 08:32",
+        "canceled": 16,
+        "byStatus": {
+          "전체": 76,
+          "진행중": 60,
+          "종료": 0,
+          "해지": 16
+        }
+      },
+      "subscribers": {
+        "notify": {
+          "total": 6545,
+          "added": 16
+        },
+        "interest": {
+          "total": 6545,
+          "added": 16
+        }
+      },
+      "customers": {
+        "total": 47,
+        "new": 28,
+        "returning": 19
+      }
+    },
     {
       "key": "2026-09-29",
       "label": "9월 29일",
@@ -36323,234 +36779,6 @@
         "subscriptionRenewalRevenue": null,
         "orders": 0,
         "newOrders": 0,
-        "renewOrders": 0,
-        "activeSubscribers": 33,
-        "activeSubscribersSource": "subscription-console",
-        "activeSubscribersAsOf": "2026-08-04 10:21",
-        "canceled": 0,
-        "byStatus": {
-          "전체": 33,
-          "진행중": 33,
-          "종료": 0,
-          "해지": 0
-        }
-      }
-    },
-    {
-      "key": "2026-08-01",
-      "label": "8월 1일",
-      "periodStart": "2026-08-01",
-      "periodEnd": "2026-08-01",
-      "summary": {
-        "revenue": {
-          "value": 2219570,
-          "deltaValue": -996630,
-          "deltaPct": -31.0
-        },
-        "orders": {
-          "value": 28,
-          "deltaValue": -11,
-          "deltaPct": -28.2
-        },
-        "aov": {
-          "value": 79270,
-          "deltaValue": -3197,
-          "deltaPct": -3.9
-        },
-        "refund": {
-          "value": 566390,
-          "deltaValue": 386190,
-          "deltaPct": 214.3,
-          "breakdown": {
-            "basis": "처리일(취소완료일)",
-            "cancel": {
-              "amount": 566390,
-              "count": 4
-            },
-            "return": {
-              "amount": 0,
-              "count": 0
-            },
-            "exchange": {
-              "amount": 0,
-              "count": 0
-            },
-            "total": {
-              "amount": 566390,
-              "count": 4
-            },
-            "deltaValue": 257590,
-            "deltaPct": 83.4
-          }
-        },
-        "visitors": {
-          "value": 660,
-          "deltaValue": -39,
-          "deltaPct": -5.6
-        },
-        "conversion": {
-          "value": 4.24,
-          "deltaValue": 0.23,
-          "deltaPct": 5.7
-        }
-      },
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "revenue": 2219570
-        }
-      ],
-      "channels": [
-        {
-          "name": "네이버가격비교-통합검색",
-          "revenue": 331440,
-          "sharePct": 37.1,
-          "visitors": 41
-        },
-        {
-          "name": "네이버플러스스토어-통합검색",
-          "revenue": 139790,
-          "sharePct": 15.7,
-          "visitors": 16
-        },
-        {
-          "name": "네이버 모바일메인",
-          "revenue": 110600,
-          "sharePct": 12.4,
-          "visitors": 1
-        },
-        {
-          "name": "네이버 브랜드검색(일반형)",
-          "revenue": 99000,
-          "sharePct": 11.1,
-          "visitors": 51
-        },
-        {
-          "name": "네이버검색",
-          "revenue": 99000,
-          "sharePct": 11.1,
-          "visitors": 11
-        },
-        {
-          "name": "네이버플러스스토어-검색",
-          "revenue": 60300,
-          "sharePct": 6.8,
-          "visitors": 16
-        },
-        {
-          "name": "네이버플러스스토어-홈",
-          "revenue": 53000,
-          "sharePct": 5.9,
-          "visitors": 5
-        }
-      ],
-      "products": [
-        {
-          "rank": 1,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 3개",
-          "productId": "13616691087",
-          "revenue": 790790,
-          "qty": 8
-        },
-        {
-          "rank": 2,
-          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 3개",
-          "productId": "13635278957",
-          "revenue": 495000,
-          "qty": 5
-        },
-        {
-          "rank": 3,
-          "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
-          "productId": "12764871210",
-          "revenue": 163200,
-          "qty": 6
-        },
-        {
-          "rank": 4,
-          "name": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 3개",
-          "productId": "13670188795",
-          "revenue": 154000,
-          "qty": 2
-        },
-        {
-          "rank": 5,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 1개",
-          "productId": "13447249282",
-          "revenue": 132600,
-          "qty": 4
-        },
-        {
-          "rank": 6,
-          "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-          "productId": "12763859709",
-          "revenue": 123480,
-          "qty": 3
-        },
-        {
-          "rank": 7,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 4개",
-          "productId": "13616691089",
-          "revenue": 120150,
-          "qty": 1
-        },
-        {
-          "rank": 8,
-          "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
-          "productId": "12894742052",
-          "revenue": 110600,
-          "qty": 1
-        },
-        {
-          "rank": 9,
-          "name": "황성주 박사의 라이프밀 데일리 아침 식사 대용 야채 동결건조 생식 30g, 14포, 2개",
-          "productId": "13616691086",
-          "revenue": 60300,
-          "qty": 1
-        },
-        {
-          "rank": 10,
-          "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
-          "productId": "12763906780",
-          "revenue": 36450,
-          "qty": 1
-        },
-        {
-          "rank": 11,
-          "name": "황성주 박사의 데이 크런치 프로틴바 에너지바 칼로리 간식 그레인, 10개입, 1개",
-          "productId": "13064086505",
-          "revenue": 18000,
-          "qty": 1
-        },
-        {
-          "rank": 12,
-          "name": "라이프밀 프룻 젤리 스틱 이너뷰티 [15포] 콜라겐 ABC, 300g, 1개",
-          "productId": "13495028611",
-          "revenue": 15000,
-          "qty": 1
-        }
-      ],
-      "subscribers": {
-        "notify": {
-          "total": 2755,
-          "added": 17
-        },
-        "interest": {
-          "total": 2755,
-          "added": 17
-        }
-      },
-      "customers": {
-        "total": 20,
-        "new": 17,
-        "returning": 3
-      },
-      "subscription": {
-        "revenue": 99000,
-        "products": [],
-        "subscriptionRenewalRevenue": null,
-        "orders": 1,
-        "newOrders": 1,
         "renewOrders": 0,
         "activeSubscribers": 33,
         "activeSubscribersSource": "subscription-console",
