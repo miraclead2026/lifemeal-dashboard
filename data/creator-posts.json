@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-30T10:57:13+09:00",
+  "updatedAt": "2026-09-30T10:57:16+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -312,6 +312,31 @@
   "unattributed": [
     {
       "platform": "blog",
+      "url": "https://blog.naver.com/jb5tdptriy/224426548132",
+      "title": "황성주 박사의 라이프밀 데일리 생식 14포 가격과 선택 포인트",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MzBfMTgz/MDAxNzkwNzAwMjA3Mjc4.w8rpi6pFkxN6r_nRVIOpjU9wUr2B8mRs3a6t4f_kEwYg.oJdbbD91oIBhaFJGej1grnkQmc3EuUXxU5xmBYiwvWMg.JPEG/shopping-product-1.jpg?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-30",
+      "author": "jb5tdptriy",
+      "authorName": "알찬이야기방",
+      "connect": "strong",
+      "evidence": [
+        "naver.me"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "995403441578880",
+      "channelProductNo": "13447249282",
+      "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+      "discoveredAt": "2026-09-30"
+    },
+    {
+      "platform": "blog",
       "url": "https://blog.naver.com/soprano1945/224425460690",
       "title": "“운동 끝나고 단백질 얼마나?” 황성주 프로틴 골드 HIGH5, 105kcal 한 포 따져봤습니다",
       "thumbnail": {
@@ -336,6 +361,33 @@
       "channelProductNo": "12764871210",
       "relatedProduct": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
       "discoveredAt": "2026-09-29"
+    },
+    {
+      "platform": "blog",
+      "url": "https://blog.naver.com/soprano1945/224425542664",
+      "title": "“몸이 녹슨다고?” 활성산소·파이토케미컬, 황성주 생식 먹기 전 알아야 할 진짜 관계",
+      "thumbnail": {
+        "url": "https://blogthumb.pstatic.net/MjAyNjA5MjlfMTk1/MDAxNzkwNjM3ODY2MTAy.X3qowhrya-hDAkTN3tHjFS0zoFoOncXcfHZ6HvK6vmIg.YJzoQeMR6EBFOMIL1KKpsvMLALjeFai82Ue92EgJ_Uwg.PNG/766393e8-52aa-4525-95f2-1de0767276bc.png?type=s2",
+        "videoThumbnail": false,
+        "vrthumbnail": false
+      },
+      "date": "2026-09-29",
+      "author": "soprano1945",
+      "authorName": "백세건강365",
+      "connect": "strong",
+      "evidence": [
+        "naver.me",
+        "strong",
+        "수수료"
+      ],
+      "source": "blog-search",
+      "metrics": {
+        "views": null
+      },
+      "affiliateId": "1000564212505056",
+      "channelProductNo": "13447249282",
+      "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+      "discoveredAt": "2026-09-30"
     },
     {
       "platform": "clip",
@@ -5810,8 +5862,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-09-29T07:15:11+09:00",
-    "mode": "revalidate",
+    "lastRun": "2026-09-30T10:57:16+09:00",
+    "mode": "blog",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
