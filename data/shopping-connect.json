@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-01 09:42",
+  "updatedAt": "2026-10-02 08:37",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,12 +10,12 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 55765,
-    "productOrderCnt": 187,
+    "accessCnt": 56107,
+    "productOrderCnt": 190,
     "salesConversionRate": 0.3,
-    "salesCnt": 286,
-    "salesAmount": 10923990,
-    "commissionAmount": 2044119,
+    "salesCnt": 292,
+    "salesAmount": 11107590,
+    "commissionAmount": 2073516,
     "commissionRate": 18.7
   },
   "products": [
@@ -23,9 +23,9 @@
       "connectProductId": "981216820329027",
       "storeProductId": "12747389906",
       "name": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "salesCnt": 75,
-      "salesAmount": 2579700,
-      "commissionAmount": 619467,
+      "salesCnt": 80,
+      "salesAmount": 2747100,
+      "commissionAmount": 642093,
       "imageUrl": "https://shop-phinf.pstatic.net/20260826_274/1787704900267YC3uW_PNG/42271148171819314_634227583.png"
     },
     {
@@ -50,9 +50,9 @@
       "connectProductId": "986303491535840",
       "storeProductId": "13674568934",
       "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-      "salesCnt": 59,
-      "salesAmount": 979300,
-      "commissionAmount": 396430,
+      "salesCnt": 60,
+      "salesAmount": 995500,
+      "commissionAmount": 403201,
       "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-10-01",
+      "label": "10월 1일",
+      "periodStart": "2026-10-01",
+      "periodEnd": "2026-10-01",
+      "summary": {
+        "access": {
+          "value": 342,
+          "deltaValue": -40,
+          "deltaPct": -10.5
+        },
+        "sales": {
+          "value": 183600,
+          "deltaValue": 124870,
+          "deltaPct": 212.6
+        }
+      },
+      "directVisits": 10
+    },
     {
       "key": "2026-09-30",
       "label": "9월 30일",
@@ -965,7 +984,7 @@
           "deltaPct": -37.8
         }
       },
-      "directVisits": 845
+      "directVisits": null
     },
     {
       "key": "2026-08-16",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-07-03",
-      "label": "7월 3일",
-      "periodStart": "2026-07-03",
-      "periodEnd": "2026-07-03",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W40",
-      "label": "9/28~9/30",
+      "label": "9/28~10/1",
       "periodStart": "2026-09-28",
-      "periodEnd": "2026-09-30",
+      "periodEnd": "2026-10-01",
       "summary": {
         "access": {
-          "value": 1729,
-          "deltaValue": -15491,
-          "deltaPct": -90.0
+          "value": 2071,
+          "deltaValue": -15149,
+          "deltaPct": -88.0
         },
         "sales": {
-          "value": 89330,
-          "deltaValue": -582880,
-          "deltaPct": -86.7
+          "value": 272930,
+          "deltaValue": -399280,
+          "deltaPct": -59.4
         }
       }
     },
@@ -2295,6 +2295,24 @@
   ],
   "months": [
     {
+      "key": "2026-10",
+      "label": "10월",
+      "periodStart": "2026-10-01",
+      "periodEnd": "2026-10-01",
+      "summary": {
+        "access": {
+          "value": 342,
+          "deltaValue": -24682,
+          "deltaPct": -98.6
+        },
+        "sales": {
+          "value": 183600,
+          "deltaValue": -2745470,
+          "deltaPct": -93.7
+        }
+      }
+    },
+    {
       "key": "2026-09",
       "label": "9월",
       "periodStart": "2026-09-01",
@@ -2491,24 +2509,6 @@
           "deltaPct": null
         }
       }
-    },
-    {
-      "key": "2025-10",
-      "label": "10월",
-      "periodStart": "2025-10-01",
-      "periodEnd": "2025-10-31",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      }
     }
   ],
   "creators": [
@@ -2517,9 +2517,9 @@
       "name": "cozyhome-edit",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfNzgg/MDAxNzgwMDczMzI5MTE4.8bnbZabFTY2HQRPuZzLuEd-TPPRJ8fOkTiU_wx3O8Ggg.lo60ai6j2uXUSCcT2iIzwIICtrkjom_Cf_Ms_ecmqiEg.PNG/ChatGPT_Image_2026%EB%85%84_5%EC%9B%94_30%EC%9D%BC_%EC%98%A4%EC%A0%84_01_48_30.png",
       "performanceType": "DIRECT",
-      "salesCnt": 89,
-      "salesAmount": 2432170,
-      "commissionAmount": 849253,
+      "salesCnt": 90,
+      "salesAmount": 2448370,
+      "commissionAmount": 856024,
       "isDeleted": false,
       "channels": [
         {
@@ -2634,11 +2634,11 @@
           "url": "https://clip.naver.com/@golden_day_",
           "title": "청담언니",
           "serviceId": "e_e2co_5n3opkGaJLUSx",
-          "followerCount": 262,
-          "contentCount": 156,
+          "followerCount": 261,
+          "contentCount": 158,
           "averageVisitCount": null,
-          "averageViewCount": 8712,
-          "averageLikeCount": 12,
+          "averageViewCount": 8290,
+          "averageLikeCount": 11,
           "averageCommentCount": 2,
           "status": "ENABLED"
         }
@@ -2704,8 +2704,8 @@
           "url": "https://blog.naver.com/gahong83",
           "title": "홍's Life",
           "serviceId": "gahong83",
-          "followerCount": 25,
-          "contentCount": 146,
+          "followerCount": 28,
+          "contentCount": 157,
           "averageVisitCount": 210,
           "averageViewCount": null,
           "averageLikeCount": 0,
@@ -2742,9 +2742,9 @@
           "serviceId": "sudden4082",
           "followerCount": 5726,
           "contentCount": 3116,
-          "averageVisitCount": 12558,
+          "averageVisitCount": 15168,
           "averageViewCount": null,
-          "averageLikeCount": 8,
+          "averageLikeCount": 9,
           "averageCommentCount": 0,
           "status": "ENABLED"
         },
@@ -2756,9 +2756,9 @@
           "followerCount": 3949,
           "contentCount": 1401,
           "averageVisitCount": null,
-          "averageViewCount": 23927,
-          "averageLikeCount": 20,
-          "averageCommentCount": 9,
+          "averageViewCount": 22750,
+          "averageLikeCount": 19,
+          "averageCommentCount": 8,
           "status": "ENABLED"
         }
       ],
@@ -2804,7 +2804,7 @@
           "followerCount": 584,
           "contentCount": 274,
           "averageVisitCount": null,
-          "averageViewCount": 381,
+          "averageViewCount": 427,
           "averageLikeCount": 2,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2820,6 +2820,42 @@
       "isNaverInfluencer": false,
       "gender": "FEMALE",
       "ageGroup": "FORTIES"
+    },
+    {
+      "creatorSpaceId": 848346744536032,
+      "name": "꽃부엉이 오늘도 기록중",
+      "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNTA3MjVfMTMg/MDAxNzUzNDE2NjU5NTY3.MyhG81kFr724o2qRB7arv3Z2ne68ViEGyaCQc6Cq56sg.47itr4tm_0ZlAGGNH1F5pIBBwNPenGK9i94BHtLE6Xwg.PNG/1000023338.png",
+      "performanceType": "DIRECT",
+      "salesCnt": 2,
+      "salesAmount": 66960,
+      "commissionAmount": 20622,
+      "isDeleted": false,
+      "channels": [
+        {
+          "channelType": "NBLOG",
+          "url": "https://blog.naver.com/flowerowlog",
+          "title": "꽃부엉이 오늘도 기록중",
+          "serviceId": "flowerowlog",
+          "followerCount": 113,
+          "contentCount": 194,
+          "averageVisitCount": 51,
+          "averageViewCount": null,
+          "averageLikeCount": 1,
+          "averageCommentCount": 2,
+          "status": "ENABLED"
+        }
+      ],
+      "primaryChannelType": "NBLOG",
+      "primaryUrl": "https://blog.naver.com/flowerowlog",
+      "mainCategory": "리빙",
+      "subCategories": [
+        "여행",
+        "뷰티"
+      ],
+      "accountType": "PERSONAL",
+      "isNaverInfluencer": false,
+      "gender": "FEMALE",
+      "ageGroup": "FIFTIES"
     },
     {
       "creatorSpaceId": 984748630834368,
@@ -2849,7 +2885,7 @@
           "url": "https://clip.naver.com/@dwyg0425",
           "title": "땡깡쟁이부자아빠",
           "serviceId": "0UjpfU-VSBmMDY5vhGXx",
-          "followerCount": 350,
+          "followerCount": 355,
           "contentCount": 7,
           "averageVisitCount": null,
           "averageViewCount": 3,
@@ -2869,46 +2905,16 @@
       "isNaverInfluencer": false,
       "gender": "MALE",
       "ageGroup": "FIFTIES"
-    },
-    {
-      "creatorSpaceId": 943404316043264,
-      "name": "...",
-      "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA2MTdfMjA4/MDAxNzgxNjI0NjU5MzQ5.TajuEBFl-jF4Vahmj6g94GZ0i9s9-jJCgit1IIbAjdAg.B0rp89JDTn1yFvKtVkCSl3oFSm14GKCrEhU_rVtAjbog.PNG/2026%EB%85%84_6%EC%9B%94_17%EC%9D%BC_%EC%98%A4%EC%A0%84_12_25_18.png",
-      "performanceType": "DIRECT",
-      "salesCnt": 1,
-      "salesAmount": 37200,
-      "commissionAmount": 11457,
-      "isDeleted": false,
-      "channels": [
-        {
-          "channelType": "NCLIP",
-          "url": "https://clip.naver.com/@updown_pick",
-          "title": "살림언니 뷰티수다",
-          "serviceId": "5tGVhqL7mOjgYfsRNbcX",
-          "followerCount": 142,
-          "contentCount": 230,
-          "averageVisitCount": null,
-          "averageViewCount": 6451,
-          "averageLikeCount": 13,
-          "averageCommentCount": 1,
-          "status": "ENABLED"
-        }
-      ],
-      "primaryChannelType": "NCLIP",
-      "primaryUrl": "https://clip.naver.com/@updown_pick",
-      "mainCategory": "뷰티",
-      "subCategories": [
-        "리빙",
-        "생활건강"
-      ],
-      "accountType": "PERSONAL",
-      "isNaverInfluencer": false,
-      "gender": "FEMALE",
-      "ageGroup": "FORTIES"
     }
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-10-01",
+      "access": 342,
+      "sales": 183600,
+      "directVisits": 10
+    },
     {
       "date": "2026-09-30",
       "access": 382,
@@ -3177,7 +3183,7 @@
       "date": "2026-08-17",
       "access": 919,
       "sales": 223570,
-      "directVisits": 845
+      "directVisits": null
     },
     {
       "date": "2026-08-16",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-07-04",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-07-03",
       "access": 0,
       "sales": 0,
       "directVisits": null
