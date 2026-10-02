@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-02 09:39",
+  "updatedAt": "2026-10-03 08:37",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,13 +10,13 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 56107,
-    "productOrderCnt": 190,
+    "accessCnt": 56453,
+    "productOrderCnt": 192,
     "salesConversionRate": 0.3,
-    "salesCnt": 292,
-    "salesAmount": 11107590,
-    "commissionAmount": 2073516,
-    "commissionRate": 18.7
+    "salesCnt": 294,
+    "salesAmount": 11184220,
+    "commissionAmount": 2097419,
+    "commissionRate": 18.8
   },
   "products": [
     {
@@ -59,9 +59,9 @@
       "connectProductId": "981216820329029",
       "storeProductId": "12763906780",
       "name": "황성주박사의 영양식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 23,
-      "salesAmount": 862650,
-      "commissionAmount": 170803,
+      "salesCnt": 24,
+      "salesAmount": 899590,
+      "commissionAmount": 178116,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_12/17873030836734Lqs3_PNG/121435927777226039_1074430072.png"
     },
     {
@@ -86,9 +86,9 @@
       "connectProductId": "981216820329026",
       "storeProductId": "12763859709",
       "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 15,
-      "salesAmount": 599760,
-      "commissionAmount": 154244,
+      "salesCnt": 16,
+      "salesAmount": 639450,
+      "commissionAmount": 170834,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
     },
     {
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-10-02",
+      "label": "10월 2일",
+      "periodStart": "2026-10-02",
+      "periodEnd": "2026-10-02",
+      "summary": {
+        "access": {
+          "value": 346,
+          "deltaValue": 4,
+          "deltaPct": 1.2
+        },
+        "sales": {
+          "value": 76630,
+          "deltaValue": -106970,
+          "deltaPct": -58.3
+        }
+      },
+      "directVisits": 18
+    },
     {
       "key": "2026-10-01",
       "label": "10월 1일",
@@ -965,7 +984,7 @@
           "deltaPct": 158.4
         }
       },
-      "directVisits": 1428
+      "directVisits": null
     },
     {
       "key": "2026-08-17",
@@ -1802,43 +1821,24 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-07-04",
-      "label": "7월 4일",
-      "periodStart": "2026-07-04",
-      "periodEnd": "2026-07-04",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
     {
       "key": "2026-W40",
-      "label": "9/28~10/1",
+      "label": "9/28~10/2",
       "periodStart": "2026-09-28",
-      "periodEnd": "2026-10-01",
+      "periodEnd": "2026-10-02",
       "summary": {
         "access": {
-          "value": 2071,
-          "deltaValue": -15149,
-          "deltaPct": -88.0
+          "value": 2417,
+          "deltaValue": -14803,
+          "deltaPct": -86.0
         },
         "sales": {
-          "value": 272930,
-          "deltaValue": -399280,
-          "deltaPct": -59.4
+          "value": 349560,
+          "deltaValue": -322650,
+          "deltaPct": -48.0
         }
       }
     },
@@ -2298,17 +2298,17 @@
       "key": "2026-10",
       "label": "10월",
       "periodStart": "2026-10-01",
-      "periodEnd": "2026-10-01",
+      "periodEnd": "2026-10-02",
       "summary": {
         "access": {
-          "value": 342,
-          "deltaValue": -24682,
-          "deltaPct": -98.6
+          "value": 688,
+          "deltaValue": -24336,
+          "deltaPct": -97.3
         },
         "sales": {
-          "value": 183600,
-          "deltaValue": -2745470,
-          "deltaPct": -93.7
+          "value": 260230,
+          "deltaValue": -2668840,
+          "deltaPct": -91.1
         }
       }
     },
@@ -2553,9 +2553,9 @@
       "name": "obo1221님의 블로그",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjAyMDVfMjky/MDAxNzcwMjU3Mzg5MjMz.m-1PZ-2vD4JgSZoY9xJKl5S2aDK6HJT2JMtpwqTw-NAg.HM27vjR3C58nx_JyawwcaqYwqW5CjR5n-tIj4tjNgqcg.PNG/1000035674.png",
       "performanceType": "DIRECT",
-      "salesCnt": 34,
-      "salesAmount": 1073920,
-      "commissionAmount": 265000,
+      "salesCnt": 35,
+      "salesAmount": 1113610,
+      "commissionAmount": 281590,
       "isDeleted": false,
       "channels": [
         {
@@ -2637,8 +2637,8 @@
           "followerCount": 261,
           "contentCount": 158,
           "averageVisitCount": null,
-          "averageViewCount": 8290,
-          "averageLikeCount": 11,
+          "averageViewCount": 7983,
+          "averageLikeCount": 10,
           "averageCommentCount": 2,
           "status": "ENABLED"
         }
@@ -2753,10 +2753,10 @@
           "url": "https://clip.naver.com/@gmdwlsl8352",
           "title": "레드뷰잉",
           "serviceId": "fSNyegT_tz5be7PiefkK",
-          "followerCount": 3949,
-          "contentCount": 1401,
+          "followerCount": 3957,
+          "contentCount": 1403,
           "averageVisitCount": null,
-          "averageViewCount": 22750,
+          "averageViewCount": 22366,
           "averageLikeCount": 19,
           "averageCommentCount": 8,
           "status": "ENABLED"
@@ -2804,8 +2804,8 @@
           "followerCount": 584,
           "contentCount": 274,
           "averageVisitCount": null,
-          "averageViewCount": 427,
-          "averageLikeCount": 2,
+          "averageViewCount": 457,
+          "averageLikeCount": 3,
           "averageCommentCount": 1,
           "status": "ENABLED"
         }
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-10-02",
+      "access": 346,
+      "sales": 76630,
+      "directVisits": 18
+    },
     {
       "date": "2026-10-01",
       "access": 342,
@@ -3177,7 +3183,7 @@
       "date": "2026-08-18",
       "access": 1524,
       "sales": 577630,
-      "directVisits": 1428
+      "directVisits": null
     },
     {
       "date": "2026-08-17",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-07-05",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-07-04",
       "access": 0,
       "sales": 0,
       "directVisits": null
