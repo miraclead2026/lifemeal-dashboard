@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-04T07:09:43+09:00",
+  "updatedAt": "2026-10-04T07:11:14+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -7012,6 +7012,26 @@
     },
     {
       "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=zJuTfNSQnhw",
+      "title": "황성주 이롬 1일1생식 특별한 날을 위한 완벽한 선물 아이템",
+      "thumbnail": "https://i.ytimg.com/vi/zJuTfNSQnhw/maxresdefault.jpg",
+      "date": "2025-10-18",
+      "author": "ggulteminfo",
+      "authorName": "꿀템정보",
+      "connect": "none",
+      "evidence": [
+        "수수료"
+      ],
+      "source": "yt-search",
+      "metrics": {
+        "views": 7,
+        "likes": 1,
+        "comments": 1
+      },
+      "discoveredAt": "2026-10-04"
+    },
+    {
+      "platform": "youtube",
       "url": "https://www.youtube.com/watch?v=VFhPQpA_GoY",
       "title": "황성주 생식 풀코스! 이롬 인기 제품 한눈에 보기  솔직 후기",
       "thumbnail": "https://i.ytimg.com/vi/VFhPQpA_GoY/maxresdefault.jpg",
@@ -7032,8 +7052,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-04T07:09:43+09:00",
-    "mode": "blog",
+    "lastRun": "2026-10-04T07:11:14+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
