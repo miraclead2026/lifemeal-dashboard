@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-10-02",
+ "updatedAt": "2026-10-03",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 570776,
-   "roas": 251,
-   "conv": 21,
+   "spend": 511475,
+   "roas": 310,
+   "conv": 22,
    "options": 4,
-   "action": "상품군 통합 ROAS 251% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "action": "상품군 통합 ROAS 310% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
    "severity": "medium",
    "executor": "watch",
    "nccAdIds": [
@@ -27,11 +27,11 @@
   {
    "channel": "쇼핑검색",
    "item": "프로틴 골드 HIGH5",
-   "spend": 283004,
-   "roas": 167,
-   "conv": 5,
+   "spend": 321898,
+   "roas": 185,
+   "conv": 7,
    "options": 1,
-   "action": "상품군 통합 ROAS 167% 목표 미달 — 제외검색어·관측(당장 OFF 아님)",
+   "action": "상품군 통합 ROAS 185% 목표 미달 — 제외검색어·관측(당장 OFF 아님)",
    "severity": "medium",
    "executor": "watch",
    "nccAdIds": [
@@ -43,11 +43,11 @@
   {
    "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 62309,
-   "roas": 63,
-   "conv": 1,
+   "spend": 119066,
+   "roas": 98,
+   "conv": 2,
    "options": 3,
-   "action": "상품군 통합 ROAS 63% (매우 낮음) (옵션 3개 합산) — OFF/개선 검토",
+   "action": "상품군 통합 ROAS 98% (매우 낮음) (옵션 3개 합산) — OFF/개선 검토",
    "severity": "high",
    "executor": "approve",
    "nccAdIds": [
@@ -62,10 +62,10 @@
   {
    "channel": "애드부스트",
    "item": "애셋 그룹#2606191823",
-   "spend": 6405494,
-   "roas": 228,
-   "conv": 199,
-   "action": "ROAS 228% 미달 — 예산 축소·소재 교체",
+   "spend": 6721557,
+   "roas": 246,
+   "conv": 228,
+   "action": "ROAS 246% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -73,20 +73,20 @@
   {
    "channel": "애드부스트",
    "item": "260708 애드부스트 제품",
-   "spend": 684783,
-   "roas": 216,
+   "spend": 689260,
+   "roas": 220,
    "conv": 23,
-   "action": "ROAS 216% 미달 — 예산 축소·소재 교체",
+   "action": "ROAS 220% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
   }
  ],
  "powerlinkAuto": {
-  "date": "2026-10-01",
-  "changed": 55,
+  "date": "2026-10-02",
+  "changed": 27,
   "downs": 0,
-  "deleteReview": 6
+  "deleteReview": 5
  },
  "summary": {
   "shopping": 3,
@@ -94,12 +94,6 @@
   "approveNeeded": 1
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 4,
-   "advoost": 2,
-   "approveNeeded": 3
-  },
   {
    "date": null,
    "shopping": 4,
@@ -261,6 +255,12 @@
    "shopping": 4,
    "advoost": 3,
    "approveNeeded": 2
+  },
+  {
+   "date": null,
+   "shopping": 3,
+   "advoost": 2,
+   "approveNeeded": 1
   },
   {
    "date": null,
