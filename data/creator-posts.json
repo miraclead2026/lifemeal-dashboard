@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-05T07:10:13+09:00",
+  "updatedAt": "2026-10-05T07:10:29+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -347,6 +347,26 @@
       "affiliateId": "1001660053365760",
       "channelProductNo": "13447249282",
       "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
+      "discoveredAt": "2026-10-05"
+    },
+    {
+      "platform": "clip",
+      "url": "https://clip.naver.com/contents?serviceType=CLIP&seedMediaId=6ac1b5d5fd9cd108c34798cf&recType=CLIP_PC&recId=%7B%22targetProfileId%22:%22_xIvwD7UGSF3hPZ974Mc%22,%22open%22:true%7D",
+      "title": "#황성주 다른 생식보다 가성비 최고",
+      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://pup-post-phinf.pstatic.net/MjAyNjEwMDRfMjAy/MDAxNzkxMDc5ODkzMDU3.LD2snakPsCWRAHf6QrjEFUUDNdz1Ld8soR7wun1DOUMg.W-PCxEHgwjp6WT3fB_QfB-7pClbflG9D9J7EKRPKns0g.JPEG/POST_IMAGE_ENC_20261004_111037_721.jpg%22&type=w352&service=clip",
+      "date": "2026-10-04",
+      "author": "yth78110",
+      "authorName": "yth78110",
+      "channelUrl": "https://clip.naver.com/@yth78110",
+      "followers": 37,
+      "connect": "none",
+      "evidence": [],
+      "source": "clip-search",
+      "metrics": {
+        "views": 0,
+        "likes": null,
+        "comments": null
+      },
       "discoveredAt": "2026-10-05"
     },
     {
@@ -7095,8 +7115,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-05T07:10:13+09:00",
-    "mode": "ig",
+    "lastRun": "2026-10-05T07:10:29+09:00",
+    "mode": "clip",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
