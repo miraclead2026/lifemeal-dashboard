@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-05T07:05:39+09:00",
+  "updatedAt": "2026-10-05T07:07:06+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -6198,6 +6198,24 @@
       "discoveredAt": "2026-09-08"
     },
     {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=povJ_PAy3aE",
+      "title": "건강한 식사는 암 치료의 시작입니다 #황성주생식 #황성주박사 #사랑의병원",
+      "thumbnail": "https://i.ytimg.com/vi/povJ_PAy3aE/maxresdefault.jpg",
+      "date": "2026-04-10",
+      "author": "hemilyhealthstory",
+      "authorName": "문무달의 [해밀리헬스] 이야기",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 363,
+        "likes": 7,
+        "comments": 0
+      },
+      "discoveredAt": "2026-10-05"
+    },
+    {
       "platform": "instagram",
       "url": "https://www.instagram.com/p/DW7YucGE7dz/",
       "title": "Girl, zoom in. 👆\n\n건강해지고 싶은데\n뭘 먹어야 할지 모르겠는 사람 🙋🏻‍♀️\n\n야채 84종이 한 포에 다 들어있고\n100% 식물성",
@@ -7077,8 +7095,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-05T07:05:39+09:00",
-    "mode": "blog",
+    "lastRun": "2026-10-05T07:07:06+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
