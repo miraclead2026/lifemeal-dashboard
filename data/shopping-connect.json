@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-05 09:38",
+  "updatedAt": "2026-10-06 08:37",
   "meta": {
     "source": "brandconnect.naver.com 어필리에이트(쇼핑커넥트) · 전체 누적",
     "basis": "주문 발생 기준·부가세 포함. 구매확정 기준 정산액과 다를 수 있음(네이버 고지)",
@@ -10,13 +10,13 @@
     "compat": "daily[] 는 기존 탭 호환용 별칭입니다. 새 화면은 days/weeks/months 를 쓰세요. days 로 전환되면 daily 는 뺍니다."
   },
   "summary": {
-    "accessCnt": 57110,
-    "productOrderCnt": 195,
+    "accessCnt": 57475,
+    "productOrderCnt": 198,
     "salesConversionRate": 0.3,
-    "salesCnt": 299,
-    "salesAmount": 11339290,
-    "commissionAmount": 2147909,
-    "commissionRate": 18.9
+    "salesCnt": 304,
+    "salesAmount": 11516050,
+    "commissionAmount": 2198832,
+    "commissionRate": 19.1
   },
   "products": [
     {
@@ -38,6 +38,15 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_226/17873029909747u4iI_PNG/121435912860945417_912484346.png"
     },
     {
+      "connectProductId": "986303491535840",
+      "storeProductId": "13674568934",
+      "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
+      "salesCnt": 63,
+      "salesAmount": 1049500,
+      "commissionAmount": 404281,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
+    },
+    {
       "connectProductId": "981216820329032",
       "storeProductId": "12764948626",
       "name": "갓 구운 하루견과 아몬드 사무실간식 20g, 30개입, 1개",
@@ -47,13 +56,13 @@
       "imageUrl": "https://shop-phinf.pstatic.net/20260820_183/1787211060405gCvbO_PNG/2733617515550951_2053253457.png"
     },
     {
-      "connectProductId": "986303491535840",
-      "storeProductId": "13674568934",
-      "name": "황성주 박사의 닥터 샐러드 마시는 샐러드 동결건조 야채 14포, 1개",
-      "salesCnt": 62,
-      "salesAmount": 1031500,
-      "commissionAmount": 403921,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260902_186/1788319196595kJuMC_JPEG/3648619887514098_829214975.jpg"
+      "connectProductId": "981216820329026",
+      "storeProductId": "12763859709",
+      "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
+      "salesCnt": 23,
+      "salesAmount": 917280,
+      "commissionAmount": 271167,
+      "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
     },
     {
       "connectProductId": "981216820329029",
@@ -63,15 +72,6 @@
       "salesAmount": 899590,
       "commissionAmount": 178116,
       "imageUrl": "https://shop-phinf.pstatic.net/20260821_12/17873030836734Lqs3_PNG/121435927777226039_1074430072.png"
-    },
-    {
-      "connectProductId": "981216820329026",
-      "storeProductId": "12763859709",
-      "name": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
-      "salesCnt": 19,
-      "salesAmount": 758520,
-      "commissionAmount": 220604,
-      "imageUrl": "https://shop-phinf.pstatic.net/20260821_196/1787303140150o3zrd_PNG/41141099529843462_1831465583.png"
     },
     {
       "connectProductId": "981216820329034",
@@ -112,6 +112,25 @@
   ],
   "unmappedProducts": [],
   "days": [
+    {
+      "key": "2026-10-05",
+      "label": "10월 5일",
+      "periodStart": "2026-10-05",
+      "periodEnd": "2026-10-05",
+      "summary": {
+        "access": {
+          "value": 365,
+          "deltaValue": 57,
+          "deltaPct": 18.5
+        },
+        "sales": {
+          "value": 176760,
+          "deltaValue": 137070,
+          "deltaPct": 345.4
+        }
+      },
+      "directVisits": 227
+    },
     {
       "key": "2026-10-04",
       "label": "10월 4일",
@@ -965,7 +984,7 @@
           "deltaPct": 146.5
         }
       },
-      "directVisits": 2280
+      "directVisits": null
     },
     {
       "key": "2026-08-20",
@@ -1802,28 +1821,27 @@
         }
       },
       "directVisits": null
-    },
-    {
-      "key": "2026-07-07",
-      "label": "7월 7일",
-      "periodStart": "2026-07-07",
-      "periodEnd": "2026-07-07",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      },
-      "directVisits": null
     }
   ],
   "weeks": [
+    {
+      "key": "2026-W41",
+      "label": "10/5~10/5",
+      "periodStart": "2026-10-05",
+      "periodEnd": "2026-10-05",
+      "summary": {
+        "access": {
+          "value": 365,
+          "deltaValue": -2709,
+          "deltaPct": -88.1
+        },
+        "sales": {
+          "value": 176760,
+          "deltaValue": -327870,
+          "deltaPct": -65.0
+        }
+      }
+    },
     {
       "key": "2026-W40",
       "label": "9/28~10/4",
@@ -2273,24 +2291,6 @@
           "deltaPct": null
         }
       }
-    },
-    {
-      "key": "2026-W15",
-      "label": "4/6~4/12",
-      "periodStart": "2026-04-06",
-      "periodEnd": "2026-04-12",
-      "summary": {
-        "access": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        },
-        "sales": {
-          "value": 0,
-          "deltaValue": 0,
-          "deltaPct": null
-        }
-      }
     }
   ],
   "months": [
@@ -2298,17 +2298,17 @@
       "key": "2026-10",
       "label": "10월",
       "periodStart": "2026-10-01",
-      "periodEnd": "2026-10-04",
+      "periodEnd": "2026-10-05",
       "summary": {
         "access": {
-          "value": 1345,
-          "deltaValue": -23679,
-          "deltaPct": -94.6
+          "value": 1710,
+          "deltaValue": -23314,
+          "deltaPct": -93.2
         },
         "sales": {
-          "value": 415300,
-          "deltaValue": -2513770,
-          "deltaPct": -85.8
+          "value": 592060,
+          "deltaValue": -2337010,
+          "deltaPct": -79.8
         }
       }
     },
@@ -2553,9 +2553,9 @@
       "name": "obo1221님의 블로그",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjAyMDVfMjky/MDAxNzcwMjU3Mzg5MjMz.m-1PZ-2vD4JgSZoY9xJKl5S2aDK6HJT2JMtpwqTw-NAg.HM27vjR3C58nx_JyawwcaqYwqW5CjR5n-tIj4tjNgqcg.PNG/1000035674.png",
       "performanceType": "DIRECT",
-      "salesCnt": 36,
-      "salesAmount": 1153300,
-      "commissionAmount": 298180,
+      "salesCnt": 37,
+      "salesAmount": 1192990,
+      "commissionAmount": 314770,
       "isDeleted": false,
       "channels": [
         {
@@ -2588,9 +2588,9 @@
       "name": "템톡톡",
       "profileImageUrl": "https://brandconnect-phinf.pstatic.net/MjAyNjA1MzBfMTg5/MDAxNzgwMDcyOTI1NzY4.f_XQqPBgeVt_cwilGqtAbb4yWv74EnFUbmB_szim4K8g.oK6d2xI9wOFTYqjk2HrqmzVGT6DHi0O2gVWSeSW99uUg.PNG/ChatGPT_Image_2026%EB%85%84_2%EC%9B%94_14%EC%9D%BC_%EC%98%A4%ED%9B%84_02_28_33.png",
       "performanceType": "DIRECT",
-      "salesCnt": 24,
-      "salesAmount": 1036660,
-      "commissionAmount": 310463,
+      "salesCnt": 25,
+      "salesAmount": 1076350,
+      "commissionAmount": 327053,
       "isDeleted": false,
       "channels": [
         {
@@ -2637,8 +2637,8 @@
           "followerCount": 262,
           "contentCount": 160,
           "averageVisitCount": null,
-          "averageViewCount": 7626,
-          "averageLikeCount": 10,
+          "averageViewCount": 7920,
+          "averageLikeCount": 11,
           "averageCommentCount": 2,
           "status": "ENABLED"
         }
@@ -2753,12 +2753,12 @@
           "url": "https://clip.naver.com/@gmdwlsl8352",
           "title": "레드뷰잉",
           "serviceId": "fSNyegT_tz5be7PiefkK",
-          "followerCount": 3957,
-          "contentCount": 1403,
+          "followerCount": 4003,
+          "contentCount": 1421,
           "averageVisitCount": null,
-          "averageViewCount": 23945,
-          "averageLikeCount": 21,
-          "averageCommentCount": 8,
+          "averageViewCount": 71337,
+          "averageLikeCount": 62,
+          "averageCommentCount": 11,
           "status": "ENABLED"
         }
       ],
@@ -2801,10 +2801,10 @@
           "url": "https://clip.naver.com/@himisong",
           "title": "하이미송",
           "serviceId": "k_4E-yiFagfvv4joxZXT",
-          "followerCount": 611,
-          "contentCount": 279,
+          "followerCount": 621,
+          "contentCount": 281,
           "averageVisitCount": null,
-          "averageViewCount": 511,
+          "averageViewCount": 546,
           "averageLikeCount": 3,
           "averageCommentCount": 1,
           "status": "ENABLED"
@@ -2872,8 +2872,8 @@
           "url": "https://blog.naver.com/dmsogood",
           "title": "보고서 읽어주는 남자",
           "serviceId": "dmsogood",
-          "followerCount": 4495,
-          "contentCount": 2292,
+          "followerCount": 4500,
+          "contentCount": 2301,
           "averageVisitCount": 93,
           "averageViewCount": null,
           "averageLikeCount": 16,
@@ -2885,7 +2885,7 @@
           "url": "https://clip.naver.com/@dwyg0425",
           "title": "땡깡쟁이부자아빠",
           "serviceId": "0UjpfU-VSBmMDY5vhGXx",
-          "followerCount": 362,
+          "followerCount": 373,
           "contentCount": 7,
           "averageVisitCount": null,
           "averageViewCount": 4,
@@ -2909,6 +2909,12 @@
   ],
   "indirect": null,
   "daily": [
+    {
+      "date": "2026-10-05",
+      "access": 365,
+      "sales": 176760,
+      "directVisits": 227
+    },
     {
       "date": "2026-10-04",
       "access": 308,
@@ -3177,7 +3183,7 @@
       "date": "2026-08-21",
       "access": 2568,
       "sales": 786920,
-      "directVisits": 2280
+      "directVisits": null
     },
     {
       "date": "2026-08-20",
@@ -3439,12 +3445,6 @@
     },
     {
       "date": "2026-07-08",
-      "access": 0,
-      "sales": 0,
-      "directVisits": null
-    },
-    {
-      "date": "2026-07-07",
       "access": 0,
       "sales": 0,
       "directVisits": null
