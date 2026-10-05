@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-06T07:05:51+09:00",
+  "updatedAt": "2026-10-06T07:07:14+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -5625,6 +5625,26 @@
       "discoveredAt": "2026-09-08"
     },
     {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=eEK2QL7hFYQ",
+      "title": "이롬생식 추천 품질보장 구매자의 실제 후기로 확인한 상품 10가지",
+      "thumbnail": "https://i.ytimg.com/vi/eEK2QL7hFYQ/maxresdefault.jpg",
+      "date": "2026-07-30",
+      "author": "shophow",
+      "authorName": "쇼핑하우",
+      "connect": "none",
+      "evidence": [
+        "수수료"
+      ],
+      "source": "yt-search",
+      "metrics": {
+        "views": 4,
+        "likes": 0,
+        "comments": 1
+      },
+      "discoveredAt": "2026-10-06"
+    },
+    {
       "platform": "clip",
       "url": "https://m.naver.com/shorts?serviceType=NTV&mediaType=VOD&seedMediaId=BD2999B9A4C97D8D9BFDDF4B8065C07AC275&recType=CLIP_PC&recId=%7B%22targetProfileId%22%3A%22cTfSY3tJ3SIRdcEgmN86%22%2C%22open%22%3Atrue%7D",
       "title": "엔비디아, 머스크의 ESS 대장주  #전력주 #대장주 #에너지 #인프라 #배터리",
@@ -7246,8 +7266,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-06T07:05:51+09:00",
-    "mode": "blog",
+    "lastRun": "2026-10-06T07:07:14+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
