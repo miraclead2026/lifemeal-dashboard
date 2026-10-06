@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-07T07:05:53+09:00",
+  "updatedAt": "2026-10-07T07:07:18+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -6456,6 +6456,26 @@
     },
     {
       "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=L9GRnrPVD7s",
+      "title": "황성주이롬생식 추천 스마트 구매의 시작 가격, 품질, 판매량 TOP 10 상품",
+      "thumbnail": "https://i.ytimg.com/vi/L9GRnrPVD7s/maxresdefault.jpg",
+      "date": "2026-06-08",
+      "author": "%ea%b3%a0%ea%b3%a0%ed%94%bd",
+      "authorName": "고고픽",
+      "connect": "none",
+      "evidence": [
+        "수수료"
+      ],
+      "source": "yt-search",
+      "metrics": {
+        "views": 138,
+        "likes": 0,
+        "comments": 1
+      },
+      "discoveredAt": "2026-10-07"
+    },
+    {
+      "platform": "youtube",
       "url": "https://www.youtube.com/watch?v=mhdO-E97uv4",
       "title": "라이프밀 추천 후회 없는 쇼핑 가격 대비 성능이 우수한 상품 10가지",
       "thumbnail": "https://i.ytimg.com/vi/mhdO-E97uv4/maxresdefault.jpg",
@@ -7714,8 +7734,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-07T07:05:53+09:00",
-    "mode": "blog",
+    "lastRun": "2026-10-07T07:07:18+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
