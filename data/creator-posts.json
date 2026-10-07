@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-07T07:11:04+09:00",
+  "updatedAt": "2026-10-08T07:05:17+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -31,7 +31,7 @@
       "primaryUrl": "https://blog.naver.com/temtalktalk",
       "posts": [],
       "coverage": {
-        "blog": "ok(3건중 0)",
+        "blog": "ok(4건중 0)",
         "youtube": "ok(5중 0)"
       }
     },
@@ -67,7 +67,7 @@
       "posts": [],
       "coverage": {
         "youtube": "ok(5중 0)",
-        "instagram": "ok(8중 0)"
+        "instagram": "ok(1중 0)"
       }
     },
     {
@@ -99,6 +99,17 @@
       "coverage": {
         "blog": "ok(50건중 1)",
         "youtube": "ok(5중 0)"
+      }
+    },
+    {
+      "creatorSpaceId": 923116406508160,
+      "name": "rcongdcong님의 블로그",
+      "primaryChannelType": "NBLOG",
+      "primaryUrl": "https://blog.naver.com/rcongdcong",
+      "posts": [],
+      "coverage": {
+        "blog": "ok(0건중 0)",
+        "youtube": "ok(1중 0)"
       }
     },
     {
@@ -273,53 +284,6 @@
       "coverage": {
         "blog": "ok(50건중 1)",
         "youtube": "ok(5중 0)"
-      }
-    },
-    {
-      "creatorSpaceId": 984748630834368,
-      "name": "Vanguard Edge",
-      "primaryChannelType": "NBLOG",
-      "primaryUrl": "https://blog.naver.com/dmsogood",
-      "posts": [
-        {
-          "platform": "blog",
-          "url": "https://blog.naver.com/dmsogood/224381870932",
-          "title": "사립초 다니고 해외여행 가는 기초생활수급자?",
-          "thumbnail": "https://ssl.pstatic.net/static/blog/icon/og_270x270.png",
-          "date": "2026-08-18",
-          "author": "dmsogood",
-          "authorName": "보읽남(보고서 읽어주는 남자)",
-          "connect": "strong",
-          "evidence": [
-            "strong",
-            "widget"
-          ],
-          "source": "blog-search",
-          "channelProductNo": "13447249282",
-          "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
-          "linkCreatorSpaceId": "984748630834368",
-          "affiliateId": "985717870546816",
-          "metrics": {
-            "views": null
-          },
-          "discoveredAt": "2026-09-05"
-        },
-        {
-          "platform": "clip",
-          "url": "https://clip.naver.com/contents?serviceType=CLIP&seedMediaId=6a9d8e122a084e2314050bdb&seedMediaType=SHORT_FORM",
-          "title": "",
-          "thumbnail": null,
-          "date": "",
-          "match": "product",
-          "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
-          "source": "clip-playwright",
-          "discoveredAt": "2026-09-10"
-        }
-      ],
-      "coverage": {
-        "blog": "ok(50건중 0)",
-        "youtube": "ok(5중 0)",
-        "clip": "ok(7중 우리상품 0)"
       }
     }
   ],
