@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-09T07:06:33+09:00",
+  "updatedAt": "2026-10-09T07:07:58+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -6567,6 +6567,24 @@
       "discoveredAt": "2026-09-05"
     },
     {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=4D5b0fcg0YE",
+      "title": "소개로 시작해, 글로벌 리더로 꿈꾸기 까지! | 이은숙 리더",
+      "thumbnail": "https://i.ytimg.com/vi/4D5b0fcg0YE/maxresdefault.jpg",
+      "date": "2026-07-13",
+      "author": "hemilyhealth_great",
+      "authorName": "Hemily Health_GREAT GROUP",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 59,
+        "likes": 4,
+        "comments": 0
+      },
+      "discoveredAt": "2026-10-09"
+    },
+    {
       "platform": "clip",
       "url": "https://clip.naver.com/contents?serviceType=CLIP&seedMediaId=6a5269b38a1a6830e2f54f54&recType=CLIP_PC&recId=%7B%22targetProfileId%22:%22DU4IboqFC34b8nRiciJr%22,%22open%22:true%7D",
       "title": "#오늘클립챌린지 #라이프밀단백질쉐이크 #데이업프로틴쉐이크 #황성주박사단백질쉐이크",
@@ -6605,6 +6623,26 @@
         "comments": null
       },
       "discoveredAt": "2026-09-08"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=llij497yQJQ",
+      "title": "[광고] 부모님 아침 챙기기 좋은 선식 , 이롬 황성주 박사 라이프밀로 챙기세요 ㅣ 이 포스팅은 쿠팡 파트너스 활동의 일환으로 이에 따른 일정액",
+      "thumbnail": "https://i.ytimg.com/vi/llij497yQJQ/maxresdefault.jpg",
+      "date": "2026-07-04",
+      "author": "%ec%8b%9c%eb%8b%88%ec%96%b4%eb%a7%9e%ec%b6%a4%ec%a0%95%eb%b3%b4",
+      "authorName": "시니어 맞춤 정보",
+      "connect": "none",
+      "evidence": [
+        "수수료"
+      ],
+      "source": "yt-search",
+      "metrics": {
+        "views": 29,
+        "likes": 2,
+        "comments": 1
+      },
+      "discoveredAt": "2026-10-09"
     },
     {
       "platform": "youtube",
@@ -8152,8 +8190,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-09T07:06:33+09:00",
-    "mode": "blog",
+    "lastRun": "2026-10-09T07:07:58+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
