@@ -1,17 +1,17 @@
 {
- "updatedAt": "2026-10-09",
+ "updatedAt": "2026-10-10",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 513678,
-   "roas": 185,
-   "conv": 11,
+   "spend": 502621,
+   "roas": 145,
+   "conv": 10,
    "options": 4,
-   "action": "상품군 통합 ROAS 185% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
-   "severity": "medium",
-   "executor": "watch",
+   "action": "상품군 통합 ROAS 145% (매우 낮음) (옵션 4개 합산) — OFF/개선 검토",
+   "severity": "high",
+   "executor": "approve",
    "nccAdIds": [
     "nad-a001-02-000000541753996",
     "nad-a001-02-000000541753997",
@@ -23,11 +23,11 @@
   {
    "channel": "쇼핑검색",
    "item": "프로틴 골드 HIGH5",
-   "spend": 253324,
-   "roas": 32,
-   "conv": 2,
+   "spend": 176047,
+   "roas": 15,
+   "conv": 1,
    "options": 1,
-   "action": "상품군 통합 ROAS 32% — 이미 집행중단(소재 OFF/삭제됨)",
+   "action": "상품군 통합 ROAS 15% — 이미 집행중단(소재 OFF/삭제됨)",
    "severity": "medium",
    "executor": "done",
    "nccAdIds": [],
@@ -36,7 +36,7 @@
   {
    "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 49479,
+   "spend": 21770,
    "roas": 0,
    "conv": 0,
    "options": 3,
@@ -51,10 +51,10 @@
   {
    "channel": "애드부스트",
    "item": "애셋 그룹#2606191823",
-   "spend": 3587242,
-   "roas": 207,
-   "conv": 92,
-   "action": "ROAS 207% 미달 — 예산 축소·소재 교체",
+   "spend": 2435219,
+   "roas": 205,
+   "conv": 63,
+   "action": "ROAS 205% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -73,21 +73,10 @@
   {
    "channel": "애드부스트",
    "item": "260708 애드부스트 제품",
-   "spend": 370424,
-   "roas": 137,
-   "conv": 10,
-   "action": "ROAS 137% 미달 — 예산 축소·소재 교체",
-   "severity": "medium",
-   "executor": "human",
-   "nccAdIds": []
-  },
-  {
-   "channel": "애드부스트",
-   "item": "광고 그룹#2608151604",
-   "spend": 81059,
-   "roas": 258,
-   "conv": 4,
-   "action": "ROAS 258% 미달 — 예산 축소·소재 교체",
+   "spend": 268849,
+   "roas": 152,
+   "conv": 7,
+   "action": "ROAS 152% 미달 — 예산 축소·소재 교체",
    "severity": "medium",
    "executor": "human",
    "nccAdIds": []
@@ -101,16 +90,10 @@
  },
  "summary": {
   "shopping": 3,
-  "advoost": 4,
-  "approveNeeded": 1
+  "advoost": 3,
+  "approveNeeded": 2
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 4,
-   "advoost": 3,
-   "approveNeeded": 2
-  },
   {
    "date": null,
    "shopping": 5,
@@ -284,6 +267,12 @@
    "shopping": 3,
    "advoost": 4,
    "approveNeeded": 1
+  },
+  {
+   "date": null,
+   "shopping": 3,
+   "advoost": 3,
+   "approveNeeded": 2
   }
  ]
 }
