@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-10-09T10:32:24+09:00",
- "basedOn": "2026-10-07",
+ "updatedAt": "2026-10-10T10:32:29+09:00",
+ "basedOn": "2026-10-08",
  "source": "SHOPPINGKEYWORD_DETAIL + CONVERSION_DETAIL (자동)",
  "window": {
   "d7": {
-   "since": "2026-10-01",
-   "until": "2026-10-07"
+   "since": "2026-10-02",
+   "until": "2026-10-08"
   },
   "d28": {
-   "since": "2026-09-10",
-   "until": "2026-10-07"
+   "since": "2026-09-11",
+   "until": "2026-10-08"
   }
  },
  "gate": {
@@ -19,24 +19,24 @@
  },
  "counts": {
   "valid": 19,
-  "excludeCandidates": 104,
+  "excludeCandidates": 106,
   "brandDiagnosis": 13,
-  "queuePending": 104
+  "queuePending": 106
  },
  "valid": [
   {
    "term": "황성주생식",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 6310,
-   "clk28": 279,
-   "cost28": 1287949,
-   "purchaseConv28": 39,
-   "convRevenue28": 3188120,
+   "imp28": 6360,
+   "clk28": 280,
+   "cost28": 1291837,
+   "purchaseConv28": 40,
+   "convRevenue28": 3222120,
    "cartConv28": 24,
-   "clk7": 68,
-   "cost7": 338113,
-   "roas28": 247.5
+   "clk7": 60,
+   "cost7": 308684,
+   "roas28": 249.4
   },
   {
    "term": "황성주생식라이프밀",
@@ -48,8 +48,8 @@
    "purchaseConv28": 9,
    "convRevenue28": 715100,
    "cartConv28": 9,
-   "clk7": 17,
-   "cost7": 95030,
+   "clk7": 15,
+   "cost7": 83951,
    "roas28": 225.4
   },
   {
@@ -84,15 +84,15 @@
    "term": "생식가루",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 217,
-   "clk28": 8,
-   "cost28": 41473,
+   "imp28": 245,
+   "clk28": 13,
+   "cost28": 59406,
    "purchaseConv28": 2,
    "convRevenue28": 207630,
    "cartConv28": 2,
-   "clk7": 3,
-   "cost7": 14767,
-   "roas28": 500.6
+   "clk7": 7,
+   "cost7": 28950,
+   "roas28": 349.5
   },
   {
    "term": "견과류",
@@ -101,12 +101,12 @@
    "imp28": 15804,
    "clk28": 34,
    "cost28": 72613,
-   "purchaseConv28": 5,
-   "convRevenue28": 186140,
+   "purchaseConv28": 4,
+   "convRevenue28": 156340,
    "cartConv28": 5,
    "clk7": 0,
    "cost7": 0,
-   "roas28": 256.3
+   "roas28": 215.3
   },
   {
    "term": "황성주단백질",
@@ -146,22 +146,22 @@
    "purchaseConv28": 3,
    "convRevenue28": 121500,
    "cartConv28": 2,
-   "clk7": 21,
-   "cost7": 67900,
+   "clk7": 17,
+   "cost7": 53651,
    "roas28": 71.9
   },
   {
    "term": "에너지바",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 7639,
+   "imp28": 7668,
    "clk28": 25,
    "cost28": 52489,
    "purchaseConv28": 2,
    "convRevenue28": 117000,
    "cartConv28": 0,
-   "clk7": 9,
-   "cost7": 16528,
+   "clk7": 6,
+   "cost7": 10696,
    "roas28": 222.9
   },
   {
@@ -216,8 +216,8 @@
    "purchaseConv28": 1,
    "convRevenue28": 66510,
    "cartConv28": 1,
-   "clk7": 1,
-   "cost7": 3398,
+   "clk7": 0,
+   "cost7": 0,
    "roas28": 427.6
   },
   {
@@ -286,8 +286,8 @@
    "purchaseConv28": 1,
    "convRevenue28": 13500,
    "cartConv28": 0,
-   "clk7": 6,
-   "cost7": 7055,
+   "clk7": 5,
+   "cost7": 5711,
    "roas28": 84.0
   }
  ],
@@ -312,8 +312,8 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 15209,
-   "clk7": 14,
+   "imp28": 15353,
+   "clk7": 8,
    "excludeEligible": false
   },
   {
@@ -325,7 +325,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 9940,
-   "clk7": 10,
+   "clk7": 9,
    "excludeEligible": false
   },
   {
@@ -361,7 +361,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 1633,
-   "clk7": 6,
+   "clk7": 4,
    "excludeEligible": false
   },
   {
@@ -397,7 +397,19 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 1291,
-   "clk7": 1,
+   "clk7": 0,
+   "excludeEligible": false
+  },
+  {
+   "term": "동결건조생식",
+   "campaignType": "쇼핑검색",
+   "cumClicks": 4,
+   "cost": 18469,
+   "status": "관측중",
+   "productRelevance": "관련의심",
+   "appliedTo": null,
+   "imp28": 59,
+   "clk7": 2,
    "excludeEligible": false
   },
   {
@@ -408,8 +420,20 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 13110,
+   "imp28": 13172,
    "clk7": 2,
+   "excludeEligible": false
+  },
+  {
+   "term": "동결건조생식추천",
+   "campaignType": "쇼핑검색",
+   "cumClicks": 5,
+   "cost": 16850,
+   "status": "관측중",
+   "productRelevance": "관련의심",
+   "appliedTo": null,
+   "imp28": 33,
+   "clk7": 4,
    "excludeEligible": false
   },
   {
@@ -420,7 +444,7 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 4112,
+   "imp28": 4130,
    "clk7": 1,
    "excludeEligible": false
   },
@@ -461,18 +485,6 @@
    "excludeEligible": false
   },
   {
-   "term": "동결건조생식",
-   "campaignType": "쇼핑검색",
-   "cumClicks": 2,
-   "cost": 10342,
-   "status": "관측중",
-   "productRelevance": "관련의심",
-   "appliedTo": null,
-   "imp28": 32,
-   "clk7": 0,
-   "excludeEligible": false
-  },
-  {
    "term": "프로틴쉐이크",
    "campaignType": "쇼핑검색",
    "cumClicks": 3,
@@ -505,7 +517,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 44,
-   "clk7": 4,
+   "clk7": 2,
    "excludeEligible": false
   },
   {
@@ -565,7 +577,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 30,
-   "clk7": 3,
+   "clk7": 2,
    "excludeEligible": false
   },
   {
@@ -577,7 +589,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 105,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -749,18 +761,6 @@
    "excludeEligible": false
   },
   {
-   "term": "동결건조생식추천",
-   "campaignType": "쇼핑검색",
-   "cumClicks": 1,
-   "cost": 5081,
-   "status": "관측중",
-   "productRelevance": "관련의심",
-   "appliedTo": null,
-   "imp28": 20,
-   "clk7": 0,
-   "excludeEligible": false
-  },
-  {
    "term": "견과",
    "campaignType": "쇼핑검색",
    "cumClicks": 2,
@@ -792,7 +792,7 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 217,
+   "imp28": 218,
    "clk7": 0,
    "excludeEligible": false
   },
@@ -817,6 +817,18 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 95,
+   "clk7": 1,
+   "excludeEligible": false
+  },
+  {
+   "term": "동결건조생식분말추천",
+   "campaignType": "쇼핑검색",
+   "cumClicks": 1,
+   "cost": 4174,
+   "status": "관측중",
+   "productRelevance": "관련의심",
+   "appliedTo": null,
+   "imp28": 8,
    "clk7": 1,
    "excludeEligible": false
   },
@@ -853,7 +865,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 60,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1020,7 +1032,7 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 664,
+   "imp28": 668,
    "clk7": 0,
    "excludeEligible": false
   },
@@ -1145,6 +1157,18 @@
    "excludeEligible": false
   },
   {
+   "term": "동결건조생식분말",
+   "campaignType": "쇼핑검색",
+   "cumClicks": 1,
+   "cost": 3116,
+   "status": "관측중",
+   "productRelevance": "관련의심",
+   "appliedTo": null,
+   "imp28": 3,
+   "clk7": 1,
+   "excludeEligible": false
+  },
+  {
    "term": "WHISHER프로틴바",
    "campaignType": "쇼핑검색",
    "cumClicks": 1,
@@ -1165,7 +1189,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 7,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1189,7 +1213,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 1,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1201,7 +1225,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 3,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1261,7 +1285,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 2,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1284,8 +1308,8 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 15,
-   "clk7": 1,
+   "imp28": 17,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1333,7 +1357,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 10,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1441,7 +1465,7 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 290,
-   "clk7": 1,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -1476,7 +1500,7 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 76,
+   "imp28": 75,
    "clk7": 0,
    "excludeEligible": false
   },
@@ -1552,8 +1576,8 @@
    "purchaseConv28": 0,
    "convRevenue28": 0,
    "cartConv28": 0,
-   "clk7": 1,
-   "cost7": 4242,
+   "clk7": 0,
+   "cost7": 0,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
