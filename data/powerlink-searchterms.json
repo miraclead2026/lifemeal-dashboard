@@ -1,70 +1,52 @@
 {
- "updatedAt": "2026-10-10",
- "basedOn": "2026-10-08",
+ "updatedAt": "2026-10-11",
+ "basedOn": "2026-10-09",
  "note": "파워링크 확장검색 실제 쿼리(EXPKEYWORD) 7일. 전환리포트 없음→노출·클릭·비용만. 신규후보=미등록&클릭2+, 제외후보=미등록&고비용&관련의심(관련판정 필요).",
  "counts": {
-  "total": 348,
-  "newCandidates": 39,
-  "excludeCandidates": 87
+  "total": 322,
+  "newCandidates": 35,
+  "excludeCandidates": 78
  },
  "newCandidates": [
   {
    "term": "단백질음식",
-   "imp": 1301,
-   "clk": 11,
-   "cost": 16804,
+   "imp": 1064,
+   "clk": 10,
+   "cost": 15143,
    "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "생식효능",
-   "imp": 64,
-   "clk": 6,
-   "cost": 5711,
-   "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "이롬생식라이프밀",
-   "imp": 19,
-   "clk": 5,
-   "cost": 964,
+   "imp": 24,
+   "clk": 6,
+   "cost": 1207,
    "group": "영양식",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "해밀리라이프밀",
-   "imp": 9,
+   "term": "라이프밀데이업프로틴",
+   "imp": 12,
    "clk": 5,
-   "cost": 458,
-   "group": "데일리생식",
+   "cost": 2809,
+   "group": "데이업",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "하루생식",
-   "imp": 30,
+   "term": "생식효능",
+   "imp": 71,
    "clk": 5,
-   "cost": 3820,
-   "group": "영양식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "단백질음식종류",
-   "imp": 108,
-   "clk": 4,
-   "cost": 6225,
-   "group": "프로틴골드",
+   "cost": 4890,
+   "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "그레놀라",
-   "imp": 482,
+   "imp": 447,
    "clk": 4,
    "cost": 4946,
    "group": "그래놀라",
@@ -73,10 +55,19 @@
   },
   {
    "term": "단백질종류",
-   "imp": 173,
+   "imp": 187,
    "clk": 4,
    "cost": 7581,
-   "group": "프로틴골드",
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "하루생식",
+   "imp": 28,
+   "clk": 4,
+   "cost": 2939,
+   "group": "영양식",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -90,20 +81,47 @@
    "relevance": "관련의심"
   },
   {
-   "term": "생식황성주",
-   "imp": 12,
+   "term": "동결건조생식효능",
+   "imp": 7,
    "clk": 3,
-   "cost": 2059,
-   "group": "발효건강식",
+   "cost": 2597,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "식물성단백질종류",
+   "imp": 64,
+   "clk": 3,
+   "cost": 4876,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "단백질식단",
+   "imp": 44,
+   "clk": 3,
+   "cost": 5553,
+   "group": "프로틴골드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주선식",
+   "imp": 67,
+   "clk": 3,
+   "cost": 1619,
+   "group": "영양식",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "라이프밀데이업프로틴",
-   "imp": 8,
+   "term": "생식황성주",
+   "imp": 10,
    "clk": 3,
-   "cost": 2033,
-   "group": "데이업",
+   "cost": 2059,
+   "group": "1일1생식",
    "registered": false,
    "relevance": "관련"
   },
@@ -117,29 +135,20 @@
    "relevance": "관련의심"
   },
   {
-   "term": "황성주선식",
-   "imp": 67,
+   "term": "라이프밀쉐이크",
+   "imp": 3,
    "clk": 3,
-   "cost": 1619,
-   "group": "1일1생식",
+   "cost": 473,
+   "group": "데이업",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "아침식사대용식",
-   "imp": 29,
+   "term": "해밀리라이프밀",
+   "imp": 6,
    "clk": 3,
-   "cost": 8218,
+   "cost": 260,
    "group": "데일리생식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "라이프밀쉐이크",
-   "imp": 4,
-   "clk": 3,
-   "cost": 473,
-   "group": "데이업",
    "registered": false,
    "relevance": "관련"
   },
@@ -153,17 +162,35 @@
    "relevance": "관련"
   },
   {
-   "term": "동결건조생식효능",
-   "imp": 6,
+   "term": "라이프밀데이업프로틴쉐이크",
+   "imp": 13,
    "clk": 2,
-   "cost": 1795,
+   "cost": 909,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "황성주박사의1일1생식라이프밀",
+   "imp": 28,
+   "clk": 2,
+   "cost": 524,
    "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "동결건조샐러드",
+   "imp": 10,
+   "clk": 2,
+   "cost": 1986,
+   "group": "닥터샐러드",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "단백질루틴",
-   "imp": 16,
+   "imp": 30,
    "clk": 2,
    "cost": 2751,
    "group": "프로틴골드",
@@ -171,26 +198,17 @@
    "relevance": "관련의심"
   },
   {
-   "term": "황성주생식뉴밀",
-   "imp": 7,
+   "term": "동결건조케일가루",
+   "imp": 6,
    "clk": 2,
-   "cost": 790,
-   "group": "1일1생식",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "달지않은단백질음료",
-   "imp": 10,
-   "clk": 2,
-   "cost": 2776,
-   "group": "데이업",
+   "cost": 2407,
+   "group": "닥터샐러드",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "쉐이크",
-   "imp": 191,
+   "imp": 196,
    "clk": 2,
    "cost": 3857,
    "group": "데이업",
@@ -198,22 +216,58 @@
    "relevance": "관련의심"
   },
   {
-   "term": "시니어단백질보충제추천",
-   "imp": 15,
+   "term": "근력과단백질",
+   "imp": 29,
    "clk": 2,
-   "cost": 2844,
+   "cost": 1828,
    "group": "프로틴골드",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "황성주단백질",
-   "imp": 18,
+   "imp": 23,
    "clk": 2,
    "cost": 572,
    "group": "프로틴골드",
    "registered": false,
    "relevance": "관련"
+  },
+  {
+   "term": "식물성단백질음식",
+   "imp": 59,
+   "clk": 2,
+   "cost": 2599,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "운동후단백질쉐이크",
+   "imp": 26,
+   "clk": 2,
+   "cost": 3456,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "단백질음식종류",
+   "imp": 78,
+   "clk": 2,
+   "cost": 3120,
+   "group": "프로틴골드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "시니어단백질보충제추천",
+   "imp": 14,
+   "clk": 2,
+   "cost": 2844,
+   "group": "프로틴골드",
+   "registered": false,
+   "relevance": "관련의심"
   },
   {
    "term": "라이프밀데이업프로틴쉐이커",
@@ -226,28 +280,10 @@
   },
   {
    "term": "젤리",
-   "imp": 706,
+   "imp": 672,
    "clk": 2,
    "cost": 4300,
    "group": "알로에젤리",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "동결건조샐러드",
-   "imp": 8,
-   "clk": 2,
-   "cost": 1986,
-   "group": "닥터샐러드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "식물성단백질종류",
-   "imp": 62,
-   "clk": 2,
-   "cost": 3511,
-   "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -270,51 +306,6 @@
    "relevance": "관련"
   },
   {
-   "term": "성분좋은단백질쉐이크",
-   "imp": 39,
-   "clk": 2,
-   "cost": 3216,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "운동후단백질쉐이크",
-   "imp": 27,
-   "clk": 2,
-   "cost": 3456,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "시니어단백질추천",
-   "imp": 20,
-   "clk": 2,
-   "cost": 3195,
-   "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "무가당단백질쉐이크",
-   "imp": 33,
-   "clk": 2,
-   "cost": 2472,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "근력과단백질",
-   "imp": 24,
-   "clk": 2,
-   "cost": 1828,
-   "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "황성주생식주문번호",
    "imp": 2,
    "clk": 2,
@@ -324,24 +315,6 @@
    "relevance": "관련"
   },
   {
-   "term": "DR샐러드",
-   "imp": 8,
-   "clk": 2,
-   "cost": 1437,
-   "group": "닥터샐러드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "씨리얼",
-   "imp": 521,
-   "clk": 2,
-   "cost": 3491,
-   "group": "그래놀라",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "황성주생식당뇨식",
    "imp": 1,
    "clk": 2,
@@ -349,60 +322,33 @@
    "group": "데일리생식",
    "registered": false,
    "relevance": "관련"
-  },
-  {
-   "term": "식사대신먹을수있는영양식",
-   "imp": 4,
-   "clk": 2,
-   "cost": 1781,
-   "group": "영양식",
-   "registered": false,
-   "relevance": "관련의심"
   }
  ],
  "excludeCandidates": [
   {
    "term": "단백질음식",
-   "imp": 1301,
-   "clk": 11,
-   "cost": 16804,
+   "imp": 1064,
+   "clk": 10,
+   "cost": 15143,
    "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "아침식사대용식",
-   "imp": 29,
-   "clk": 3,
-   "cost": 8218,
-   "group": "데일리생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "단백질종류",
-   "imp": 173,
+   "imp": 187,
    "clk": 4,
    "cost": 7581,
-   "group": "프로틴골드",
+   "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "단백질음식종류",
-   "imp": 108,
-   "clk": 4,
-   "cost": 6225,
+   "term": "단백질식단",
+   "imp": 44,
+   "clk": 3,
+   "cost": 5553,
    "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "생식효능",
-   "imp": 64,
-   "clk": 6,
-   "cost": 5711,
-   "group": "1일1생식",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -417,7 +363,7 @@
   },
   {
    "term": "그레놀라",
-   "imp": 482,
+   "imp": 447,
    "clk": 4,
    "cost": 4946,
    "group": "그래놀라",
@@ -425,8 +371,26 @@
    "relevance": "관련의심"
   },
   {
+   "term": "생식효능",
+   "imp": 71,
+   "clk": 5,
+   "cost": 4890,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "식물성단백질종류",
+   "imp": 64,
+   "clk": 3,
+   "cost": 4876,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "젤리",
-   "imp": 706,
+   "imp": 672,
    "clk": 2,
    "cost": 4300,
    "group": "알로에젤리",
@@ -435,7 +399,7 @@
   },
   {
    "term": "쉐이크",
-   "imp": 191,
+   "imp": 196,
    "clk": 2,
    "cost": 3857,
    "group": "데이업",
@@ -443,35 +407,8 @@
    "relevance": "관련의심"
   },
   {
-   "term": "하루생식",
-   "imp": 30,
-   "clk": 5,
-   "cost": 3820,
-   "group": "영양식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "식물성단백질종류",
-   "imp": 62,
-   "clk": 2,
-   "cost": 3511,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "씨리얼",
-   "imp": 521,
-   "clk": 2,
-   "cost": 3491,
-   "group": "그래놀라",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "운동후단백질쉐이크",
-   "imp": 27,
+   "imp": 26,
    "clk": 2,
    "cost": 3456,
    "group": "데이업",
@@ -479,26 +416,26 @@
    "relevance": "관련의심"
   },
   {
-   "term": "성분좋은단백질쉐이크",
-   "imp": 39,
+   "term": "단백질음식종류",
+   "imp": 78,
    "clk": 2,
-   "cost": 3216,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "시니어단백질추천",
-   "imp": 20,
-   "clk": 2,
-   "cost": 3195,
+   "cost": 3120,
    "group": "프로틴골드",
    "registered": false,
    "relevance": "관련의심"
   },
   {
+   "term": "하루생식",
+   "imp": 28,
+   "clk": 4,
+   "cost": 2939,
+   "group": "영양식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "시니어단백질보충제추천",
-   "imp": 15,
+   "imp": 14,
    "clk": 2,
    "cost": 2844,
    "group": "프로틴골드",
@@ -506,17 +443,8 @@
    "relevance": "관련의심"
   },
   {
-   "term": "달지않은단백질음료",
-   "imp": 10,
-   "clk": 2,
-   "cost": 2776,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "단백질루틴",
-   "imp": 16,
+   "imp": 30,
    "clk": 2,
    "cost": 2751,
    "group": "프로틴골드",
@@ -524,29 +452,38 @@
    "relevance": "관련의심"
   },
   {
-   "term": "식물성단백질프로틴",
-   "imp": 10,
+   "term": "아침식사대용식",
+   "imp": 21,
    "clk": 1,
-   "cost": 2737,
-   "group": "프로틴골드",
+   "cost": 2718,
+   "group": "데일리생식",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "고단백질음료",
-   "imp": 13,
-   "clk": 1,
-   "cost": 2607,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "무가당단백질쉐이크",
-   "imp": 33,
+   "term": "식물성단백질음식",
+   "imp": 59,
    "clk": 2,
-   "cost": 2472,
+   "cost": 2599,
    "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "동결건조생식효능",
+   "imp": 7,
+   "clk": 3,
+   "cost": 2597,
+   "group": "1일1생식",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "동결건조케일가루",
+   "imp": 6,
+   "clk": 2,
+   "cost": 2407,
+   "group": "닥터샐러드",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -570,7 +507,7 @@
   },
   {
    "term": "다이어트단백질보충제",
-   "imp": 11,
+   "imp": 14,
    "clk": 1,
    "cost": 2101,
    "group": "프로틴골드",
@@ -579,7 +516,7 @@
   },
   {
    "term": "동결건조샐러드",
-   "imp": 8,
+   "imp": 10,
    "clk": 2,
    "cost": 1986,
    "group": "닥터샐러드",
@@ -615,37 +552,10 @@
   },
   {
    "term": "근력과단백질",
-   "imp": 24,
+   "imp": 29,
    "clk": 2,
    "cost": 1828,
    "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "동결건조생식효능",
-   "imp": 6,
-   "clk": 2,
-   "cost": 1795,
-   "group": "1일1생식",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "고단백단백질",
-   "imp": 4,
-   "clk": 1,
-   "cost": 1787,
-   "group": "데이업",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "식사대신먹을수있는영양식",
-   "imp": 4,
-   "clk": 2,
-   "cost": 1781,
-   "group": "영양식",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -659,8 +569,17 @@
    "relevance": "관련의심"
   },
   {
+   "term": "씨리얼",
+   "imp": 274,
+   "clk": 1,
+   "cost": 1720,
+   "group": "그래놀라",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "저당그레놀라",
-   "imp": 93,
+   "imp": 87,
    "clk": 1,
    "cost": 1707,
    "group": "그래놀라",
@@ -677,19 +596,10 @@
    "relevance": "관련의심"
   },
   {
-   "term": "단백질보충방법",
-   "imp": 6,
+   "term": "성분좋은단백질쉐이크추천",
+   "imp": 2,
    "clk": 1,
-   "cost": 1696,
-   "group": "프로틴골드",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "담백질음료",
-   "imp": 54,
-   "clk": 1,
-   "cost": 1692,
+   "cost": 1674,
    "group": "데이업",
    "registered": false,
    "relevance": "관련의심"
@@ -705,7 +615,7 @@
   },
   {
    "term": "식사대용다이어트식품",
-   "imp": 4,
+   "imp": 5,
    "clk": 1,
    "cost": 1628,
    "group": "프로틴골드",
@@ -714,10 +624,64 @@
   },
   {
    "term": "어르신식사대용단백질",
-   "imp": 6,
+   "imp": 5,
    "clk": 1,
    "cost": 1619,
    "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "식물성단백질식품",
+   "imp": 7,
+   "clk": 1,
+   "cost": 1608,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "마시는쉐이크",
+   "imp": 2,
+   "clk": 1,
+   "cost": 1605,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "프로틴식품",
+   "imp": 1,
+   "clk": 1,
+   "cost": 1604,
+   "group": "프로틴골드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "아침대용단백질음료",
+   "imp": 3,
+   "clk": 1,
+   "cost": 1583,
+   "group": "프로틴골드",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "성분좋은단백질쉐이크",
+   "imp": 42,
+   "clk": 1,
+   "cost": 1563,
+   "group": "데이업",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "시니어단백질추천",
+   "imp": 18,
+   "clk": 1,
+   "cost": 1552,
+   "group": "프로틴골드",
    "registered": false,
    "relevance": "관련의심"
   }
