@@ -1,17 +1,17 @@
 {
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "1일1생식 라이프밀 420g",
-   "spend": 297017,
-   "roas": 158,
-   "conv": 8,
+   "spend": 290582,
+   "roas": 149,
+   "conv": 7,
    "options": 4,
-   "action": "상품군 통합 ROAS 158% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
-   "severity": "medium",
-   "executor": "watch",
+   "action": "상품군 통합 ROAS 149% (매우 낮음) (옵션 4개 합산) — OFF/개선 검토",
+   "severity": "high",
+   "executor": "approve",
    "nccAdIds": [
     "nad-a001-02-000000541753996",
     "nad-a001-02-000000541754004",
@@ -22,7 +22,7 @@
   {
    "channel": "쇼핑검색",
    "item": "갓 구운 하루견과 20g 30개입",
-   "spend": 25532,
+   "spend": 49409,
    "roas": 0,
    "conv": 0,
    "options": 3,
@@ -46,15 +46,9 @@
  "summary": {
   "shopping": 2,
   "advoost": 0,
-  "approveNeeded": 1
+  "approveNeeded": 2
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 5,
-   "advoost": 3,
-   "approveNeeded": 3
-  },
   {
    "date": null,
    "shopping": 5,
@@ -228,6 +222,12 @@
    "shopping": 2,
    "advoost": 0,
    "approveNeeded": 1
+  },
+  {
+   "date": null,
+   "shopping": 2,
+   "advoost": 0,
+   "approveNeeded": 2
   }
  ]
 }
