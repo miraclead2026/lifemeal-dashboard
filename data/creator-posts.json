@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-17T07:04:02+09:00",
+  "updatedAt": "2026-10-17T07:04:41+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -4028,32 +4028,6 @@
       "channelProductNo": "13447249282",
       "relatedProduct": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
       "discoveredAt": "2026-09-29"
-    },
-    {
-      "platform": "blog",
-      "url": "https://blog.naver.com/carhoney72/224425042634",
-      "title": "아침을 자주 거른다면? 생식 한 포가 식사대용이 될 수 있을까｜황성주 박사의 1일 1생식 라....",
-      "thumbnail": "https://ssl.pstatic.net/static/blog/icon/og_270x270.png",
-      "date": "2026-09-28",
-      "author": "carhoney72",
-      "authorName": "우리동네 좋은이웃",
-      "connect": "strong",
-      "evidence": [
-        "strong",
-        "widget"
-      ],
-      "source": "blog-search",
-      "metrics": {
-        "views": null
-      },
-      "affiliateId": "1000155409885920",
-      "channelProductNo": "12747389906",
-      "relatedProduct": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-      "linkCreatorSpaceId": "972633243390688",
-      "discoveredAt": "2026-09-29",
-      "linkUserName": "carhoney72님의 블로그",
-      "linkUserUrl": "https://blog.naver.com/carhoney72",
-      "linkUserChannelType": "NBLOG"
     },
     {
       "platform": "blog",
@@ -10072,8 +10046,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-17T07:04:02+09:00",
-    "mode": "clip",
+    "lastRun": "2026-10-17T07:04:41+09:00",
+    "mode": "revalidate",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
