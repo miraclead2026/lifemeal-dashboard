@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19T07:05:50+09:00",
+  "updatedAt": "2026-10-19T07:07:20+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -620,6 +620,24 @@
       "relatedProduct": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 1개",
       "linkCreatorSpaceId": "993504311473088",
       "discoveredAt": "2026-10-18"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=zmKhmW-e1is",
+      "title": "단체도시락 유부 1200개 만들고 야장가서 피로푸는 평균나이 27세들",
+      "thumbnail": "https://i.ytimg.com/vi/zmKhmW-e1is/maxresdefault.jpg",
+      "date": "2026-10-17",
+      "author": "%ec%8a%a4%ec%8b%9c%ec%96%b4%ed%95%ad",
+      "authorName": "어항",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 47461,
+        "likes": 427,
+        "comments": 53
+      },
+      "discoveredAt": "2026-10-19"
     },
     {
       "platform": "blog",
@@ -2492,6 +2510,24 @@
       "relatedProduct": "황성주박사의 발효건강식 황성주생식 식사대용 30포, 1개",
       "linkCreatorSpaceId": "991332291047136",
       "discoveredAt": "2026-10-11"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://www.youtube.com/watch?v=yyCR7FfJLKA",
+      "title": "라이프밀 데이업 프로틴 쉐이크 홈쇼핑 인서트 좋은분들과 즐촬했네요",
+      "thumbnail": "https://i.ytimg.com/vi/yyCR7FfJLKA/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AHOBYACgAqKAgwIABABGCwgZShyMA8=&rs=AOn4CLB2iiPpLgL3Yl6CIU7bIX4K80ug7A",
+      "date": "2026-10-09",
+      "author": "user-succulents",
+      "authorName": "다육테라스",
+      "connect": "none",
+      "evidence": [],
+      "source": "yt-search",
+      "metrics": {
+        "views": 75,
+        "likes": 2,
+        "comments": 0
+      },
+      "discoveredAt": "2026-10-19"
     },
     {
       "platform": "blog",
@@ -10354,8 +10390,8 @@
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-19T07:05:50+09:00",
-    "mode": "blog",
+    "lastRun": "2026-10-19T07:07:20+09:00",
+    "mode": "yt",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
