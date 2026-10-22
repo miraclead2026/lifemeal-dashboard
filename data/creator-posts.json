@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22T07:13:14+09:00",
+  "updatedAt": "2026-10-23T07:03:32+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -10,7 +10,7 @@
       "posts": [],
       "coverage": {
         "blog": "ok(2건중 0)",
-        "youtube": "ok(5중 0)"
+        "youtube": "fail(HTTP Error 401: Unauthorized)"
       }
     },
     {
@@ -21,7 +21,7 @@
       "posts": [],
       "coverage": {
         "blog": "ok(0건중 0)",
-        "youtube": "ok(1중 0)"
+        "youtube": "fail(HTTP Error 401: Unauthorized)"
       }
     },
     {
@@ -32,7 +32,7 @@
       "posts": [],
       "coverage": {
         "blog": "ok(5건중 0)",
-        "youtube": "ok(5중 0)"
+        "youtube": "fail(HTTP Error 401: Unauthorized)"
       }
     },
     {
@@ -54,8 +54,8 @@
         }
       ],
       "coverage": {
-        "youtube": "ok(5중 0)",
-        "instagram": "ok(1중 0)",
+        "youtube": "fail(HTTP Error 401: Unauthorized)",
+        "instagram": "fail(HTTP Error 401: Unauthorized)",
         "clip": "ok(17중 우리상품 0)"
       }
     },
@@ -66,8 +66,8 @@
       "primaryUrl": "https://www.instagram.com/_lilys_home/",
       "posts": [],
       "coverage": {
-        "youtube": "ok(5중 0)",
-        "instagram": "ok(1중 0)"
+        "youtube": "fail(HTTP Error 401: Unauthorized)",
+        "instagram": "fail(HTTP Error 401: Unauthorized)"
       }
     },
     {
@@ -98,7 +98,7 @@
       ],
       "coverage": {
         "blog": "ok(50건중 1)",
-        "youtube": "ok(5중 0)"
+        "youtube": "fail(HTTP Error 401: Unauthorized)"
       }
     },
     {
@@ -109,7 +109,7 @@
       "posts": [],
       "coverage": {
         "blog": "ok(0건중 0)",
-        "youtube": "ok(1중 0)"
+        "youtube": "fail(HTTP Error 401: Unauthorized)"
       }
     },
     {
@@ -118,6 +118,18 @@
       "primaryChannelType": "NBLOG",
       "primaryUrl": "https://blog.naver.com/sudden4082",
       "posts": [
+        {
+          "platform": "blog",
+          "url": "https://blog.naver.com/sudden4082/224449751005",
+          "title": "탈색 5달째 금발에 웨이브까지.. 면허증 속 흑발 생머리와 딴판인 25세 윈터 긴머리 히피펌",
+          "thumbnail": null,
+          "date": "2026-10-22",
+          "source": "naver-rss",
+          "metrics": {
+            "views": null
+          },
+          "discoveredAt": "2026-10-23"
+        },
         {
           "platform": "blog",
           "url": "https://blog.naver.com/sudden4082/224421081862",
@@ -181,8 +193,8 @@
         }
       ],
       "coverage": {
-        "blog": "ok(50건중 0)",
-        "youtube": "ok(5중 0)",
+        "blog": "ok(50건중 1)",
+        "youtube": "fail(HTTP Error 401: Unauthorized)",
         "clip": "ok(17중 우리상품 0)"
       }
     },
@@ -256,7 +268,7 @@
       ],
       "coverage": {
         "blog": "ok(50건중 1)",
-        "youtube": "ok(1중 0)",
+        "youtube": "fail(HTTP Error 401: Unauthorized)",
         "clip": "ok(17중 우리상품 0)"
       }
     },
@@ -283,7 +295,7 @@
       ],
       "coverage": {
         "blog": "ok(50건중 1)",
-        "youtube": "ok(5중 0)"
+        "youtube": "fail(HTTP Error 401: Unauthorized)"
       }
     }
   ],
