@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-24",
+ "updatedAt": "2026-10-25",
  "goal": "개별 상품은 ROAS 330 우선(효율) · 통합 ROAS가 330 넘으면 볼륨 확대(증액)",
  "userTasks": [
   {
@@ -136,15 +136,15 @@
   }
  ],
  "note": "일일 리포트=오늘 조치 / 세분화 전략=제안·진행·된것·안된것 누적 추적",
- "combinedRoas": 431,
+ "combinedRoas": 477,
  "mode": "볼륨확대",
  "budgetProposal": {
   "channel": "쇼핑검색",
   "action": "쇼핑 그룹 일예산 증액 검토 (예: +20~30%)",
-  "reason": "통합 ROAS 431% ≥ 330 + 예산 소진 중 → 예산 풀면 자동입찰이 고효율 상품에 더 배분해 매출↑",
+  "reason": "통합 ROAS 477% ≥ 330 + 예산 소진 중 → 예산 풀면 자동입찰이 고효율 상품에 더 배분해 매출↑",
   "how": "쇼핑 그룹 dailyBudget PUT (되돌리기 가능)"
  },
- "modeNote": "통합 ROAS 431% ≥ 330 → 볼륨 확대(그룹 예산 증액 OK)",
+ "modeNote": "통합 ROAS 477% ≥ 330 → 볼륨 확대(그룹 예산 증액 OK)",
  "cards": [
   {
    "channel": "쇼핑검색",
@@ -175,15 +175,11 @@
    "price": "29800",
    "url": "https://smartstore.naver.com/main/products/12764948626",
    "status": "관찰중",
-   "daysTracked": 60,
-   "statusNote": "제안 60일째 · 아직 목표 미달",
+   "daysTracked": 61,
+   "statusNote": "제안 61일째 · 아직 목표 미달",
    "firstProposed": "2026-08-25",
    "roasFrom": 421,
    "history": [
-    {
-     "date": "2026-10-17",
-     "roas": 0
-    },
     {
      "date": "2026-10-18",
      "roas": 151
@@ -210,6 +206,10 @@
     },
     {
      "date": "2026-10-24",
+     "roas": 103
+    },
+    {
+     "date": "2026-10-25",
      "roas": 103
     }
    ]
@@ -243,15 +243,11 @@
    "price": "59200",
    "url": "https://smartstore.naver.com/main/products/13638665038",
    "status": "관찰중",
-   "daysTracked": 63,
-   "statusNote": "제안 63일째 · 아직 목표 미달",
+   "daysTracked": 64,
+   "statusNote": "제안 64일째 · 아직 목표 미달",
    "firstProposed": "2026-08-22",
-   "roasFrom": 387,
+   "roasFrom": 435,
    "history": [
-    {
-     "date": "2026-10-17",
-     "roas": 0
-    },
     {
      "date": "2026-10-18",
      "roas": 0
@@ -279,22 +275,26 @@
     {
      "date": "2026-10-24",
      "roas": 122
+    },
+    {
+     "date": "2026-10-25",
+     "roas": 122
     }
    ]
   },
   {
    "channel": "쇼핑검색",
    "product": "라이프밀 데이 크런치 프로틴바 단백질바 단백질간식 에너지바 초코, 10개입, 2개",
-   "spend": 19397,
-   "imp": 33859,
-   "clk": 24,
+   "spend": 22943,
+   "imp": 40000,
+   "clk": 27,
    "conv": 0,
    "ctr": 0.1,
    "cvr": 0.0,
    "roas": 0,
    "bottleneck": "전환 0",
    "verdict": "개선",
-   "direction": "클릭 24인데 전환 0(크런치바 · 단백질 2개) — 상세·가격·리뷰가 발목. 나쁜 유입은 제외검색어로 컷.",
+   "direction": "클릭 27인데 전환 0(크런치바 · 단백질 2개) — 상세·가격·리뷰가 발목. 나쁜 유입은 제외검색어로 컷.",
    "levers": [
     {
      "who": "사용자",
@@ -311,15 +311,11 @@
    "price": "39000",
    "url": "https://smartstore.naver.com/main/products/13670986904",
    "status": "관찰중",
-   "daysTracked": 15,
-   "statusNote": "제안 15일째 · 아직 목표 미달",
+   "daysTracked": 16,
+   "statusNote": "제안 16일째 · 아직 목표 미달",
    "firstProposed": "2026-10-09",
    "roasFrom": 1159,
    "history": [
-    {
-     "date": "2026-10-15",
-     "roas": 670
-    },
     {
      "date": "2026-10-16",
      "roas": 670
@@ -347,6 +343,10 @@
     {
      "date": "2026-10-24",
      "roas": 0
+    },
+    {
+     "date": "2026-10-25",
+     "roas": 0
     }
    ]
   },
@@ -354,7 +354,7 @@
    "channel": "쇼핑검색",
    "product": "황성주박사의 라이프밀 영양식 황성주생식 아침식사대용 30포, 2개",
    "spend": 10889,
-   "imp": 3339,
+   "imp": 3907,
    "clk": 6,
    "conv": 0,
    "ctr": 0.2,
@@ -362,7 +362,7 @@
    "roas": 0,
    "bottleneck": "클릭(CTR) 낮음",
    "verdict": "개선",
-   "direction": "노출 3,339인데 클릭 6(CTR 0.2%)(식사대용/생식 2개) — 클릭이 안 나요. 전환은 잘 되니 썸네일·가격이 관건.",
+   "direction": "노출 3,907인데 클릭 6(CTR 0.2%)(식사대용/생식 2개) — 클릭이 안 나요. 전환은 잘 되니 썸네일·가격이 관건.",
    "levers": [
     {
      "who": "사용자",
@@ -379,8 +379,8 @@
    "price": "81000",
    "url": "https://smartstore.naver.com/main/products/13635278956",
    "status": "관찰중",
-   "daysTracked": 1,
-   "statusNote": "제안 1일째 · 아직 목표 미달",
+   "daysTracked": 2,
+   "statusNote": "제안 2일째 · 아직 목표 미달",
    "firstProposed": "2026-10-23",
    "roasFrom": 0,
    "history": [
@@ -390,6 +390,10 @@
     },
     {
      "date": "2026-10-24",
+     "roas": 0
+    },
+    {
+     "date": "2026-10-25",
      "roas": 0
     }
    ]
@@ -423,7 +427,7 @@
    "price": null,
    "url": null,
    "status": "개선됨",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 304,
@@ -482,7 +486,7 @@
    "price": "73900",
    "url": "https://smartstore.naver.com/main/products/12808019284",
    "status": "개선됨",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 486,
@@ -550,7 +554,7 @@
    "price": null,
    "url": null,
    "status": "개선됨",
-   "daysTracked": 20,
+   "daysTracked": 21,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-10-04",
    "roasFrom": 31,
@@ -609,7 +613,7 @@
    "price": "110600",
    "url": "https://smartstore.naver.com/main/products/12894742052",
    "status": "개선됨",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 869,
@@ -677,7 +681,7 @@
    "price": "54000",
    "url": "https://smartstore.naver.com/main/products/13670188794",
    "status": "개선됨",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 254,
@@ -745,7 +749,7 @@
    "price": null,
    "url": null,
    "status": "개선됨",
-   "daysTracked": 56,
+   "daysTracked": 57,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-29",
    "roasFrom": 251,
@@ -813,7 +817,7 @@
    "price": "147300",
    "url": "https://smartstore.naver.com/main/products/12763789807",
    "status": "개선됨",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 1183,
@@ -872,7 +876,7 @@
    "price": "37200",
    "url": "https://smartstore.naver.com/main/products/12747389906",
    "status": "개선됨",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 419,
@@ -931,7 +935,7 @@
    "price": null,
    "url": null,
    "status": "개선됨",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 193,
@@ -999,7 +1003,7 @@
    "price": "55000",
    "url": "https://smartstore.naver.com/main/products/13670986902",
    "status": "개선됨",
-   "daysTracked": 15,
+   "daysTracked": 16,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-10-09",
    "roasFrom": 0,
@@ -1067,7 +1071,7 @@
    "price": "15000",
    "url": "https://smartstore.naver.com/main/products/13495035486",
    "status": "개선됨",
-   "daysTracked": 27,
+   "daysTracked": 28,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-09-27",
    "roasFrom": 0,
@@ -1135,7 +1139,7 @@
    "price": "130000",
    "url": "https://smartstore.naver.com/main/products/13670986906",
    "status": "개선됨",
-   "daysTracked": 15,
+   "daysTracked": 16,
    "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-10-09",
    "roasFrom": 168,
@@ -1177,16 +1181,16 @@
   {
    "channel": "쇼핑검색",
    "product": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
-   "spend": 297115,
-   "imp": 6407,
-   "clk": 272,
-   "conv": 55,
-   "ctr": 4.2,
-   "cvr": 20.2,
-   "roas": 1862,
+   "spend": 383231,
+   "imp": 7537,
+   "clk": 365,
+   "conv": 60,
+   "ctr": 4.8,
+   "cvr": 16.4,
+   "roas": 1555,
    "bottleneck": "양호",
    "verdict": "양호",
-   "direction": "ROAS 1862% 양호(식사대용/생식 1개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
+   "direction": "ROAS 1555% 양호(식사대용/생식 1개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
    "levers": [],
    "nature": "식사대용/생식 1개",
    "bulk": false,
@@ -1194,15 +1198,11 @@
    "price": "34000",
    "url": "https://smartstore.naver.com/main/products/13447249282",
    "status": "양호",
-   "daysTracked": 63,
+   "daysTracked": 64,
    "statusNote": "",
    "firstProposed": "2026-08-22",
-   "roasFrom": 535,
+   "roasFrom": 657,
    "history": [
-    {
-     "date": "2026-10-12",
-     "roas": 2054
-    },
     {
      "date": "2026-10-18",
      "roas": 4246
@@ -1230,6 +1230,10 @@
     {
      "date": "2026-10-24",
      "roas": 1862
+    },
+    {
+     "date": "2026-10-25",
+     "roas": 1555
     }
    ]
   }
