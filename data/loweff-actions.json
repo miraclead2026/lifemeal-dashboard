@@ -1,24 +1,11 @@
 {
- "updatedAt": "2026-10-24",
+ "updatedAt": "2026-10-25",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
-   "item": "갓 구운 하루견과 20g 30개입",
-   "spend": 31623,
-   "roas": 231,
-   "conv": 1,
-   "options": 3,
-   "action": "상품군 통합 ROAS 231% — 이미 집행중단(소재 OFF/삭제됨) (옵션 3개 합산)",
-   "severity": "medium",
-   "executor": "done",
-   "nccAdIds": [],
-   "matched": false
-  },
-  {
-   "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 20979,
+   "spend": 27427,
    "roas": 0,
    "conv": 0,
    "options": 1,
@@ -27,22 +14,6 @@
    "executor": "approve",
    "nccAdIds": [
     "nad-a001-02-000000553654559"
-   ],
-   "matched": true
-  },
-  {
-   "channel": "쇼핑검색",
-   "item": "영양식 황성주생식 30포",
-   "spend": 17643,
-   "roas": 230,
-   "conv": 1,
-   "options": 2,
-   "action": "상품군 통합 ROAS 230% 목표 미달 (옵션 2개 합산) — 제외검색어·관측(당장 OFF 아님)",
-   "severity": "medium",
-   "executor": "watch",
-   "nccAdIds": [
-    "nad-a001-02-000000541753965",
-    "nad-a001-02-000000541754002"
    ],
    "matched": true
   }
@@ -54,17 +25,11 @@
   "deleteReview": 3
  },
  "summary": {
-  "shopping": 3,
+  "shopping": 1,
   "advoost": 0,
   "approveNeeded": 1
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 4,
-   "advoost": 3,
-   "approveNeeded": 2
-  },
   {
    "date": null,
    "shopping": 3,
@@ -236,6 +201,12 @@
   {
    "date": null,
    "shopping": 3,
+   "advoost": 0,
+   "approveNeeded": 1
+  },
+  {
+   "date": null,
+   "shopping": 1,
    "advoost": 0,
    "approveNeeded": 1
   }
