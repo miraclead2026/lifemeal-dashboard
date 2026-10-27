@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-28T07:04:03+09:00",
+  "updatedAt": "2026-10-28T07:04:09+09:00",
   "note": "크리에이터 교차추적(등록채널 외 유튜브·인스타 포함). coverage=채널별 수집결과, 실패는 실패로 표시. 발굴(discover_posts) 데이터와 병합.",
   "creators": [
     {
@@ -9923,6 +9923,26 @@
       "discoveredAt": "2026-09-30"
     },
     {
+      "platform": "clip",
+      "url": "https://shoppinglive.naver.com/shortclips/11098602",
+      "title": "라이프밀 추석 선물세트",
+      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://video-phinf.pstatic.net/20260831_198/17881811413487yB3F_JPEG/7qtrQLFDo4_04.jpg%22&type=w352&service=clip",
+      "date": "2026-08-31",
+      "author": "",
+      "authorName": "라이프밀 브랜드 스토어",
+      "channelUrl": "https://shoppinglive.naver.com/channels/265448",
+      "followers": 0,
+      "connect": "none",
+      "evidence": [],
+      "source": "clip-search",
+      "metrics": {
+        "views": 404,
+        "likes": null,
+        "comments": null
+      },
+      "discoveredAt": "2026-10-28"
+    },
+    {
       "platform": "blog",
       "url": "https://blog.naver.com/gateaujuni1019/224395378475",
       "title": "우리 아이 편식 습관, 황성주 박사 라이프밀 생식으로 해결했어요!",
@@ -10594,6 +10614,26 @@
         "comments": 16
       },
       "discoveredAt": "2026-09-05"
+    },
+    {
+      "platform": "clip",
+      "url": "https://shoppinglive.naver.com/shortclips/11030726",
+      "title": "동결건조 알아보기",
+      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://video-phinf.pstatic.net/20260819_204/1787092144067tTDkx_JPEG/2v0bKbvHlY_01.jpg%22&type=w352&service=clip",
+      "date": "2026-08-19",
+      "author": "",
+      "authorName": "라이프밀 브랜드 스토어",
+      "channelUrl": "https://shoppinglive.naver.com/channels/265448",
+      "followers": 0,
+      "connect": "none",
+      "evidence": [],
+      "source": "clip-search",
+      "metrics": {
+        "views": 84,
+        "likes": null,
+        "comments": null
+      },
+      "discoveredAt": "2026-10-28"
     },
     {
       "platform": "blog",
@@ -11856,51 +11896,11 @@
         "comments": 0
       },
       "discoveredAt": "2026-09-11"
-    },
-    {
-      "platform": "clip",
-      "url": "https://m.blog.naver.com/wotnr3707/clip/14224878",
-      "title": "황성주 생식 산삼배양그네",
-      "thumbnail": "https://s.pstatic.net/dthumb.phinf/?src=%22https://phinf.pstatic.net/tvcast/20260416_162/upwsE_1776304143076bqfbz_JPEG/thumbnail-04C389D6-7B71-43F7-8AD2-266A7C5D1F0F.jpg%22&type=w352&service=clip",
-      "date": "2026-04-16",
-      "author": "",
-      "authorName": "해밀리언 하임수지",
-      "channelUrl": "https://m.blog.naver.com/wotnr3707",
-      "followers": 0,
-      "connect": "none",
-      "evidence": [],
-      "source": "clip-search",
-      "metrics": {
-        "views": 107,
-        "likes": null,
-        "comments": null
-      },
-      "discoveredAt": "2026-09-05"
-    },
-    {
-      "platform": "youtube",
-      "url": "https://www.youtube.com/watch?v=pE0wpdTpWQE",
-      "title": "황성주 생식 풀 패키지 언박싱  솔직 후기! (이롬 생식 비교분석)",
-      "thumbnail": "https://i.ytimg.com/vi/pE0wpdTpWQE/maxresdefault.jpg",
-      "date": "2026-04-14",
-      "author": "%ec%b0%90%ec%b6%94%ec%b2%9c%ec%95%84%ec%9d%b4%ed%85%9c5-p8n",
-      "authorName": "찐추천아이템5",
-      "connect": "none",
-      "evidence": [
-        "수수료"
-      ],
-      "source": "yt-search",
-      "metrics": {
-        "views": 2,
-        "likes": 0,
-        "comments": 1
-      },
-      "discoveredAt": "2026-09-08"
     }
   ],
   "discovery": {
-    "lastRun": "2026-10-28T07:04:03+09:00",
-    "mode": "ig",
+    "lastRun": "2026-10-28T07:04:09+09:00",
+    "mode": "clip",
     "recencyDays": 120,
     "rule": "블로그: 우리상품 언급 AND (커넥트마커 strong|link|widget OR 작성자=판매크리에이터). 유튜브·인스타·클립: 우리 브랜드/상품 언급이면 채택(커넥트 확인 여부는 connect 로 구분, 랭킹용 metrics 포함).",
     "markers": {
