@@ -1,11 +1,41 @@
 {
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
+   "item": "1일1생식 라이프밀 420g",
+   "spend": 70204,
+   "roas": 86,
+   "conv": 1,
+   "options": 4,
+   "action": "상품군 통합 ROAS 86% (매우 낮음) (옵션 4개 합산) — OFF/개선 검토",
+   "severity": "high",
+   "executor": "approve",
+   "nccAdIds": [
+    "nad-a001-02-000000605583791",
+    "nad-a001-02-000000605583792",
+    "nad-a001-02-000000605583793",
+    "nad-a001-02-000000605583794",
+    "nad-a001-02-000000605583800",
+    "nad-a001-02-000000605583801",
+    "nad-a001-02-000000605583802",
+    "nad-a001-02-000000605583803",
+    "nad-a001-02-000000605032226",
+    "nad-a001-02-000000605032227",
+    "nad-a001-02-000000605032228",
+    "nad-a001-02-000000605032229",
+    "nad-a001-02-000000605033360",
+    "nad-a001-02-000000605033361",
+    "nad-a001-02-000000605033362",
+    "nad-a001-02-000000605033363"
+   ],
+   "matched": true
+  },
+  {
+   "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 28734,
+   "spend": 37023,
    "roas": 0,
    "conv": 0,
    "options": 1,
@@ -25,17 +55,11 @@
   "deleteReview": 3
  },
  "summary": {
-  "shopping": 1,
+  "shopping": 2,
   "advoost": 0,
-  "approveNeeded": 1
+  "approveNeeded": 2
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 4,
-   "advoost": 3,
-   "approveNeeded": 3
-  },
   {
    "date": null,
    "shopping": 4,
@@ -209,6 +233,12 @@
    "shopping": 1,
    "advoost": 0,
    "approveNeeded": 1
+  },
+  {
+   "date": null,
+   "shopping": 2,
+   "advoost": 0,
+   "approveNeeded": 2
   }
  ]
 }
