@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-11-02",
  "goal": "개별 상품은 ROAS 330 우선(효율) · 통합 ROAS가 330 넘으면 볼륨 확대(증액)",
  "userTasks": [
   {
@@ -9,7 +9,18 @@
    "image": "https://shopping-phinf.pstatic.net/main_9121549/91215497857.3.jpg",
    "price": "39000",
    "url": "https://smartstore.naver.com/main/products/13670986904",
-   "roas": 197,
+   "roas": 596,
+   "bottleneck": "클릭(CTR) 낮음",
+   "todo": "대표이미지(썸네일) 교체·가격 검토"
+  },
+  {
+   "product": "황성주박사의 라이프밀 영양식 황성주생식 아침식사대용 30포, 2개",
+   "channel": "쇼핑검색",
+   "nature": "식사대용/생식 2개",
+   "image": "https://shopping-phinf.pstatic.net/main_9117978/91179789637.5.jpg",
+   "price": "81000",
+   "url": "https://smartstore.naver.com/main/products/13635278956",
+   "roas": 0,
    "bottleneck": "클릭(CTR) 낮음",
    "todo": "대표이미지(썸네일) 교체·가격 검토"
   },
@@ -34,54 +45,32 @@
    "roas": 222,
    "bottleneck": "클릭(CTR) 낮음",
    "todo": "대표이미지(썸네일) 교체·가격 검토"
-  },
-  {
-   "product": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 2개",
-   "channel": "쇼핑검색",
-   "nature": "단백질 · 식사대용/생식 2개",
-   "image": "https://shopping-phinf.pstatic.net/main_9121469/91214699747.2.jpg",
-   "price": "54000",
-   "url": "https://smartstore.naver.com/main/products/13670188794",
-   "roas": 23,
-   "bottleneck": "클릭(CTR) 낮음",
-   "todo": "대표이미지(썸네일) 교체·가격 검토"
-  },
-  {
-   "product": "황성주박사의 라이프밀 영양식 황성주생식 아침식사대용 30포, 2개",
-   "channel": "쇼핑검색",
-   "nature": "식사대용/생식 2개",
-   "image": "https://shopping-phinf.pstatic.net/main_9117978/91179789637.5.jpg",
-   "price": "81000",
-   "url": "https://smartstore.naver.com/main/products/13635278956",
-   "roas": 0,
-   "bottleneck": "클릭(CTR) 낮음",
-   "todo": "대표이미지(썸네일) 교체·가격 검토"
   }
  ],
  "note": "일일 리포트=오늘 조치 / 세분화 전략=제안·진행·된것·안된것 누적 추적",
- "combinedRoas": 617,
+ "combinedRoas": 572,
  "mode": "볼륨확대",
  "budgetProposal": {
   "channel": "쇼핑검색",
   "action": "쇼핑 그룹 일예산 증액 검토 (예: +20~30%)",
-  "reason": "통합 ROAS 617% ≥ 330 + 예산 소진 중 → 예산 풀면 자동입찰이 고효율 상품에 더 배분해 매출↑",
+  "reason": "통합 ROAS 572% ≥ 330 + 예산 소진 중 → 예산 풀면 자동입찰이 고효율 상품에 더 배분해 매출↑",
   "how": "쇼핑 그룹 dailyBudget PUT (되돌리기 가능)"
  },
- "modeNote": "통합 ROAS 617% ≥ 330 → 볼륨 확대(그룹 예산 증액 OK)",
+ "modeNote": "통합 ROAS 572% ≥ 330 → 볼륨 확대(그룹 예산 증액 OK)",
  "cards": [
   {
    "channel": "쇼핑검색",
    "product": "라이프밀 데이 크런치 프로틴바 단백질바 단백질간식 에너지바 초코, 10개입, 2개",
-   "spend": 63312,
-   "imp": 77705,
-   "clk": 72,
-   "conv": 3,
+   "spend": 89142,
+   "imp": 112021,
+   "clk": 100,
+   "conv": 9,
    "ctr": 0.1,
-   "cvr": 4.2,
-   "roas": 197,
+   "cvr": 9.0,
+   "roas": 596,
    "bottleneck": "클릭(CTR) 낮음",
    "verdict": "개선",
-   "direction": "노출 77,705인데 클릭 72(CTR 0.1%)(크런치바 · 단백질 2개) — 클릭이 안 나요. 전환은 잘 되니 썸네일·가격이 관건.",
+   "direction": "노출 112,021인데 클릭 100(CTR 0.1%)(크런치바 · 단백질 2개) — 클릭이 안 나요. 전환은 잘 되니 썸네일·가격이 관건.",
    "levers": [
     {
      "who": "사용자",
@@ -98,15 +87,11 @@
    "price": "39000",
    "url": "https://smartstore.naver.com/main/products/13670986904",
    "status": "관찰중",
-   "daysTracked": 21,
-   "statusNote": "제안 21일째 · 아직 목표 미달",
+   "daysTracked": 24,
+   "statusNote": "제안 24일째 · 아직 목표 미달",
    "firstProposed": "2026-10-09",
    "roasFrom": 1159,
    "history": [
-    {
-     "date": "2026-10-23",
-     "roas": 0
-    },
     {
      "date": "2026-10-24",
      "roas": 0
@@ -134,6 +119,78 @@
     {
      "date": "2026-10-30",
      "roas": 197
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 596
+    }
+   ]
+  },
+  {
+   "channel": "쇼핑검색",
+   "product": "황성주박사의 라이프밀 영양식 황성주생식 아침식사대용 30포, 2개",
+   "spend": 10520,
+   "imp": 6621,
+   "clk": 6,
+   "conv": 0,
+   "ctr": 0.1,
+   "cvr": 0.0,
+   "roas": 0,
+   "bottleneck": "클릭(CTR) 낮음",
+   "verdict": "개선",
+   "direction": "노출 6,621인데 클릭 6(CTR 0.1%)(식사대용/생식 2개) — 클릭이 안 나요. 전환은 잘 되니 썸네일·가격이 관건.",
+   "levers": [
+    {
+     "who": "사용자",
+     "what": "대표이미지(썸네일) 교체·가격 검토"
+    },
+    {
+     "who": "내가",
+     "what": "제목 개선 제안"
+    }
+   ],
+   "nature": "식사대용/생식 2개",
+   "bulk": false,
+   "image": "https://shopping-phinf.pstatic.net/main_9117978/91179789637.5.jpg",
+   "price": "81000",
+   "url": "https://smartstore.naver.com/main/products/13635278956",
+   "status": "관찰중",
+   "daysTracked": 10,
+   "statusNote": "제안 10일째 · 아직 목표 미달",
+   "firstProposed": "2026-10-23",
+   "roasFrom": 0,
+   "history": [
+    {
+     "date": "2026-10-23",
+     "roas": 0
+    },
+    {
+     "date": "2026-10-24",
+     "roas": 0
+    },
+    {
+     "date": "2026-10-25",
+     "roas": 0
+    },
+    {
+     "date": "2026-10-26",
+     "roas": 0
+    },
+    {
+     "date": "2026-10-27",
+     "roas": 0
+    },
+    {
+     "date": "2026-10-28",
+     "roas": 0
+    },
+    {
+     "date": "2026-10-29",
+     "roas": 0
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 0
     }
    ]
   },
@@ -165,9 +222,9 @@
    "image": "https://shopping-phinf.pstatic.net/main_9030945/90309459575.7.jpg",
    "price": "29800",
    "url": "https://smartstore.naver.com/main/products/12764948626",
-   "status": "관찰중",
-   "daysTracked": 66,
-   "statusNote": "제안 66일째 · 아직 목표 미달",
+   "status": "개선됨",
+   "daysTracked": 69,
+   "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-25",
    "roasFrom": 268,
    "history": [
@@ -233,9 +290,9 @@
    "image": "https://shopping-phinf.pstatic.net/main_9118317/91183175747.6.jpg",
    "price": "59200",
    "url": "https://smartstore.naver.com/main/products/13638665038",
-   "status": "관찰중",
-   "daysTracked": 69,
-   "statusNote": "제안 69일째 · 아직 목표 미달",
+   "status": "개선됨",
+   "daysTracked": 72,
+   "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
    "firstProposed": "2026-08-22",
    "roasFrom": 324,
    "history": [
@@ -275,149 +332,17 @@
   },
   {
    "channel": "쇼핑검색",
-   "product": "황성주 박사의 프로틴 골드 HIGH5 하루 단백질 식사대용 21포, 2개",
-   "spend": 114274,
-   "imp": 33304,
-   "clk": 44,
-   "conv": 1,
-   "ctr": 0.1,
-   "cvr": 2.3,
-   "roas": 23,
-   "bottleneck": "클릭(CTR) 낮음",
-   "verdict": "개선",
-   "direction": "노출 33,304인데 클릭 44(CTR 0.1%)(단백질 · 식사대용/생식 2개) — 클릭이 안 나요. 전환은 잘 되니 썸네일·가격이 관건.",
-   "levers": [
-    {
-     "who": "사용자",
-     "what": "대표이미지(썸네일) 교체·가격 검토"
-    },
-    {
-     "who": "내가",
-     "what": "제목 개선 제안"
-    }
-   ],
-   "nature": "단백질 · 식사대용/생식 2개",
-   "bulk": false,
-   "image": "https://shopping-phinf.pstatic.net/main_9121469/91214699747.2.jpg",
-   "price": "54000",
-   "url": "https://smartstore.naver.com/main/products/13670188794",
-   "status": "개선됨",
-   "daysTracked": 69,
-   "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
-   "firstProposed": "2026-08-22",
-   "roasFrom": 254,
-   "history": [
-    {
-     "date": "2026-10-13",
-     "roas": 184
-    },
-    {
-     "date": "2026-10-14",
-     "roas": 125
-    },
-    {
-     "date": "2026-10-15",
-     "roas": 129
-    },
-    {
-     "date": "2026-10-16",
-     "roas": 141
-    },
-    {
-     "date": "2026-10-17",
-     "roas": 95
-    },
-    {
-     "date": "2026-10-18",
-     "roas": 106
-    },
-    {
-     "date": "2026-10-19",
-     "roas": 23
-    },
-    {
-     "date": "2026-10-20",
-     "roas": 23
-    }
-   ]
-  },
-  {
-   "channel": "쇼핑검색",
-   "product": "황성주박사의 라이프밀 영양식 황성주생식 아침식사대용 30포, 2개",
-   "spend": 10889,
-   "imp": 5835,
-   "clk": 6,
-   "conv": 0,
-   "ctr": 0.1,
-   "cvr": 0.0,
-   "roas": 0,
-   "bottleneck": "클릭(CTR) 낮음",
-   "verdict": "개선",
-   "direction": "노출 5,835인데 클릭 6(CTR 0.1%)(식사대용/생식 2개) — 클릭이 안 나요. 전환은 잘 되니 썸네일·가격이 관건.",
-   "levers": [
-    {
-     "who": "사용자",
-     "what": "대표이미지(썸네일) 교체·가격 검토"
-    },
-    {
-     "who": "내가",
-     "what": "제목 개선 제안"
-    }
-   ],
-   "nature": "식사대용/생식 2개",
-   "bulk": false,
-   "image": "https://shopping-phinf.pstatic.net/main_9117978/91179789637.5.jpg",
-   "price": "81000",
-   "url": "https://smartstore.naver.com/main/products/13635278956",
-   "status": "개선됨",
-   "daysTracked": 7,
-   "statusNote": "저효율 목록에서 빠짐(회복/지출감소)",
-   "firstProposed": "2026-10-23",
-   "roasFrom": 0,
-   "history": [
-    {
-     "date": "2026-10-23",
-     "roas": 0
-    },
-    {
-     "date": "2026-10-24",
-     "roas": 0
-    },
-    {
-     "date": "2026-10-25",
-     "roas": 0
-    },
-    {
-     "date": "2026-10-26",
-     "roas": 0
-    },
-    {
-     "date": "2026-10-27",
-     "roas": 0
-    },
-    {
-     "date": "2026-10-28",
-     "roas": 0
-    },
-    {
-     "date": "2026-10-29",
-     "roas": 0
-    }
-   ]
-  },
-  {
-   "channel": "쇼핑검색",
    "product": "황성주 박사의 라이프밀 데일리 동결건조 생식 30g, 14포, 1개",
-   "spend": 792359,
-   "imp": 12753,
-   "clk": 762,
-   "conv": 162,
-   "ctr": 6.0,
-   "cvr": 21.3,
-   "roas": 1905,
+   "spend": 901562,
+   "imp": 16922,
+   "clk": 840,
+   "conv": 178,
+   "ctr": 5.0,
+   "cvr": 21.2,
+   "roas": 1778,
    "bottleneck": "양호",
    "verdict": "양호",
-   "direction": "ROAS 1905% 양호(식사대용/생식 1개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
+   "direction": "ROAS 1778% 양호(식사대용/생식 1개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
    "levers": [],
    "nature": "식사대용/생식 1개",
    "bulk": false,
@@ -425,15 +350,11 @@
    "price": "34000",
    "url": "https://smartstore.naver.com/main/products/13447249282",
    "status": "양호",
-   "daysTracked": 69,
+   "daysTracked": 72,
    "statusNote": "",
    "firstProposed": "2026-08-22",
-   "roasFrom": 544,
+   "roasFrom": 403,
    "history": [
-    {
-     "date": "2026-10-23",
-     "roas": 1932
-    },
     {
      "date": "2026-10-24",
      "roas": 1862
@@ -461,22 +382,26 @@
     {
      "date": "2026-10-30",
      "roas": 1905
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 1778
     }
    ]
   },
   {
    "channel": "쇼핑검색",
    "product": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 4개",
-   "spend": 145060,
-   "imp": 3176,
-   "clk": 98,
-   "conv": 11,
-   "ctr": 3.1,
-   "cvr": 11.2,
-   "roas": 871,
+   "spend": 228548,
+   "imp": 5209,
+   "clk": 156,
+   "conv": 27,
+   "ctr": 3.0,
+   "cvr": 17.3,
+   "roas": 1539,
    "bottleneck": "양호",
    "verdict": "양호",
-   "direction": "ROAS 871% 양호(식사대용/생식 4개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
+   "direction": "ROAS 1539% 양호(식사대용/생식 4개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
    "levers": [],
    "nature": "식사대용/생식 4개",
    "bulk": true,
@@ -484,15 +409,11 @@
    "price": "148000",
    "url": "https://smartstore.naver.com/main/products/12763789807",
    "status": "양호",
-   "daysTracked": 69,
+   "daysTracked": 72,
    "statusNote": "",
    "firstProposed": "2026-08-22",
-   "roasFrom": 1688,
+   "roasFrom": 860,
    "history": [
-    {
-     "date": "2026-10-13",
-     "roas": 767
-    },
     {
      "date": "2026-10-14",
      "roas": 783
@@ -520,22 +441,26 @@
     {
      "date": "2026-10-30",
      "roas": 871
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 1539
     }
    ]
   },
   {
    "channel": "쇼핑검색",
    "product": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 1개",
-   "spend": 121289,
-   "imp": 2114,
-   "clk": 87,
-   "conv": 19,
-   "ctr": 4.1,
-   "cvr": 21.8,
-   "roas": 1104,
+   "spend": 172089,
+   "imp": 4055,
+   "clk": 131,
+   "conv": 27,
+   "ctr": 3.2,
+   "cvr": 20.6,
+   "roas": 1016,
    "bottleneck": "양호",
    "verdict": "양호",
-   "direction": "ROAS 1104% 양호(식사대용/생식 1개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
+   "direction": "ROAS 1016% 양호(식사대용/생식 1개) — 유지. 통합 330 넘으면 그룹 예산 증액 시 우선 배분.",
    "levers": [],
    "nature": "식사대용/생식 1개",
    "bulk": false,
@@ -543,15 +468,11 @@
    "price": "37200",
    "url": "https://smartstore.naver.com/main/products/12747389906",
    "status": "양호",
-   "daysTracked": 69,
+   "daysTracked": 72,
    "statusNote": "",
    "firstProposed": "2026-08-22",
-   "roasFrom": 577,
+   "roasFrom": 614,
    "history": [
-    {
-     "date": "2026-10-13",
-     "roas": 554
-    },
     {
      "date": "2026-10-14",
      "roas": 555
@@ -579,22 +500,26 @@
     {
      "date": "2026-10-30",
      "roas": 1104
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 1016
     }
    ]
   },
   {
    "channel": "쇼핑검색",
    "product": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 2개",
-   "spend": 37690,
-   "imp": 1527,
-   "clk": 33,
-   "conv": 4,
-   "ctr": 2.2,
-   "cvr": 12.1,
-   "roas": 1209,
+   "spend": 51205,
+   "imp": 2678,
+   "clk": 42,
+   "conv": 5,
+   "ctr": 1.6,
+   "cvr": 11.9,
+   "roas": 978,
    "bottleneck": "고효율(저지출)",
    "verdict": "양호",
-   "direction": "ROAS 1209%로 효율 좋아요(식사대용/생식 2개). 개별 증액은 자동입찰이라 불가 — 통합 330 넘고 예산 꽉 차면 그룹 예산 증액 시 우선 배분.",
+   "direction": "ROAS 978%로 효율 좋아요(식사대용/생식 2개). 개별 증액은 자동입찰이라 불가 — 통합 330 넘고 예산 꽉 차면 그룹 예산 증액 시 우선 배분.",
    "levers": [],
    "nature": "식사대용/생식 2개",
    "bulk": false,
@@ -602,15 +527,11 @@
    "price": "74000",
    "url": "https://smartstore.naver.com/main/products/12808019284",
    "status": "양호",
-   "daysTracked": 69,
+   "daysTracked": 72,
    "statusNote": "",
    "firstProposed": "2026-08-22",
-   "roasFrom": 432,
+   "roasFrom": 433,
    "history": [
-    {
-     "date": "2026-10-10",
-     "roas": 345
-    },
     {
      "date": "2026-10-11",
      "roas": 325
@@ -638,22 +559,26 @@
     {
      "date": "2026-10-30",
      "roas": 1209
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 978
     }
    ]
   },
   {
    "channel": "쇼핑검색",
    "product": "황성주 박사의 1일 1생식 라이프밀 동결건조 식사대용 420g, 3개",
-   "spend": 31824,
-   "imp": 1865,
-   "clk": 22,
-   "conv": 7,
+   "spend": 39892,
+   "imp": 2456,
+   "clk": 29,
+   "conv": 11,
    "ctr": 1.2,
-   "cvr": 31.8,
-   "roas": 3210,
+   "cvr": 37.9,
+   "roas": 3119,
    "bottleneck": "고효율(저지출)",
    "verdict": "양호",
-   "direction": "ROAS 3210%로 효율 좋아요(식사대용/생식 3개). 개별 증액은 자동입찰이라 불가 — 통합 330 넘고 예산 꽉 차면 그룹 예산 증액 시 우선 배분.",
+   "direction": "ROAS 3119%로 효율 좋아요(식사대용/생식 3개). 개별 증액은 자동입찰이라 불가 — 통합 330 넘고 예산 꽉 차면 그룹 예산 증액 시 우선 배분.",
    "levers": [],
    "nature": "식사대용/생식 3개",
    "bulk": false,
@@ -661,15 +586,11 @@
    "price": "111000",
    "url": "https://smartstore.naver.com/main/products/12894742052",
    "status": "양호",
-   "daysTracked": 69,
+   "daysTracked": 72,
    "statusNote": "",
    "firstProposed": "2026-08-22",
-   "roasFrom": 886,
+   "roasFrom": 715,
    "history": [
-    {
-     "date": "2026-10-13",
-     "roas": 784
-    },
     {
      "date": "2026-10-14",
      "roas": 480
@@ -697,22 +618,26 @@
     {
      "date": "2026-10-30",
      "roas": 3210
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 3119
     }
    ]
   },
   {
    "channel": "쇼핑검색",
    "product": "황성주박사의 라이프밀 영양식 황성주생식 아침식사대용 30포, 1개",
-   "spend": 14725,
-   "imp": 4069,
-   "clk": 22,
-   "conv": 6,
-   "ctr": 0.5,
-   "cvr": 27.3,
-   "roas": 3160,
+   "spend": 22415,
+   "imp": 5113,
+   "clk": 32,
+   "conv": 9,
+   "ctr": 0.6,
+   "cvr": 28.1,
+   "roas": 2841,
    "bottleneck": "고효율(저지출)",
    "verdict": "양호",
-   "direction": "ROAS 3160%로 효율 좋아요(식사대용/생식 1개). 개별 증액은 자동입찰이라 불가 — 통합 330 넘고 예산 꽉 차면 그룹 예산 증액 시 우선 배분.",
+   "direction": "ROAS 2841%로 효율 좋아요(식사대용/생식 1개). 개별 증액은 자동입찰이라 불가 — 통합 330 넘고 예산 꽉 차면 그룹 예산 증액 시 우선 배분.",
    "levers": [],
    "nature": "식사대용/생식 1개",
    "bulk": false,
@@ -720,7 +645,7 @@
    "price": "40500",
    "url": "https://smartstore.naver.com/main/products/12763906780",
    "status": "양호",
-   "daysTracked": 3,
+   "daysTracked": 6,
    "statusNote": "",
    "firstProposed": "2026-10-27",
    "roasFrom": 2767,
@@ -740,6 +665,10 @@
     {
      "date": "2026-10-30",
      "roas": 3160
+    },
+    {
+     "date": "2026-11-02",
+     "roas": 2841
     }
    ]
   }
@@ -747,7 +676,7 @@
  "summary": {
   "증액기회": 0,
   "신규": 0,
-  "관찰중": 3,
+  "관찰중": 2,
   "개선됨": 2,
   "양호": 6
  }
