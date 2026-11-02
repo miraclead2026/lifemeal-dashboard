@@ -1,17 +1,17 @@
 {
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-11-02",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
    "item": "데이크런치 프로틴바",
-   "spend": 55642,
-   "roas": 0,
-   "conv": 0,
+   "spend": 54695,
+   "roas": 250,
+   "conv": 1,
    "options": 1,
-   "action": "상품군 전체 전환 0인데 광고비 소진 — 상품군 광고 OFF/개선 검토",
-   "severity": "high",
-   "executor": "approve",
+   "action": "상품군 통합 ROAS 250% 목표 미달 — 제외검색어·관측(당장 OFF 아님)",
+   "severity": "medium",
+   "executor": "watch",
    "nccAdIds": [
     "nad-a001-02-000000553654559"
    ],
@@ -27,15 +27,9 @@
  "summary": {
   "shopping": 1,
   "advoost": 0,
-  "approveNeeded": 1
+  "approveNeeded": 0
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 3,
-   "advoost": 2,
-   "approveNeeded": 1
-  },
   {
    "date": null,
    "shopping": 3,
@@ -209,6 +203,12 @@
    "shopping": 1,
    "advoost": 0,
    "approveNeeded": 1
+  },
+  {
+   "date": null,
+   "shopping": 1,
+   "advoost": 0,
+   "approveNeeded": 0
   }
  ]
 }
