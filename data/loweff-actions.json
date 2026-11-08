@@ -1,15 +1,36 @@
 {
- "updatedAt": "2026-11-07",
+ "updatedAt": "2026-11-08",
  "goal": "ROAS 330% 유지하며 매출 최대화 — 저효율부터 정리",
  "proposals": [
   {
    "channel": "쇼핑검색",
+   "item": "1일1생식 라이프밀 420g",
+   "spend": 1887092,
+   "roas": 302,
+   "conv": 86,
+   "options": 4,
+   "action": "상품군 통합 ROAS 302% 목표 미달 (옵션 4개 합산) — 제외검색어·관측(당장 OFF 아님)",
+   "severity": "medium",
+   "executor": "watch",
+   "nccAdIds": [
+    "nad-a001-02-000000541754005",
+    "nad-a001-02-000000605583794",
+    "nad-a001-02-000000605583803",
+    "nad-a001-02-000000605032229",
+    "nad-a001-02-000000605033363",
+    "nad-a001-02-000000605632730",
+    "nad-a001-02-000000605632735"
+   ],
+   "matched": true
+  },
+  {
+   "channel": "쇼핑검색",
    "item": "라이프밀 데일리 30g 14포",
-   "spend": 1141942,
-   "roas": 241,
-   "conv": 57,
+   "spend": 1209532,
+   "roas": 251,
+   "conv": 60,
    "options": 1,
-   "action": "상품군 통합 ROAS 241% 목표 미달 — 제외검색어·관측(당장 OFF 아님)",
+   "action": "상품군 통합 ROAS 251% 목표 미달 — 제외검색어·관측(당장 OFF 아님)",
    "severity": "medium",
    "executor": "watch",
    "nccAdIds": [
@@ -28,17 +49,11 @@
   "deleteReview": 3
  },
  "summary": {
-  "shopping": 1,
+  "shopping": 2,
   "advoost": 0,
   "approveNeeded": 0
  },
  "days": [
-  {
-   "date": null,
-   "shopping": 3,
-   "advoost": 3,
-   "approveNeeded": 2
-  },
   {
    "date": null,
    "shopping": 3,
@@ -210,6 +225,12 @@
   {
    "date": null,
    "shopping": 1,
+   "advoost": 0,
+   "approveNeeded": 0
+  },
+  {
+   "date": null,
+   "shopping": 2,
    "advoost": 0,
    "approveNeeded": 0
   }
