@@ -1,15 +1,15 @@
 {
- "updatedAt": "2026-11-08T10:33:04+09:00",
- "basedOn": "2026-11-06",
+ "updatedAt": "2026-11-09T10:33:23+09:00",
+ "basedOn": "2026-11-07",
  "source": "SHOPPINGKEYWORD_DETAIL + CONVERSION_DETAIL (자동)",
  "window": {
   "d7": {
-   "since": "2026-10-31",
-   "until": "2026-11-06"
+   "since": "2026-11-01",
+   "until": "2026-11-07"
   },
   "d28": {
-   "since": "2026-10-10",
-   "until": "2026-11-06"
+   "since": "2026-10-11",
+   "until": "2026-11-07"
   }
  },
  "gate": {
@@ -18,59 +18,59 @@
   "note": "productRelevance='관련의심'=미적용 고정(허브 확인 큐). 실제 제외=확정후보&무관."
  },
  "counts": {
-  "valid": 29,
-  "excludeCandidates": 82,
-  "brandDiagnosis": 63,
-  "queuePending": 82
+  "valid": 32,
+  "excludeCandidates": 81,
+  "brandDiagnosis": 67,
+  "queuePending": 81
  },
  "valid": [
   {
    "term": "황성주생식",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 34461,
-   "clk28": 2145,
-   "cost28": 2891102,
-   "purchaseConv28": 178,
-   "convRevenue28": 12172500,
-   "cartConv28": 186,
-   "clk7": 1317,
-   "cost7": 1875439,
-   "roas28": 421.0
+   "imp28": 36098,
+   "clk28": 2238,
+   "cost28": 2999354,
+   "purchaseConv28": 188,
+   "convRevenue28": 12714720,
+   "cartConv28": 199,
+   "clk7": 1368,
+   "cost7": 1945408,
+   "roas28": 423.9
   },
   {
    "term": "황성주생식라이프밀",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 7662,
-   "clk28": 472,
-   "cost28": 720401,
-   "purchaseConv28": 46,
-   "convRevenue28": 3316650,
-   "cartConv28": 54,
-   "clk7": 288,
-   "cost7": 451186,
-   "roas28": 460.4
+   "imp28": 8251,
+   "clk28": 493,
+   "cost28": 729647,
+   "purchaseConv28": 49,
+   "convRevenue28": 3517410,
+   "cartConv28": 56,
+   "clk7": 316,
+   "cost7": 496904,
+   "roas28": 482.1
   },
   {
    "term": "황성주영양식",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 133,
-   "clk28": 14,
-   "cost28": 7162,
+   "imp28": 136,
+   "clk28": 16,
+   "cost28": 8207,
    "purchaseConv28": 5,
    "convRevenue28": 317700,
    "cartConv28": 2,
-   "clk7": 5,
-   "cost7": 1462,
-   "roas28": 4435.9
+   "clk7": 6,
+   "cost7": 2014,
+   "roas28": 3871.1
   },
   {
    "term": "동결건조생식가루",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 952,
+   "imp28": 973,
    "clk28": 41,
    "cost28": 64079,
    "purchaseConv28": 3,
@@ -84,15 +84,15 @@
    "term": "생식가루",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 2204,
-   "clk28": 125,
-   "cost28": 152285,
+   "imp28": 2282,
+   "clk28": 129,
+   "cost28": 156297,
    "purchaseConv28": 4,
    "convRevenue28": 189450,
    "cartConv28": 6,
-   "clk7": 91,
-   "cost7": 108512,
-   "roas28": 124.4
+   "clk7": 95,
+   "cost7": 112524,
+   "roas28": 121.2
   },
   {
    "term": "황성주박사생식",
@@ -154,7 +154,7 @@
    "term": "이롬황성주생식",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 43,
+   "imp28": 44,
    "clk28": 2,
    "cost28": 3289,
    "purchaseConv28": 1,
@@ -165,24 +165,38 @@
    "roas28": 3420.5
   },
   {
+   "term": "황성주생식80",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 1,
+   "clk28": 1,
+   "cost28": 1892,
+   "purchaseConv28": 1,
+   "convRevenue28": 111000,
+   "cartConv28": 0,
+   "clk7": 1,
+   "cost7": 1892,
+   "roas28": 5866.8
+  },
+  {
    "term": "동결건조생식",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 1208,
-   "clk28": 83,
-   "cost28": 137840,
+   "imp28": 1215,
+   "clk28": 84,
+   "cost28": 139490,
    "purchaseConv28": 1,
    "convRevenue28": 111000,
    "cartConv28": 11,
-   "clk7": 76,
-   "cost7": 127161,
-   "roas28": 80.5
+   "clk7": 77,
+   "cost7": 128811,
+   "roas28": 79.6
   },
   {
    "term": "황성주라이프밀데일리",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 72,
+   "imp28": 73,
    "clk28": 3,
    "cost28": 2465,
    "purchaseConv28": 1,
@@ -205,6 +219,20 @@
    "clk7": 5,
    "cost7": 7717,
    "roas28": 958.9
+  },
+  {
+   "term": "황성주영양식라이프밀30G",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 5,
+   "clk28": 1,
+   "cost28": 1028,
+   "purchaseConv28": 2,
+   "convRevenue28": 72900,
+   "cartConv28": 1,
+   "clk7": 1,
+   "cost7": 1028,
+   "roas28": 7091.4
   },
   {
    "term": "견과류",
@@ -249,10 +277,24 @@
    "roas28": 915.6
   },
   {
+   "term": "당뇨생식",
+   "campaignType": "쇼핑검색",
+   "brand": false,
+   "imp28": 1,
+   "clk28": 2,
+   "cost28": 3300,
+   "purchaseConv28": 1,
+   "convRevenue28": 68080,
+   "cartConv28": 0,
+   "clk7": 2,
+   "cost7": 3300,
+   "roas28": 2063.0
+  },
+  {
    "term": "동결건조생식추천",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 281,
+   "imp28": 280,
    "clk28": 18,
    "cost28": 27921,
    "purchaseConv28": 2,
@@ -280,7 +322,7 @@
    "term": "단백질바",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 31833,
+   "imp28": 31185,
    "clk28": 15,
    "cost28": 12826,
    "purchaseConv28": 1,
@@ -342,8 +384,8 @@
    "purchaseConv28": 1,
    "convRevenue28": 37200,
    "cartConv28": 2,
-   "clk7": 3,
-   "cost7": 4181,
+   "clk7": 2,
+   "cost7": 3192,
    "roas28": 293.7
   },
   {
@@ -378,15 +420,15 @@
    "term": "황선주생식",
    "campaignType": "쇼핑검색",
    "brand": false,
-   "imp28": 112,
-   "clk28": 9,
-   "cost28": 16616,
+   "imp28": 129,
+   "clk28": 10,
+   "cost28": 18575,
    "purchaseConv28": 1,
    "convRevenue28": 32300,
    "cartConv28": 0,
    "clk7": 3,
-   "cost7": 4503,
-   "roas28": 194.4
+   "cost7": 5028,
+   "roas28": 173.9
   },
   {
    "term": "황성주생식라이프밀사은품",
@@ -412,8 +454,8 @@
    "purchaseConv28": 1,
    "convRevenue28": 30600,
    "cartConv28": 0,
-   "clk7": 2,
-   "cost7": 1069,
+   "clk7": 1,
+   "cost7": 992,
    "roas28": 2722.4
   },
   {
@@ -440,8 +482,8 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 19908,
-   "clk7": 8,
+   "imp28": 19812,
+   "clk7": 7,
    "excludeEligible": false
   },
   {
@@ -452,8 +494,20 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 1901,
+   "imp28": 1895,
    "clk7": 2,
+   "excludeEligible": false
+  },
+  {
+   "term": "선식",
+   "campaignType": "쇼핑검색",
+   "cumClicks": 9,
+   "cost": 12519,
+   "status": "관측중",
+   "productRelevance": "관련의심",
+   "appliedTo": null,
+   "imp28": 73,
+   "clk7": 4,
    "excludeEligible": false
   },
   {
@@ -464,7 +518,7 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 27524,
+   "imp28": 27292,
    "clk7": 6,
    "excludeEligible": false
   },
@@ -476,7 +530,7 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 139,
+   "imp28": 145,
    "clk7": 4,
    "excludeEligible": false
   },
@@ -490,18 +544,6 @@
    "appliedTo": null,
    "imp28": 164,
    "clk7": 7,
-   "excludeEligible": false
-  },
-  {
-   "term": "선식",
-   "campaignType": "쇼핑검색",
-   "cumClicks": 6,
-   "cost": 7992,
-   "status": "관측중",
-   "productRelevance": "관련의심",
-   "appliedTo": null,
-   "imp28": 68,
-   "clk7": 1,
    "excludeEligible": false
   },
   {
@@ -625,18 +667,6 @@
    "excludeEligible": false
   },
   {
-   "term": "생식",
-   "campaignType": "쇼핑검색",
-   "cumClicks": 1,
-   "cost": 3541,
-   "status": "관측중",
-   "productRelevance": "관련의심",
-   "appliedTo": null,
-   "imp28": 29,
-   "clk7": 0,
-   "excludeEligible": false
-  },
-  {
    "term": "생식가루추천",
    "campaignType": "쇼핑검색",
    "cumClicks": 2,
@@ -752,8 +782,8 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 7357,
-   "clk7": 1,
+   "imp28": 7473,
+   "clk7": 0,
    "excludeEligible": false
   },
   {
@@ -933,6 +963,18 @@
    "productRelevance": "관련의심",
    "appliedTo": null,
    "imp28": 5,
+   "clk7": 1,
+   "excludeEligible": false
+  },
+  {
+   "term": "선식추천",
+   "campaignType": "쇼핑검색",
+   "cumClicks": 1,
+   "cost": 1611,
+   "status": "관측중",
+   "productRelevance": "관련의심",
+   "appliedTo": null,
+   "imp28": 2,
    "clk7": 1,
    "excludeEligible": false
   },
@@ -1369,18 +1411,6 @@
    "excludeEligible": false
   },
   {
-   "term": "10간식",
-   "campaignType": "쇼핑검색",
-   "cumClicks": 1,
-   "cost": 649,
-   "status": "관측중",
-   "productRelevance": "관련의심",
-   "appliedTo": null,
-   "imp28": 10,
-   "clk7": 0,
-   "excludeEligible": false
-  },
-  {
    "term": "크런치단백질바",
    "campaignType": "쇼핑검색",
    "cumClicks": 1,
@@ -1412,7 +1442,7 @@
    "status": "관측중",
    "productRelevance": "관련의심",
    "appliedTo": null,
-   "imp28": 227,
+   "imp28": 224,
    "clk7": 0,
    "excludeEligible": false
   }
@@ -1430,6 +1460,20 @@
    "cartConv28": 0,
    "clk7": 6,
    "cost7": 8596,
+   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
+  },
+  {
+   "term": "생식라이프밀",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 59,
+   "clk28": 4,
+   "cost28": 6693,
+   "purchaseConv28": 0,
+   "convRevenue28": 0,
+   "cartConv28": 0,
+   "clk7": 4,
+   "cost7": 6693,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
@@ -1461,20 +1505,6 @@
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
-   "term": "생식라이프밀",
-   "campaignType": "쇼핑검색",
-   "brand": true,
-   "imp28": 45,
-   "clk28": 3,
-   "cost28": 4541,
-   "purchaseConv28": 0,
-   "convRevenue28": 0,
-   "cartConv28": 0,
-   "clk7": 3,
-   "cost7": 4541,
-   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
-  },
-  {
    "term": "황성주박사의생식가격",
    "campaignType": "쇼핑검색",
    "brand": true,
@@ -1486,6 +1516,20 @@
    "cartConv28": 0,
    "clk7": 2,
    "cost7": 4319,
+   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
+  },
+  {
+   "term": "황성주생식가격",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 65,
+   "clk28": 3,
+   "cost28": 4212,
+   "purchaseConv28": 0,
+   "convRevenue28": 0,
+   "cartConv28": 0,
+   "clk7": 3,
+   "cost7": 4212,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
@@ -1503,20 +1547,6 @@
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
-   "term": "라이프밀황성주박사의1일1생식라이프밀",
-   "campaignType": "쇼핑검색",
-   "brand": true,
-   "imp28": 5,
-   "clk28": 1,
-   "cost28": 3487,
-   "purchaseConv28": 0,
-   "convRevenue28": 0,
-   "cartConv28": 1,
-   "clk7": 0,
-   "cost7": 0,
-   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
-  },
-  {
    "term": "황성주생식가루",
    "campaignType": "쇼핑검색",
    "brand": true,
@@ -1531,6 +1561,20 @@
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
+   "term": "황성주생식14포",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 10,
+   "clk28": 2,
+   "cost28": 3130,
+   "purchaseConv28": 0,
+   "convRevenue28": 0,
+   "cartConv28": 0,
+   "clk7": 2,
+   "cost7": 3130,
+   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
+  },
+  {
    "term": "황성주하른애1일1생식생식",
    "campaignType": "쇼핑검색",
    "brand": true,
@@ -1540,8 +1584,8 @@
    "purchaseConv28": 0,
    "convRevenue28": 0,
    "cartConv28": 0,
-   "clk7": 2,
-   "cost7": 3092,
+   "clk7": 0,
+   "cost7": 0,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
@@ -1559,17 +1603,17 @@
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
-   "term": "황성주생식가격",
+   "term": "라이프밀",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 53,
+   "imp28": 19,
    "clk28": 2,
-   "cost28": 2756,
+   "cost28": 2791,
    "purchaseConv28": 0,
    "convRevenue28": 0,
    "cartConv28": 0,
-   "clk7": 2,
-   "cost7": 2756,
+   "clk7": 1,
+   "cost7": 645,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
@@ -1587,6 +1631,20 @@
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
+   "term": "황성주고단백생식",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 4,
+   "clk28": 2,
+   "cost28": 2304,
+   "purchaseConv28": 0,
+   "convRevenue28": 0,
+   "cartConv28": 0,
+   "clk7": 2,
+   "cost7": 2304,
+   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
+  },
+  {
    "term": "황성주1일",
    "campaignType": "쇼핑검색",
    "brand": true,
@@ -1596,8 +1654,8 @@
    "purchaseConv28": 0,
    "convRevenue28": 0,
    "cartConv28": 0,
-   "clk7": 1,
-   "cost7": 1458,
+   "clk7": 0,
+   "cost7": 0,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
@@ -1612,20 +1670,6 @@
    "cartConv28": 0,
    "clk7": 2,
    "cost7": 2174,
-   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
-  },
-  {
-   "term": "라이프밀",
-   "campaignType": "쇼핑검색",
-   "brand": true,
-   "imp28": 18,
-   "clk28": 1,
-   "cost28": 2146,
-   "purchaseConv28": 0,
-   "convRevenue28": 0,
-   "cartConv28": 0,
-   "clk7": 0,
-   "cost7": 0,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
@@ -1702,7 +1746,7 @@
    "term": "황성주생식효과",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 51,
+   "imp28": 55,
    "clk28": 1,
    "cost28": 1792,
    "purchaseConv28": 0,
@@ -1783,6 +1827,20 @@
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
+   "term": "황성주생식1일1생식라이프밀",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 7,
+   "clk28": 1,
+   "cost28": 1644,
+   "purchaseConv28": 0,
+   "convRevenue28": 0,
+   "cartConv28": 0,
+   "clk7": 1,
+   "cost7": 1644,
+   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
+  },
+  {
    "term": "황성주무과당신부",
    "campaignType": "쇼핑검색",
    "brand": true,
@@ -1808,6 +1866,34 @@
    "cartConv28": 0,
    "clk7": 0,
    "cost7": 0,
+   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
+  },
+  {
+   "term": "황성주생식신제품",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 5,
+   "clk28": 1,
+   "cost28": 1595,
+   "purchaseConv28": 0,
+   "convRevenue28": 0,
+   "cartConv28": 0,
+   "clk7": 1,
+   "cost7": 1595,
+   "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
+  },
+  {
+   "term": "황성주발아생식",
+   "campaignType": "쇼핑검색",
+   "brand": true,
+   "imp28": 23,
+   "clk28": 1,
+   "cost28": 1592,
+   "purchaseConv28": 0,
+   "convRevenue28": 0,
+   "cartConv28": 0,
+   "clk7": 1,
+   "cost7": 1592,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
@@ -1968,7 +2054,7 @@
    "term": "황성주생식성분",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 22,
+   "imp28": 26,
    "clk28": 1,
    "cost28": 1427,
    "purchaseConv28": 0,
@@ -2080,7 +2166,7 @@
    "term": "황성주생식칼로리",
    "campaignType": "쇼핑검색",
    "brand": true,
-   "imp28": 36,
+   "imp28": 29,
    "clk28": 1,
    "cost28": 1243,
    "purchaseConv28": 0,
@@ -2198,8 +2284,8 @@
    "purchaseConv28": 0,
    "convRevenue28": 0,
    "cartConv28": 0,
-   "clk7": 1,
-   "cost7": 772,
+   "clk7": 0,
+   "cost7": 0,
    "note": "브랜드 전환0 — 랜딩·상품매칭 점검"
   },
   {
