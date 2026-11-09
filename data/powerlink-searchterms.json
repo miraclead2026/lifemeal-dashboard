@@ -1,11 +1,11 @@
 {
- "updatedAt": "2026-11-08",
- "basedOn": "2026-11-06",
+ "updatedAt": "2026-11-09",
+ "basedOn": "2026-11-07",
  "note": "파워링크 확장검색 실제 쿼리(EXPKEYWORD) 7일. 전환리포트 없음→노출·클릭·비용만. 신규후보=미등록&클릭2+, 제외후보=미등록&고비용&관련의심(관련판정 필요).",
  "counts": {
-  "total": 198,
-  "newCandidates": 42,
-  "excludeCandidates": 52
+  "total": 211,
+  "newCandidates": 48,
+  "excludeCandidates": 53
  },
  "newCandidates": [
   {
@@ -19,48 +19,48 @@
   },
   {
    "term": "동결건조생식추천",
-   "imp": 97,
-   "clk": 13,
-   "cost": 10925,
+   "imp": 96,
+   "clk": 12,
+   "cost": 10154,
    "group": "확장_닥터샐러드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "생식효능",
-   "imp": 124,
-   "clk": 6,
-   "cost": 3862,
+   "imp": 126,
+   "clk": 7,
+   "cost": 4440,
    "group": "확장_발효건강식_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "하루단백질쌀",
-   "imp": 110,
-   "clk": 5,
-   "cost": 3929,
-   "group": " 확장_프로틴골드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "아침식사대용추천",
-   "imp": 166,
-   "clk": 5,
-   "cost": 3887,
-   "group": "확장_영양식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "황성주이롬생식",
-   "imp": 20,
-   "clk": 5,
-   "cost": 3216,
+   "term": "황성주생식홈페이지",
+   "imp": 8,
+   "clk": 6,
+   "cost": 3819,
    "group": "확장_데일리생식_예산상승_1019",
    "registered": false,
    "relevance": "관련"
+  },
+  {
+   "term": "황성주박사라이프밀",
+   "imp": 14,
+   "clk": 6,
+   "cost": 1825,
+   "group": "확장_데일리생식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "점심대용간편식",
+   "imp": 43,
+   "clk": 5,
+   "cost": 5421,
+   "group": "확장_영양식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
   },
   {
    "term": "동결생식",
@@ -81,17 +81,17 @@
    "relevance": "관련의심"
   },
   {
-   "term": "점심대용간편식",
-   "imp": 39,
+   "term": "아침식사대용추천",
+   "imp": 164,
    "clk": 4,
-   "cost": 4173,
+   "cost": 2931,
    "group": "확장_영양식_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "이롬라이프밀",
-   "imp": 38,
+   "imp": 41,
    "clk": 4,
    "cost": 742,
    "group": "확장_데일리생식_예산상승_1019",
@@ -99,22 +99,76 @@
    "relevance": "관련"
   },
   {
-   "term": "황성주박사라이프밀",
-   "imp": 10,
+   "term": "이롬생식라이프밀",
+   "imp": 36,
    "clk": 4,
-   "cost": 910,
+   "cost": 736,
    "group": "확장_데일리생식_예산상승_1019",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "황성주생식홈페이지",
-   "imp": 5,
+   "term": "하루단백질쌀",
+   "imp": 96,
    "clk": 4,
-   "cost": 3034,
+   "cost": 3639,
+   "group": " 확장_프로틴골드_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주박사의1일1생식라이프밀",
+   "imp": 49,
+   "clk": 3,
+   "cost": 780,
+   "group": "확장_영양식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "황성주1일1생식라이프밀",
+   "imp": 25,
+   "clk": 3,
+   "cost": 880,
    "group": "확장_데일리생식_예산상승_1019",
    "registered": false,
    "relevance": "관련"
+  },
+  {
+   "term": "황성주생식효능",
+   "imp": 27,
+   "clk": 3,
+   "cost": 1655,
+   "group": "확장_발효건강식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "샐러드분말스틱",
+   "imp": 10,
+   "clk": 3,
+   "cost": 2731,
+   "group": "확장_닥터샐러드_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주이롬생식",
+   "imp": 21,
+   "clk": 3,
+   "cost": 2893,
+   "group": "확장_데일리생식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "저녁대용",
+   "imp": 24,
+   "clk": 3,
+   "cost": 3733,
+   "group": "확장_영양식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
   },
   {
    "term": "이롬라이프밀생식",
@@ -126,49 +180,13 @@
    "relevance": "관련"
   },
   {
-   "term": "황성주1일1생식라이프밀",
-   "imp": 23,
-   "clk": 3,
-   "cost": 880,
-   "group": "확장_데일리생식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
    "term": "하루단백질",
-   "imp": 37,
+   "imp": 32,
    "clk": 3,
    "cost": 2637,
    "group": " 확장_프로틴골드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
-  },
-  {
-   "term": "이롬생식라이프밀",
-   "imp": 31,
-   "clk": 3,
-   "cost": 607,
-   "group": "확장_데일리생식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "샐러드분말스틱",
-   "imp": 15,
-   "clk": 3,
-   "cost": 2731,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "이롬황성주박사의1일1생식라이프밀",
-   "imp": 15,
-   "clk": 3,
-   "cost": 2005,
-   "group": "확장_데일리생식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련"
   },
   {
    "term": "생식식이섬유동결건조",
@@ -190,7 +208,7 @@
   },
   {
    "term": "동결건조샐러드",
-   "imp": 11,
+   "imp": 10,
    "clk": 3,
    "cost": 3000,
    "group": "확장_닥터샐러드_예산상승_1019",
@@ -198,35 +216,8 @@
    "relevance": "관련의심"
   },
   {
-   "term": "황성주박사생식",
-   "imp": 27,
-   "clk": 2,
-   "cost": 408,
-   "group": "확장_영양식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "동결건조채소분말",
-   "imp": 10,
-   "clk": 2,
-   "cost": 1549,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "황성주생식효능",
-   "imp": 19,
-   "clk": 2,
-   "cost": 1208,
-   "group": "확장_발효건강식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
    "term": "1일1생식라이프밀",
-   "imp": 34,
+   "imp": 37,
    "clk": 2,
    "cost": 417,
    "group": "확장_데일리생식_예산상승_1019",
@@ -234,19 +225,100 @@
    "relevance": "관련"
   },
   {
-   "term": "황성주생식라이프밀주문방법",
-   "imp": 4,
+   "term": "건강식",
+   "imp": 150,
    "clk": 2,
-   "cost": 1868,
+   "cost": 1298,
+   "group": "확장_발효건강식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주박사생식",
+   "imp": 31,
+   "clk": 2,
+   "cost": 408,
+   "group": "확장_영양식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "아침식사",
+   "imp": 667,
+   "clk": 2,
+   "cost": 1776,
+   "group": "확장_데일리생식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "동결건조채소분말",
+   "imp": 14,
+   "clk": 2,
+   "cost": 1549,
+   "group": "확장_닥터샐러드_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주생식영양성분",
+   "imp": 3,
+   "clk": 2,
+   "cost": 1269,
+   "group": "확장_발효건강식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "케일가루효능",
+   "imp": 21,
+   "clk": 2,
+   "cost": 2302,
+   "group": "확장_닥터샐러드_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "생식가격",
+   "imp": 7,
+   "clk": 2,
+   "cost": 476,
+   "group": "확장_발효건강식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "생식라이프밀",
+   "imp": 10,
+   "clk": 2,
+   "cost": 1060,
    "group": "확장_데일리생식_예산상승_1019",
    "registered": false,
    "relevance": "관련"
   },
   {
-   "term": "황성주박사의1일1생식라이프밀",
-   "imp": 36,
+   "term": "황성주1일생식",
+   "imp": 16,
    "clk": 2,
-   "cost": 476,
+   "cost": 524,
+   "group": "확장_데일리생식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련"
+  },
+  {
+   "term": "생식은먹는방법",
+   "imp": 7,
+   "clk": 2,
+   "cost": 1055,
+   "group": "확장_발효건강식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "황성주생식라이프밀주문방법",
+   "imp": 4,
+   "clk": 2,
+   "cost": 1868,
    "group": "확장_데일리생식_예산상승_1019",
    "registered": false,
    "relevance": "관련"
@@ -279,13 +351,13 @@
    "relevance": "관련"
   },
   {
-   "term": "생식은먹는방법",
-   "imp": 5,
+   "term": "이롬황성주박사의1일1생식라이프밀",
+   "imp": 13,
    "clk": 2,
-   "cost": 1055,
-   "group": "확장_발효건강식_예산상승_1019",
+   "cost": 1154,
+   "group": "확장_데일리생식_예산상승_1019",
    "registered": false,
-   "relevance": "관련의심"
+   "relevance": "관련"
   },
   {
    "term": "1생식라이프밀",
@@ -295,78 +367,6 @@
    "group": "확장_데일리생식_예산상승_1019",
    "registered": false,
    "relevance": "관련"
-  },
-  {
-   "term": "생식의효과",
-   "imp": 2,
-   "clk": 2,
-   "cost": 961,
-   "group": "확장_발효건강식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "동결건조식이섬유생식",
-   "imp": 6,
-   "clk": 2,
-   "cost": 1262,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "동결생식식이섬유",
-   "imp": 3,
-   "clk": 2,
-   "cost": 1465,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "동결생식효능",
-   "imp": 7,
-   "clk": 2,
-   "cost": 1294,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "샐러드가루추천",
-   "imp": 7,
-   "clk": 2,
-   "cost": 1037,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "황성주박사라이프밀생식",
-   "imp": 1,
-   "clk": 2,
-   "cost": 709,
-   "group": "확장_데일리생식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "황성주동결생식",
-   "imp": 1,
-   "clk": 2,
-   "cost": 1452,
-   "group": "확장_데일리생식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련"
-  },
-  {
-   "term": "동결건조채소가루",
-   "imp": 6,
-   "clk": 2,
-   "cost": 1571,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
   }
  ],
  "excludeCandidates": [
@@ -381,9 +381,9 @@
   },
   {
    "term": "동결건조생식추천",
-   "imp": 97,
-   "clk": 13,
-   "cost": 10925,
+   "imp": 96,
+   "clk": 12,
+   "cost": 10154,
    "group": "확장_닥터샐러드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
@@ -398,6 +398,15 @@
    "relevance": "관련의심"
   },
   {
+   "term": "점심대용간편식",
+   "imp": 43,
+   "clk": 5,
+   "cost": 5421,
+   "group": "확장_영양식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "노인식사대용영양식",
    "imp": 26,
    "clk": 4,
@@ -407,47 +416,47 @@
    "relevance": "관련의심"
   },
   {
-   "term": "점심대용간편식",
-   "imp": 39,
-   "clk": 4,
-   "cost": 4173,
+   "term": "생식효능",
+   "imp": 126,
+   "clk": 7,
+   "cost": 4440,
+   "group": "확장_발효건강식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "저녁대용",
+   "imp": 24,
+   "clk": 3,
+   "cost": 3733,
    "group": "확장_영양식_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
   {
    "term": "하루단백질쌀",
-   "imp": 110,
-   "clk": 5,
-   "cost": 3929,
+   "imp": 96,
+   "clk": 4,
+   "cost": 3639,
    "group": " 확장_프로틴골드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
   {
-   "term": "아침식사대용추천",
-   "imp": 166,
-   "clk": 5,
-   "cost": 3887,
-   "group": "확장_영양식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "생식효능",
-   "imp": 124,
-   "clk": 6,
-   "cost": 3862,
-   "group": "확장_발효건강식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
    "term": "동결건조샐러드",
-   "imp": 11,
+   "imp": 10,
    "clk": 3,
    "cost": 3000,
    "group": "확장_닥터샐러드_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "아침식사대용추천",
+   "imp": 164,
+   "clk": 4,
+   "cost": 2931,
+   "group": "확장_영양식_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -462,7 +471,7 @@
   },
   {
    "term": "샐러드분말스틱",
-   "imp": 15,
+   "imp": 10,
    "clk": 3,
    "cost": 2731,
    "group": "확장_닥터샐러드_예산상승_1019",
@@ -471,10 +480,19 @@
   },
   {
    "term": "하루단백질",
-   "imp": 37,
+   "imp": 32,
    "clk": 3,
    "cost": 2637,
    "group": " 확장_프로틴골드_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
+   "term": "케일가루효능",
+   "imp": 21,
+   "clk": 2,
+   "cost": 2302,
+   "group": "확장_닥터샐러드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -506,8 +524,17 @@
    "relevance": "관련의심"
   },
   {
+   "term": "아침식사",
+   "imp": 667,
+   "clk": 2,
+   "cost": 1776,
+   "group": "확장_데일리생식_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "동결건조채소가루",
-   "imp": 6,
+   "imp": 3,
    "clk": 2,
    "cost": 1571,
    "group": "확장_닥터샐러드_예산상승_1019",
@@ -516,7 +543,7 @@
   },
   {
    "term": "동결건조채소분말",
-   "imp": 10,
+   "imp": 14,
    "clk": 2,
    "cost": 1549,
    "group": "확장_닥터샐러드_예산상승_1019",
@@ -525,7 +552,7 @@
   },
   {
    "term": "점심대용",
-   "imp": 18,
+   "imp": 20,
    "clk": 1,
    "cost": 1535,
    "group": "확장_영양식_예산상승_1019",
@@ -551,20 +578,11 @@
    "relevance": "관련의심"
   },
   {
-   "term": "저녁대용",
-   "imp": 21,
-   "clk": 1,
-   "cost": 1393,
-   "group": "확장_영양식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "아침식사대용생식",
-   "imp": 2,
-   "clk": 1,
-   "cost": 1325,
-   "group": "확장_영양식_예산상승_1019",
+   "term": "건강식",
+   "imp": 150,
+   "clk": 2,
+   "cost": 1298,
+   "group": "확장_발효건강식_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -597,7 +615,7 @@
   },
   {
    "term": "저녁간편식",
-   "imp": 13,
+   "imp": 14,
    "clk": 1,
    "cost": 1285,
    "group": "확장_영양식_예산상승_1019",
@@ -623,11 +641,11 @@
    "relevance": "관련의심"
   },
   {
-   "term": "영양식우유",
-   "imp": 3,
+   "term": "단백질영양제",
+   "imp": 20,
    "clk": 1,
-   "cost": 1253,
-   "group": "확장_영양식_예산상승_1019",
+   "cost": 1245,
+   "group": " 확장_프로틴골드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -641,20 +659,20 @@
    "relevance": "관련의심"
   },
   {
+   "term": "마시는샐러드내돈내산",
+   "imp": 7,
+   "clk": 1,
+   "cost": 1239,
+   "group": "확장_닥터샐러드_예산상승_1019",
+   "registered": false,
+   "relevance": "관련의심"
+  },
+  {
    "term": "미숫가루단백질량",
    "imp": 1,
    "clk": 1,
    "cost": 1239,
    "group": " 확장_프로틴골드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "마시는샐러드내돈내산",
-   "imp": 5,
-   "clk": 1,
-   "cost": 1239,
-   "group": "확장_닥터샐러드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   },
@@ -678,7 +696,7 @@
   },
   {
    "term": "샐러드파우더",
-   "imp": 8,
+   "imp": 11,
    "clk": 1,
    "cost": 1224,
    "group": "확장_닥터샐러드_예산상승_1019",
@@ -687,7 +705,7 @@
   },
   {
    "term": "아침식사대용간편식",
-   "imp": 96,
+   "imp": 109,
    "clk": 1,
    "cost": 1219,
    "group": "확장_영양식_예산상승_1019",
@@ -705,28 +723,10 @@
   },
   {
    "term": "간단한아침",
-   "imp": 44,
+   "imp": 69,
    "clk": 1,
    "cost": 1207,
    "group": "확장_데일리생식_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "샐러드가루스틱야채운",
-   "imp": 1,
-   "clk": 1,
-   "cost": 1204,
-   "group": "확장_닥터샐러드_예산상승_1019",
-   "registered": false,
-   "relevance": "관련의심"
-  },
-  {
-   "term": "야채생식가루",
-   "imp": 2,
-   "clk": 1,
-   "cost": 1204,
-   "group": "확장_닥터샐러드_예산상승_1019",
    "registered": false,
    "relevance": "관련의심"
   }
